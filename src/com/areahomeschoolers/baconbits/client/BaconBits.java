@@ -1,3 +1,5 @@
+package com.areahomeschoolers.baconbits.client;
+
 import com.areahomeschoolers.baconbits.shared.FieldVerifier;
 
 import com.google.gwt.core.client.EntryPoint;
