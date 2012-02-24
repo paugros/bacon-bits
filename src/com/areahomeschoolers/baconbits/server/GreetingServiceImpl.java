@@ -1,7 +1,13 @@
 package com.areahomeschoolers.baconbits.server;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import com.areahomeschoolers.baconbits.client.GreetingService;
-import com.areahomeschoolers.baconbits.shared.FieldVerifier;
+
+import com.google.appengine.api.rdbms.AppEngineDriver;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
@@ -12,34 +18,21 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 
 	@Override
 	public String greetServer(String input) throws IllegalArgumentException {
-		// Verify that the input is valid. 
-		if (!FieldVerifier.isValidName(input)) {
-			// If the input is not valid, throw an IllegalArgumentException back to
-			// the client.
-			throw new IllegalArgumentException("Name must be at least 4 characters long");
+		try {
+			return runIt();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
-		String serverInfo = getServletContext().getServerInfo();
-		String userAgent = getThreadLocalRequest().getHeader("User-Agent");
-
-		// Escape data from the client to avoid cross-site script vulnerabilities.
-		input = escapeHtml(input);
-		userAgent = escapeHtml(userAgent);
-
-		return "Hello, " + input + "!<br><br>I am running " + serverInfo + ".<br><br>It looks like you are using:<br>" + userAgent;
+		return "";
 	}
 
-	/**
-	 * Escape an html string. Escaping data received from the client helps to
-	 * prevent cross-site script vulnerabilities.
-	 * 
-	 * @param html the html string to escape
-	 * @return the escaped string
-	 */
-	private String escapeHtml(String html) {
-		if (html == null) {
-			return null;
-		}
-		return html.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+	private String runIt() throws SQLException {
+		DriverManager.registerDriver(new AppEngineDriver());
+
+		Connection c = DriverManager.getConnection("jdbc:google:rdbms://baconbits-sql:areahomeschoolers/baconbits");
+		ResultSet rs = c.createStatement().executeQuery("select * from articles");
+		rs.next();
+		return rs.getString("title") + ": " + rs.getString("article");
 	}
 }
