@@ -31,7 +31,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		DriverManager.registerDriver(new AppEngineDriver());
 
 		Connection c = DriverManager.getConnection("jdbc:google:rdbms://baconbits-sql:areahomeschoolers/baconbits");
-		ResultSet rs = c.createStatement().executeQuery("select * from articles");
+		ResultSet rs = c.createStatement().executeQuery("select * from articles limit 1");
 		rs.next();
 		return rs.getString("title") + ": " + rs.getString("article");
 	}
