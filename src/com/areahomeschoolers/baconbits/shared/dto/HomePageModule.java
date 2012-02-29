@@ -1,20 +1,20 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
-public final class Tags extends EntityDto<Tags> {
+public final class HomePageModule extends EntityDto<HomePageModule> {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
-	private String tag;
+	private String name;
 
 	public String getType() {
-		return tag;
+		return name;
 	}
 
 	public void setType(String type) {
-		this.tag = type;
+		this.name = type;
 	}
 
 }

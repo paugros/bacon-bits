@@ -1,6 +1,6 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
-public final class ArticleTypes extends EntityDto<ArticleTypes> {
+public final class UserType extends EntityDto<UserType> {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {

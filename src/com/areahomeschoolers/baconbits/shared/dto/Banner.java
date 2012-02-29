@@ -2,20 +2,22 @@ package com.areahomeschoolers.baconbits.shared.dto;
 
 import java.util.Date;
 
-public final class Comments extends EntityDto<Comments> {
+public final class Banner extends EntityDto<Banner> {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
-	private String comment;
-	private int articleId;
-	private int userId;
+	private String bannerText;
+	private int locationId;
+
+	private int addedById;
+
 	private Date startDate, endDate, addedDate;
 
 	public int getAddedById() {
-		return userId;
+		return addedById;
 	}
 
 	public Date getAddedDate() {
@@ -23,7 +25,7 @@ public final class Comments extends EntityDto<Comments> {
 	}
 
 	public String getBannerText() {
-		return comment;
+		return bannerText;
 	}
 
 	public Date getEndDate() {
@@ -31,7 +33,7 @@ public final class Comments extends EntityDto<Comments> {
 	}
 
 	public int getLocationId() {
-		return articleId;
+		return locationId;
 	}
 
 	public Date getStartDate() {
@@ -39,7 +41,7 @@ public final class Comments extends EntityDto<Comments> {
 	}
 
 	public void setAddedById(int addedById) {
-		this.userId = addedById;
+		this.addedById = addedById;
 	}
 
 	public void setAddedDate(Date addedDate) {
@@ -47,7 +49,7 @@ public final class Comments extends EntityDto<Comments> {
 	}
 
 	public void setBannerText(String bannerText) {
-		this.comment = bannerText;
+		this.bannerText = bannerText;
 	}
 
 	public void setEndDate(Date endDate) {
@@ -55,7 +57,7 @@ public final class Comments extends EntityDto<Comments> {
 	}
 
 	public void setLocationId(int locationId) {
-		this.articleId = locationId;
+		this.locationId = locationId;
 	}
 
 	public void setStartDate(Date startDate) {
