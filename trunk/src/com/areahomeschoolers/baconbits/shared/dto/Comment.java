@@ -2,24 +2,20 @@ package com.areahomeschoolers.baconbits.shared.dto;
 
 import java.util.Date;
 
-public final class Documents extends EntityDto<Documents> {
+public final class Comment extends EntityDto<Comment> {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
-	private String description;
-	private String fileName;
-	private String fileType;
-	private String fileExtension;
-	private String document;
+	private String comment;
 	private int articleId;
-	private int addedById;
+	private int userId;
 	private Date startDate, endDate, addedDate;
 
 	public int getAddedById() {
-		return addedById;
+		return userId;
 	}
 
 	public Date getAddedDate() {
@@ -27,27 +23,11 @@ public final class Documents extends EntityDto<Documents> {
 	}
 
 	public String getBannerText() {
-		return description;
-	}
-
-	public String getDocument() {
-		return document;
+		return comment;
 	}
 
 	public Date getEndDate() {
 		return endDate;
-	}
-
-	public String getFileExtension() {
-		return fileExtension;
-	}
-
-	public String getFileName() {
-		return fileName;
-	}
-
-	public String getFileType() {
-		return fileType;
 	}
 
 	public int getLocationId() {
@@ -59,7 +39,7 @@ public final class Documents extends EntityDto<Documents> {
 	}
 
 	public void setAddedById(int addedById) {
-		this.addedById = addedById;
+		this.userId = addedById;
 	}
 
 	public void setAddedDate(Date addedDate) {
@@ -67,27 +47,11 @@ public final class Documents extends EntityDto<Documents> {
 	}
 
 	public void setBannerText(String bannerText) {
-		this.description = bannerText;
-	}
-
-	public void setDocument(String document) {
-		this.document = document;
+		this.comment = bannerText;
 	}
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
-	}
-
-	public void setFileExtension(String fileExtension) {
-		this.fileExtension = fileExtension;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	public void setFileType(String fileType) {
-		this.fileType = fileType;
 	}
 
 	public void setLocationId(int locationId) {

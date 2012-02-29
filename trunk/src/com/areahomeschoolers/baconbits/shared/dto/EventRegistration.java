@@ -2,38 +2,43 @@ package com.areahomeschoolers.baconbits.shared.dto;
 
 import java.util.Date;
 
-public final class Banners extends EntityDto<Banners> {
+public final class EventRegistration extends EntityDto<EventRegistration> {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
-	private String bannerText;
-	private int locationId;
+	private int peopleCount;
+	private String description;
 
-	private int addedById;
+	private int userId;
 
 	private Date startDate, endDate, addedDate;
+	private int eventId;
 
 	public int getAddedById() {
-		return addedById;
+		return userId;
 	}
 
 	public Date getAddedDate() {
 		return addedDate;
 	}
 
-	public String getBannerText() {
-		return bannerText;
+	public String getDescription() {
+		return description;
 	}
 
 	public Date getEndDate() {
 		return endDate;
 	}
 
-	public int getLocationId() {
-		return locationId;
+	public int getEventTypeId() {
+		return eventId;
+	}
+
+	public int getPeopleCount() {
+		return peopleCount;
 	}
 
 	public Date getStartDate() {
@@ -41,26 +46,31 @@ public final class Banners extends EntityDto<Banners> {
 	}
 
 	public void setAddedById(int addedById) {
-		this.addedById = addedById;
+		this.userId = addedById;
 	}
 
 	public void setAddedDate(Date addedDate) {
 		this.addedDate = addedDate;
 	}
 
-	public void setBannerText(String bannerText) {
-		this.bannerText = bannerText;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
 
-	public void setLocationId(int locationId) {
-		this.locationId = locationId;
+	public void setEventTypeId(int eventTypeId) {
+		this.eventId = eventTypeId;
+	}
+
+	public void setPeopleCount(int peopleCount) {
+		this.peopleCount = peopleCount;
 	}
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
+
 }
