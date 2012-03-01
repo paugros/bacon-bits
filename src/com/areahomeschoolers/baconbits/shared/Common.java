@@ -33,10 +33,10 @@ public abstract class Common {
 
 	private static final String[] PRIVATE_ALLOWED_UPLOAD_EXTENSIONS = { "jpeg", "jpg", "gif", "png", "csv", "xls", "xlsx", "doc", "docx", "pdf", "vsd", "tif",
 			"pcap", "zip", "txt", "htm", "html", "pcf", "vpl", "ppt", "pptx", "mpp", "cap", "wav", "bmp", "mp3" };
+
 	public static final List<String> ALLOWED_UPLOAD_EXTENSIONS = Collections.unmodifiableList(Arrays.asList(PRIVATE_ALLOWED_UPLOAD_EXTENSIONS));
 
 	private final static String EMAIL_VALIDATION_REGEX = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
-
 	public static final int MAX_DATA_ROWS = 2000;
 
 	/**
@@ -319,6 +319,26 @@ public abstract class Common {
 		}
 
 		return true;
+	}
+
+	public static boolean isIn(Integer value, Integer... list) {
+		for (Integer i : list) {
+			if (value == i) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static boolean isIn(String value, String... list) {
+		for (String compare : list) {
+			if (value.equals(compare)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
