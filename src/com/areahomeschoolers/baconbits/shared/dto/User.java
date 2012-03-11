@@ -35,6 +35,10 @@ public final class User extends EntityDto<User> {
 		return endDate;
 	}
 
+	public String getFullName() {
+		return firstName + " " + lastName;
+	}
+
 	public String getHomePhone() {
 		return homePhone;
 	}
