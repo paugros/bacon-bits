@@ -3,10 +3,14 @@ package com.areahomeschoolers.baconbits.client;
 import java.util.Date;
 import java.util.Map;
 
+import com.areahomeschoolers.baconbits.client.content.Layout;
+import com.areahomeschoolers.baconbits.client.generated.Factory;
+import com.areahomeschoolers.baconbits.client.generated.ReflectiveFactory;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.GenericEntity;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.NodeList;
@@ -22,14 +26,14 @@ import com.google.gwt.user.client.Window.ClosingHandler;
 public final class Application {
 
 	// private static SystemServiceAsync systemService;
-	// private static Layout layout;
+	private static Layout layout;
 	// private static final String DEFAULT_TOKEN = "page=Home";
-	// private static final Factory factory = (Factory) GWT.create(ReflectiveFactory.class);
+	private static final Factory factory = (Factory) GWT.create(ReflectiveFactory.class);
 	private static ApplicationData applicationData;
 	// private static boolean preserveSearchValues;
 	// private static boolean reloadBeforeNextPageLoad;
 	private static Command rpcFailureCommand;
-	public static final String APPLICATION_NAME = "Dash";
+	public static final String APPLICATION_NAME = "AHS";
 	// private static final int pollInterval = 60 * 1000;
 	// private static boolean pollIsPending = false;
 	// private static boolean pollImmediately = true;
@@ -56,13 +60,13 @@ public final class Application {
 		return applicationData.getCurrentUser();
 	}
 
-	// public static Factory getFactory() {
-	// return factory;
-	// }
-	//
-	// public static Layout getLayout() {
-	// return layout;
-	// }
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static Layout getLayout() {
+		return layout;
+	}
 
 	public static GenericEntity getLogoImage() {
 		return applicationData.getLogoImage();
@@ -82,10 +86,6 @@ public final class Application {
 
 	public static GenericEntity getUserPreferences() {
 		return applicationData.getUserPreferences();
-	}
-
-	public static boolean isLive() {
-		return applicationData.isLive();
 	}
 
 	// public static void printPage() {
@@ -137,12 +137,13 @@ public final class Application {
 	// HistoryToken.set(PageUrl.home());
 	// }
 
-	public static void setRpcFailureCommand(Command command) {
-		rpcFailureCommand = command;
+	public static boolean isLive() {
+		return applicationData.isLive();
 	}
 
-	public static void setTitle(String title) {
-		Window.setTitle(title + " - " + Application.APPLICATION_NAME);
+	public static void printPage() {
+		// TODO Auto-generated method stub
+
 	}
 
 	// private static void createNewPage(String page) {
@@ -189,9 +190,22 @@ public final class Application {
 	// preserveSearchValues = false;
 	// }
 
-	// private static void setLayout(Layout layout) {
-	// Application.layout = layout;
-	// }
+	public static void reloadPage() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public static void setRpcFailureCommand(Command command) {
+		rpcFailureCommand = command;
+	}
+
+	public static void setTitle(String title) {
+		Window.setTitle(title + " - " + Application.APPLICATION_NAME);
+	}
+
+	private static void setLayout(Layout layout) {
+		Application.layout = layout;
+	}
 
 	public Application(ApplicationData ap) {
 		// set session information
@@ -214,7 +228,7 @@ public final class Application {
 		// History.addValueChangeHandler(Application.this);
 
 		// initialize layout
-		// Application.setLayout(new Layout());
+		Application.setLayout(new Layout());
 
 		// initialize history
 		String initToken = History.getToken();
