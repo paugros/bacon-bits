@@ -5,14 +5,11 @@ import com.areahomeschoolers.baconbits.client.common.Common;
 import com.areahomeschoolers.baconbits.client.generated.Instantiable;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
-import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
 import com.areahomeschoolers.baconbits.shared.dto.SidebarEntity;
-import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
@@ -28,8 +25,8 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment.HorizontalAlignmentConstant;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -64,13 +61,13 @@ public final class Layout {
 	private static int sidebarWidth = DEFAULT_SIDEBAR_WIDTH;
 	private final MainLayoutDock dock = new MainLayoutDock(Unit.PX);
 	private final SearchBox searchBox;
-	private MainMenu menu;
+	private final MainMenu menu;
 	private final ScrollPanel sidePanel = new ScrollPanel();
 	private final Grid splitter = new Grid(1, 1);
 	private final Image arrow = new Image(MainImageBundle.INSTANCE.arrowLeft());
 	private final ScrollPanel bodyPanel = new ScrollPanel();
 	private final AbsolutePanel ap = new AbsolutePanel();
-	private final User currentUser = Application.getCurrentUser();
+	// private final User currentUser = Application.getCurrentUser();
 	private Widget sidebar;
 	private final SimplePanel logoPanel = new SimplePanel();
 	private boolean sbIsCollapsed = false;
@@ -82,7 +79,7 @@ public final class Layout {
 	private VerticalPanel currentPagePanel;
 	private final HorizontalPanel headerPanel;
 
-	private HorizontalPanel menuPanel;
+	private final HorizontalPanel menuPanel;
 
 	public Layout() {
 		headerPanel = new HorizontalPanel();
@@ -104,10 +101,10 @@ public final class Layout {
 		headerPanel.add(sessionPanel);
 
 		// user switching / user label
-		Hyperlink userLink = new Hyperlink(currentUser.getFullName(), PageUrl.user(currentUser.getId()));
+		// Hyperlink userLink = new Hyperlink(currentUser.getFullName(), PageUrl.user(currentUser.getId()));
 
-		userLink.addStyleName("nowrap");
-		sessionPanel.add(userLink);
+		// userLink.addStyleName("nowrap");
+		// sessionPanel.add(userLink);
 
 		ClickLabel logout = new ClickLabel("Log out", new MouseDownHandler() {
 			@Override
@@ -140,6 +137,11 @@ public final class Layout {
 		});
 		splitter.setStyleName("splitter");
 		splitter.setWidget(0, 0, arrow);
+
+		menu = new MainMenu();
+		menuPanel = new HorizontalPanel();
+		menuPanel.add(menu);
+		menuPanel.setCellWidth(menu, "100%");
 
 		dock.addStyleName("Dock");
 		dock.addNorth(headerPanel, HEADER_HEIGHT);
@@ -242,27 +244,27 @@ public final class Layout {
 	}
 
 	public void setLogoImage(Image image) {
-		Image defaultImage = getDefaultLogoImage();
-
-		PaddedPanel pp = new PaddedPanel();
-		pp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-
-		if (!Application.isLive() && !image.getUrl().equals(defaultImage.getUrl())) {
-			pp.add(defaultImage);
-		}
-
-		pp.add(image);
-
-		HTML logoDiv = new HTML("<a href=\"#" + PageUrl.home() + "\">" + pp + "</a>");
-		logoDiv.addMouseDownHandler(new MouseDownHandler() {
-			@Override
-			public void onMouseDown(MouseDownEvent event) {
-				// if ("Home".equals(HistoryToken.getElement("page"))) {
-				Application.reloadPage();
-				// }
-			}
-		});
-		logoPanel.setWidget(logoDiv);
+		// Image defaultImage = getDefaultLogoImage();
+		//
+		// PaddedPanel pp = new PaddedPanel();
+		// pp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		//
+		// if (!Application.isLive() && !image.getUrl().equals(defaultImage.getUrl())) {
+		// pp.add(defaultImage);
+		// }
+		//
+		// pp.add(image);
+		//
+		// HTML logoDiv = new HTML("<a href=\"#" + PageUrl.home() + "\">" + pp + "</a>");
+		// logoDiv.addMouseDownHandler(new MouseDownHandler() {
+		// @Override
+		// public void onMouseDown(MouseDownEvent event) {
+		// // if ("Home".equals(HistoryToken.getElement("page"))) {
+		// Application.reloadPage();
+		// // }
+		// }
+		// });
+		logoPanel.setWidget(new Label("Image goes here"));
 	}
 
 	public void setPage(String title, VerticalPanel page) {
@@ -371,7 +373,7 @@ public final class Layout {
 		bodyPanel.scrollToTop();
 	}
 
-	private Image getDefaultLogoImage() {
-		return new Image();
-	}
+	// private Image getDefaultLogoImage() {
+	// return new Image();
+	// }
 }

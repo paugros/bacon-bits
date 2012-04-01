@@ -1,0 +1,65 @@
+package com.areahomeschoolers.baconbits.client;
+
+import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
+import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
+import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
+
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+/**
+ * GWT Module EntryPoint that authenticates user and then loads Application in another code fragment
+ */
+public class BaconBitsEntryPoint implements EntryPoint {
+	private final LoginServiceAsync loginService = (LoginServiceAsync) GWT.create(LoginService.class);
+
+	@Override
+	public void onModuleLoad() {
+		loginService.getApplicationData(new AsyncCallback<ApplicationData>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Could not authenticate.", caught);
+			}
+
+			@Override
+			public void onSuccess(final ApplicationData ap) {
+				if (ap != null) {
+					initApplication(ap);
+				} else {
+					showLoginDialog();
+					return;
+				}
+			}
+		});
+
+	}
+
+	private void initApplication(final ApplicationData ap) {
+		GWT.runAsync(new RunAsyncCallback() {
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+
+			@Override
+			public void onSuccess() {
+				new Application(ap);
+			}
+		});
+
+	}
+
+	private void showLoginDialog() {
+		LoginDialog ld = new LoginDialog(loginService);
+		ld.setLoginHandler(new LoginHandler() {
+			@Override
+			public void onLogin(ApplicationData ap) {
+				initApplication(ap);
+			}
+		});
+		ld.center();
+	}
+}
