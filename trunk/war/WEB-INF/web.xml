@@ -7,15 +7,23 @@
 
   <display-name>BaconBits</display-name>
   
-  <!-- Servlets -->
-  <servlet>
-    <servlet-name>LoginService</servlet-name>
-    <servlet-class>com.areahomeschoolers.baconbits.server.service.LoginServiceImpl</servlet-class>
-  </servlet>
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>/WEB-INF/applicationContext.xml, /WEB-INF/applicationContext-security.xml</param-value>
+  </context-param>
   
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  
+  <servlet>
+    <servlet-name>dispatcher</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>  
   <servlet-mapping>
-    <servlet-name>LoginService</servlet-name>
-    <url-pattern>/baconbits/service/login</url-pattern>
+    <servlet-name>dispatcher</servlet-name>
+    <url-pattern>/baconbits/service/*</url-pattern>
   </servlet-mapping>
   
   <!-- Default page to serve -->
