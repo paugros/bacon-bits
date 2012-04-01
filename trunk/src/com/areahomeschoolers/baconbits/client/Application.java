@@ -4,13 +4,10 @@ import java.util.Date;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.content.Layout;
-import com.areahomeschoolers.baconbits.client.generated.Factory;
-import com.areahomeschoolers.baconbits.client.generated.ReflectiveFactory;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.GenericEntity;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.NodeList;
@@ -28,7 +25,6 @@ public final class Application {
 	// private static SystemServiceAsync systemService;
 	private static Layout layout;
 	// private static final String DEFAULT_TOKEN = "page=Home";
-	private static final Factory factory = (Factory) GWT.create(ReflectiveFactory.class);
 	private static ApplicationData applicationData;
 	// private static boolean preserveSearchValues;
 	// private static boolean reloadBeforeNextPageLoad;
@@ -58,10 +54,6 @@ public final class Application {
 
 	public static User getCurrentUser() {
 		return applicationData.getCurrentUser();
-	}
-
-	public static Factory getFactory() {
-		return factory;
 	}
 
 	public static Layout getLayout() {
