@@ -1,19 +1,21 @@
 package com.areahomeschoolers.baconbits.server.service;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
+import com.areahomeschoolers.baconbits.server.spring.GWTController;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 
-import com.google.appengine.api.rdbms.AppEngineDriver;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-
-public class LoginServiceImpl extends RemoteServiceServlet implements LoginService {
+@Controller
+@RequestMapping("/login")
+public class LoginServiceImpl extends GWTController implements LoginService {
 
 	private static final long serialVersionUID = 1L;
+
+	public LoginServiceImpl() {
+
+	}
 
 	@Override
 	public ApplicationData getApplicationData() {
@@ -35,11 +37,11 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 	}
 
-	private String runIt() throws SQLException {
-		DriverManager.registerDriver(new AppEngineDriver());
-		Connection c = DriverManager.getConnection("jdbc:google:rdbms://baconbits-sql:areahomeschoolers/baconbits");
-		ResultSet rs = c.createStatement().executeQuery("select * from articles limit 1");
-		rs.next();
-		return rs.getString("title") + ": " + rs.getString("article");
-	}
+	// private String runIt() throws SQLException {
+	// DriverManager.registerDriver(new AppEngineDriver());
+	// Connection c = DriverManager.getConnection("jdbc:google:rdbms://baconbits-sql:areahomeschoolers/baconbits");
+	// ResultSet rs = c.createStatement().executeQuery("select * from articles limit 1");
+	// rs.next();
+	// return rs.getString("title") + ": " + rs.getString("article");
+	// }
 }

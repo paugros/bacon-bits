@@ -1,12 +1,5 @@
 package com.areahomeschoolers.baconbits.server.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Properties;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,32 +43,6 @@ public class ServerContext implements ApplicationContextAware {
 		url += "/" + getGwtCodeServerAsQueryString();
 
 		return url;
-	}
-
-	public static Date getBuildDate() {
-		InputStream is = tl.get().servletContext.getResourceAsStream("/WEB-INF/ribeye.properties");
-		Properties props = new Properties();
-
-		try {
-			props.load(is);
-
-			return new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(props.getProperty("build.date"));
-		} catch (IOException e) {
-			return null;
-		} catch (ParseException e) {
-			return null;
-		}
-	}
-
-	public static int getBuildNumber() {
-		InputStream is = tl.get().servletContext.getResourceAsStream("/WEB-INF/ribeye.properties");
-		Properties props = new Properties();
-		try {
-			props.load(is);
-			return Integer.parseInt(props.getProperty("build.number"));
-		} catch (IOException e) {
-			return 0;
-		}
 	}
 
 	public static User getCurrentUser() {

@@ -7,17 +7,17 @@
   http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
 <http pattern="/*" security="none" />
-<http pattern="/ribeye/*" security="none" />
-<http pattern="/ribeye/images/**" security="none" />
-<http pattern="/ribeye/gwt/**" security="none" />
-<http pattern="/ribeye/service/login" security="none" />
-<http pattern="/ribeye/service/notAuthenticated" security="none" />
-<http pattern="/ribeye/service/public" security="none" />
+<http pattern="/baconbits/*" security="none" />
+<http pattern="/baconbits/images/**" security="none" />
+<http pattern="/baconbits/gwt/**" security="none" />
+<http pattern="/baconbits/service/login" security="none" />
+<http pattern="/baconbits/service/notAuthenticated" security="none" />
+<http pattern="/baconbits/service/public" security="none" />
 
 <!--
 <http>
-	<form-login login-page="/ribeye/service/notAuthenticated" />
-	<intercept-url pattern="/ribeye/service/billing**" access="ROLE_DSCI_DASH_USERS,ROLE_PORTAL_BILLING" />
+	<form-login login-page="/baconbits/service/notAuthenticated" />
+	<intercept-url pattern="/baconbits/service/billing**" access="ROLE_DSCI_DASH_USERS,ROLE_PORTAL_BILLING" />
 	
 	<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
 </http>
