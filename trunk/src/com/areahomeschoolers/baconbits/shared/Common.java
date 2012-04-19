@@ -37,6 +37,7 @@ public abstract class Common {
 	public static final List<String> ALLOWED_UPLOAD_EXTENSIONS = Collections.unmodifiableList(Arrays.asList(PRIVATE_ALLOWED_UPLOAD_EXTENSIONS));
 
 	private final static String EMAIL_VALIDATION_REGEX = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
+
 	public static final int MAX_DATA_ROWS = 2000;
 
 	/**
@@ -239,6 +240,10 @@ public abstract class Common {
 		}
 
 		return idList;
+	}
+
+	public static String getSimpleClassName(Class<?> c) {
+		return c.getName().substring(c.getName().lastIndexOf(".") + 1);
 	}
 
 	/**

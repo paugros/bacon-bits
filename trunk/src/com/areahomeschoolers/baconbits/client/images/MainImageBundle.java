@@ -49,6 +49,8 @@ public interface MainImageBundle extends ClientBundle {
 	@Source("file/zip.png")
 	ImageResource fileIconZip();
 
+	ImageResource logo();
+
 	ImageResource pixel();
 
 	ImageResource refresh();
@@ -62,5 +64,7 @@ public interface MainImageBundle extends ClientBundle {
 	ImageResource sortDescending();
 
 	ImageResource verticalDragHandle();
+
+	ImageResource yellowWarning();
 
 }

@@ -17,23 +17,11 @@ public class ApplicationData implements IsSerializable {
 	private LinkedHashMap<Integer, Date> userActivity;
 	private GenericEntity userPreferences;
 	private HashSet<EntityType> entityTypes;
-	private int buildNumber;
-	private Date buildDate;
-	private Date nextReleaseDate;
-	private GenericEntity logoImage;
 
 	private boolean isLive;
 
 	public ApplicationData() {
 
-	}
-
-	public Date getBuildDate() {
-		return buildDate;
-	}
-
-	public int getBuildNumber() {
-		return buildNumber;
 	}
 
 	public User getCurrentUser() {
@@ -46,14 +34,6 @@ public class ApplicationData implements IsSerializable {
 
 	public HashSet<EntityType> getEntityTypes() {
 		return entityTypes;
-	}
-
-	public GenericEntity getLogoImage() {
-		return logoImage;
-	}
-
-	public Date getNextReleaseDate() {
-		return nextReleaseDate;
 	}
 
 	public HashMap<String, GenericEntity> getNotificationEntityTypeColors() {
@@ -76,14 +56,6 @@ public class ApplicationData implements IsSerializable {
 		return isLive;
 	}
 
-	public void setBuildDate(Date buildDate) {
-		this.buildDate = buildDate;
-	}
-
-	public void setBuildNumber(int buildNumber) {
-		this.buildNumber = buildNumber;
-	}
-
 	public void setCurrentUser(User currentUser) {
 		this.currentUser = currentUser;
 	}
@@ -98,14 +70,6 @@ public class ApplicationData implements IsSerializable {
 
 	public void setLive(boolean isLive) {
 		this.isLive = isLive;
-	}
-
-	public void setLogoImage(GenericEntity logoImage) {
-		this.logoImage = logoImage;
-	}
-
-	public void setNextReleaseDate(Date nextReleaseDate) {
-		this.nextReleaseDate = nextReleaseDate;
 	}
 
 	public void setNotificationEntityTypeColors(HashMap<String, GenericEntity> notificationEntityTypeColors) {

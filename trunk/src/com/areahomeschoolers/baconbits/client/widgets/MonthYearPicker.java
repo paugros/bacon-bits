@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.areahomeschoolers.baconbits.shared.ClientDateUtils;
+import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
