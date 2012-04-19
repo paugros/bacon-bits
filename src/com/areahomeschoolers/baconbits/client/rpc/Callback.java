@@ -1,9 +1,9 @@
 package com.areahomeschoolers.baconbits.client.rpc;
 
 import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.client.common.Constants;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
+import com.areahomeschoolers.baconbits.shared.Constants;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

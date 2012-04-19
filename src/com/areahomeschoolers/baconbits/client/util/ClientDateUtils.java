@@ -1,10 +1,11 @@
-package com.areahomeschoolers.baconbits.shared;
+package com.areahomeschoolers.baconbits.client.util;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.shared.Constants;
+import com.areahomeschoolers.baconbits.shared.dto.Pair;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 
@@ -19,6 +20,7 @@ public abstract class ClientDateUtils {
 
 	private static DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy:MM:dd HH:mm:ss");
 	private static DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyy:MM:dd");
+	private static DateTimeFormat timeFormat = DateTimeFormat.getFormat("HH:mm:ss");
 	private static List<Date> holidays;
 
 	public static Date addDays(Date date, long amount) {
@@ -399,6 +401,47 @@ public abstract class ClientDateUtils {
 
 	public static Date setYear(Date date, int year) {
 		return dateTimeFormat.parse(year + dateTimeFormat.format(date).substring(4));
+	}
+
+	/**
+	 * This function will return a list of days t
+	 * 
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	public static List<Pair<Date, Date>> splitByDays(Date start, Date end) {
+		List<Pair<Date, Date>> ranges = new ArrayList<Pair<Date, Date>>();
+		if (isSameDay(start, end)) {
+			ranges.add(new Pair<Date, Date>(start, end));
+			return ranges;
+		}
+
+		long daysBetween = daysBetween(start, end);
+
+		// Compare the times without the dates
+		Date startTime = dateTimeFormat.parse("2000:01:01 " + timeFormat.format(start));
+		Date endTime = dateTimeFormat.parse("2000:01:01 " + timeFormat.format(end));
+		if (startTime.getTime() > endTime.getTime()) {
+			daysBetween++;
+		}
+
+		for (long i = 0; i <= daysBetween; i++) {
+			ranges.add(new Pair<Date, Date>());
+		}
+
+		ranges.get(0).setA(start);
+		ranges.get(ranges.size() - 1).setB(end);
+
+		for (long i = 0; i < daysBetween; i++) {
+			Date tempStart = setDayTime(addDays(start, i + 1), "00:00:00");
+			Date tempEnd = setDayTime(addDays(start, i + 1), "00:00:00");
+
+			ranges.get((int) i).setB(tempEnd);
+			ranges.get((int) i + 1).setA(tempStart);
+		}
+
+		return ranges;
 	}
 
 	public static Date subDays(Date date, long amount) {

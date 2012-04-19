@@ -16,6 +16,7 @@
 
   <!-- Other module inherits                                      -->
 
+  <stylesheet src="BaconBits.css" />
   <!-- Specify the app entry point class.                         -->
   <entry-point class="com.areahomeschoolers.baconbits.client.BaconBitsEntryPoint"></entry-point>
 

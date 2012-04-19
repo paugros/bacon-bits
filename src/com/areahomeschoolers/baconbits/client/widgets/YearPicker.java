@@ -2,7 +2,7 @@ package com.areahomeschoolers.baconbits.client.widgets;
 
 import java.util.Date;
 
-import com.areahomeschoolers.baconbits.shared.ClientDateUtils;
+import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;

@@ -1,14 +1,17 @@
 package com.areahomeschoolers.baconbits.client.content;
 
 import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.client.common.Common;
+import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.generated.Instantiable;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.SidebarEntity;
 
 import com.google.gwt.dom.client.Style.Overflow;
@@ -26,7 +29,6 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment.HorizontalAlignmentC
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -88,7 +90,21 @@ public final class Layout {
 
 		// logo
 		headerPanel.add(logoPanel);
-		resetLogoImage();
+		PaddedPanel pp = new PaddedPanel();
+		pp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+
+		pp.add(new Image(MainImageBundle.INSTANCE.logo()));
+
+		HTML logoDiv = new HTML("<a href=\"#" + PageUrl.home() + "\">" + pp + "</a>");
+		logoDiv.addMouseDownHandler(new MouseDownHandler() {
+			@Override
+			public void onMouseDown(MouseDownEvent event) {
+				if ("Home".equals(HistoryToken.getElement("page"))) {
+					Application.reloadPage();
+				}
+			}
+		});
+		logoPanel.setWidget(logoDiv);
 
 		SimplePanel spacer = new SimplePanel();
 		headerPanel.add(spacer);
@@ -140,6 +156,7 @@ public final class Layout {
 
 		menu = new MainMenu();
 		menuPanel = new HorizontalPanel();
+		menuPanel.setWidth("100%");
 		menuPanel.add(menu);
 		menuPanel.setCellWidth(menu, "100%");
 
@@ -219,10 +236,6 @@ public final class Layout {
 		ap.remove(w);
 	}
 
-	public void resetLogoImage() {
-		setLogoImage(null);
-	}
-
 	public void setHeaderVisible(boolean visible) {
 		if (visible == headerIsVisible) {
 			return;
@@ -241,30 +254,6 @@ public final class Layout {
 		dock.forceLayout();
 
 		headerIsVisible = visible;
-	}
-
-	public void setLogoImage(Image image) {
-		// Image defaultImage = getDefaultLogoImage();
-		//
-		// PaddedPanel pp = new PaddedPanel();
-		// pp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		//
-		// if (!Application.isLive() && !image.getUrl().equals(defaultImage.getUrl())) {
-		// pp.add(defaultImage);
-		// }
-		//
-		// pp.add(image);
-		//
-		// HTML logoDiv = new HTML("<a href=\"#" + PageUrl.home() + "\">" + pp + "</a>");
-		// logoDiv.addMouseDownHandler(new MouseDownHandler() {
-		// @Override
-		// public void onMouseDown(MouseDownEvent event) {
-		// // if ("Home".equals(HistoryToken.getElement("page"))) {
-		// Application.reloadPage();
-		// // }
-		// }
-		// });
-		logoPanel.setWidget(new Label("Image goes here"));
 	}
 
 	public void setPage(String title, VerticalPanel page) {
@@ -373,7 +362,4 @@ public final class Layout {
 		bodyPanel.scrollToTop();
 	}
 
-	// private Image getDefaultLogoImage() {
-	// return new Image();
-	// }
 }

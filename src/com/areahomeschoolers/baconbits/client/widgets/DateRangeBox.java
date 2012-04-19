@@ -2,10 +2,10 @@ package com.areahomeschoolers.baconbits.client.widgets;
 
 import java.util.Date;
 
+import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.validation.HasValidator;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
-import com.areahomeschoolers.baconbits.shared.ClientDateUtils;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
