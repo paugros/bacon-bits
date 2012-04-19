@@ -1,0 +1,1036 @@
+/** Add css rules here for your application. */
+
+
+/** Example rules used by the template application (remove for your app) */
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+  color: #777777;
+  margin: 40px 0px 70px;
+  text-align: center;
+}
+
+.sendButton {
+  display: block;
+  font-size: 16pt;
+}
+
+/** Most GWT widgets already have a style name defined */
+.gwt-DialogBox {
+  width: 400px;
+}
+
+.dialogVPanel {
+  margin: 5px;
+}
+
+.serverResponseLabelError {
+  color: red;
+}
+
+/** Set ids using widget.getElement().setId("idOfElement") */
+#closeButton {
+  margin: 15px 6px 6px;
+}
+
+html,body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+body,table td,select {
+	font-family: Arial Unicode MS, Arial, sans-serif;
+	font-size: small;
+}
+
+body {
+	color: black;
+	margin: 0px;
+	border: 0px;
+	padding: 0px;
+	background: #fff;
+	direction: ltr;
+}
+
+pre {
+	font-family: monospace
+}
+
+a,a:visited {
+	color: #1A4DA0;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #1A4DA0;
+	text-decoration: underline;
+}
+
+img {
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+
+/* -------------------------- CLASS/INSTANCE/PARTICULAR STYLES ---------------------------------- */
+/* styles in this section should be strongly associated with particular classes, instance */
+/* objects or use cases */
+.oldNamePanel {
+	margin-left: 10px;
+	color: #444444;
+}
+
+.businessCard {
+	background: url("images/cardBackground.png") repeat;
+	border: 1px solid #000000;
+}
+
+.businessCard .bottomPanel {
+	padding-top: 13px;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-bottom: 5px;
+}
+
+.businessCard .divider {
+	line-height: 2px;
+}
+
+.businessCard .topPanel {
+	padding-top: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-bottom: 0px;
+}
+
+.calendarToday {
+	background-color: #FFF7D7;
+	border: 1px solid #FFF7D7;
+}
+
+.calendarToday-selected {
+	border: 1px solid #FAD163;
+}
+
+.clickBox {
+	cursor: pointer;
+	padding: 1px 3px;
+	border: 1px solid #b0c4d6;
+	background: #d0e4f6;
+	margin-left: 1px;
+	margin-right: 1px;
+}
+
+.clickBox:hover {
+	background: white;
+}
+
+.ClickLabel {
+	color: #1A4DA0;
+	cursor: pointer;
+	text-decoration: none;
+	display: inline;
+}
+
+.headerPanel .ClickLabel, .headerPanel a {
+	
+}
+
+.ClickLabel:hover {
+	text-decoration: underline;
+}
+
+.ControlledRichTextArea {
+	
+}
+
+.ControlledRichTextArea .body {
+	background-color: #FFFFFF;
+}
+
+.developmentCycleTable {
+	border-collapse: collapse;
+}
+
+.developmentCycleTable td {
+	font-size: 10px;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: middle;
+	border: 1px solid black;
+	cursor: default;
+}
+
+.DataTable {
+	border-collapse: collapse;
+	background: #F8F8F8;
+}
+
+.DataTable td {
+	border: 1px solid #ACACAC;
+}
+
+.DataTable td table td {
+	border: none;
+}
+
+.DataTable .sortableTableHeaderCell {
+	background: url("images/backgrounds.png") repeat-x 0px -72px;
+	white-space: nowrap;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	border-bottom: 1px solid #333333;
+}
+
+.DataTable .sortableTableHeaderCell div {
+	color: #333333;
+	font-weight: bold;
+	padding-left: 2px;
+	padding-right: 2px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	white-space: nowrap;
+}
+
+.DataTable .flatTableHeaderRow,.DataTable .flatTableHeaderRow td,.DataTable .flatTableHeaderRow div {
+	background: none;
+	background-color: #E7F2FE;
+	color: #000000;
+}
+
+.DataTable .sortableTableHeaderRow {
+	cursor: pointer;
+}
+
+.DataTable .sortableTableFooterRow {
+	font-weight: bold;
+}
+
+.DataTable .selectCell {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.ctEvenRow, .ctEvenRow td {
+	background-color: #FFFFFF;
+}
+
+.ctOddRow, .ctOddRow td {
+	background-color: #F5F5F5;
+}
+
+.evenRow {
+	background-color: #FFFFFF;
+}
+
+.oddRow {
+	background-color: #F5F5F5;
+}
+
+
+.DataTable .leftColumn {
+	border-right: none;
+}
+
+.DataTable .middleColumn {
+	border-left: none;
+	border-right: none;
+}
+
+.DataTable .green {
+	background-color: #50FF50;
+}
+
+.DataTable .red {
+	background-color: #FF8080;
+}
+
+.DataTable .gold {
+	background-color: #FFFFA0;
+}
+
+.DataTable .rightColumn {
+	border-left: none;
+}
+
+.dottedUnderline {
+	border-bottom: 1px dotted #000000;
+}
+
+.DropDownMenu {
+	font-weight: bold;
+	cursor: hand;
+}
+
+.DropDownMenu-open,.DropDownMenu:hover {
+	background: #e2f2ff;
+}
+
+.DropDownMenu-popup {
+	background-color: white;
+	border: 2px solid #8CB3DF;
+	padding: 2px;
+}
+
+.DropDownMenu-popup .item {
+	padding: 4px;
+	color: black;
+	cursor: pointer;
+	text-decoration: none;
+	display: block;
+}
+
+.DropDownMenu-popup .item:hover {
+	background: #e3e8f3;
+}
+
+.selectedWidget {
+	background-color: #77B4E8;
+}
+
+.DataTable .totalCell {
+	background-color: #EDFFED;
+	/*
+	border-top: 1px solid #9EE699;
+	border-bottom: none;
+	border-left: none;
+	border-right: none;
+	*/
+}
+
+.DndVerticalPanel {
+	
+}
+
+.DndVerticalPanel .item {
+	border-spacing: 0px;
+	border-collapse: collapse;
+	margin-bottom: 2px;
+}
+
+.DndVerticalPanel .item .content {
+	background-color: #FFFFFF;
+}
+
+.DndVerticalPanel .item td {
+	padding: 0px;
+}
+
+.eavFormCell {
+	padding: 0px;
+}
+
+.eavFormTable {
+	padding: 0px;
+}
+
+.footer {
+	padding-bottom: 10px;
+	text-align: center;
+	color: #777777;
+}
+
+.FormField {
+	height: 28px;
+	border-collapse: collapse;
+}
+
+.FormField-disabled {
+	width: 400px;
+}
+
+.FormField-emancipated {
+	width: 400px;
+}
+
+.FormField-emancipated:hover {
+	background-color: #E0EFFF;
+}
+
+.FormField-editing {
+	background-color: #CFE5FF;
+}
+
+.GoogleMap {
+	
+}
+
+.GoogleMap .mapWidget {
+	border: 1px solid #666666;
+}
+
+.GoogleMap .mapErrors {
+	margin: 10px;
+}
+
+.globalDocumentRowEven, .globalDocumentRowEven td {
+	background-color: #F0FFF0;
+}
+
+.globalDocumentRowOdd, .globalDocumentRowOdd td {
+	background-color: #D0F5D0;
+}
+
+.hiddenHeader thead { 
+	display: none; 
+}
+
+.hiddenFooter tfoot { 
+	display: none; 
+}
+
+.homePage {
+}
+
+/* overrides style from gwt-dnd.css */
+.homePage .dragdrop-positioner {
+	border: 2px dashed #8094A6;
+}
+
+.HomePageModule {
+	padding: 8px;
+}
+
+.HomePageModule .body {
+	width: 100%;
+	background-color: #F8F8F8;
+}
+
+.verticalDragHandle {
+	background-color: #67A7E3;
+	vertical-align: middle;
+	border-right: 1px solid #67A7E3;
+	text-align: center;
+	font-size: 1px;
+	width: 10px;
+}
+
+.HomePageModule .titleBar {
+	padding: 0px;
+	border-spacing: 0px;
+	width: 100%;
+	background-color: #ACD3FF;
+	border: 1px solid #8CB3DF;
+}
+
+.HomePageModule .optionsSection {
+	width: 100%;
+	padding: 2px;
+	background-color: #ECF4FD;
+	border: 1px solid #BCC4CD;
+}
+
+.HomePageModule .TitleBar-section {
+	background-color: #ECF4FD;
+	border: 1px solid #BCC4CD;
+}
+
+.HomePageModule .dragBar {
+	padding: 2px 4px;
+	font-weight: bold;
+	white-space: nowrap;
+	width: 100%;
+}
+
+.HomePageModule .buttonPanel {
+	padding: 0px;
+	border-spacing: 0px;
+	margin: 0px;
+}
+
+.HomePageModule .button:hover {
+	background-color: white;
+}
+
+.listBoxTitleOption {
+	color: black;
+	background-color: #CCE2F8;
+	font-weight: bold;
+	width: 100%;
+}
+
+.MainLayoutDock .headerPanel {
+	width: 100%;
+	height: 100%;
+	background: url("images/backgrounds.png") repeat-x 0px 0px;
+}
+
+.MainLayoutDock .splitter {
+	width: 100%;
+	height: 100%;
+	padding: 0px;
+	border-spacing: 0px;
+	cursor: pointer;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.MainLayoutDock .splitter td {
+	background-color: white;
+	border-left: 1px solid #999999;
+}
+
+.MainLayoutDock .splitter:hover td {
+	background-color: #C9E2FC;
+}
+
+.MainLayoutDock .sidePanel {
+	background-color: #e3f1ff;
+	vertical-align: top;
+	width: 100%;
+}
+
+.MainLayoutDock .bodyPanel {
+	background-color: white;
+}
+
+.MainLayoutDock .page {
+	width: 100%;
+	vertical-align: top;
+}
+
+.notification {
+	color: white;
+	white-space: nowrap;
+	font-size: 10px;
+	padding-left: 2px;
+	padding-right: 2px;
+	text-align: center;
+}
+
+.notification-empty {
+	color: #DDDDDD;
+}
+
+.flag {
+	color: white;
+	width: 20px;
+	height: 13px;
+	border: 1px solid #000000;
+	cursor: pointer;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.colorPickerGrid {
+	border: 1px solid #71AB69;
+	border-left: none;
+}
+
+.colorPickerCell {
+	padding: 0px;
+	padding: 1px 2px;
+	width: 10px;
+	border-left: 1px solid #71AB69;
+	margin: 0px;
+	cursor: pointer;
+}
+
+.FlagPanel {
+	border-top: 1px solid #4a7fb0;
+	border-bottom: 1px solid #085ba6;
+	border-right: none;
+	border-left: none;
+	background: url("images/backgrounds.png") repeat-x 0px -52px;
+	color: white;
+	height: 16px;
+	padding-right: 5px;
+	padding-left: 5px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+.NotificationPanel {
+	border-top: 1px solid #4a7fb0;
+	border-bottom: 1px solid #085ba6;
+	border-right: none;
+	border-left: none;
+	background: url("images/backgrounds.png") repeat-x 0px -52px;
+	color: white;
+	height: 22px;
+	cursor: pointer;
+}
+
+.notificationDetailsPanel {
+	background-color: #FFFFFF;
+}
+
+.notificationAlertContent {
+	margin: 25px 25px 15px 15px;
+}
+
+.notificationAlertPanel {
+	border: 1px solid #F8E118;
+	vertical-align: middle;
+	background-color: #FCF3AA;
+}
+
+.menuLink,.menuLink:visited,.menuLink:hover {
+	color: black;
+	cursor: default;
+	display: block;
+	padding: 2px 7px 2px 1px;
+	text-decoration: none;
+}
+
+.kbPendingKGroupOwnerNotification {
+	background-color: #FF9900;
+	border: 1px solid #FF9900;
+}
+
+.orderPageAlerts {
+	background-color: #FF9900;
+	border: 1px solid #EE9900;
+}
+
+.percentageBar-blue {
+	background-color: #004DFF;
+	border: 1px solid #001DDF;
+}
+
+.percentageBar-empty {
+	background-color: #E5E5E5;
+	border: 1px solid #C5C5C5;
+}
+
+.percentageBar-green {
+	background-color: #008800;
+	border: 1px solid #005500;
+}
+
+.percentageBar-red {
+	background-color: #FF0000;
+	border: 1px solid #550000;
+}
+
+.percentageBar-leftBorder {
+	border-left: 3px solid black;
+}
+
+.percentageBar-yellow {
+	background-color: #F1B421;
+	border: 1px solid #805F11;
+}
+
+.sectionContent {
+	width: 100%;
+	padding: 6px 2px;
+	background: #F8F8F8;
+	border: 1px solid #ACACAC;
+	border-top: none;
+}
+
+.FormField .sectionContent {
+	padding: 0px;
+}
+
+.sectionContent .sectionContent, .dialogMiddleCenter .sectionContent {
+	background: transparent;
+	border: none;
+}
+
+.sectionContent .narrowLabelColumn {
+	width: 150px;
+	padding: 2px;
+}
+
+.sectionContent .noWidthLabelColumn {
+	padding: 2px;
+}
+
+.sectionContent .defaultLabelColumn {
+	width: 200px;
+	padding: 2px;
+}
+
+.sectionContent .wideLabelColumn {
+	width: 300px;
+	padding: 2px;
+}
+
+.sessionPanel {
+	padding-left: 20px;
+	padding-right: 10px;
+}
+
+.StatusPanel {
+	background-color: #FEF0A7;
+	border: 1px solid #FFCC35;
+	font-weight: bold;
+	padding: 4px;
+	position: fixed;
+	top: 1px;
+	left: 50%;
+	margin-left: -41px;
+}
+
+.tabPanel {
+	margin-top: 5px;
+}
+
+.tabPanel .borderlessTabBottom {
+	border-top: 3px solid #92C1F0;
+}
+
+.timeBoxOption { /* top right bottom left */
+	padding: 2px 0px 2px 10px;
+	width: 75px;
+	cursor: default;
+}
+
+.TitleBar {
+	font-weight: bold;
+	width: 100%;
+	padding: 0px;
+	padding-left: 1px;
+	padding-right: 1px;
+}
+
+.TitleBar-sidebar {
+	background-color: #ACD3FF;
+	border: 1px solid #8CB3DF;
+}
+
+.TitleBar-section {
+	background-color: #ACD3FF;
+	border: 1px solid #8CB3DF;
+}
+
+.TitleBar-subSection {
+	background-color: #ECF4FD;
+	border: 1px solid #BCC4CD;
+}
+
+.TitleBar .control {
+	cursor: pointer;
+}
+
+.customerBar {
+	font-weight: bold;
+	padding: 1px;
+	background-color: #C3F8CE;
+	border: 1px solid #93C89E;
+	color: black;
+}
+
+.customerBar-normal {
+	background-color: #bdf1c8;
+	color: black;
+	border: 1px solid #9DD1A8;
+}
+
+.customerBar-inactive {
+	background-color: #FBB9B9;
+	color: #7A1412;
+	border: 1px solid #DB9999;
+}
+
+.customerBar-overdue {
+	background-color: #B9BEFB;
+	color: #0C188F;
+	border: 1px solid #999EDB;
+}
+
+.rsHeading {
+	font-weight: bold;
+	border-bottom: 1px solid black;
+	border-top: 1px solid black;
+}
+
+/*  --------------------------------------- GENERAL STYLES --------------------------------------- */
+/* styles in this section should be broad and usually applied to any number/kind of elements */
+.activeText {
+	color: #007800;
+}
+
+.inactiveText {
+	color: #DA3838;
+}
+
+.centered {
+	text-align: center;
+	vertical-align: middle;
+	display: table-cell;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.italic {
+	font-style: italic;
+}
+
+.errorText, .errorText a {
+	color: #F04824;
+}
+
+.darkText {
+	color: #666666;
+}
+
+.fadedText {
+	color: #BBBBBB;
+}
+
+.strikeText {
+	text-decoration: line-through;
+}
+
+.smallText, .smallText a, .smallText p, .smallText div, .smallText span, .smallText td {
+	font-size: 10px;
+}
+
+.mediumText, .mediumText a, .mediumText p, .mediumText div, .mediumText span, .mediumText td {
+	font-size: 12px;
+}
+
+.largeText, .largeText a, .largeText p, .largeText div, .largeText span, .largeText td {
+	font-size: 14px;
+}
+
+.hugeText, .hugeText a, .hugeText p, .hugeText div, .hugeText span, .hugeText td {
+	font-size: 16px;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+.pointer {
+	cursor: pointer;
+}
+
+.printable {
+	width: 800px;
+	page-break-after: always;
+}
+
+.topAligned,.topAligned td {
+	vertical-align: top;
+}
+
+.lightPadding {
+	padding: 3px;
+}
+
+.mediumPadding {
+	padding: 6px;
+}
+
+.mediumHeavyPadding {
+	padding: 18px;
+}
+
+.heavyPadding {
+	padding: 20px;
+}
+
+/* ------------------------------------------------------- GWT OVERRIDES ------------------------------------------------------- */
+/* styles in this section should override styles in GWT's stylesheet or a stylesheet from another library */
+
+.dateBoxFormatError {
+	background-color: white;
+}
+
+.gwt-Button {
+	padding: 1px 5px 1px 5px;
+	-padding: 3px 5px;
+	background: url("images/hborder.png") repeat-x 0px -27px;
+}
+
+.gwt-DecoratorPanel {
+	width: 100%;
+}
+
+.gwt-DecoratorPanel .middleCenter {
+	height: 100%;
+	width: 100%;
+}
+
+.gwt-Hyperlink {
+	display: inline;
+}
+
+.gwt-MenuBar-horizontal {
+	border-top: 1px solid #4a7fb0;
+	border-bottom: 1px solid #085ba6;
+	border-right: none;
+	border-left: none;
+	background: url("images/backgrounds.png") repeat-x 0px -52px;
+	height: 20px;
+}
+	
+.gwt-MenuBar-horizontal .gwt-MenuItem {
+	padding: 0px 10px;
+	vertical-align: bottom;
+	font-weight: normal;
+	color: white;
+}
+
+.gwt-MenuBar-horizontal .gwt-MenuItem-selected {
+	color: black;
+}
+
+.gwt-TextBoxError {
+	border: 2px solid #F04824;
+}
+
+.gwt-TextBox, .gwt-PasswordTextBox {
+	padding: 2px;
+	font-family: Arial Unicode MS, Arial, sans-serif;
+}
+
+.gwt-TabPanelBottom {
+	padding: 0px;
+	border-color: #92c1f0;
+	border-style: solid;
+	border-width: 3px 2px 2px;
+	overflow: hidden;
+}
+
+.gwt-TabBar {
+	
+}
+
+.gwt-TabBar .gwt-TabBarFirst {
+	width: 5px; 
+}
+
+.gwt-TabBar .gwt-TabBarRest {
+	
+}
+
+.gwt-TabBar .gwt-TabBarItem {
+	margin-left: 6px;
+	padding: 3px 6px 3px 6px;
+	cursor: pointer;
+	cursor: hand;
+	color: black;
+	font-weight: bold;
+	text-align: center;
+	background: #d0e4f6;
+}
+
+.gwt-TabBar .gwt-TabBarItem-selected {
+	cursor: default;
+	background: #92c1f0;
+}
+
+.gwt-TabBar .gwt-TabBarItem-disabled {
+	cursor: default;
+	color: #999999;
+}
+
+.gwt-TabPanel {
+	
+}
+
+.gwt-DecoratedTabBar {
+	background: none repeat scroll 0 0 #FFFFFF;
+	padding-top: 0px;
+}
+
+.gwt-DecoratedTabBar .gwt-TabBarFirst {
+	width: 5px; 
+}
+
+.gwt-DecoratedTabBar .gwt-TabBarRest {
+	
+}
+
+.gwt-DecoratedTabBar .gwt-TabBarItem {
+	border-collapse: collapse;
+	margin-left: 6px;
+}
+
+.gwt-DecoratedTabBar .tabTopCenter {
+	padding: 0px;
+	background: #d0e4f6;
+}
+
+.gwt-DecoratedTabBar .tabTopLeft,.gwt-DecoratedTabBar .tabTopRight {
+	padding: 0px;
+	zoom: 1;
+}
+
+.gwt-DecoratedTabBar .tabTopLeftInner,.gwt-DecoratedTabBar .tabTopRightInner {
+	width: 6px;
+	height: 6px;
+}
+
+.gwt-DecoratedTabBar .tabTopLeft {
+	background: url(images/corner.png) no-repeat 0px -55px;
+	-background: url(images/corner_ie6.png) no-repeat 0px -55px;
+}
+
+.gwt-DecoratedTabBar .tabTopRight {
+	background: url(images/corner.png) no-repeat -6px -55px;
+	-background: url(images/corner_ie6.png) no-repeat -6px -55px;
+}
+
+* html .gwt-DecoratedTabBar .tabTopLeftInner,* html .gwt-DecoratedTabBar .tabTopRightInner {
+	width: 6px;
+	height: 6px;
+	overflow: hidden;
+}
+
+.gwt-DecoratedTabBar .tabMiddleLeft,.gwt-DecoratedTabBar .tabMiddleRight {
+	width: 6px;
+	padding: 0px;
+	background: #d0e4f6;
+}
+
+.gwt-DecoratedTabBar .tabMiddleLeftInner,.gwt-DecoratedTabBar .tabMiddleRightInner {
+	width: 1px;
+	height: 1px;
+}
+
+.gwt-DecoratedTabBar .tabMiddleCenter {
+	padding: 0px 4px 2px 4px;
+	cursor: pointer;
+	cursor: hand;
+	color: black;
+	font-weight: bold;
+	text-align: center;
+	background: #d0e4f6;
+}
+
+.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabTopCenter {
+	background: #92c1f0;
+}
+
+.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabTopLeft {
+	background: url(images/corner.png) no-repeat 0px -55px;
+	-background: url(images/corner_ie6.png) no-repeat 0px -55px;
+	background-position: 0px -61px;
+}
+
+.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabTopRight {
+	background: url(images/corner.png) no-repeat -6px -55px;
+	-background: url(images/corner_ie6.png) no-repeat -6px -55px;
+	background-position: -6px -61px;
+}
+
+.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabMiddleLeft,.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabMiddleRight {
+	background: #92c1f0;
+}
+
+.gwt-DecoratedTabBar .gwt-TabBarItem-selected .tabMiddleCenter {
+	cursor: default;
+	background: #92c1f0;
+}
+
+.gwt-DecoratedTabBar .gwt-TabBarItem-disabled .tabMiddleCenter {
+	cursor: default;
+	color: #999999;
+}
+
+.gwt-DateBox {
+	padding: 3px;
+}
+
+.gwt-SuggestBox {
+	padding: 3px;
+}
