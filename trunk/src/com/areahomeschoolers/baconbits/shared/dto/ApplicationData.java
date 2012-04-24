@@ -12,10 +12,10 @@ public class ApplicationData implements IsSerializable {
 	private User currentUser;
 
 	private HashMap<String, String> entityLinkers;
-	private ArrayList<GenericEntity> userLinks;
-	private HashMap<String, GenericEntity> notificationEntityTypeColors;
+	private ArrayList<Data> userLinks;
+	private HashMap<String, Data> notificationEntityTypeColors;
 	private LinkedHashMap<Integer, Date> userActivity;
-	private GenericEntity userPreferences;
+	private Data userPreferences;
 	private HashSet<EntityType> entityTypes;
 
 	private boolean isLive;
@@ -36,7 +36,7 @@ public class ApplicationData implements IsSerializable {
 		return entityTypes;
 	}
 
-	public HashMap<String, GenericEntity> getNotificationEntityTypeColors() {
+	public HashMap<String, Data> getNotificationEntityTypeColors() {
 		return notificationEntityTypeColors;
 	}
 
@@ -44,11 +44,11 @@ public class ApplicationData implements IsSerializable {
 		return userActivity;
 	}
 
-	public ArrayList<GenericEntity> getUserLinks() {
+	public ArrayList<Data> getUserLinks() {
 		return userLinks;
 	}
 
-	public GenericEntity getUserPreferences() {
+	public Data getUserPreferences() {
 		return userPreferences;
 	}
 
@@ -72,7 +72,7 @@ public class ApplicationData implements IsSerializable {
 		this.isLive = isLive;
 	}
 
-	public void setNotificationEntityTypeColors(HashMap<String, GenericEntity> notificationEntityTypeColors) {
+	public void setNotificationEntityTypeColors(HashMap<String, Data> notificationEntityTypeColors) {
 		this.notificationEntityTypeColors = notificationEntityTypeColors;
 	}
 
@@ -80,11 +80,11 @@ public class ApplicationData implements IsSerializable {
 		this.userActivity = userActivity;
 	}
 
-	public void setUserLinks(ArrayList<GenericEntity> userLinks) {
+	public void setUserLinks(ArrayList<Data> userLinks) {
 		this.userLinks = userLinks;
 	}
 
-	public void setUserPreferences(GenericEntity userPreferences) {
+	public void setUserPreferences(Data userPreferences) {
 		this.userPreferences = userPreferences;
 	}
 

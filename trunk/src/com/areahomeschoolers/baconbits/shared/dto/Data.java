@@ -9,42 +9,42 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 
-public final class GenericEntity extends EntityDto<GenericEntity> {
+public final class Data extends EntityDto<Data> {
 	private static final long serialVersionUID = 1L;
 	private HashMap<String, String> data = new HashMap<String, String>();
 	private HashMap<String, Date> dateData = new HashMap<String, Date>();
 	private String sortValue;
 
-	public GenericEntity() {
+	public Data() {
 
 	}
 
-	public GenericEntity(String key, boolean value) {
+	public Data(String key, boolean value) {
 		put(key, value);
 	}
 
-	public GenericEntity(String key, Date value) {
+	public Data(String key, Date value) {
 		put(key, value);
 	}
 
-	public GenericEntity(String key, double value) {
+	public Data(String key, double value) {
 		put(key, value);
 	}
 
-	public GenericEntity(String key, int value) {
+	public Data(String key, int value) {
 		put(key, value);
 	}
 
-	public GenericEntity(String key, long value) {
+	public Data(String key, long value) {
 		put(key, value);
 	}
 
-	public GenericEntity(String key, String value) {
+	public Data(String key, String value) {
 		put(key, value);
 	}
 
 	@Override
-	public int compareTo(GenericEntity that) {
+	public int compareTo(Data that) {
 		if (sortValue == null) {
 			return super.compareTo(that);
 		}
@@ -52,8 +52,8 @@ public final class GenericEntity extends EntityDto<GenericEntity> {
 		return sortValue.compareTo(that.getSortValue());
 	}
 
-	public GenericEntity copy() {
-		GenericEntity copy = new GenericEntity();
+	public Data copy() {
+		Data copy = new Data();
 		copy.data = new HashMap<String, String>(this.data);
 		copy.dateData = new HashMap<String, Date>(this.dateData);
 		copy.sortValue = (this.sortValue == null) ? null : new String(this.sortValue);
@@ -67,7 +67,7 @@ public final class GenericEntity extends EntityDto<GenericEntity> {
 			return super.equals(that);
 		}
 
-		return sortValue.equals(((GenericEntity) that).getSortValue());
+		return sortValue.equals(((Data) that).getSortValue());
 	}
 
 	public String get(String key) {
@@ -181,7 +181,7 @@ public final class GenericEntity extends EntityDto<GenericEntity> {
 		return data.put(key, value);
 	}
 
-	public void putAll(GenericEntity genericEntity) {
+	public void putAll(Data genericEntity) {
 		data.putAll(genericEntity.getData());
 		dateData.putAll(genericEntity.getDateData());
 	}

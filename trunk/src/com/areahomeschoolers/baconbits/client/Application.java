@@ -4,10 +4,11 @@ import java.util.Date;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.content.Layout;
+import com.areahomeschoolers.baconbits.client.content.home.HomePage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
-import com.areahomeschoolers.baconbits.shared.dto.GenericEntity;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -17,6 +18,7 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.Window.ClosingHandler;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
  * Application supplies access to main client systems: history, layout, session and factory.
@@ -49,7 +51,7 @@ public final class Application implements ValueChangeHandler<String> {
 		return applicationData.getUserActivity();
 	}
 
-	public static GenericEntity getUserPreferences() {
+	public static Data getUserPreferences() {
 		return applicationData.getUserPreferences();
 	}
 
@@ -70,9 +72,11 @@ public final class Application implements ValueChangeHandler<String> {
 	}
 
 	private static void createNewPage(String page) {
-		// create new page
-		if ("".equals(page)) {
+		VerticalPanel vp = layout.getNewPagePanel();
 
+		// create new page
+		if ("Home".equals(page)) {
+			new HomePage(vp);
 		} else if ("".equals(page)) {
 
 		} else {
