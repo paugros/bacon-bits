@@ -7,11 +7,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 public class DataSourceFactory {
 	public DataSource createDataSource() {
 		BasicDataSource ds = new BasicDataSource();
-		// try {
-		// Connection c = DriverManager.getConnection("jdbc:google:rdbms://baconbits-sql:areahomeschoolers/baconbits");
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// }
+		ds.setUrl("jdbc:google:rdbms://baconbits-sql:areahomeschoolers/baconbits");
 
 		return ds;
 	}

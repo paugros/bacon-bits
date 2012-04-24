@@ -36,12 +36,4 @@ public class LoginServiceImpl extends GWTController implements LoginService {
 	public void logout() {
 
 	}
-
-	// private String runIt() throws SQLException {
-	// DriverManager.registerDriver(new AppEngineDriver());
-	// Connection c = DriverManager.getConnection("jdbc:google:rdbms://baconbits-sql:areahomeschoolers/baconbits");
-	// ResultSet rs = c.createStatement().executeQuery("select * from articles limit 1");
-	// rs.next();
-	// return rs.getString("title") + ": " + rs.getString("article");
-	// }
 }

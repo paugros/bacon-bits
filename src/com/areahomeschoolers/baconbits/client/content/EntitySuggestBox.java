@@ -3,7 +3,7 @@ package com.areahomeschoolers.baconbits.client.content;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
 import com.areahomeschoolers.baconbits.client.widgets.ServerSuggestOracle;
-import com.areahomeschoolers.baconbits.shared.dto.GenericEntity;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -109,7 +109,7 @@ public class EntitySuggestBox extends Composite {
 		this.clearOnFocus = clearOnFocus;
 	}
 
-	public void setOptions(GenericEntity options) {
+	public void setOptions(Data options) {
 		oracle.setOptions(options);
 	}
 

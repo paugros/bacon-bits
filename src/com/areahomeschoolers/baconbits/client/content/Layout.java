@@ -24,8 +24,6 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment.HorizontalAlignmentConstant;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -211,31 +209,6 @@ public final class Layout {
 		return sbIsVisible;
 	}
 
-	public void positionOnPage(Widget w, int left, int top) {
-		int menuOffset = (menu == null) ? 0 : dock.getWidgetContainerElement(menuPanel).getClientHeight();
-		int headerOffset = dock.getWidgetContainerElement(headerPanel).getClientHeight() + menuOffset;
-		int sidebarOffset = dock.getWidgetContainerElement(sidePanel).getClientWidth() + dock.getWidgetContainerElement(splitter).getClientWidth();
-
-		ap.add(w, left + bodyPanel.getHorizontalScrollPosition() - sidebarOffset, top + bodyPanel.getVerticalScrollPosition() - headerOffset);
-	}
-
-	public void positionRelativeTo(Widget add, Widget relative, HorizontalAlignmentConstant alignment) {
-		ap.add(add, 0, 0);
-
-		int left = relative.getAbsoluteLeft();
-		int top = relative.getAbsoluteTop();
-
-		if (alignment == HasHorizontalAlignment.ALIGN_RIGHT) {
-			left += relative.getOffsetWidth() - add.getOffsetWidth();
-		}
-
-		positionOnPage(add, left, top + relative.getOffsetHeight());
-	}
-
-	public void removePositionOnPage(Widget w) {
-		ap.remove(w);
-	}
-
 	public void setHeaderVisible(boolean visible) {
 		if (visible == headerIsVisible) {
 			return;
@@ -347,7 +320,7 @@ public final class Layout {
 	}
 
 	private void addPageToBodyPanel(String title, VerticalPanel page) {
-		HTML footer = new HTML("&copy; 2005-2012 DSCI Corporation. All rights reserved. Proprietary & Confidential.");
+		HTML footer = new HTML("&copy; 2005-2012 Weare Home Educators. All rights reserved. Proprietary & Confidential.");
 		footer.setStylePrimaryName("footer");
 
 		VerticalPanel vp = new VerticalPanel();

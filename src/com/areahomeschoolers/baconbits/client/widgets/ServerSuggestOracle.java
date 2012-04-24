@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.areahomeschoolers.baconbits.shared.dto.GenericEntity;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 import com.google.gwt.user.client.ui.SuggestOracle;
 
@@ -171,9 +171,9 @@ public class ServerSuggestOracle extends SuggestOracle {
 		this.enabled = enabled;
 	}
 
-	public void setOptions(GenericEntity options) {
+	public void setOptions(Data options) {
 		if (options == null) {
-			options = new GenericEntity();
+			options = new Data();
 		}
 		// this.options = options;
 	}
