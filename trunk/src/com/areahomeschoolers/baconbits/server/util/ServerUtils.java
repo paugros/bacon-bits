@@ -28,7 +28,6 @@ import org.w3c.dom.NodeList;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
-import com.microsoft.sqlserver.jdbc.SQLServerException;
 
 /**
  * A repository of useful static methods, constants, etc. for use only on the server side
@@ -46,7 +45,7 @@ public abstract class ServerUtils {
 				String value = (rs.getObject(columnIndex) == null) ? null : rs.getObject(columnIndex).toString();
 				try {
 					row.put(meta.getColumnName(columnIndex), rs.getDate(columnIndex));
-				} catch (SQLServerException e) {
+				} catch (Exception e) {
 					row.put(meta.getColumnName(columnIndex), value);
 				}
 			}
