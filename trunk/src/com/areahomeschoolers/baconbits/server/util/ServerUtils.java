@@ -20,7 +20,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.w3c.dom.Document;
@@ -37,8 +36,6 @@ import com.microsoft.sqlserver.jdbc.SQLServerException;
 public abstract class ServerUtils {
 
 	public static final String SQL_TOP_CLAUSE = "top " + (Common.MAX_DATA_ROWS + 1);
-
-	private static final Logger logger = Logger.getLogger(ServerUtils.class);
 
 	private final static RowMapper<Data> genericDateRowMapper = new RowMapper<Data>() {
 		@Override
@@ -100,7 +97,6 @@ public abstract class ServerUtils {
 		try {
 			stream = url.openStream();
 		} catch (IOException e) {
-			logger.error("Could not open stream for " + url, e);
 		}
 		try {
 			Document document = null;
@@ -115,14 +111,12 @@ public abstract class ServerUtils {
 
 				document = builder.parse(stream);
 			} catch (Exception e) {
-				logger.error("Could not parse response from " + url, e);
 			}
 			return document;
 		} finally {
 			try {
 				stream.close();
 			} catch (IOException e) {
-				logger.error("Could not close connection to " + url, e);
 			}
 		}
 	}
