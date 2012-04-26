@@ -11,7 +11,6 @@ public abstract class EntityDto<T extends EntityDto<T>> implements HasId, IsSeri
 	private static final long serialVersionUID = 1L;
 	public static final String DEFAULT_NEW_DESCRIPTOR = "New";
 	private int id;
-	private static int nextDefaultId = 1;
 
 	@Override
 	public int compareTo(T that) {
@@ -89,10 +88,6 @@ public abstract class EntityDto<T extends EntityDto<T>> implements HasId, IsSeri
 
 	public boolean isSaved() {
 		return getId() > 0;
-	}
-
-	public void setDefaultId() {
-		this.id = ++nextDefaultId;
 	}
 
 	@Override
