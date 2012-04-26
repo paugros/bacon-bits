@@ -2,7 +2,7 @@ package com.areahomeschoolers.baconbits.client.rpc.service;
 
 import java.util.ArrayList;
 
-import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -12,5 +12,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("service/article")
 public interface ArticleService extends RemoteService {
-	public ArrayList<Data> getArticles();
+	public ArrayList<Article> getArticles();
 }

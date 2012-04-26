@@ -22,7 +22,7 @@ public final class Article extends EntityDto<Article> {
 		return addedDate;
 	}
 
-	public String getDescription() {
+	public String getArticle() {
 		return article;
 	}
 
@@ -46,8 +46,8 @@ public final class Article extends EntityDto<Article> {
 		this.addedDate = addedDate;
 	}
 
-	public void setDescription(String description) {
-		this.article = description;
+	public void setArticle(String article) {
+		this.article = article;
 	}
 
 	public void setEndDate(Date endDate) {

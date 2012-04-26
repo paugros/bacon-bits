@@ -8,7 +8,7 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
-import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -20,11 +20,11 @@ public class HomePage implements Page {
 	public HomePage(VerticalPanel p) {
 		page = p;
 
-		articleService.getArticles(new Callback<ArrayList<Data>>() {
+		articleService.getArticles(new Callback<ArrayList<Article>>() {
 			@Override
-			protected void doOnSuccess(ArrayList<Data> result) {
-				for (Data item : result) {
-					page.add(new Label(item.get("title") + ": " + item.get("article")));
+			protected void doOnSuccess(ArrayList<Article> result) {
+				for (Article item : result) {
+					page.add(new Label(item.getTitle() + ": " + item.getArticle()));
 				}
 
 				Application.getLayout().setPage("Home", page);
