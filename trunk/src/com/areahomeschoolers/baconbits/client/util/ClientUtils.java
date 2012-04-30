@@ -61,6 +61,27 @@ public abstract class ClientUtils {
 		return ret;
 	}
 
+	public static void exportCsvFile(String name, String fileData) {
+		// DocumentServiceAsync documentService = (DocumentServiceAsync) ServiceCache.getService(DocumentService.class);
+		//
+		// Document document = new Document();
+		// document.setSystemDocument(true);
+		// document.setStringData(fileData);
+		// document.setFileExtension("csv");
+		// document.setDescription("__TEMPORARY_CSV_FILE__");
+		// document.setFileName(name + ".csv");
+		// document.setFileType("application/vnd.ms-excel");
+		// document.setAddedById(Application.getCurrentUser().getId());
+		//
+		// documentService.save(document, new Callback<Document>(false) {
+		// @Override
+		// protected void doOnSuccess(Document doc) {
+		// String url = "/ribeye/service/file?id=" + doc.getId() + "&deleteAfterServing=1";
+		// Window.Location.replace(url);
+		// }
+		// });
+	}
+
 	// public static void downloadExcelFile(String title, String data) {
 	// DocumentServiceAsync documentService = (DocumentServiceAsync) ServiceCache.getService(DocumentService.class);
 	//

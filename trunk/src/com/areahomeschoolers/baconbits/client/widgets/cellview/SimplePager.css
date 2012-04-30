@@ -1,0 +1,13 @@
+@CHARSET "ISO-8859-1";
+
+.pageDetails {
+	padding: 0px, 3px;
+	text-align: center;
+}
+
+.button {
+	padding: 0px 1px 0px 0px;
+}
+
+.disabledButton {
+}

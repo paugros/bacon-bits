@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.content.Layout;
+import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
 import com.areahomeschoolers.baconbits.client.content.home.HomePage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
@@ -77,8 +78,8 @@ public final class Application implements ValueChangeHandler<String> {
 		// create new page
 		if ("Home".equals(page)) {
 			new HomePage(vp);
-		} else if ("".equals(page)) {
-
+		} else if ("Article".equals(page)) {
+			new ArticlePage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

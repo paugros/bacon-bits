@@ -2,6 +2,9 @@ package com.areahomeschoolers.baconbits.client.util;
 
 import java.util.Date;
 
+import com.areahomeschoolers.baconbits.client.HistoryToken;
+import com.areahomeschoolers.baconbits.shared.Common;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -53,22 +56,7 @@ public class Url {
 	}
 
 	public static boolean getBooleanParameter(String token) {
-		// return Boolean.parseBoolean(HistoryToken.getElement(token));
-		return false;
-	}
-
-	public static String getCustomerUrlSegment() {
-		int accountId = accountId();
-		int customerId = customerId();
-
-		if (accountId > 0) {
-			// return "&accountId=" + HistoryToken.getElement("accountId");
-		} else if (customerId > 0) {
-			// return "&customerId=" + HistoryToken.getElement("customerId");
-		} else {
-			return "";
-		}
-		return "";
+		return Boolean.parseBoolean(HistoryToken.getElement(token));
 	}
 
 	public static DateTimeFormat getDateFormat() {
@@ -76,17 +64,17 @@ public class Url {
 	}
 
 	public static Date getDateParameter(String token) {
-		// String value = HistoryToken.getElement(token);
-		// if (Common.isNullOrBlank(value)) {
-		// return null;
-		// }
+		String value = HistoryToken.getElement(token);
+		if (Common.isNullOrBlank(value)) {
+			return null;
+		}
 
-		// try {
-		// return dateFormat.parse(value);
-		// } catch (IllegalArgumentException e) {
-		// return null;
-		// }
-		return null;
+		try {
+			return dateFormat.parse(value);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+
 	}
 
 	/**
@@ -104,16 +92,15 @@ public class Url {
 	}
 
 	public static int getIntegerParameter(String token) {
-		// String value = HistoryToken.getElement(token);
-		// if (Common.isInteger(value)) {
-		// return Integer.parseInt(value);
-		// }
+		String value = HistoryToken.getElement(token);
+		if (Common.isInteger(value)) {
+			return Integer.parseInt(value);
+		}
 		return -1;
 	}
 
 	public static String getParam(String token) {
-		// return HistoryToken.getElement(token);
-		return "";
+		return HistoryToken.getElement(token);
 	}
 
 	public static boolean isParamValidId(String token) {

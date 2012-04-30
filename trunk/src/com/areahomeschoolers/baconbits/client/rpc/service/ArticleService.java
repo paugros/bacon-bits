@@ -13,4 +13,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("service/article")
 public interface ArticleService extends RemoteService {
 	public ArrayList<Article> getArticles();
+
+	public Article getById(int articleId);
+
+	public Article save(Article article);
 }

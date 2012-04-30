@@ -783,15 +783,15 @@ img {
 }
 
 .mediumText, .mediumText a, .mediumText p, .mediumText div, .mediumText span, .mediumText td {
-	font-size: 12px;
-}
-
-.largeText, .largeText a, .largeText p, .largeText div, .largeText span, .largeText td {
 	font-size: 14px;
 }
 
+.largeText, .largeText a, .largeText p, .largeText div, .largeText span, .largeText td {
+	font-size: 18px;
+}
+
 .hugeText, .hugeText a, .hugeText p, .hugeText div, .hugeText span, .hugeText td {
-	font-size: 16px;
+	font-size: 22px;
 }
 
 .nowrap {
