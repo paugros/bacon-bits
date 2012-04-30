@@ -8,8 +8,8 @@ public class DataSourceFactory {
 	public DataSource createDataSource() {
 		BasicDataSource ds = new BasicDataSource();
 		ds.setUrl("jdbc:google:rdbms://baconbits-sql:areahomeschoolers/baconbits");
-		ds.setMaxActive(1);
-		ds.setMaxIdle(1);
+		ds.setValidationQuery("select max(id) from articles");
+		ds.setTestWhileIdle(true);
 		ds.setTestOnBorrow(true);
 
 		return ds;

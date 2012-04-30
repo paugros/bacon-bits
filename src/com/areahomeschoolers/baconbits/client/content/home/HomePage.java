@@ -8,9 +8,11 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class HomePage implements Page {
@@ -24,7 +26,12 @@ public class HomePage implements Page {
 			@Override
 			protected void doOnSuccess(ArrayList<Article> result) {
 				for (Article item : result) {
-					page.add(new Label(item.getTitle() + ": " + item.getArticle()));
+					VerticalPanel vp = new VerticalPanel();
+					Hyperlink title = new Hyperlink(item.getTitle(), PageUrl.article(item.getId()));
+					title.addStyleName("hugeText");
+					vp.add(title);
+					vp.add(new HTML(item.getArticle()));
+					page.add(vp);
 				}
 
 				Application.getLayout().setPage("Home", page);

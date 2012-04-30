@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -66,6 +67,7 @@ public final class MainMenu extends MenuBar {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Our Homeschool Corner", "");
 		addLinkToMenu(menu, "Latest Newsletter", "");
+		addLinkToMenu(menu, "Add Article", PageUrl.article(0));
 
 		return menu;
 	}
