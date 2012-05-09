@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 /**
@@ -103,14 +104,10 @@ public class ServerContext implements ApplicationContextAware {
 	 *            Authenticated user's username
 	 */
 	public static void setCurrentUser(String username) {
-		// UserDao userDao = (UserDao) ctx.getBean("userDaoImpl");
-		// User u = userDao.getUserByUsername(username);
-		//
-		// u.setCanSwitch(u.memberOf(Group.APPLICATIONS_DEVELOPMENT));
-		// u.setOriginalUserId(u.getId());
-		// u.setOriginalEmail(u.getEmail());
-		//
-		// tl.get().request.getSession().setAttribute("user", u);
+		UserService userService = (UserService) ctx.getBean("userServiceImpl");
+		User u = userService.getUserByUsername(username);
+
+		tl.get().request.getSession().setAttribute("user", u);
 	}
 
 	public static void unloadContext() {

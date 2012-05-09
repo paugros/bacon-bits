@@ -11,6 +11,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,17 +30,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 		RowMapper<User> mapper = new RowMapper<User>() {
 			@Override
 			public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-				return new User(rs.getString("Login"), rs.getString("PasswordDigest"), rs.getBoolean("IsEnabled"), rs.getBoolean("IsEnabled"), true, true,
+				return new User(rs.getString("email"), rs.getString("passwordDigest"), rs.getBoolean("isEnabled"), rs.getBoolean("isEnabled"), true, true,
 						getAuthorities(rs));
 			}
 		};
 
 		User user;
 
-		String sql = "select top 1 u.ID, u.Login, u.PasswordDigest, u.CustomerID, u.VendorID, u.IsPortalSuperUser, ";
-		sql += "dbo.IsActive(u.StartDate, u.EndDate, getdate()) as IsEnabled from dbo.Users u ";
-		sql += "where u.Login = ? and PasswordDigest is not null";
+		String sql = "select u.id, u.email, u.passwordDigest, ";
+		sql += "isActive(u.StartDate, u.EndDate) as isEnabled from users u ";
+		sql += "where u.email = ? and u.passwordDigest is not null limit 1";
 
 		try {
 			user = sjt.queryForObject(sql, mapper, username);
@@ -57,6 +57,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	private List<GrantedAuthority> getAuthorities(ResultSet rs) throws SQLException {
 		List<GrantedAuthority> authList = new ArrayList<GrantedAuthority>();
+		authList.add(new SimpleGrantedAuthority("ROLE_BASIC_USER"));
 
 		return authList;
 	}

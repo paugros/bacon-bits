@@ -14,25 +14,29 @@ public final class User extends EntityDto<User> {
 	private String lastName;
 	private String passwordDigest;
 	private String homePhone;
+	// only for setting
+	private String password;
 	private String mobilePhone;
 	private int userTypeId;
+	private boolean active;
+	private boolean resetPassword;
 
 	private Date startDate, endDate, addedDate, lastLoginDate;
-
-	public int getAddedById() {
-		return userTypeId;
-	}
 
 	public Date getAddedDate() {
 		return addedDate;
 	}
 
-	public String getDescription() {
-		return firstName;
+	public String getEmail() {
+		return email;
 	}
 
 	public Date getEndDate() {
 		return endDate;
+	}
+
+	public String getFirstName() {
+		return firstName;
 	}
 
 	public String getFullName() {
@@ -55,32 +59,48 @@ public final class User extends EntityDto<User> {
 		return mobilePhone;
 	}
 
+	public String getPassword() {
+		return password;
+	}
+
 	public String getPasswordDigest() {
 		return passwordDigest;
+	}
+
+	public boolean getResetPassword() {
+		return resetPassword;
 	}
 
 	public Date getStartDate() {
 		return startDate;
 	}
 
-	public String getTitle() {
-		return email;
+	public int getUserTypeId() {
+		return userTypeId;
 	}
 
-	public void setAddedById(int addedById) {
-		this.userTypeId = addedById;
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 	public void setAddedDate(Date addedDate) {
 		this.addedDate = addedDate;
 	}
 
-	public void setDescription(String description) {
-		this.firstName = description;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
 	public void setHomePhone(String homePhone) {
@@ -99,16 +119,24 @@ public final class User extends EntityDto<User> {
 		this.mobilePhone = mobilePhone;
 	}
 
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 	public void setPasswordDigest(String passwordDigest) {
 		this.passwordDigest = passwordDigest;
+	}
+
+	public void setResetPassword(boolean resetPassword) {
+		this.resetPassword = resetPassword;
 	}
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 
-	public void setTitle(String title) {
-		this.email = title;
+	public void setUserTypeId(int userTypeId) {
+		this.userTypeId = userTypeId;
 	}
 
 }

@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -65,6 +66,7 @@ public class ArticleServiceImpl extends GWTController implements ArticleService 
 		return wrapper.queryForObject(sql, new ArticleMapper(), articleId);
 	}
 
+	@PreAuthorize("hasRole('ROLE_BASIC_USER')")
 	@Override
 	public Article save(Article article) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(article);

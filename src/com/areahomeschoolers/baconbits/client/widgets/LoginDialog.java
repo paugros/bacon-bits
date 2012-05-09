@@ -15,7 +15,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Grid;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
@@ -36,7 +35,7 @@ public class LoginDialog extends DialogBox {
 	private final Button submit;
 	private LoginHandler loginHandler;
 	private final boolean sessionExpired;
-	private static final String TITLE = "Dash - DSCI Portal";
+	private static final String TITLE = "AHS - Area Homeschoolers";
 	private static final String BAD_CREDENTIALS = "The username or password you entered is incorrect.";
 	private static final String SESSION_EXPIRED = "Your session has expired.  Please sign in again.";
 	private static boolean isShown;
@@ -72,6 +71,17 @@ public class LoginDialog extends DialogBox {
 			}
 		});
 
+		Button cancel = new Button("Cancel", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				hide();
+			}
+		});
+
+		PaddedPanel padded = new PaddedPanel();
+		padded.add(submit);
+		padded.add(cancel);
+
 		KeyDownHandler kdh = new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
@@ -92,7 +102,7 @@ public class LoginDialog extends DialogBox {
 
 		Grid g = new Grid(3, 2);
 		g.setCellPadding(5);
-		g.setWidget(0, 0, new Label("Username:"));
+		g.setWidget(0, 0, new Label("Email:"));
 		g.setWidget(0, 1, usernameInput);
 		Label pl = new Label("Password:");
 		pl.getElement().getStyle().setPaddingTop(3, Unit.PX);
@@ -103,21 +113,13 @@ public class LoginDialog extends DialogBox {
 		} else {
 			g.setWidget(1, 1, pp);
 		}
-		g.setWidget(2, 1, submit);
+		g.setWidget(2, 1, padded);
 		g.getCellFormatter().setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_LEFT);
 		g.getCellFormatter().setHorizontalAlignment(0, 1, HasHorizontalAlignment.ALIGN_LEFT);
 		g.getCellFormatter().setHorizontalAlignment(1, 0, HasHorizontalAlignment.ALIGN_LEFT);
 		g.getCellFormatter().setHorizontalAlignment(1, 1, HasHorizontalAlignment.ALIGN_LEFT);
 		g.getCellFormatter().setHorizontalAlignment(2, 1, HasHorizontalAlignment.ALIGN_LEFT);
 		vp.add(g);
-
-		String html = "All login attempts and sessions are logged. Please refer to our ";
-		html += "<a href=\"http://www.dscicorp.com/wua.php\">online usage</a> policies for more information.<br><br>";
-		html += "&copy; 2005-2012 DSCI Corporation. All rights reserved. Proprietary & Confidential.  For more information, visit ";
-		html += "<a href=\"http://www.dscicorp.com/\">www.dscicorp.com</a>.";
-		HTML legal = new HTML(html);
-		legal.setStyleName("smallText");
-		vp.add(legal);
 
 		setWidget(vp);
 	}
