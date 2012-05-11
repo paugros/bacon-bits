@@ -12,6 +12,7 @@ public class DataSourceFactory {
 		ds.setTestWhileIdle(true);
 		ds.setTestOnBorrow(true);
 		ds.setInitialSize(1);
+		ds.setMinIdle(1);
 
 		return ds;
 	}
