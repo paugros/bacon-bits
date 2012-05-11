@@ -11,6 +11,7 @@ public class DataSourceFactory {
 		ds.setValidationQuery("select max(id) from articles");
 		ds.setTestWhileIdle(true);
 		ds.setTestOnBorrow(true);
+		ds.setInitialSize(1);
 
 		return ds;
 	}
