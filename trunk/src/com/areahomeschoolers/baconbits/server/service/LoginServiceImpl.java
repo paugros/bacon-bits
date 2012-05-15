@@ -94,6 +94,7 @@ public class LoginServiceImpl extends GWTController implements LoginService {
 
 	@Override
 	public void logout() {
+		ServerContext.setCurrentUser(null);
 		ServerContext.getSession().setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, null);
 		SecurityContextHolder.clearContext();
 	}

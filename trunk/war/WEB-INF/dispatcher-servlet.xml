@@ -10,4 +10,6 @@
        
   <context:component-scan base-package="com.areahomeschoolers.baconbits.server.service" />
   <context:component-scan base-package="com.areahomeschoolers.baconbits.server.util" />
+  <context:annotation-config />
+  <security:global-method-security pre-post-annotations="enabled" />
 </beans>

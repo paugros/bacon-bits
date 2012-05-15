@@ -2,16 +2,22 @@ package com.areahomeschoolers.baconbits.client.content;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
+import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.generated.Instantiable;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
+import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.SidebarEntity;
 
 import com.google.gwt.dom.client.Style.Overflow;
@@ -20,6 +26,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Grid;
@@ -114,27 +121,41 @@ public final class Layout {
 		LinkPanel sessionPanel = new LinkPanel();
 		headerPanel.add(sessionPanel);
 
-		// user switching / user label
-		// Hyperlink userLink = new Hyperlink(currentUser.getFullName(), PageUrl.user(currentUser.getId()));
-
-		// userLink.addStyleName("nowrap");
-		// sessionPanel.add(userLink);
-
-		ClickLabel logout = new ClickLabel("Log out", new MouseDownHandler() {
-			@Override
-			public void onMouseDown(MouseDownEvent event) {
-				// LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
-				// loginService.logout(new Callback<Void>(false) {
-				// @Override
-				// protected void doOnSuccess(Void result) {
-				// Window.Location.reload();
-				// }
-				// });
-			}
-		});
-		logout.addStyleName("nowrap");
+		ClickLabel logInOrOut = new ClickLabel();
+		if (Application.isAuthenticated()) {
+			logInOrOut.setText("Log out");
+			logInOrOut.addMouseDownHandler(new MouseDownHandler() {
+				@Override
+				public void onMouseDown(MouseDownEvent event) {
+					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
+					loginService.logout(new Callback<Void>(false) {
+						@Override
+						protected void doOnSuccess(Void result) {
+							Window.Location.reload();
+						}
+					});
+				}
+			});
+		} else {
+			logInOrOut.setText("Log in");
+			logInOrOut.addMouseDownHandler(new MouseDownHandler() {
+				@Override
+				public void onMouseDown(MouseDownEvent event) {
+					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
+					final LoginDialog ld = new LoginDialog(loginService);
+					ld.setLoginHandler(new LoginHandler() {
+						@Override
+						public void onLogin(ApplicationData ap) {
+							Window.Location.reload();
+						}
+					});
+					ld.center();
+				}
+			});
+		}
+		logInOrOut.addStyleName("nowrap");
 		sessionPanel.addStyleName("sessionPanel");
-		sessionPanel.add(logout);
+		sessionPanel.add(logInOrOut);
 
 		ap.setHeight("100%");
 		ap.getElement().getStyle().setOverflow(Overflow.VISIBLE);

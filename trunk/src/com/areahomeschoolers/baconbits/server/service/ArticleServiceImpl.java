@@ -66,8 +66,8 @@ public class ArticleServiceImpl extends GWTController implements ArticleService 
 		return wrapper.queryForObject(sql, new ArticleMapper(), articleId);
 	}
 
-	@PreAuthorize("hasRole('ROLE_BASIC_USER')")
 	@Override
+	@PreAuthorize("hasRole('ROLE_BASIC_USER')")
 	public Article save(Article article) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(article);
 
