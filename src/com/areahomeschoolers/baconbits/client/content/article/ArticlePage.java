@@ -43,8 +43,13 @@ public class ArticlePage implements Page {
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 
 	public ArticlePage(VerticalPanel page) {
-		this.page = page;
 		int articleId = Url.getIntegerParameter("articleId");
+		if (!Application.isAuthenticated() && articleId < 0) {
+			new ErrorPage(PageError.NOT_AUTHORIZED);
+			return;
+		}
+
+		this.page = page;
 
 		if (articleId > 0) {
 			articleService.getById(articleId, new Callback<Article>() {

@@ -65,6 +65,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource verticalDragHandle();
 
+	ImageResource waggingFinger();
+
 	ImageResource yellowWarning();
 
 }

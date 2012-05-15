@@ -56,6 +56,10 @@ public final class Application implements ValueChangeHandler<String> {
 		return applicationData.getUserPreferences();
 	}
 
+	public static boolean isAuthenticated() {
+		return applicationData.getCurrentUser() != null;
+	}
+
 	public static boolean isLive() {
 		return applicationData.isLive();
 	}
