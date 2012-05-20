@@ -7,6 +7,11 @@ public class PageUrl {
 		return (id == 0) ? url : url + "&articleId=" + id;
 	}
 
+	public static String event(int id) {
+		String url = "page=Event";
+		return (id == 0) ? url : url + "&eventId=" + id;
+	}
+
 	public static String home() {
 		return "page=Home";
 	}

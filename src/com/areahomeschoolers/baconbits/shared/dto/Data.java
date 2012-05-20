@@ -175,7 +175,7 @@ public final class Data extends EntityDto<Data> {
 	}
 
 	public String put(String key, String value) {
-		if (key.equals("ID") && Common.isInteger(value)) {
+		if (key.equals("id") && Common.isInteger(value)) {
 			setId(Integer.parseInt(value));
 		}
 		return data.put(key, value);

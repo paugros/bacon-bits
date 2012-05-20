@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.server.spring.GWTController;
+import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
-import com.areahomeschoolers.baconbits.shared.Constants;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 @Controller
@@ -52,18 +54,18 @@ public class ArticleServiceImpl extends GWTController implements ArticleService 
 	}
 
 	@Override
-	public ArrayList<Article> getArticles() {
-		String sql = "select * from articles";
-		ArrayList<Article> data = wrapper.query(sql, new ArticleMapper());
-
-		return data;
-	}
-
-	@Override
 	public Article getById(int articleId) {
 		String sql = "select * from articles where id = ?";
 
 		return wrapper.queryForObject(sql, new ArticleMapper(), articleId);
+	}
+
+	@Override
+	public ArrayList<Article> list(ArgMap<ArticleArg> args) {
+		String sql = "select * from articles";
+		ArrayList<Article> data = wrapper.query(sql, new ArticleMapper());
+
+		return data;
 	}
 
 	@Override
@@ -72,19 +74,19 @@ public class ArticleServiceImpl extends GWTController implements ArticleService 
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(article);
 
 		if (article.isSaved()) {
-			String sql = "update articles set title = :title, article = :article, startDate = :startDate, endDate = :endDate where id = :id";
+			String sql = "update articles set title = :title, article = :article, startDate = :startDate, endDate = :endDate, groupId = :groupId where id = :id";
 			wrapper.update(sql, namedParams);
 		} else {
 			if (article.getStartDate() == null) {
 				article.setStartDate(new Date());
 			}
-			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article) values ";
-			sql += "(:addedById, :startDate, :endDate, now(), :title, :article)";
+			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId) values ";
+			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			wrapper.update(sql, namedParams, keys);
 
-			article.setId(Integer.parseInt(keys.getKeys().get(Constants.GENERATED_KEY_TOKEN).toString()));
+			article.setId(ServerUtils.getIdFromKeys(keys));
 		}
 
 		return getById(article.getId());
