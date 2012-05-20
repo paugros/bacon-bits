@@ -33,8 +33,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class ArticlePage implements Page {
 	private Form form = new Form(new FormSubmitHandler() {
 		@Override
-		public void onFormSubmit(FormField formWidget) {
-			saveDocument();
+		public void onFormSubmit(FormField formField) {
+			save();
 		}
 	});
 	private VerticalPanel page;
@@ -77,20 +77,20 @@ public class ArticlePage implements Page {
 		titleInput.addStyleName("hugeText");
 		titleInput.setVisibleLength(65);
 		titleInput.setMaxLength(100);
-		FormField nameField = form.createFormField("", titleInput, null);
-		nameField.setDtoUpdater(new Command() {
+		FormField titleField = form.createFormField("", titleInput, null);
+		titleField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
 				article.setTitle(titleInput.getText());
 			}
 		});
-		nameField.setInitializer(new Command() {
+		titleField.setInitializer(new Command() {
 			@Override
 			public void execute() {
 				titleInput.setText(article.getTitle());
 			}
 		});
-		formTable.addField(nameField);
+		formTable.addField(titleField);
 
 		final ControlledRichTextArea dataInput = new ControlledRichTextArea();
 		FormField dataField = form.createFormField("", dataInput, null);
@@ -131,7 +131,7 @@ public class ArticlePage implements Page {
 		Application.getLayout().setPage(title, page);
 	}
 
-	private void saveDocument() {
+	private void save() {
 		articleService.save(article, new Callback<Article>() {
 			@Override
 			protected void doOnSuccess(Article a) {

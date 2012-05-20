@@ -142,6 +142,15 @@ public class ControlledRichTextArea extends Composite {
 					}
 				});
 				bp.addLeftButton(submit);
+				Button submitAndClose = new Button("Update and Close");
+				submitAndClose.addMouseDownHandler(new MouseDownHandler() {
+					@Override
+					public void onMouseDown(MouseDownEvent event) {
+						richText.setHTML(textArea.getText());
+						hide();
+					}
+				});
+				bp.addLeftButton(submitAndClose);
 				bp.getCloseButton().setText("Close");
 				setWidget(vp);
 			}

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.exceptions.ClientClassNotFoundException;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
+import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserPreferenceService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
@@ -41,6 +42,8 @@ public class ServiceCache {
 				proxy = (RemoteServiceProxy) GWT.create(LoginService.class);
 			} else if ("UserService".equals(className)) {
 				proxy = (RemoteServiceProxy) GWT.create(UserService.class);
+			} else if ("EventService".equals(className)) {
+				proxy = (RemoteServiceProxy) GWT.create(EventService.class);
 			} else if ("UserPreferenceService".equals(className)) {
 				proxy = (RemoteServiceProxy) GWT.create(UserPreferenceService.class);
 			}

@@ -284,7 +284,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public void removePagingControl() {
-		getCellTable().setPageLength(Integer.MAX_VALUE);
+		pagingControl.setPageSize(Integer.MAX_VALUE);
 		pagingControl.setDisplay(null);
 		int pagerIndex = controlPanel.getWidgetIndex(pagingControl);
 		controlPanel.remove(pagerIndex);

@@ -168,15 +168,10 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 
 	// States
 	private boolean isFinishedLoading;
-	private boolean waitingIndicator = true;
 	private boolean linksOpenNewTab;
 	private boolean defaultByIndex = true;
-	private boolean fullRowSelect = false;
 	private boolean hasBeenPopulated;
 	protected boolean maintainHidden = false;
-
-	private int pagingThreshold;
-	private int pageSize;
 
 	// UI Components
 	private MaxHeightScrollPanel scrollPanel;
@@ -194,7 +189,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
 		setLoadingIndicator(new Label("Loading..."));
 		setEmptyTableWidget(new Label("No results"));
-		setPageLength(DEFAULT_PAGE_SIZE);
 		setPageStart(0);
 		registerTitleBar(titleBar);
 		getTitleBar().addPagingControl();
@@ -208,18 +202,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 					removeStyleName("hiddenHeader");
 					removeStyleName("hiddenFooter");
 				}
-
-				if (getList().size() > pagingThreshold) {
-					if (getPageSize() == pagingThreshold) {
-						setPageSize(pageSize);
-					}
-				} else if (getList().size() < pagingThreshold) {
-					if (getPageSize() != pagingThreshold) {
-						pageSize = getPageSize();
-						setPageSize(pagingThreshold);
-					}
-				}
-
 				updateTitleTotal();
 			}
 		});
@@ -620,6 +602,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	public void clearInitialized() {
 		clear();
 		isFinishedLoading = false;
+		hasBeenPopulated = false;
 		clearSelection();
 	}
 
@@ -780,10 +763,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		return titleBar != null;
 	}
 
-	public boolean hasWaitingIndicator() {
-		return waitingIndicator;
-	}
-
 	public boolean hideItem(T item, boolean updateTotal, boolean fireRowUpdate) {
 		if (visibleItems.contains(item)) {
 			hiddenItems.add(item);
@@ -819,10 +798,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 
 	public boolean isFinishedLoading() {
 		return isFinishedLoading;
-	}
-
-	public boolean isFullRowSelect() {
-		return fullRowSelect;
 	}
 
 	public boolean isHidden(T item) {
@@ -1075,10 +1050,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		this.displayColumns = EnumSet.copyOf(Arrays.asList(displayColumns));
 	}
 
-	public void setFullRowSelect(boolean fullRowSelect) {
-		this.fullRowSelect = fullRowSelect;
-	}
-
 	public void setItemEnabled(T item, boolean enabled) {
 		if (getSelectionCell() instanceof CheckboxCell) {
 			CheckboxCell cell = (CheckboxCell) getSelectionCell();
@@ -1126,19 +1097,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 
 	public void setLinksOpenNewTab(boolean linksOpenNewTab) {
 		this.linksOpenNewTab = linksOpenNewTab;
-	}
-
-	public void setPageLength(int length) {
-		setPageSize(length);
-		if (length * 2 >= Integer.MAX_VALUE) {
-			setPagingThreshold(Integer.MAX_VALUE);
-		} else {
-			setPagingThreshold(length * 2);
-		}
-	}
-
-	public void setPagingThreshold(int pagingThreshold) {
-		this.pagingThreshold = pagingThreshold;
 	}
 
 	@Override
@@ -1218,7 +1176,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 			final MultiSelectionModel<T> msm = new MultiSelectionModel<T>(entityKeyProvider);
 			setSelectionModel(msm);
 
-			final CheckboxCell cbCell = (CheckboxCell) (selectionCell = new CheckboxCell(true, !fullRowSelect));
+			final CheckboxCell cbCell = (CheckboxCell) (selectionCell = new CheckboxCell(true, true));
 			selectionColumn = new Column<T, Boolean>(cbCell) {
 				@Override
 				public Boolean getValue(T object) {
@@ -1299,7 +1257,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 				}
 			};
 
-			selectionCell = new RadioButtonCell(true, !fullRowSelect);
+			selectionCell = new RadioButtonCell(true, true);
 			selectionColumn = new Column<T, Boolean>(selectionCell) {
 				@Override
 				public Boolean getValue(T object) {
@@ -1357,10 +1315,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	 */
 	public void setTitleStyle(TitleBarStyle titleStyle) {
 		titleBar.setType(titleStyle);
-	}
-
-	public void setWaitingIndicator(boolean waitingIndicator) {
-		this.waitingIndicator = waitingIndicator;
 	}
 
 	/**
@@ -1523,7 +1477,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	 * @return A {@link Callback} for use with fetching data.
 	 */
 	private void createCallback() {
-		callback = new Callback<ArrayList<T>>(waitingIndicator) {
+		callback = new Callback<ArrayList<T>>(true) {
 			@Override
 			protected void doOnSuccess(ArrayList<T> results) {
 				handleResults(results);

@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public final class User extends EntityDto<User> {
@@ -14,6 +15,7 @@ public final class User extends EntityDto<User> {
 	private String lastName;
 	private String passwordDigest;
 	private String homePhone;
+	private ArrayList<Integer> groupIds;
 	// only for setting
 	private String password;
 	private String mobilePhone;
@@ -41,6 +43,10 @@ public final class User extends EntityDto<User> {
 
 	public String getFullName() {
 		return firstName + " " + lastName;
+	}
+
+	public ArrayList<Integer> getGroupIds() {
+		return groupIds;
 	}
 
 	public String getHomePhone() {
@@ -101,6 +107,10 @@ public final class User extends EntityDto<User> {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	public void setGroupIds(ArrayList<Integer> groupIds) {
+		this.groupIds = groupIds;
 	}
 
 	public void setHomePhone(String homePhone) {

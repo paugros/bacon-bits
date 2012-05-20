@@ -28,7 +28,6 @@ import com.google.gwt.view.client.HasRows;
 import com.google.gwt.view.client.Range;
 
 public class VariableSizePager extends AbstractPager {
-
 	private static class ImageButton extends Image {
 		private boolean disabled;
 		private final ImageResource resDisabled;
@@ -81,9 +80,8 @@ public class VariableSizePager extends AbstractPager {
 	private DefaultListBox pageSizeListBox;
 	private boolean pageResizingEnabled = true;
 	private int defaultPageSize = 50;
-
+	private int pagingThreshold;
 	private static final String PAGE_SIZE_PREF = "tablePageSize.";
-
 	private List<ParameterHandler<Integer>> pageSizeChangeHandlers = new ArrayList<ParameterHandler<Integer>>();
 
 	public VariableSizePager(CellTitleBar<?> titlebar) {
@@ -150,7 +148,6 @@ public class VariableSizePager extends AbstractPager {
 			@Override
 			public void onChange(ChangeEvent event) {
 				desiredPageSize = pageSizeListBox.getIntValue();
-				titlebar.getCellTable().setPageLength(desiredPageSize);
 				if (desiredPageSize == Integer.MAX_VALUE) {
 					if (getDisplay() != null) {
 						HasRows d = getDisplay();
@@ -227,6 +224,10 @@ public class VariableSizePager extends AbstractPager {
 		return "";
 	}
 
+	public int getPagingThreshold() {
+		return pagingThreshold;
+	}
+
 	@Override
 	public void previousPage() {
 		if (getDisplay() != null) {
@@ -289,7 +290,6 @@ public class VariableSizePager extends AbstractPager {
 	@Override
 	public void setPageSize(int pageSize) {
 		desiredPageSize = pageSize;
-		titlebar.getCellTable().setPagingThreshold(desiredPageSize * 2);
 		super.setPageSize(pageSize);
 	}
 
@@ -329,13 +329,20 @@ public class VariableSizePager extends AbstractPager {
 		Range r = display.getVisibleRange();
 		int rows = titlebar.getCellTable().visibleItems.size();
 		titlebar.setTotal(rows);
-		display.setVisibleRange(r.getStart(), Math.min(rows - r.getStart(), desiredPageSize));
-		// Update the prev and first buttons.
-		setPrevPageButtonsDisabled(!hasPreviousPage());
-
-		// Update the next and last buttons.
-		if (isRangeLimited() || !display.isRowCountExact()) {
-			setNextPageButtonsDisabled(r.getStart() + r.getLength() >= display.getRowCount());
+		int utilizedPageSize = desiredPageSize;
+		if (rows < desiredPageSize * 2) {
+			utilizedPageSize *= 2;
 		}
+
+		if (desiredPageSize == Integer.MAX_VALUE) {
+			display.setVisibleRange(0, rows);
+			setNextPageButtonsDisabled(true);
+			setPrevPageButtonsDisabled(true);
+		} else {
+			display.setVisibleRange(r.getStart(), Math.min(rows - r.getStart(), utilizedPageSize));
+			setPrevPageButtonsDisabled(!hasPreviousPage());
+			setNextPageButtonsDisabled(!hasNextPage());
+		}
+		display.setRowCount(rows);
 	}
 }

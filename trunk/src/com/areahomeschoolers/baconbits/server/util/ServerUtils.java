@@ -22,10 +22,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.support.KeyHolder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 
@@ -184,6 +186,10 @@ public abstract class ServerUtils {
 	 */
 	public static RowMapper<Data> getGenericRowMapper(boolean getDateValues) {
 		return getDateValues ? genericDateRowMapper : genericRowMapper;
+	}
+
+	public final static int getIdFromKeys(KeyHolder keys) {
+		return Integer.parseInt(keys.getKeys().get(Constants.GENERATED_KEY_TOKEN).toString());
 	}
 
 	public static RowMapper<Integer> getIntRowMapper() {
