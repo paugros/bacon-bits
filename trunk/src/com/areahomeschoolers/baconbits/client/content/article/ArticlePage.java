@@ -13,14 +13,11 @@ import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
-import com.areahomeschoolers.baconbits.client.widgets.ButtonPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
-import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
-import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -28,6 +25,8 @@ import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class ArticlePage implements Page {
@@ -38,7 +37,7 @@ public class ArticlePage implements Page {
 		}
 	});
 	private VerticalPanel page;
-	private FieldTable formTable = new FieldTable();
+	private FieldTable fieldTable = new FieldTable();
 	private Article article = new Article();
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 
@@ -68,16 +67,16 @@ public class ArticlePage implements Page {
 		}
 	}
 
-	private void initializePage() {
-		String title = "Edit Article";
-		TitleBar titleBar = new TitleBar(title, TitleBarStyle.SECTION);
-		formTable.setWidth("100%");
+	private void createFieldTable() {
+		fieldTable.setWidth("100%");
 
 		final RequiredTextBox titleInput = new RequiredTextBox();
+		final Label titleDisplay = new Label();
+		titleDisplay.addStyleName("hugeText");
 		titleInput.addStyleName("hugeText");
 		titleInput.setVisibleLength(65);
 		titleInput.setMaxLength(100);
-		FormField titleField = form.createFormField("", titleInput, null);
+		FormField titleField = form.createFormField("", titleInput, titleDisplay);
 		titleField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
@@ -88,12 +87,14 @@ public class ArticlePage implements Page {
 			@Override
 			public void execute() {
 				titleInput.setText(article.getTitle());
+				titleDisplay.setText(article.getTitle());
 			}
 		});
-		formTable.addField(titleField);
+		fieldTable.addField(titleField);
 
 		final ControlledRichTextArea dataInput = new ControlledRichTextArea();
-		FormField dataField = form.createFormField("", dataInput, null);
+		final HTML dataDisplay = new HTML();
+		FormField dataField = form.createFormField("", dataInput, dataDisplay);
 		dataField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
@@ -104,14 +105,11 @@ public class ArticlePage implements Page {
 			@Override
 			public void execute() {
 				dataInput.getTextArea().setHTML(article.getArticle());
+				dataDisplay.setHTML(article.getArticle());
 			}
 		});
-		formTable.addField(dataField);
+		fieldTable.addField(dataField);
 
-		ButtonPanel buttons = new ButtonPanel();
-		Button saveButton = new Button("Save");
-		form.registerSubmitButton(saveButton);
-		buttons.addCenterButton(saveButton);
 		Button cancelButton = new Button("Cancel");
 		cancelButton.addMouseDownHandler(new MouseDownHandler() {
 			@Override
@@ -119,16 +117,39 @@ public class ArticlePage implements Page {
 				History.back();
 			}
 		});
-		buttons.addCenterButton(cancelButton);
 
-		buttons.setWidth("800px");
-		formTable.addField("", buttons);
+		form.getButtonPanel().addCenterButton(cancelButton);
+	}
 
+	private void createReadOnlyPage() {
+		String title = article.isSaved() ? article.getTitle() : "New Article";
+		page.add(new ArticleWidget(article));
+		Application.getLayout().setPage(title, page);
+	}
+
+	private void createReadWritePage() {
+		String title = article.isSaved() ? article.getTitle() : "New Article";
+
+		createFieldTable();
 		form.initialize();
 
-		page.add(WidgetFactory.newSection(titleBar, formTable));
+		if (!article.isSaved()) {
+			form.configureForAdd(fieldTable);
+		} else {
+			form.emancipate();
+		}
 
-		Application.getLayout().setPage(title, page);
+		page.add(WidgetFactory.newSection(title, fieldTable));
+
+		Application.getLayout().setPage(article.getTitle(), page);
+	}
+
+	private void initializePage() {
+		if (!Application.isAuthenticated()) {
+			createReadOnlyPage();
+		} else {
+			createReadWritePage();
+		}
 	}
 
 	private void save() {
