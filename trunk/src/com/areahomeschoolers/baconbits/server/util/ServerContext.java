@@ -23,6 +23,8 @@ public class ServerContext implements ApplicationContextAware {
 	private static ApplicationContext ctx = null;
 	// tl holds all thread-specific data
 	private static ThreadLocal<ServerContext> tl = new ThreadLocal<ServerContext>();
+	private static boolean isLiveIsSet;
+	private static boolean isLive;
 
 	public static ApplicationContext getApplicationContext() {
 		return ctx;
@@ -87,6 +89,18 @@ public class ServerContext implements ApplicationContextAware {
 			return null;
 		}
 		return tl.get().request.getSession();
+	}
+
+	public static boolean isLive() {
+		if (isLiveIsSet) {
+			return isLive;
+		}
+
+		// String localIp = ServerUtils.getLocalNetworkIp();
+		// isLive = localIp == null || "192.168.108.14".equals(localIp);
+		isLiveIsSet = true;
+
+		return isLive;
 	}
 
 	public static void loadContext(HttpServletRequest request, HttpServletResponse response, ServletContext servletContext) {
