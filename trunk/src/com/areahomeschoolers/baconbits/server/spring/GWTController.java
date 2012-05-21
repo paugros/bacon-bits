@@ -19,7 +19,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 /**
  * Spring controller class that handles all requests and passes them on to GWT. Also initializes server context.
  */
-public class GWTController extends RemoteServiceServlet implements ServletConfigAware, ServletContextAware, Controller, RemoteService {
+public class GwtController extends RemoteServiceServlet implements ServletConfigAware, ServletContextAware, Controller, RemoteService {
 
 	private static final long serialVersionUID = 1L;
 
