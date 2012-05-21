@@ -118,25 +118,6 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(categoryField);
 
-		final HTML descriptionDisplay = new HTML();
-		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
-		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
-		descriptionField.setRequired(true);
-		descriptionField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				descriptionDisplay.setHTML(event.getDescription());
-				descriptionInput.getTextArea().setHTML(event.getDescription());
-			}
-		});
-		descriptionField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				event.setDescription(descriptionInput.getTextArea().getHTML());
-			}
-		});
-		fieldTable.addField(descriptionField);
-
 		final Label addressDisplay = new Label();
 		final MaxLengthTextArea addressInput = new MaxLengthTextArea(200);
 		addressInput.setVisibleLines(3);
@@ -341,11 +322,29 @@ public class EventPage implements Page {
 			fieldTable.addField("Added by:", event.getAddedByFullName());
 			fieldTable.addField("Added date:", Formatter.formatDateTime(event.getAddedDate()));
 		}
+
+		final HTML descriptionDisplay = new HTML();
+		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
+		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
+		descriptionField.setRequired(true);
+		descriptionField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				descriptionDisplay.setHTML(event.getDescription());
+				descriptionInput.getTextArea().setHTML(event.getDescription());
+			}
+		});
+		descriptionField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				event.setDescription(descriptionInput.getTextArea().getHTML());
+			}
+		});
+		fieldTable.addField(descriptionField);
 	}
 
 	private void initializePage() {
-		String title = "Edit Event";
-
+		String title = event.isSaved() ? event.getTitle() : "New Event";
 		createFieldTable();
 		form.initialize();
 
@@ -355,6 +354,10 @@ public class EventPage implements Page {
 			form.configureForAdd(fieldTable);
 		} else {
 			form.emancipate();
+
+			if (!Application.isAuthenticated()) {
+				form.setEnabled(false);
+			}
 		}
 
 		Application.getLayout().setPage(title, page);

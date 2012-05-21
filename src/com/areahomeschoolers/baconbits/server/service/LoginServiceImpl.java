@@ -11,14 +11,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
-import com.areahomeschoolers.baconbits.server.spring.GWTController;
+import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 @Controller
 @RequestMapping("/login")
-public class LoginServiceImpl extends GWTController implements LoginService {
+public class LoginServiceImpl extends GwtController implements LoginService {
 	private static final long serialVersionUID = 1L;
 	private final AuthenticationManager authenticationManager;
 

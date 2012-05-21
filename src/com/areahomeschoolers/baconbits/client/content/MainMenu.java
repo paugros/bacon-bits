@@ -98,7 +98,6 @@ public final class MainMenu extends MenuBar {
 				});
 			}
 		});
-		addLinkToMenu(menu, "Add Article", PageUrl.article(0));
 
 		menu.addItem("Reload Page", new Command() {
 			@Override
@@ -112,6 +111,7 @@ public final class MainMenu extends MenuBar {
 
 	private MenuBar getBlogMenu() {
 		MenuBar menu = new MenuBar(true);
+		addLinkToMenu(menu, "Add Article", PageUrl.article(0));
 		addLinkToMenu(menu, "Our Homeschool Corner", "");
 		addLinkToMenu(menu, "Latest Newsletter", "");
 
