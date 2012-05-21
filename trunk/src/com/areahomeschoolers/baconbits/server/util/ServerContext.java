@@ -110,7 +110,7 @@ public class ServerContext implements ApplicationContextAware {
 			u = userService.getUserByUsername(username);
 		}
 
-		tl.get().request.getSession().setAttribute("user", u);
+		getSession().setAttribute("user", u);
 	}
 
 	public static void unloadContext() {
