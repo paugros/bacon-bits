@@ -13,7 +13,7 @@ public final class Article extends EntityDto<Article> {
 	private String article;
 	private int addedById;
 	private Date startDate, endDate, addedDate;
-	private int groupId;
+	private Integer groupId;
 
 	public int getAddedById() {
 		return addedById;
@@ -31,7 +31,10 @@ public final class Article extends EntityDto<Article> {
 		return endDate;
 	}
 
-	public int getGroupId() {
+	public Integer getGroupId() {
+		if (groupId == null || groupId == 0) {
+			return null;
+		}
 		return groupId;
 	}
 
@@ -59,7 +62,7 @@ public final class Article extends EntityDto<Article> {
 		this.endDate = endDate;
 	}
 
-	public void setGroupId(int groupId) {
+	public void setGroupId(Integer groupId) {
 		this.groupId = groupId;
 	}
 
