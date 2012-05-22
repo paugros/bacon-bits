@@ -37,16 +37,16 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class EventPage implements Page {
-	private Form form = new Form(new FormSubmitHandler() {
+	private final Form form = new Form(new FormSubmitHandler() {
 		@Override
 		public void onFormSubmit(FormField formField) {
 			save(formField);
 		}
 	});
 	private VerticalPanel page;
-	private FieldTable fieldTable = new FieldTable();
+	private final FieldTable fieldTable = new FieldTable();
 	private Event event = new Event();
-	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
+	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private EventPageData pageData;
 
 	public EventPage(VerticalPanel page) {
@@ -182,121 +182,123 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(registrationDatesField);
 
-		final Label publishDateDisplay = new Label();
-		final DateTimeBox publishDateInput = new DateTimeBox();
-		FormField publishDateField = form.createFormField("Publish date:", publishDateInput, publishDateDisplay);
-		publishDateField.setRequired(true);
-		publishDateField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				publishDateDisplay.setText(Formatter.formatDate(event.getPublishDate()));
-				publishDateInput.setValue(event.getPublishDate());
-			}
-		});
-		publishDateField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				event.setPublishDate(publishDateInput.getValue());
-			}
-		});
-		fieldTable.addField(publishDateField);
+		if (Application.isAuthenticated()) {
+			final Label publishDateDisplay = new Label();
+			final DateTimeBox publishDateInput = new DateTimeBox();
+			FormField publishDateField = form.createFormField("Publish date:", publishDateInput, publishDateDisplay);
+			publishDateField.setRequired(true);
+			publishDateField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					publishDateDisplay.setText(Formatter.formatDate(event.getPublishDate()));
+					publishDateInput.setValue(event.getPublishDate());
+				}
+			});
+			publishDateField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					event.setPublishDate(publishDateInput.getValue());
+				}
+			});
+			fieldTable.addField(publishDateField);
 
-		final Label activeDisplay = new Label();
-		final DefaultListBox activeInput = new DefaultListBox();
-		activeInput.addItem("No", 0);
-		activeInput.addItem("Yes", 1);
-		FormField activeField = form.createFormField("Active:", activeInput, activeDisplay);
-		activeField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				activeDisplay.setText(Common.yesNo(event.getActive()));
-				activeInput.setValue(event.getActive() ? 1 : 0);
-			}
-		});
-		activeField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				event.setActive(activeInput.getIntValue() == 1);
-			}
-		});
-		fieldTable.addField(activeField);
+			final Label activeDisplay = new Label();
+			final DefaultListBox activeInput = new DefaultListBox();
+			activeInput.addItem("No", 0);
+			activeInput.addItem("Yes", 1);
+			FormField activeField = form.createFormField("Active:", activeInput, activeDisplay);
+			activeField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					activeDisplay.setText(Common.yesNo(event.getActive()));
+					activeInput.setValue(event.getActive() ? 1 : 0);
+				}
+			});
+			activeField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					event.setActive(activeInput.getIntValue() == 1);
+				}
+			});
+			fieldTable.addField(activeField);
 
-		final Label emailDisplay = new Label();
-		final EmailTextBox emailInput = new EmailTextBox();
-		emailInput.setMultiEmail(true);
-		emailInput.setMaxLength(200);
-		emailInput.setVisibleLength(60);
-		FormField emailField = form.createFormField("Notification email(s) (separate with commas):", emailInput, emailDisplay);
-		emailField.setRequired(true);
-		emailField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				emailDisplay.setText(event.getNotificationEmail());
-				emailInput.setText(event.getNotificationEmail());
-			}
-		});
-		emailField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				event.setNotificationEmail(emailInput.getText());
-			}
-		});
-		fieldTable.addField(emailField);
+			final Label emailDisplay = new Label();
+			final EmailTextBox emailInput = new EmailTextBox();
+			emailInput.setMultiEmail(true);
+			emailInput.setMaxLength(200);
+			emailInput.setVisibleLength(60);
+			FormField emailField = form.createFormField("Notification email(s) (separate with commas):", emailInput, emailDisplay);
+			emailField.setRequired(true);
+			emailField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					emailDisplay.setText(event.getNotificationEmail());
+					emailInput.setText(event.getNotificationEmail());
+				}
+			});
+			emailField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					event.setNotificationEmail(emailInput.getText());
+				}
+			});
+			fieldTable.addField(emailField);
 
-		final Label costDisplay = new Label();
-		final NumericTextBox costInput = new NumericTextBox(2);
-		costInput.setMaxLength(10);
-		FormField costField = form.createFormField("Cost:", costInput, costDisplay);
-		costField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				costDisplay.setText(Formatter.formatCurrency(event.getCost()));
-				costInput.setValue(event.getCost());
-			}
-		});
-		costField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				event.setCost(costInput.getDouble());
-			}
-		});
-		fieldTable.addField(costField);
+			final Label costDisplay = new Label();
+			final NumericTextBox costInput = new NumericTextBox(2);
+			costInput.setMaxLength(10);
+			FormField costField = form.createFormField("Cost:", costInput, costDisplay);
+			costField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					costDisplay.setText(Formatter.formatCurrency(event.getCost()));
+					costInput.setValue(event.getCost());
+				}
+			});
+			costField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					event.setCost(costInput.getDouble());
+				}
+			});
+			fieldTable.addField(costField);
 
-		final Label minParticipantsDisplay = new Label();
-		final NumericTextBox minParticipantsInput = new NumericTextBox();
-		FormField minParticipantsField = form.createFormField("Minimum participants:", minParticipantsInput, minParticipantsDisplay);
-		minParticipantsField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				minParticipantsDisplay.setText(Integer.toString(event.getMinimumParticipants()));
-				minParticipantsInput.setValue(event.getMinimumParticipants());
-			}
-		});
-		minParticipantsField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				event.setMinimumParticipants(minParticipantsInput.getInteger());
-			}
-		});
-		fieldTable.addField(minParticipantsField);
+			final Label minParticipantsDisplay = new Label();
+			final NumericTextBox minParticipantsInput = new NumericTextBox();
+			FormField minParticipantsField = form.createFormField("Minimum participants:", minParticipantsInput, minParticipantsDisplay);
+			minParticipantsField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					minParticipantsDisplay.setText(Integer.toString(event.getMinimumParticipants()));
+					minParticipantsInput.setValue(event.getMinimumParticipants());
+				}
+			});
+			minParticipantsField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					event.setMinimumParticipants(minParticipantsInput.getInteger());
+				}
+			});
+			fieldTable.addField(minParticipantsField);
 
-		final Label maxParticipantsDisplay = new Label();
-		final NumericTextBox maxParticipantsInput = new NumericTextBox();
-		FormField maxParticipantsField = form.createFormField("Maximum participants:", maxParticipantsInput, maxParticipantsDisplay);
-		maxParticipantsField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				maxParticipantsDisplay.setText(Integer.toString(event.getMaximumParticipants()));
-				maxParticipantsInput.setValue(event.getMaximumParticipants());
-			}
-		});
-		maxParticipantsField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				event.setMaximumParticipants(maxParticipantsInput.getInteger());
-			}
-		});
-		fieldTable.addField(maxParticipantsField);
+			final Label maxParticipantsDisplay = new Label();
+			final NumericTextBox maxParticipantsInput = new NumericTextBox();
+			FormField maxParticipantsField = form.createFormField("Maximum participants:", maxParticipantsInput, maxParticipantsDisplay);
+			maxParticipantsField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					maxParticipantsDisplay.setText(Integer.toString(event.getMaximumParticipants()));
+					maxParticipantsInput.setValue(event.getMaximumParticipants());
+				}
+			});
+			maxParticipantsField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					event.setMaximumParticipants(maxParticipantsInput.getInteger());
+				}
+			});
+			fieldTable.addField(maxParticipantsField);
+		}
 
 		final Label adultDisplay = new Label();
 		final DefaultListBox adultInput = new DefaultListBox();
@@ -318,7 +320,7 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(adultField);
 
-		if (event.isSaved()) {
+		if (event.isSaved() && Application.isAuthenticated()) {
 			fieldTable.addField("Added by:", event.getAddedByFullName());
 			fieldTable.addField("Added date:", Formatter.formatDateTime(event.getAddedDate()));
 		}
