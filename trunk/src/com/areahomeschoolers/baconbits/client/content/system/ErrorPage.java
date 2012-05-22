@@ -8,8 +8,6 @@ import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
-import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
-import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.shared.Common;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -43,8 +41,6 @@ public final class ErrorPage {
 		pageTitles.put(PageError.NOT_AUTHORIZED, "Not Authorized");
 		pageTitles.put(PageError.INVALID_ACTION, "Invalid Action");
 		pageTitles.put(PageError.SYSTEM_ERROR, "System Error");
-
-		page.add(new TitleBar(pageTitles.get(errorType), TitleBarStyle.SECTION));
 
 		errorPanel.setWidth("100%");
 		errorPanel.setStyleName("hugeText");
