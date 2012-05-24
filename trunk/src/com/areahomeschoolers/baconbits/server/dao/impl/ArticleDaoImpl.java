@@ -16,6 +16,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.ArticleDao;
+import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
@@ -71,6 +72,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			if (article.getStartDate() == null) {
 				article.setStartDate(new Date());
 			}
+			article.setAddedById(ServerContext.getCurrentUser().getId());
+
 			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId) values ";
 			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId)";
 
