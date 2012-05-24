@@ -1,7 +1,5 @@
 package com.areahomeschoolers.baconbits.server.spring;
 
-import java.util.Enumeration;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -37,9 +35,6 @@ public class GwtController extends RemoteServiceServlet implements ServletConfig
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// System.out.println(request.getSession().getCreationTime());
 		// load our ServerContext with current request, response, session, user, appContext, etc.
-		for (Enumeration<?> e = request.getSession().getAttributeNames(); e.hasMoreElements();) {
-			System.out.println(e.nextElement());
-		}
 		ServerContext.loadContext(request, response, servletContext);
 		try {
 			doPost(request, response);
