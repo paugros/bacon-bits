@@ -141,7 +141,7 @@ public class ArticlePage implements Page {
 
 		page.add(WidgetFactory.newSection(title, fieldTable));
 
-		Application.getLayout().setPage(article.getTitle(), page);
+		Application.getLayout().setPage(title, page);
 	}
 
 	private void initializePage() {
