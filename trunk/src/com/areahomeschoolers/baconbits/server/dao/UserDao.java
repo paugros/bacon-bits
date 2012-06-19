@@ -7,9 +7,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 public interface UserDao {
 	public User getById(int userId);
+
+	public UserPageData getPageData(int userId);
 
 	public User getUserByUsername(String username);
 

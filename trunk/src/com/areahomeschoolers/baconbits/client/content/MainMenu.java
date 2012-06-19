@@ -77,6 +77,9 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getAdminMenu() {
 		MenuBar menu = new MenuBar(true);
 
+		addLinkToMenu(menu, "Add User", PageUrl.user(0));
+		addLinkToMenu(menu, "List Users", PageUrl.userList());
+
 		menu.addItem("Expire Session", new Command() {
 			@Override
 			public void execute() {

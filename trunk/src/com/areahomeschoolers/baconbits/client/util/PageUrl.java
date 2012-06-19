@@ -21,6 +21,10 @@ public class PageUrl {
 		return (id == 0) ? url : url + "&userId=" + id;
 	}
 
+	public static String userList() {
+		return "page=UserList";
+	}
+
 	private PageUrl() {
 
 	}

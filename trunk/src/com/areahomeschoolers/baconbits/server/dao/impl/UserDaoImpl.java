@@ -19,11 +19,13 @@ import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
+import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 @Repository
 public class UserDaoImpl extends SpringWrapper implements UserDao {
@@ -43,6 +45,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 			user.setAddedDate(rs.getTimestamp("addedDate"));
 			user.setLastLoginDate(rs.getTimestamp("lastLoginDate"));
 			user.setActive(rs.getBoolean("isEnabled"));
+			user.setUserType(rs.getString("type"));
 			return user;
 		}
 	}
@@ -58,12 +61,33 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 	@Autowired
 	public UserDaoImpl(DataSource dataSource) {
 		super(dataSource);
-		SELECT = "select isActive(startDate, endDate) as isEnabled, u.* from users u ";
+		SELECT = "select isActive(startDate, endDate) as isEnabled, t.type, u.* from users u ";
+		SELECT += "join userTypes t on t.id = u.userTypeId ";
 	}
 
 	@Override
 	public User getById(int userId) {
 		return queryForObject(SELECT + "where u.id = ?", new UserMapper(), userId);
+	}
+
+	@Override
+	public UserPageData getPageData(int userId) {
+		UserPageData pd = new UserPageData();
+		if (userId > 0) {
+			pd.setUser(getById(userId));
+
+			if (pd.getUser() == null) {
+				return null;
+			}
+		} else {
+			User u = new User();
+			pd.setUser(u);
+		}
+
+		String sql = "select * from userTypes order by type";
+		pd.setUserTypes(query(sql, ServerUtils.getGenericRowMapper()));
+
+		return pd;
 	}
 
 	@Override
@@ -82,7 +106,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 
 	@Override
 	public ArrayList<User> list(ArgMap<UserArg> args) {
-		String sql = "select * from users";
+		String sql = SELECT;
 		ArrayList<User> data = query(sql, new UserMapper());
 
 		return data;

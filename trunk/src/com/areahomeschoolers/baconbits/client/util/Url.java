@@ -14,18 +14,6 @@ public class Url {
 
 	private static DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyy-M-d");
 
-	public static int accountId() {
-		return getIntegerParameter("accountId");
-	}
-
-	public static int addressId() {
-		return getIntegerParameter("addressId");
-	}
-
-	public static int customerId() {
-		return getIntegerParameter("customerId");
-	}
-
 	public static String decode(String encodedText) {
 		if (encodedText == null) {
 			return null;

@@ -3,9 +3,7 @@ package com.areahomeschoolers.baconbits.client.widgets.cellview;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
-import com.areahomeschoolers.baconbits.client.util.UserPreferences;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 
 import com.google.gwt.core.client.Scheduler;
@@ -163,7 +161,7 @@ public class VariableSizePager extends AbstractPager {
 					}
 				}
 				titlebar.cellTable.refresh();
-				UserPreferences.save(getPageSizePrefString(), pageSizeListBox.getSelectedText());
+				// UserPreferences.save(getPageSizePrefString(), pageSizeListBox.getSelectedText());
 				for (ParameterHandler<Integer> ph : pageSizeChangeHandlers) {
 					ph.execute(desiredPageSize);
 				}
@@ -247,12 +245,7 @@ public class VariableSizePager extends AbstractPager {
 			@Override
 			public void execute() {
 				if (getDisplay() != null && pageResizingEnabled) {
-					String value = Application.getUserPreferences().get(getPageSizePrefString());
-					if (value == null) {
-						pageSizeListBox.setSelectedIndex(2);
-					} else {
-						pageSizeListBox.setValueByItemText(value);
-					}
+					pageSizeListBox.setSelectedIndex(2);
 					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 						@Override
 						public void execute() {

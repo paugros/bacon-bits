@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 @Controller
 @RequestMapping("/user")
@@ -29,6 +30,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 	@Override
 	public User getById(int userId) {
 		return dao.getById(userId);
+	}
+
+	@Override
+	public UserPageData getPageData(int userId) {
+		return dao.getPageData(userId);
 	}
 
 	@Override
