@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
@@ -1675,28 +1674,29 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	 * @return
 	 */
 	private boolean setSortFromPref() {
-		if (sortPolicy != CellSortPolicy.ON) {
-			return false;
-		}
-
-		String prefName = getSortPrefString();
-		if (prefName == null) {
-			return false;
-		}
-
-		prefName = TABLE_SORT_PREF + prefName;
-
-		String sortVal = Application.getUserPreferences().get(prefName);
-		if (sortVal == null) {
-			return false;
-		}
-
-		String[] vals = sortVal.split(";");
-		this.defaultSortDirection = "A".equals(vals[0]) ? SortDirection.SORT_ASC : SortDirection.SORT_DESC;
-		this.defaultSortIndex = Integer.parseInt(vals[1]);
-		this.defaultByIndex = true;
-
 		return true;
+		// if (sortPolicy != CellSortPolicy.ON) {
+		// return false;
+		// }
+		//
+		// String prefName = getSortPrefString();
+		// if (prefName == null) {
+		// return false;
+		// }
+		//
+		// prefName = TABLE_SORT_PREF + prefName;
+		//
+		// String sortVal = Application.getUserPreferences().get(prefName);
+		// if (sortVal == null) {
+		// return false;
+		// }
+		//
+		// String[] vals = sortVal.split(";");
+		// this.defaultSortDirection = "A".equals(vals[0]) ? SortDirection.SORT_ASC : SortDirection.SORT_DESC;
+		// this.defaultSortIndex = Integer.parseInt(vals[1]);
+		// this.defaultByIndex = true;
+		//
+		// return true;
 	}
 
 	private void setupSorting() {

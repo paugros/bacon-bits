@@ -9,6 +9,8 @@ import com.areahomeschoolers.baconbits.client.content.event.EventPage;
 import com.areahomeschoolers.baconbits.client.content.home.HomePage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.user.UserListPage;
+import com.areahomeschoolers.baconbits.client.content.user.UserPage;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -87,6 +89,10 @@ public final class Application implements ValueChangeHandler<String> {
 			new ArticlePage(vp);
 		} else if ("Event".equals(page)) {
 			new EventPage(vp);
+		} else if ("User".equals(page)) {
+			new UserPage(vp);
+		} else if ("UserList".equals(page)) {
+			new UserListPage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client.util;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.shared.Common;
 
 import com.google.gwt.dom.client.Style.Unit;
@@ -102,6 +103,10 @@ public abstract class WidgetFactory {
 		return label;
 	}
 
+	public static VerticalPanel newSection(EntityCellTable<?, ?, ?> cellTable) {
+		return newSection(cellTable.getTitleBar(), cellTable);
+	}
+
 	public static VerticalPanel newSection(String title, Widget w) {
 		return WidgetFactory.newSection(new TitleBar(title, TitleBarStyle.SECTION), w);
 	}
@@ -113,22 +118,6 @@ public abstract class WidgetFactory {
 		vp.setWidth("100%");
 		return vp;
 	}
-
-	// public static VerticalPanel newSection(EntityCellTable<?, ?, ?> cellTable) {
-	// return newSection(cellTable.getTitleBar(), cellTable);
-	// }
-	//
-	// public static VerticalPanel newSection(String title, Widget w) {
-	// return WidgetFactory.newSection(new TitleBar(title, TitleBarStyle.SECTION), w);
-	// }
-	//
-	// public static VerticalPanel newSection(TitleBar tb, Widget w) {
-	// VerticalPanel vp = new VerticalPanel();
-	// vp.add(tb);
-	// vp.add(w);
-	// vp.setWidth("100%");
-	// return vp;
-	// }
 
 	/**
 	 * Determines whether a link will open a new tab.

@@ -23,6 +23,9 @@ public final class User extends EntityDto<User> {
 	private boolean active;
 	private boolean resetPassword;
 
+	// aux
+	private String userType;
+
 	private Date startDate, endDate, addedDate, lastLoginDate;
 
 	public Date getAddedDate() {
@@ -79,6 +82,10 @@ public final class User extends EntityDto<User> {
 
 	public Date getStartDate() {
 		return startDate;
+	}
+
+	public String getUserType() {
+		return userType;
 	}
 
 	public int getUserTypeId() {
@@ -143,6 +150,10 @@ public final class User extends EntityDto<User> {
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
 	}
 
 	public void setUserTypeId(int userTypeId) {
