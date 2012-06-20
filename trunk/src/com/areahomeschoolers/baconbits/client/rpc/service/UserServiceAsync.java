@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
@@ -19,5 +20,7 @@ public interface UserServiceAsync {
 
 	void list(ArgMap<UserArg> args, AsyncCallback<ArrayList<User>> callback);
 
-	void save(User user, AsyncCallback<User> callback);
+	void save(User user, AsyncCallback<ServerResponseData<User>> callback);
+
+	void validatePassword(String password, AsyncCallback<ServerResponseData<String>> callback);
 }

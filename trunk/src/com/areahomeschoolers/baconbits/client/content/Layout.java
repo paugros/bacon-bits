@@ -15,11 +15,14 @@ import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.SidebarEntity;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -120,6 +123,7 @@ public final class Layout {
 
 		LinkPanel sessionPanel = new LinkPanel();
 		headerPanel.add(sessionPanel);
+		sessionPanel.addStyleName("sessionPanel");
 
 		ClickLabel logInOrOut = new ClickLabel();
 		if (Application.isAuthenticated()) {
@@ -154,8 +158,27 @@ public final class Layout {
 			});
 		}
 		logInOrOut.addStyleName("nowrap");
-		sessionPanel.addStyleName("sessionPanel");
 		sessionPanel.add(logInOrOut);
+
+		if (!Application.isAuthenticated()) {
+			ClickLabel resetLabel = new ClickLabel("Change password", new MouseDownHandler() {
+				@Override
+				public void onMouseDown(MouseDownEvent event) {
+					GWT.runAsync(new RunAsyncCallback() {
+						@Override
+						public void onFailure(Throwable caught) {
+						}
+
+						@Override
+						public void onSuccess() {
+							new ResetPasswordDialog(true).center();
+						}
+					});
+				}
+			});
+			resetLabel.addStyleName("nowrap");
+			sessionPanel.add(resetLabel);
+		}
 
 		ap.setHeight("100%");
 		ap.getElement().getStyle().setOverflow(Overflow.VISIBLE);

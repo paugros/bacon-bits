@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
+import com.areahomeschoolers.baconbits.server.dao.impl.UserDaoImpl;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
+import com.areahomeschoolers.baconbits.server.util.Mailer;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
@@ -24,7 +28,6 @@ public class UserServiceImpl extends GwtController implements UserService {
 	@Autowired
 	public UserServiceImpl(UserDao dao) {
 		this.dao = dao;
-
 	}
 
 	@Override
@@ -48,8 +51,44 @@ public class UserServiceImpl extends GwtController implements UserService {
 	}
 
 	@Override
-	public User save(User user) {
-		return dao.save(user);
+	public ServerResponseData<User> save(User user) {
+		String portalPassword = "";
+		if (user.getGeneratePassword()) {
+			portalPassword = UserDaoImpl.generatePassword();
+			user.setPassword(portalPassword);
+		}
+
+		ServerResponseData<User> response = dao.save(user);
+
+		if (user.getGeneratePassword() && !response.hasErrors()) {
+			Mailer mail = new Mailer();
+			mail.useSystemFrom();
+			mail.addTo(user.getFullName() + " <" + user.getEmail() + ">");
+			mail.setSubject("Area Homeschoolers Login Information");
+			String msg = "Hello,\n\n";
+			if (!user.isSaved()) {
+				msg += "A login account has been created for you at Area Homeschoolers. \n\n";
+			} else {
+				msg += "The password for your Area Homeschoolers account has been reset. ";
+			}
+			msg += "Login information appears below. You will be required to establish a new password upon logging in.\n\n";
+			msg += "Site: http://areahomeschoolers.appspot.com/\n";
+			msg += "User name: " + user.getUserName() + "\n";
+			msg += "Password: " + portalPassword + "\n\n";
+			msg += "Thank you.\n\n";
+			mail.setBody(msg);
+			mail.send();
+
+			response.getData().setGeneratePassword(false);
+		}
+		return response;
+	}
+
+	@Override
+	public ServerResponseData<String> validatePassword(String password) {
+		ServerResponseData<String> data = new ServerResponseData<String>();
+		data.setErrors(Common.asArrayList(dao.validatePassword(password)));
+		return data;
 	}
 
 }

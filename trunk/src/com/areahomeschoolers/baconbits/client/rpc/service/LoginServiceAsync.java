@@ -11,5 +11,9 @@ public interface LoginServiceAsync {
 
 	void loginAndGetApplicationData(String username, String password, AsyncCallback<ApplicationData> callback);
 
+	void loginForPasswordReset(int id, String digest, AsyncCallback<ApplicationData> callback);
+
 	void logout(AsyncCallback<Void> callback);
+
+	void sendPasswordResetEmail(String username, AsyncCallback<Boolean> callback);
 }
