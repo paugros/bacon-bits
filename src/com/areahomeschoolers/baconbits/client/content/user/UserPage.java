@@ -14,16 +14,16 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
-import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
@@ -42,7 +42,7 @@ public class UserPage implements Page {
 	private final FieldTable fieldTable = new FieldTable();
 	private User user = new User();
 	private final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
-	private UserPageData pageData;
+	private final Label passwordLabel = new Label();
 
 	public UserPage(VerticalPanel page) {
 		int userId = Url.getIntegerParameter("userId");
@@ -62,7 +62,6 @@ public class UserPage implements Page {
 				}
 
 				user = result.getUser();
-				pageData = result;
 				initializePage();
 			}
 		});
@@ -129,26 +128,30 @@ public class UserPage implements Page {
 		});
 		fieldTable.addField(emailField);
 
-		final Label typeDisplay = new Label();
-		final RequiredListBox typeInput = new RequiredListBox();
-		for (Data type : pageData.getUserTypes()) {
-			typeInput.addItem(type.get("type"), type.getId());
+		final Label adminDisplay = new Label();
+		final DefaultListBox adminInput = new DefaultListBox();
+		adminInput.addItem("Yes");
+		adminInput.addItem("No");
+		FormField adminField = form.createFormField("System administrator:", adminInput, adminDisplay);
+		adminField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				adminDisplay.setText(Common.yesNo(user.getSystemAdministrator()));
+				adminInput.setValue(Common.yesNo(user.getSystemAdministrator()));
+			}
+		});
+		adminField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				user.setSystemAdministrator("Yes".equals(adminInput.getValue()));
+			}
+		});
+		fieldTable.addField(adminField);
+
+		if (user.isSaved()) {
+			updatePasswordLabel();
+			fieldTable.addField("Password:", passwordLabel);
 		}
-		FormField typeField = form.createFormField("User type:", typeInput, typeDisplay);
-		typeField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				typeDisplay.setText(user.getUserType());
-				typeInput.setValue(user.getUserTypeId());
-			}
-		});
-		typeField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				user.setUserTypeId(typeInput.getIntValue());
-			}
-		});
-		fieldTable.addField(typeField);
 
 		final Label homePhoneDisplay = new Label();
 		final PhoneTextBox homePhoneInput = new PhoneTextBox();
@@ -249,17 +252,29 @@ public class UserPage implements Page {
 	}
 
 	private void save(final FormField field) {
-		userService.save(user, new Callback<User>() {
+		userService.save(user, new Callback<ServerResponseData<User>>() {
 			@Override
-			protected void doOnSuccess(User u) {
+			protected void doOnSuccess(ServerResponseData<User> r) {
 				if (!Url.isParamValidId("userId")) {
-					HistoryToken.set(PageUrl.user(u.getId()));
+					HistoryToken.set(PageUrl.user(r.getData().getId()));
 				} else {
-					user = u;
-					form.setDto(u);
+					user = r.getData();
+					form.setDto(r.getData());
 					field.setInputVisibility(false);
 				}
 			}
 		});
+	}
+
+	private void updatePasswordLabel() {
+		String pwd;
+
+		if (user.getResetPassword()) {
+			pwd = "Sent to user, will be reset upon first login.";
+		} else {
+			pwd = "Has been set by the user.";
+		}
+
+		passwordLabel.setText(pwd);
 	}
 }

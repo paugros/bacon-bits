@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
@@ -23,5 +24,7 @@ public interface UserService extends RemoteService {
 
 	public ArrayList<User> list(ArgMap<UserArg> args);
 
-	public User save(User user);
+	public ServerResponseData<User> save(User user);
+
+	public ServerResponseData<String> validatePassword(String password);
 }

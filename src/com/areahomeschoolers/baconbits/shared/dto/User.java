@@ -18,15 +18,16 @@ public final class User extends EntityDto<User> {
 	private ArrayList<Integer> groupIds;
 	// only for setting
 	private String password;
+
 	private String mobilePhone;
-	private int userTypeId;
 	private boolean active;
+	private boolean systemAdministrator;
 	private boolean resetPassword;
 
-	// aux
-	private String userType;
-
 	private Date startDate, endDate, addedDate, lastLoginDate;
+
+	// aux
+	private boolean generatePassword;
 
 	public Date getAddedDate() {
 		return addedDate;
@@ -46,6 +47,10 @@ public final class User extends EntityDto<User> {
 
 	public String getFullName() {
 		return firstName + " " + lastName;
+	}
+
+	public boolean getGeneratePassword() {
+		return generatePassword;
 	}
 
 	public ArrayList<Integer> getGroupIds() {
@@ -84,12 +89,12 @@ public final class User extends EntityDto<User> {
 		return startDate;
 	}
 
-	public String getUserType() {
-		return userType;
+	public boolean getSystemAdministrator() {
+		return systemAdministrator;
 	}
 
-	public int getUserTypeId() {
-		return userTypeId;
+	public String getUserName() {
+		return email;
 	}
 
 	public boolean isActive() {
@@ -114,6 +119,10 @@ public final class User extends EntityDto<User> {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	public void setGeneratePassword(boolean generatePassword) {
+		this.generatePassword = generatePassword;
 	}
 
 	public void setGroupIds(ArrayList<Integer> groupIds) {
@@ -152,12 +161,8 @@ public final class User extends EntityDto<User> {
 		this.startDate = startDate;
 	}
 
-	public void setUserType(String userType) {
-		this.userType = userType;
-	}
-
-	public void setUserTypeId(int userTypeId) {
-		this.userTypeId = userTypeId;
+	public void setSystemAdministrator(boolean systemAdministrator) {
+		this.systemAdministrator = systemAdministrator;
 	}
 
 }

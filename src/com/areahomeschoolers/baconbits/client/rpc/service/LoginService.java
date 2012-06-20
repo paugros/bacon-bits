@@ -16,5 +16,9 @@ public interface LoginService extends RemoteService {
 
 	ApplicationData loginAndGetApplicationData(String username, String password);
 
+	ApplicationData loginForPasswordReset(int id, String digest);
+
 	void logout();
+
+	boolean sendPasswordResetEmail(String username);
 }

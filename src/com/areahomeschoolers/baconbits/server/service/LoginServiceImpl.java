@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
+import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
@@ -21,10 +22,12 @@ import com.areahomeschoolers.baconbits.shared.dto.User;
 public class LoginServiceImpl extends GwtController implements LoginService {
 	private static final long serialVersionUID = 1L;
 	private final AuthenticationManager authenticationManager;
+	private final UserDao userDao;
 
 	@Autowired
-	public LoginServiceImpl(AuthenticationManager authenticationManager) {
+	public LoginServiceImpl(AuthenticationManager authenticationManager, UserDao userDao) {
 		this.authenticationManager = authenticationManager;
+		this.userDao = userDao;
 	}
 
 	@Override
@@ -93,9 +96,24 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 	}
 
 	@Override
+	public ApplicationData loginForPasswordReset(int id, String digest) {
+		User u = userDao.setPasswordFromDigest(id, digest);
+		if (u == null) {
+			return null;
+		}
+
+		return loginAndGetApplicationData(u.getUserName(), digest);
+	}
+
+	@Override
 	public void logout() {
 		ServerContext.setCurrentUser(null);
 		ServerContext.getSession().setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, null);
 		SecurityContextHolder.clearContext();
+	}
+
+	@Override
+	public boolean sendPasswordResetEmail(String username) {
+		return userDao.sendPasswordResetEmail(username);
 	}
 }
