@@ -59,10 +59,12 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 			user.setEmail(rs.getString("email"));
 			user.setFirstName(rs.getString("firstName"));
 			user.setLastName(rs.getString("lastName"));
+			user.setPasswordDigest(rs.getString("passwordDigest"));
 			user.setHomePhone(rs.getString("homePhone"));
 			user.setMobilePhone(rs.getString("mobilePhone"));
 			user.setStartDate(rs.getTimestamp("startDate"));
 			user.setEndDate(rs.getTimestamp("endDate"));
+			user.setResetPassword(rs.getBoolean("resetPassword"));
 			user.setAddedDate(rs.getTimestamp("addedDate"));
 			user.setLastLoginDate(rs.getTimestamp("lastLoginDate"));
 			user.setActive(rs.getBoolean("isEnabled"));
@@ -97,8 +99,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 	@Autowired
 	public UserDaoImpl(DataSource dataSource) {
 		super(dataSource);
-		SELECT = "select isActive(startDate, endDate) as isEnabled, t.type, u.* from users u ";
-		SELECT += "join userTypes t on t.id = u.userTypeId ";
+		SELECT = "select isActive(startDate, endDate) as isEnabled, u.* from users u ";
 	}
 
 	@Override
@@ -176,15 +177,15 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		}
 
 		if (user.isSaved()) {
-			String sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, ";
-			sql += "homePhone = :homePhone, mobilePhone = :mobilePhone, lastLoginDate = :lastLoginDate, passwordDigest = :passwordDigest where id = :id";
+			String sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, isSystemAdministrator = :systemAdministrator, ";
+			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, lastLoginDate = :lastLoginDate, passwordDigest = :passwordDigest where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (user.getStartDate() == null) {
 				user.setStartDate(new Date());
 			}
-			String sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, userTypeId) values ";
-			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, :userTypeId)";
+			String sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, isSystemAdministrator, resetPassword) values ";
+			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, :systemAdministrator, :resetPassword)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

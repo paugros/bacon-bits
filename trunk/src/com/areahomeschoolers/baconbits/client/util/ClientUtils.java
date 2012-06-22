@@ -3,9 +3,13 @@ package com.areahomeschoolers.baconbits.client.util;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import com.google.gwt.core.client.GWT;
+import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.rpc.service.DocumentService;
+import com.areahomeschoolers.baconbits.client.rpc.service.DocumentServiceAsync;
+import com.areahomeschoolers.baconbits.shared.dto.Document;
+
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.dom.client.TableSectionElement;
@@ -24,105 +28,25 @@ public abstract class ClientUtils {
 			KeyCodes.KEY_RIGHT, KeyCodes.KEY_END, KeyCodes.KEY_HOME, KeyCodes.KEY_ENTER, KeyCodes.KEY_ESCAPE, KeyCodes.KEY_DELETE, KeyCodes.KEY_SHIFT,
 			KeyCodes.KEY_ALT, KeyCodes.KEY_CTRL, KeyCodes.KEY_TAB };
 	public static final List<Character> ALLOWED_KEY_CODES = Collections.unmodifiableList(Arrays.asList(PRIVATE_ALLOWED_KEY_CODES));
-	private static Map<String, String> linkers;
-
-	public static String applyCodeTag(String buff) {
-		if (buff == null) {
-			return buff;
-		}
-		String ret = new String(buff);
-		if (GWT.isScript()) {
-			ret = injectCodeTag(ret);
-		} else {
-			ret = ret.replaceAll("(?=\\[pre\\])(.*?)\\[\\/pre\\]", "<pre>$1</pre>");
-		}
-		return ret;
-	}
-
-	/**
-	 * @param buf
-	 *            String to apply linkers to
-	 * @return A new string, in which all linkers are applied
-	 */
-	public static String applyLinkers(String buf) {
-		if (buf == null) {
-			return buf;
-		}
-		String ret = new String(buf);
-
-		for (String key : linkers.keySet()) {
-			String url = linkers.get(key);
-			if (GWT.isScript()) {
-				ret = injectLinker(key, url, ret);
-			} else {
-				ret = ret.replaceAll("(?i)(" + key + ")-(\\d+)", "<a href=\"" + url + "\">$1-$2</a>");
-			}
-		}
-		return ret;
-	}
 
 	public static void exportCsvFile(String name, String fileData) {
-		// DocumentServiceAsync documentService = (DocumentServiceAsync) ServiceCache.getService(DocumentService.class);
-		//
-		// Document document = new Document();
-		// document.setSystemDocument(true);
-		// document.setStringData(fileData);
-		// document.setFileExtension("csv");
-		// document.setDescription("__TEMPORARY_CSV_FILE__");
-		// document.setFileName(name + ".csv");
-		// document.setFileType("application/vnd.ms-excel");
-		// document.setAddedById(Application.getCurrentUser().getId());
-		//
-		// documentService.save(document, new Callback<Document>(false) {
-		// @Override
-		// protected void doOnSuccess(Document doc) {
-		// String url = "/ribeye/service/file?id=" + doc.getId() + "&deleteAfterServing=1";
-		// Window.Location.replace(url);
-		// }
-		// });
+		DocumentServiceAsync documentService = (DocumentServiceAsync) ServiceCache.getService(DocumentService.class);
+
+		Document document = new Document();
+		document.setStringData(fileData);
+		document.setFileExtension("csv");
+		document.setDescription("__TEMPORARY_CSV_FILE__");
+		document.setFileName(name + ".csv");
+		document.setFileType("application/vnd.ms-excel");
+
+		documentService.save(document, new Callback<Document>(false) {
+			@Override
+			protected void doOnSuccess(Document doc) {
+				String url = "/baconbits/service/file?id=" + doc.getId() + "&deleteAfterServing=1";
+				Window.Location.replace(url);
+			}
+		});
 	}
-
-	// public static void downloadExcelFile(String title, String data) {
-	// DocumentServiceAsync documentService = (DocumentServiceAsync) ServiceCache.getService(DocumentService.class);
-	//
-	// Document document = new Document();
-	// document.setSystemDocument(true);
-	// document.setStringData(data);
-	// document.setFileExtension("csv");
-	// document.setDescription("__TEMPORARY_CSV_FILE__");
-	// document.setFileName(title + ".csv");
-	// document.setFileType("application/vnd.ms-excel");
-	// document.setAddedById(Application.getCurrentUser().getId());
-	//
-	// documentService.save(document, new Callback<Document>(false) {
-	// @Override
-	// protected void doOnSuccess(Document doc) {
-	// String url = "/ribeye/service/file?id=" + doc.getId() + "&deleteAfterServing=1";
-	// Window.Location.replace(url);
-	// }
-	// });
-	// }
-
-	// public static void exportCsvFile(String name, String fileData) {
-	// DocumentServiceAsync documentService = (DocumentServiceAsync) ServiceCache.getService(DocumentService.class);
-	//
-	// Document document = new Document();
-	// document.setSystemDocument(true);
-	// document.setStringData(fileData);
-	// document.setFileExtension("csv");
-	// document.setDescription("__TEMPORARY_CSV_FILE__");
-	// document.setFileName(name + ".csv");
-	// document.setFileType("application/vnd.ms-excel");
-	// document.setAddedById(Application.getCurrentUser().getId());
-	//
-	// documentService.save(document, new Callback<Document>(false) {
-	// @Override
-	// protected void doOnSuccess(Document doc) {
-	// String url = "/ribeye/service/file?id=" + doc.getId() + "&deleteAfterServing=1";
-	// Window.Location.replace(url);
-	// }
-	// });
-	// }
 
 	/**
 	 * Returns a parent DOM element of the specified type.
@@ -201,15 +125,6 @@ public abstract class ClientUtils {
 		}
 	}
 
-	/**
-	 * Called by Application on client initialization.
-	 * 
-	 * @param map
-	 */
-	public static void setLinkers(Map<String, String> map) {
-		ClientUtils.linkers = map;
-	}
-
 	private static Element getParentElementByTagName(Element el, String type, int depth) {
 		if (el == null) {
 			return null;
@@ -221,16 +136,6 @@ public abstract class ClientUtils {
 		}
 		return getParentElementByTagName(el.getParentElement(), type, ++depth);
 	}
-
-	private static native String injectCodeTag(String text) /*-{
-		var pattern = new RegExp("\\[pre\\](.*?)(?:\\[\\/pre\\])", "gi");
-		return text.replace(pattern, "<pre>$1</pre>");
-	}-*/;
-
-	private static native String injectLinker(String key, String url, String text) /*-{
-		var pattern = new RegExp("(" + key + ")-(\\d+)", "gi");
-		return text.replace(pattern, "<a href=\"" + url + "\">$1-$2</a>");
-	}-*/;
 
 	private ClientUtils() {
 	}

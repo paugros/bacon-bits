@@ -123,6 +123,9 @@ public final class User extends EntityDto<User> {
 
 	public void setGeneratePassword(boolean generatePassword) {
 		this.generatePassword = generatePassword;
+		if (generatePassword) {
+			resetPassword = true;
+		}
 	}
 
 	public void setGroupIds(ArrayList<Integer> groupIds) {

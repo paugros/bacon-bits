@@ -52,10 +52,10 @@ public class UserServiceImpl extends GwtController implements UserService {
 
 	@Override
 	public ServerResponseData<User> save(User user) {
-		String portalPassword = "";
+		String password = "";
 		if (user.getGeneratePassword()) {
-			portalPassword = UserDaoImpl.generatePassword();
-			user.setPassword(portalPassword);
+			password = UserDaoImpl.generatePassword();
+			user.setPassword(password);
 		}
 
 		ServerResponseData<User> response = dao.save(user);
@@ -74,7 +74,7 @@ public class UserServiceImpl extends GwtController implements UserService {
 			msg += "Login information appears below. You will be required to establish a new password upon logging in.\n\n";
 			msg += "Site: http://areahomeschoolers.appspot.com/\n";
 			msg += "User name: " + user.getUserName() + "\n";
-			msg += "Password: " + portalPassword + "\n\n";
+			msg += "Password: " + password + "\n\n";
 			msg += "Thank you.\n\n";
 			mail.setBody(msg);
 			mail.send();

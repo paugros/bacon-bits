@@ -11,10 +11,13 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.UserListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserPage;
+import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
@@ -120,6 +123,19 @@ public final class Application implements ValueChangeHandler<String> {
 			History.fireCurrentHistoryState();
 		} else {
 			History.newItem(DEFAULT_TOKEN);
+		}
+
+		if (isAuthenticated() && getCurrentUser().getResetPassword()) {
+			GWT.runAsync(new RunAsyncCallback() {
+				@Override
+				public void onFailure(Throwable caught) {
+				}
+
+				@Override
+				public void onSuccess() {
+					new ResetPasswordDialog(false).center();
+				}
+			});
 		}
 
 		Window.addWindowClosingHandler(new ClosingHandler() {
