@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -14,6 +15,9 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
@@ -21,12 +25,15 @@ import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -149,8 +156,42 @@ public class UserPage implements Page {
 		fieldTable.addField(adminField);
 
 		if (user.isSaved()) {
-			updatePasswordLabel();
-			fieldTable.addField("Password:", passwordLabel);
+			FormField passwordField = new FormField("Password:", passwordLabel, passwordLabel);
+			passwordField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					updatePasswordLabel();
+				}
+			});
+			passwordField.initialize();
+			passwordField.emancipate();
+			passwordField.getLinkPanel().clear();
+			passwordField.setEnabled(false);
+			passwordField.getLinkPanel().add(new ClickLabel("Reset password", new MouseDownHandler() {
+				@Override
+				public void onMouseDown(MouseDownEvent event) {
+					String msg = "Reset the password for this user? Login information will be sent to their email address.";
+					ConfirmDialog.confirm(msg, new ConfirmHandler() {
+						@Override
+						public void onConfirm() {
+							user.setGeneratePassword(true);
+							userService.save(user, new Callback<ServerResponseData<User>>() {
+								@Override
+								protected void doOnSuccess(ServerResponseData<User> result) {
+									if (result.hasErrors()) {
+										new ServerResponseDialog(result).center();
+										return;
+									}
+									user = result.getData();
+									updatePasswordLabel();
+									AlertDialog.alert("Login Information Sent", new Label("Login information has been emailed to the user."));
+								}
+							});
+						}
+					});
+				}
+			}));
+			fieldTable.addField(passwordField);
 		}
 
 		final Label homePhoneDisplay = new Label();

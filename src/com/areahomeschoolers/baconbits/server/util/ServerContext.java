@@ -91,6 +91,10 @@ public class ServerContext implements ApplicationContextAware {
 		return tl.get().request.getSession();
 	}
 
+	public static boolean isAuthenticated() {
+		return getCurrentUser() != null;
+	}
+
 	public static boolean isLive() {
 		if (isLiveIsSet) {
 			return isLive;

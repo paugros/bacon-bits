@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
+import com.areahomeschoolers.baconbits.client.util.UserPreferences;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 
 import com.google.gwt.core.client.Scheduler;
@@ -26,6 +27,7 @@ import com.google.gwt.view.client.HasRows;
 import com.google.gwt.view.client.Range;
 
 public class VariableSizePager extends AbstractPager {
+
 	private static class ImageButton extends Image {
 		private boolean disabled;
 		private final ImageResource resDisabled;
@@ -161,7 +163,8 @@ public class VariableSizePager extends AbstractPager {
 					}
 				}
 				titlebar.cellTable.refresh();
-				// UserPreferences.save(getPageSizePrefString(), pageSizeListBox.getSelectedText());
+				UserPreferences.save(getPageSizePrefString(), pageSizeListBox.getSelectedText());
+
 				for (ParameterHandler<Integer> ph : pageSizeChangeHandlers) {
 					ph.execute(desiredPageSize);
 				}

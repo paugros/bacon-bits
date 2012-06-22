@@ -160,7 +160,7 @@ public final class Layout {
 		logInOrOut.addStyleName("nowrap");
 		sessionPanel.add(logInOrOut);
 
-		if (!Application.isAuthenticated()) {
+		if (Application.isAuthenticated()) {
 			ClickLabel resetLabel = new ClickLabel("Change password", new MouseDownHandler() {
 				@Override
 				public void onMouseDown(MouseDownEvent event) {

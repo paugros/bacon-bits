@@ -10,6 +10,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -99,6 +101,22 @@ public class LoginDialog extends DialogBox {
 
 		VerticalPanel pp = new VerticalPanel();
 		pp.add(passwordInput);
+
+		ClickLabel forgot = new ClickLabel("Forgot password?", new MouseDownHandler() {
+			@Override
+			public void onMouseDown(MouseDownEvent event) {
+				hide();
+				ForgotPasswordDialog dialog = new ForgotPasswordDialog(loginService, new Command() {
+					@Override
+					public void execute() {
+						center();
+					}
+				});
+				dialog.center();
+			}
+		});
+		forgot.addStyleName("smallText");
+		pp.add(forgot);
 
 		Grid g = new Grid(3, 2);
 		g.setCellPadding(5);

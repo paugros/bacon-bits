@@ -11,6 +11,10 @@ public abstract class UserPreferences {
 	private static UserPreferenceServiceAsync userPreferenceService = (UserPreferenceServiceAsync) ServiceCache.getService(UserPreferenceService.class);
 
 	public static void save(String key, String value) {
+		if (Application.getUserPreferences() == null) {
+			return;
+		}
+
 		Application.getUserPreferences().put(key, value);
 		userPreferenceService.set(Application.getCurrentUser().getId(), key, value, new Callback<Void>(false) {
 			@Override

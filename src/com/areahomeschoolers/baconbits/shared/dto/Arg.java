@@ -7,6 +7,10 @@ public interface Arg {
 
 	}
 
+	public enum DocumentArg implements Arg, IsSerializable {
+
+	}
+
 	public enum EventArg implements Arg, IsSerializable {
 
 	}
