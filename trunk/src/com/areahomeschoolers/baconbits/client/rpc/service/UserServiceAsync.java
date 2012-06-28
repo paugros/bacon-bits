@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -19,6 +20,8 @@ public interface UserServiceAsync {
 	void getUserByUsername(String username, AsyncCallback<User> callback);
 
 	void list(ArgMap<UserArg> args, AsyncCallback<ArrayList<User>> callback);
+
+	void listGroups(ArgMap<UserArg> args, AsyncCallback<ArrayList<UserGroup>> callback);
 
 	void save(User user, AsyncCallback<ServerResponseData<User>> callback);
 

@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -28,6 +29,8 @@ import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
@@ -167,30 +170,32 @@ public class UserPage implements Page {
 			passwordField.emancipate();
 			passwordField.getLinkPanel().clear();
 			passwordField.setEnabled(false);
-			passwordField.getLinkPanel().add(new ClickLabel("Reset password", new MouseDownHandler() {
-				@Override
-				public void onMouseDown(MouseDownEvent event) {
-					String msg = "Reset the password for this user? Login information will be sent to their email address.";
-					ConfirmDialog.confirm(msg, new ConfirmHandler() {
-						@Override
-						public void onConfirm() {
-							user.setGeneratePassword(true);
-							userService.save(user, new Callback<ServerResponseData<User>>() {
-								@Override
-								protected void doOnSuccess(ServerResponseData<User> result) {
-									if (result.hasErrors()) {
-										new ServerResponseDialog(result).center();
-										return;
+			if (Application.isAuthenticated()) {
+				passwordField.getLinkPanel().add(new ClickLabel("Reset password", new MouseDownHandler() {
+					@Override
+					public void onMouseDown(MouseDownEvent event) {
+						String msg = "Reset the password for this user? Login information will be sent to their email address.";
+						ConfirmDialog.confirm(msg, new ConfirmHandler() {
+							@Override
+							public void onConfirm() {
+								user.setGeneratePassword(true);
+								userService.save(user, new Callback<ServerResponseData<User>>() {
+									@Override
+									protected void doOnSuccess(ServerResponseData<User> result) {
+										if (result.hasErrors()) {
+											new ServerResponseDialog(result).center();
+											return;
+										}
+										user = result.getData();
+										updatePasswordLabel();
+										AlertDialog.alert("Login Information Sent", new Label("Login information has been emailed to the user."));
 									}
-									user = result.getData();
-									updatePasswordLabel();
-									AlertDialog.alert("Login Information Sent", new Label("Login information has been emailed to the user."));
-								}
-							});
-						}
-					});
-				}
-			}));
+								});
+							}
+						});
+					}
+				}));
+			}
 			fieldTable.addField(passwordField);
 		}
 
@@ -278,6 +283,25 @@ public class UserPage implements Page {
 		form.initialize();
 
 		page.add(WidgetFactory.newSection(title, fieldTable));
+
+		if (user.isSaved()) {
+			ArgMap<UserArg> args = new ArgMap<UserArg>();
+			args.put(UserArg.USER_ID, user.getId());
+			final UserGroupCellTable groupsTable = new UserGroupCellTable(args);
+			groupsTable.setTitle("Group Membership");
+			groupsTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
+			groupsTable.getTitleBar().addExcelControl();
+			groupsTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
+				@Override
+				public void onMouseDown(MouseDownEvent event) {
+					UserGroupSelector selector = new UserGroupSelector(new ArgMap<UserArg>());
+					selector.setMultiSelect(true);
+					selector.center();
+				}
+			}));
+			groupsTable.populate();
+			page.add(WidgetFactory.newSection(groupsTable));
+		}
 
 		if (!user.isSaved()) {
 			form.configureForAdd(fieldTable);

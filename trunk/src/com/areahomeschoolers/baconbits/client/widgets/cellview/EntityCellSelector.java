@@ -549,8 +549,6 @@ public abstract class EntityCellSelector<T extends EntityDto<T>, U extends Arg, 
 		return canSubmit;
 	}
 
-	protected abstract SelectionPolicy getSelectionPolicy();
-
 	/**
 	 * Sets or replaces the {@link EntityDataTable} paired with this selector.
 	 * 
