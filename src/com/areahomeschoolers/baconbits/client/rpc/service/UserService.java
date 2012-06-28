@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -23,6 +24,8 @@ public interface UserService extends RemoteService {
 	public User getUserByUsername(String username);
 
 	public ArrayList<User> list(ArgMap<UserArg> args);
+
+	public ArrayList<UserGroup> listGroups(ArgMap<UserArg> args);
 
 	public ServerResponseData<User> save(User user);
 

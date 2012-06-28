@@ -31,6 +31,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 import edu.vt.middleware.password.CharacterCharacteristicsRule;
@@ -51,6 +52,22 @@ import edu.vt.middleware.password.WhitespaceRule;
 
 @Repository
 public class UserDaoImpl extends SpringWrapper implements UserDao {
+	private final class GroupMapper implements RowMapper<UserGroup> {
+		@Override
+		public UserGroup mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return createUserGroup(rs);
+		}
+	}
+
+	private final class GroupMemberMapper implements RowMapper<UserGroup> {
+		@Override
+		public UserGroup mapRow(ResultSet rs, int rowNum) throws SQLException {
+			UserGroup g = createUserGroup(rs);
+			g.setAdministrator(rs.getBoolean("isAdministrator"));
+			return g;
+		}
+	}
+
 	private final class UserMapper implements RowMapper<User> {
 		@Override
 		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -74,6 +91,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 	}
 
 	private static String SELECT;
+
 	public static MessageResolver resolver = null;
 
 	public final static String generatePassword() {
@@ -145,6 +163,26 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		ArrayList<User> data = query(sql, new UserMapper());
 
 		return data;
+	}
+
+	@Override
+	public ArrayList<UserGroup> listGroups(ArgMap<UserArg> args) {
+		int userId = args.getInt(UserArg.USER_ID);
+
+		List<Object> sqlArgs = new ArrayList<Object>();
+		String sql = "select * from groups g ";
+		if (userId > 0) {
+			sql += "join userGroupMembers ugm on ugm.groupId = g.id ";
+			sql += "where ugm.userId = ? ";
+			sqlArgs.add(userId);
+		}
+		sql += "order by groupName asc";
+
+		if (userId > 0) {
+			return query(sql, new GroupMemberMapper(), sqlArgs.toArray());
+		}
+
+		return query(sql, new GroupMapper(), sqlArgs.toArray());
 	}
 
 	@Override
@@ -336,6 +374,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 			return validator.getMessages(result);
 		}
 		return new ArrayList<String>();
+	}
+
+	private UserGroup createUserGroup(ResultSet rs) throws SQLException {
+		UserGroup group = new UserGroup();
+		group.setGroupName(rs.getString("groupName"));
+		group.setDescription(rs.getString("description"));
+		return group;
 	}
 
 }

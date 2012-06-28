@@ -16,6 +16,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 @Controller
@@ -48,6 +49,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 	@Override
 	public ArrayList<User> list(ArgMap<UserArg> args) {
 		return dao.list(args);
+	}
+
+	@Override
+	public ArrayList<UserGroup> listGroups(ArgMap<UserArg> args) {
+		return dao.listGroups(args);
 	}
 
 	@Override
