@@ -290,6 +290,39 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 	}
 
 	@Override
+	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add) {
+		for (User u : users) {
+			updateUserGroupRelation(u, g, add);
+		}
+	}
+
+	@Override
+	public void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add) {
+		for (UserGroup ug : g) {
+			updateUserGroupRelation(u, ug, add);
+		}
+	}
+
+	@Override
+	public void updateUserGroupRelation(User u, UserGroup g, boolean add) {
+		if (add) {
+			// Check if relation already exists
+			String sql = "select count(*) from userGroupMembers where userId = ? and groupId = ?";
+			if (queryForInt(sql, u.getId(), g.getId()) > 0) {
+				sql = "update userGroupMembers set isAdministrator = ? where userId = ? and groupId = ?";
+				update(sql, g.getAdministrator(), u.getId(), g.getId());
+				return;
+			}
+
+			sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, ?, ?)";
+			update(sql, u.getId(), g.getId(), g.getAdministrator());
+		} else {
+			String sql = "delete from userGroupMembers where userId = ? and groupId = ?";
+			update(sql, u.getId(), g.getId());
+		}
+	}
+
+	@Override
 	public List<String> validatePassword(String password) {
 		// password must be between 8 and 16 chars long
 		LengthRule lengthRule = new LengthRule(8, 20);
@@ -378,6 +411,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 
 	private UserGroup createUserGroup(ResultSet rs) throws SQLException {
 		UserGroup group = new UserGroup();
+		group.setId(rs.getInt("id"));
 		group.setGroupName(rs.getString("groupName"));
 		group.setDescription(rs.getString("description"));
 		return group;

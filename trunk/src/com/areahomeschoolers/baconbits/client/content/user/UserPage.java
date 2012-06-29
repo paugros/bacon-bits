@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
+import java.util.ArrayList;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
@@ -33,6 +35,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -288,14 +291,40 @@ public class UserPage implements Page {
 			ArgMap<UserArg> args = new ArgMap<UserArg>();
 			args.put(UserArg.USER_ID, user.getId());
 			final UserGroupCellTable groupsTable = new UserGroupCellTable(args);
+			groupsTable.setUser(user);
 			groupsTable.setTitle("Group Membership");
 			groupsTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
 			groupsTable.getTitleBar().addExcelControl();
 			groupsTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
 				@Override
 				public void onMouseDown(MouseDownEvent event) {
-					UserGroupSelector selector = new UserGroupSelector(new ArgMap<UserArg>());
+					final UserGroupSelector selector = new UserGroupSelector(new ArgMap<UserArg>());
+					selector.addSubmitCommand(new Command() {
+						@Override
+						public void execute() {
+							final ArrayList<UserGroup> groups = new ArrayList<UserGroup>(selector.getSelectedItems());
+							groups.removeAll(groupsTable.getFullList());
+							if (groups.isEmpty()) {
+								return;
+							}
+
+							for (UserGroup g : groups) {
+								if (!groupsTable.getFullList().contains(g)) {
+									groupsTable.addItem(g);
+								}
+							}
+							userService.updateUserGroupRelation(user, groups, true, new Callback<Void>() {
+								@Override
+								protected void doOnSuccess(Void item) {
+									groups.removeAll(groupsTable.getFullList());
+								}
+							});
+							selector.clearSelection();
+						}
+					});
+
 					selector.setMultiSelect(true);
+					selector.setSelectedItems(groupsTable.getFullList());
 					selector.center();
 				}
 			}));

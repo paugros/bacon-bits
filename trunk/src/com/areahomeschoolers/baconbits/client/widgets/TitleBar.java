@@ -2,11 +2,15 @@ package com.areahomeschoolers.baconbits.client.widgets;
 
 import java.util.ArrayList;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserPreferenceService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserPreferenceServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -54,7 +58,7 @@ public class TitleBar extends Composite {
 
 	protected UserPreferenceServiceAsync userPreferenceService = (UserPreferenceServiceAsync) ServiceCache.getService(UserPreferenceService.class);
 
-	ArrayList<Widget> totalWidgets = new ArrayList<Widget>();
+	private ArrayList<Widget> totalWidgets = new ArrayList<Widget>();
 
 	/**
 	 * @param titleText
@@ -172,6 +176,61 @@ public class TitleBar extends Composite {
 		titleGrid.setWidget(0, 2, visibilityControl);
 		titleGrid.getCellFormatter().setHorizontalAlignment(0, 2, HasHorizontalAlignment.ALIGN_RIGHT);
 		titleGrid.getCellFormatter().setWidth(0, 2, "15px");
+	}
+
+	public void addVisibilityControl(final Widget contents, final String userPreference, final ParameterHandler<Boolean> afterVisibility) {
+		userPreferenceService.getPreferencesByGroupName(Application.getCurrentUser().getId(), userPreference, new Callback<Data>() {
+			@Override
+			protected void doOnSuccess(Data result) {
+				boolean hidden = false;
+				if (result.isEmpty()) {
+					if (contents != null) {
+						addVisibilityControl(contents, true, new Command() {
+							@Override
+							public void execute() {
+								if (afterVisibility != null) {
+									afterVisibility.execute(contents.isVisible());
+								}
+								userPreferenceService.set(Application.getCurrentUser().getId(), userPreference, Boolean.toString(!contents.isVisible()),
+										new Callback<Void>() {
+											@Override
+											protected void doOnSuccess(Void result) {
+											}
+										});
+							}
+						});
+						if (afterVisibility != null) {
+							afterVisibility.execute(true);
+						}
+					}
+				} else {
+					try {
+						hidden = !Boolean.parseBoolean(result.get(userPreference));
+						if (afterVisibility != null) {
+							afterVisibility.execute(hidden);
+						}
+					} catch (Exception e) {
+					}
+					if (contents != null) {
+						addVisibilityControl(contents, hidden, new Command() {
+							@Override
+							public void execute() {
+								if (afterVisibility != null) {
+									afterVisibility.execute(contents.isVisible());
+								}
+								userPreferenceService.set(Application.getCurrentUser().getId(), userPreference, Boolean.toString(!contents.isVisible()),
+										new Callback<Void>() {
+											@Override
+											protected void doOnSuccess(Void result) {
+											}
+										});
+							}
+						});
+					}
+				}
+
+			}
+		});
 	}
 
 	public void clearLinks() {

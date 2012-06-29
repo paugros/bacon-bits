@@ -2,15 +2,25 @@ package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
+
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.ui.Widget;
 
 public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg, UserGroupColumn> {
 	public enum UserGroupColumn implements EntityCellTableColumn<UserGroupColumn> {
@@ -28,6 +38,8 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 		}
 	}
 
+	private User user;
+
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
 	public UserGroupCellTable(ArgMap<UserArg> args) {
@@ -38,6 +50,14 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 	private UserGroupCellTable() {
 		setDefaultSortColumn(UserGroupColumn.NAME, SortDirection.SORT_ASC);
 		setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION);
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	@Override
@@ -66,17 +86,74 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 				});
 				break;
 			case ADMINISTRATOR:
-				addTextColumn(col, new ValueGetter<String, UserGroup>() {
-					@Override
-					public String get(UserGroup item) {
-						return Common.yesNo(item.getAdministrator());
-					}
-				});
+				if (user != null) {
+					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
+						@Override
+						protected Widget createWidget(final UserGroup item) {
+							return new ClickLabel(Common.yesNo(item.getAdministrator()), new MouseDownHandler() {
+								@Override
+								public void onMouseDown(MouseDownEvent event) {
+									String action = item.getAdministrator() ? "Revoke" : "Grant";
+									String confirm = action + " administrator access for " + user.getFullName() + " in the " + item.getGroupName() + " group?";
+									ConfirmDialog.confirm(confirm, new ConfirmHandler() {
+										@Override
+										public void onConfirm() {
+											item.setAdministrator(!item.getAdministrator());
+											refresh();
+											userService.updateUserGroupRelation(user, item, true, new Callback<Void>(false) {
+												@Override
+												protected void doOnSuccess(Void item) {
+												}
+											});
+										}
+									});
+								}
+							});
+						}
+					}, new ValueGetter<Boolean, UserGroup>() {
+						@Override
+						public Boolean get(UserGroup item) {
+							return item.getAdministrator();
+						}
+					});
+				} else {
+					addTextColumn(col, new ValueGetter<String, UserGroup>() {
+						@Override
+						public String get(UserGroup item) {
+							return Common.yesNo(item.getAdministrator());
+						}
+					});
+				}
 				break;
 			default:
 				new AssertionError();
 				break;
 			}
+		}
+
+		if (user != null) {
+			addCompositeWidgetColumn("Delete", new WidgetCellCreator<UserGroup>() {
+				@Override
+				protected Widget createWidget(final UserGroup group) {
+					return new ClickLabel("X", new MouseDownHandler() {
+						@Override
+						public void onMouseDown(MouseDownEvent event) {
+							String confirm = "Remove " + user.getFullName() + " from the " + group.getGroupName() + " group?";
+							ConfirmDialog.confirm(confirm, new ConfirmHandler() {
+								@Override
+								public void onConfirm() {
+									removeItem(group);
+									userService.updateUserGroupRelation(user, group, false, new Callback<Void>(false) {
+										@Override
+										protected void doOnSuccess(Void item) {
+										}
+									});
+								}
+							});
+						}
+					});
+				}
+			});
 		}
 	}
 

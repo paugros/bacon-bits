@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
@@ -76,6 +77,11 @@ import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C extends Enum<C> & EntityCellTableColumn<C>> extends CellTable<T> {
+
+	public enum AddOption {
+		SKIP_SORT, SKIP_ROW_UPDATE
+	}
+
 	/**
 	 * Selection configuration options.
 	 */
@@ -368,8 +374,21 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		}, dateGetter);
 	}
 
-	public void addItem(T item) {
-		addItem(item, true);
+	@SuppressWarnings("unchecked")
+	public void addItem(T item, final AddOption... options) {
+		Arrays.sort(options);
+		entityIdMap.put(entityKeyProvider.getKey(item), item);
+		hiddenItems.remove(item);
+		visibleItems.remove(item);
+		if (visibleItems.isEmpty()) {
+			populate(Arrays.asList(item));
+		} else {
+			visibleItems.add(item);
+			unfilteredList.add(item);
+			if (Arrays.binarySearch(options, AddOption.SKIP_ROW_UPDATE) == -1) {
+				onRowDataUpdate(Arrays.binarySearch(options, AddOption.SKIP_SORT) == -1, null);
+			}
+		}
 	}
 
 	/**
@@ -380,49 +399,23 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	 * @param sort
 	 *            Sort after adding
 	 */
-	public void addItem(T item, boolean sort) {
-		addItem(item, sort, true);
-	}
 
-	public void addItem(T item, boolean sort, boolean fireRowUpdate) {
-		entityIdMap.put(entityKeyProvider.getKey(item), item);
-		hiddenItems.remove(item);
-		visibleItems.remove(item);
-		unfilteredList.remove(item);
-		if (visibleItems.isEmpty()) {
-			ArrayList<T> items = new ArrayList<T>();
-			items.add(item);
-			populate(items);
-		} else {
-			visibleItems.add(item);
-			unfilteredList.add(item);
-			if (fireRowUpdate) {
-				onRowDataUpdate(sort);
-			}
-		}
-	}
-
-	public void addItems(ArrayList<T> items) {
-		addItems(items, true);
-	}
-
-	public void addItems(ArrayList<T> items, boolean sort) {
+	public void addItems(ArrayList<T> items, final AddOption... options) {
+		Arrays.sort(options);
 		if (visibleItems.isEmpty()) {
 			populate(items);
 		} else {
 			for (T item : items) {
-				addItem(item, false, false);
+				addItem(item, AddOption.SKIP_ROW_UPDATE, AddOption.SKIP_SORT);
 			}
-			onRowDataUpdate(sort);
+			if (Arrays.binarySearch(options, AddOption.SKIP_ROW_UPDATE) == -1) {
+				onRowDataUpdate(Arrays.binarySearch(options, AddOption.SKIP_SORT) == -1, null);
+			}
 		}
 	}
 
 	public Column<T, ?> addNumberColumn(EntityCellTableColumn<C> column, ValueGetter<Number, T> numberGetter) {
 		return addNumberColumn(column.getTitle(), numberGetter);
-	}
-
-	public Column<T, ?> addNumberColumn(EntityCellTableColumn<C> column, ValueGetter<Number, T> numberGetter, final String format) {
-		return addNumberColumn(column.getTitle(), numberGetter, format);
 	}
 
 	public Column<T, ?> addNumberColumn(String header, ValueGetter<Number, T> numberGetter) {
@@ -439,10 +432,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 
 		setColumnAlignment(getColumnCount() - 1, HasHorizontalAlignment.ALIGN_RIGHT);
 		return col;
-	}
-
-	public Column<T, SafeHtml> addSafeHtmlColumn(EntityCellTableColumn<C> column, final ValueGetter<SafeHtml, T> sortnDisplay) {
-		return addSafeHtmlColumn(column.getTitle().toString(), sortnDisplay);
 	}
 
 	public Column<T, SafeHtml> addSafeHtmlColumn(String header, final ValueGetter<SafeHtml, T> sortnDisplay) {
@@ -540,10 +529,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		return addAggregatedNumberColumn(header, AggregationMethod.TOTAL, null, numberGetter, "0", false);
 	}
 
-	public Column<T, ?> addTotaledNumberColumn(String header, ValueGetter<Number, T> numberGetter, String format) {
-		return addAggregatedNumberColumn(header, AggregationMethod.TOTAL, null, numberGetter, format, false);
-	}
-
 	public Column<T, ?> addTotaledNumberColumn(String header, WidgetCellCreator<T> cellCreator, ValueGetter<Number, T> numberGetter, String format) {
 		return addAggregatedNumberColumn(header, AggregationMethod.TOTAL, cellCreator, numberGetter, format, false);
 	}
@@ -595,7 +580,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		visibleItems.clear();
 		hiddenItems.clear();
 		unfilteredList.clear();
-		onRowDataUpdate(false);
+		onRowDataUpdate(false, null);
 	}
 
 	public void clearInitialized() {
@@ -617,12 +602,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 
 	public void disableUserSorting() {
 		sortPolicy = CellSortPolicy.ON_USER_DISABLED;
-	}
-
-	public void flushWidgets() {
-		for (WidgetCellCreator<?> cwc : cellWidgetCreators) {
-			cwc.flushCachce();
-		}
 	}
 
 	/**
@@ -770,7 +749,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 				updateTitleTotal();
 			}
 			if (fireRowUpdate) {
-				onRowDataUpdate(false);
+				onRowDataUpdate(false, null);
 			}
 			if (removed && hiddenItems.contains(item)) {
 				return true;
@@ -780,7 +759,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	}
 
 	public int indexOf(T item) {
-		return getVisibleItems().indexOf(item);
+		return visibleItems.indexOf(item);
 	}
 
 	public void insertItem(T item, int index) {
@@ -792,7 +771,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		unfilteredList.remove(item);
 		unfilteredList.add(item);
 		entityIdMap.put(entityKeyProvider.getKey(item), item);
-		onRowDataUpdate(true);
+		onRowDataUpdate(true, null);
 	}
 
 	public boolean isFinishedLoading() {
@@ -878,7 +857,9 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 
 	public void refresh(boolean flushWidgets) {
 		if (flushWidgets) {
-			flushWidgets();
+			for (WidgetCellCreator<?> cwc : cellWidgetCreators) {
+				cwc.flushCachce();
+			}
 		}
 		setRowData(0, visibleItems);
 		setRowCount(visibleItems.size());
@@ -954,7 +935,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		hiddenItems.remove(item);
 		entityIdMap.remove(entityKeyProvider.getKey(item));
 		if (update) {
-			onRowDataUpdate(sort);
+			onRowDataUpdate(sort, null);
 		}
 	}
 
@@ -965,7 +946,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		for (T item : items) {
 			removeItem(item, false, false);
 		}
-		onRowDataUpdate(true);
+		onRowDataUpdate(true, null);
 	}
 
 	public void revertSelectedItems() {
@@ -1079,7 +1060,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		for (T item : items) {
 			setItemVisible(item, visible, updateTotal);
 		}
-		onRowDataUpdate(false);
+		onRowDataUpdate(false, null);
 	}
 
 	public void setItemVisible(T item, boolean visible) {
@@ -1336,7 +1317,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		if (hasTitleBar()) {
 			updateTitleTotal();
 		}
-		onRowDataUpdate(sort);
+		onRowDataUpdate(sort, null);
 	}
 
 	/**
@@ -1370,7 +1351,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 				updateTitleTotal();
 			}
 			if (fireUpdate) {
-				onRowDataUpdate(sort);
+				onRowDataUpdate(sort, null);
 			}
 			return hiddenItems.remove(item) && visibleItems.contains(item);
 		}
@@ -1665,7 +1646,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 			entityIdMap.put(entityKeyProvider.getKey(item), item);
 		}
 		isFinishedLoading = true;
-		onRowDataUpdate(false);
+		onRowDataUpdate(false, null);
 	}
 
 	/**
@@ -1674,29 +1655,32 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	 * @return
 	 */
 	private boolean setSortFromPref() {
+		if (Application.getUserPreferences() == null) {
+			return false;
+		}
+
+		if (sortPolicy != CellSortPolicy.ON) {
+			return false;
+		}
+
+		String prefName = getSortPrefString();
+		if (prefName == null) {
+			return false;
+		}
+
+		prefName = TABLE_SORT_PREF + prefName;
+
+		String sortVal = Application.getUserPreferences().get(prefName);
+		if (sortVal == null) {
+			return false;
+		}
+
+		String[] vals = sortVal.split(";");
+		this.defaultSortDirection = "A".equals(vals[0]) ? SortDirection.SORT_ASC : SortDirection.SORT_DESC;
+		this.defaultSortIndex = Integer.parseInt(vals[1]);
+		this.defaultByIndex = true;
+
 		return true;
-		// if (sortPolicy != CellSortPolicy.ON) {
-		// return false;
-		// }
-		//
-		// String prefName = getSortPrefString();
-		// if (prefName == null) {
-		// return false;
-		// }
-		//
-		// prefName = TABLE_SORT_PREF + prefName;
-		//
-		// String sortVal = Application.getUserPreferences().get(prefName);
-		// if (sortVal == null) {
-		// return false;
-		// }
-		//
-		// String[] vals = sortVal.split(";");
-		// this.defaultSortDirection = "A".equals(vals[0]) ? SortDirection.SORT_ASC : SortDirection.SORT_DESC;
-		// this.defaultSortIndex = Integer.parseInt(vals[1]);
-		// this.defaultByIndex = true;
-		//
-		// return true;
 	}
 
 	private void setupSorting() {
@@ -1909,26 +1893,21 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		return Url.getParam("page") + ";" + title;
 	}
 
-	protected void onRowDataUpdate(boolean sort) {
-		onRowDataUpdate(sort, null);
-	}
-
-	protected void onRowDataUpdate(boolean sort, final boolean flushWidgets, EntityCellTable<T, U, C> callingPartner) {
+	protected void onRowDataUpdate(boolean sort, EntityCellTable<T, U, C> callingPartner) {
 		if (sort) {
 			sort();
 		}
 		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 			@Override
 			public void execute() {
-				refresh(flushWidgets);
-				if (titleBar == null || (titleBar != null && titleBar.getPager() == null)
-						|| (titleBar != null && titleBar.getPager() != null && titleBar.getPager().getDisplay() == null)) {
+				if (titleBar == null || (titleBar != null && !titleBar.isPaging())) {
 					setVisibleRange(0, visibleItems.size());
 				}
 				if (EntityCellTable.this instanceof HasDisableCriteria<?>) {
 					((HasDisableCriteria<?>) EntityCellTable.this).applyDisableCriteria();
 				}
 				RowCountChangeEvent.fire(EntityCellTable.this, visibleItems.size(), true);
+				refresh();
 			}
 		});
 		for (EntityCellTable<T, U, C> partner : partners) {
@@ -1943,10 +1922,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 				partner.populate(getFullList());
 			}
 		}
-	}
-
-	protected void onRowDataUpdate(boolean sort, EntityCellTable<T, U, C> callingPartner) {
-		onRowDataUpdate(sort, true, callingPartner);
 	}
 
 	/**
