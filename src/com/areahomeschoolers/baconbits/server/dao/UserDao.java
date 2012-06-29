@@ -30,5 +30,11 @@ public interface UserDao {
 
 	public User setPasswordFromDigest(int id, String digest);
 
+	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add);
+
+	public void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add);
+
+	public void updateUserGroupRelation(User u, UserGroup g, boolean add);
+
 	public List<String> validatePassword(String password);
 }

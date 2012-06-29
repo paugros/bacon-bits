@@ -3,22 +3,23 @@ package com.areahomeschoolers.baconbits.client.widgets.cellview;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
-import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
-import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.EntityDto;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -36,7 +37,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 
 	protected EntityCellTable<T, ?, ?> cellTable;
-	private VariableSizePager pagingControl = new VariableSizePager(this);
+	private VariableSizePager pagingControl;
 	private HorizontalPanel searchControl;
 	private Image tableSearchControl;
 	private Image refreshControl;
@@ -44,13 +45,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	private List<Command> refreshCommands = new ArrayList<Command>();
 	private TextBox searchControlInput = new TextBox();
 	private DefaultListBox filterListControl;
-
-	private Timer searchTimer = new Timer() {
-		@Override
-		public void run() {
-			searchTable();
-		}
-	};
+	private Timer searchTimer;
 
 	private ClickLabel clearFilter;
 
@@ -60,6 +55,39 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 
 	public CellTitleBar(String titleText, TitleBarStyle type, VariableSizePager pagingControl) {
 		super(titleText, type);
+	}
+
+	public void addActiveFilterControl() {
+		final DefaultListBox listBox = addFilterListControl();
+		listBox.addItem("Active");
+		listBox.addItem("Inactive");
+		listBox.addItem("All");
+
+		listBox.setValue(Common.ucWords(cellTable.getArgMap().getStatus().toString()));
+
+		listBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				String val = listBox.getValue();
+				ArgMap<?> args = cellTable.getArgMap();
+				Status oldStatus = args.getStatus();
+				Status newStatus;
+
+				if ("Active".equals(val)) {
+					newStatus = Status.ACTIVE;
+				} else if ("Inactive".equals(val)) {
+					newStatus = Status.INACTIVE;
+				} else {
+					newStatus = Status.ALL;
+				}
+
+				args.setStatus(newStatus);
+
+				if (oldStatus != newStatus) {
+					cellTable.populate();
+				}
+			}
+		});
 	}
 
 	public void addExcelControl() {
@@ -95,7 +123,8 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public void addPagingControl() {
-		if (cellTable != null && pagingControl != null) {
+		if (cellTable != null) {
+			pagingControl = new VariableSizePager(this);
 			pagingControl.setDisplay(cellTable);
 			pagingControl.setPageSize(cellTable.getPageSize());
 			pagingControl.setPageStart(cellTable.getPageStart());
@@ -137,6 +166,13 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		if (tableSearchControl != null || cellTable == null) {
 			return;
 		}
+
+		searchTimer = new Timer() {
+			@Override
+			public void run() {
+				searchTable();
+			}
+		};
 
 		searchControlInput.setHeight("16px");
 		if (searchControl == null) {
@@ -211,53 +247,6 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		addVisibilityControl(cellTable, userPreference, afterVisibility);
 	}
 
-	public void addVisibilityControl(final Widget contents, final String userPreference, final ParameterHandler<Boolean> afterVisibility) {
-		userPreferenceService.getPreferencesByGroupName(Application.getCurrentUser().getId(), userPreference, new Callback<Data>() {
-			@Override
-			protected void doOnSuccess(Data result) {
-				boolean hidden = false;
-				if (result.isEmpty()) {
-					if (contents != null) {
-						addVisibilityControl(contents, true, new Command() {
-							@Override
-							public void execute() {
-								afterVisibility.execute(contents.isVisible());
-								userPreferenceService.set(Application.getCurrentUser().getId(), userPreference, Boolean.toString(!contents.isVisible()),
-										new Callback<Void>() {
-											@Override
-											protected void doOnSuccess(Void result) {
-											}
-										});
-							}
-						});
-						afterVisibility.execute(true);
-					}
-				} else {
-					try {
-						hidden = !Boolean.parseBoolean(result.get(userPreference));
-						afterVisibility.execute(hidden);
-					} catch (Exception e) {
-					}
-					if (contents != null) {
-						addVisibilityControl(contents, hidden, new Command() {
-							@Override
-							public void execute() {
-								afterVisibility.execute(contents.isVisible());
-								userPreferenceService.set(Application.getCurrentUser().getId(), userPreference, Boolean.toString(!contents.isVisible()),
-										new Callback<Void>() {
-											@Override
-											protected void doOnSuccess(Void result) {
-											}
-										});
-							}
-						});
-					}
-				}
-
-			}
-		});
-	}
-
 	public void clearFilter() {
 		if (searchControlInput != null) {
 			searchControlInput.setText("");
@@ -265,7 +254,9 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		if (clearFilter != null) {
 			clearFilter.setEnabled(false);
 		}
-		searchTable();
+		if (tableSearchControl != null) {
+			searchTable();
+		}
 	}
 
 	/**
@@ -283,12 +274,17 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		return !searchControlInput.getText().isEmpty();
 	}
 
+	public boolean isPaging() {
+		return pagingControl != null;
+	}
+
 	public void removePagingControl() {
-		pagingControl.setPageSize(Integer.MAX_VALUE);
-		pagingControl.setDisplay(null);
 		int pagerIndex = controlPanel.getWidgetIndex(pagingControl);
 		controlPanel.remove(pagerIndex);
 		controlPanel.remove(pagerIndex - 1);
+		pagingControl.setPageSize(Integer.MAX_VALUE);
+		pagingControl.setDisplay(null);
+		pagingControl = null;
 	}
 
 	/**
@@ -300,7 +296,9 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public void setPageResizingEnabled(boolean pageResizingEnabled) {
-		pagingControl.setPageResizingEnabled(pageResizingEnabled);
+		if (isPaging()) {
+			pagingControl.setPageResizingEnabled(pageResizingEnabled);
+		}
 	}
 
 	@Override
@@ -333,10 +331,13 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 
 	@Override
 	protected void setTotalContents(int total) {
-		if (getPager().getDisplay() != null) {
-			totalPanel.add(new HTML(pagingControl.getPagingDetails()));
+		if (isPaging()) {
+			HTML label = new HTML(pagingControl.getPagingDetails());
+			label.setWordWrap(false);
+			totalPanel.add(label);
 			return;
 		}
+
 		if (((cellTable != null && !hasFilter() && filterListControl == null) || total == cellTable.getFullList().size())) {
 			totalPanel.add(new HTML(Formatter.formatNumber(total, "#,###")));
 			return;

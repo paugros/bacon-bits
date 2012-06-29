@@ -482,6 +482,7 @@ public abstract class EntityCellSelector<T extends EntityDto<T>, U extends Arg, 
 			};
 			entityCellTable.addDataReturnHandler(showHandler);
 		}
+
 		if (autoPopulated) {
 			if (!entityCellTable.hasBeenPopulated()) {
 				entityCellTable.populate();

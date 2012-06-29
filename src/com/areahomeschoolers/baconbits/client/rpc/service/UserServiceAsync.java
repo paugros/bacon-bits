@@ -25,5 +25,11 @@ public interface UserServiceAsync {
 
 	void save(User user, AsyncCallback<ServerResponseData<User>> callback);
 
+	void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add, AsyncCallback<Void> callback);
+
+	void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add, AsyncCallback<Void> callback);
+
+	void updateUserGroupRelation(User u, UserGroup g, boolean add, AsyncCallback<Void> callback);
+
 	void validatePassword(String password, AsyncCallback<ServerResponseData<String>> callback);
 }
