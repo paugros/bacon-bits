@@ -14,10 +14,14 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.GroupListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -28,6 +32,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class ArticlePage implements Page {
 	private Form form = new Form(new FormSubmitHandler() {
@@ -76,7 +81,7 @@ public class ArticlePage implements Page {
 		titleInput.addStyleName("hugeText");
 		titleInput.setVisibleLength(65);
 		titleInput.setMaxLength(100);
-		FormField titleField = form.createFormField("", titleInput, titleDisplay);
+		FormField titleField = form.createFormField("Title:", titleInput, titleDisplay);
 		titleField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
@@ -91,6 +96,53 @@ public class ArticlePage implements Page {
 			}
 		});
 		fieldTable.addField(titleField);
+
+		if (Application.isAuthenticated()) {
+			final Label publicDisplay = new Label();
+			final DefaultListBox publicInput = new DefaultListBox();
+			publicInput.addItem("No", 0);
+			publicInput.addItem("Yes", 1);
+			FormField publicField = form.createFormField("Public article:", publicInput, publicDisplay);
+			publicField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					publicDisplay.setText(Common.yesNo(article.getPublicArticle()));
+					publicInput.setValue(article.getPublicArticle() ? 1 : 0);
+				}
+			});
+			publicField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					article.setPublicArticle(publicInput.getIntValue() == 1);
+				}
+			});
+			fieldTable.addField(publicField);
+
+			final Label groupDisplay = new Label();
+			WidgetCreator groupCreator = new WidgetCreator() {
+				@Override
+				public Widget createWidget() {
+					return new GroupListBox(article.getGroupId());
+				}
+			};
+			final FormField groupField = form.createFormField("Group:", groupCreator, groupDisplay);
+			groupField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					groupDisplay.setText(Common.getDefaultIfNull(article.getGroupName(), "All groups"));
+					if (groupField.inputIsCreated()) {
+						((GroupListBox) groupField.getInputWidget()).setValue(article.getGroupId());
+					}
+				}
+			});
+			groupField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					article.setGroupId(((GroupListBox) groupField.getInputWidget()).getIntValue());
+				}
+			});
+			fieldTable.addField(groupField);
+		}
 
 		final ControlledRichTextArea dataInput = new ControlledRichTextArea();
 		final HTML dataDisplay = new HTML();

@@ -18,6 +18,7 @@ public final class Event extends EntityDto<Event> {
 	private double cost;
 	private String address;
 	private boolean adultRequired = false;
+	private boolean publicEvent = false;
 	private boolean active = true;
 	private boolean sendSurvey;
 	private int minimumParticipants, maximumParticipants;
@@ -93,6 +94,10 @@ public final class Event extends EntityDto<Event> {
 
 	public String getNotificationEmail() {
 		return notificationEmail;
+	}
+
+	public boolean getPublicEvent() {
+		return publicEvent;
 	}
 
 	public Date getPublishDate() {
@@ -181,6 +186,10 @@ public final class Event extends EntityDto<Event> {
 
 	public void setNotificationEmail(String notificationEmail) {
 		this.notificationEmail = notificationEmail;
+	}
+
+	public void setPublicEvent(boolean publicEvent) {
+		this.publicEvent = publicEvent;
 	}
 
 	public void setPublishDate(Date publishDate) {

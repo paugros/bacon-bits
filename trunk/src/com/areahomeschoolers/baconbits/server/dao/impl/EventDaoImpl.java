@@ -52,6 +52,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setStartDate(rs.getTimestamp("startDate"));
 			event.setTitle(rs.getString("title"));
 			event.setGroupName(rs.getString("groupName"));
+			event.setPublicEvent(rs.getBoolean("isPublic"));
 			event.setAddedByFullName(rs.getString("firstName") + " " + rs.getString("lastName"));
 			return event;
 		}
@@ -115,7 +116,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, ";
-			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active ";
+			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, isPublic = :publicEvent ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -123,10 +124,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, ";
-			sql += "publishDate, active) values ";
+			sql += "publishDate, active, isPublic) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, ";
-			sql += ":publishDate, :active)";
+			sql += ":publishDate, :active, :publicEvent)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

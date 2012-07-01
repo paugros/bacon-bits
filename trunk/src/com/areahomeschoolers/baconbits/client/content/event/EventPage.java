@@ -22,10 +22,15 @@ import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.GoogleMap;
+import com.areahomeschoolers.baconbits.client.widgets.GroupListBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.TabPage;
+import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
+import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
@@ -35,6 +40,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class EventPage implements Page {
 	private final Form form = new Form(new FormSubmitHandler() {
@@ -48,6 +54,7 @@ public class EventPage implements Page {
 	private Event event = new Event();
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private EventPageData pageData;
+	private TabPage tabPanel;
 
 	public EventPage(VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -73,29 +80,34 @@ public class EventPage implements Page {
 		});
 	}
 
+	private FormField createDescriptionField() {
+		final HTML descriptionDisplay = new HTML();
+		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
+		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
+		descriptionField.setRequired(true);
+		descriptionField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				descriptionDisplay.setHTML(event.getDescription());
+				descriptionInput.getTextArea().setHTML(event.getDescription());
+			}
+		});
+		descriptionField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				event.setDescription(descriptionInput.getTextArea().getHTML());
+			}
+		});
+
+		return descriptionField;
+	}
+
 	private void createFieldTable() {
 		fieldTable.setWidth("100%");
 
-		final RequiredTextBox titleInput = new RequiredTextBox();
-		final Label titleDisplay = new Label();
-		titleInput.addStyleName("hugeText");
-		titleInput.setVisibleLength(65);
-		titleInput.setMaxLength(100);
-		FormField titleField = form.createFormField("Title:", titleInput, titleDisplay);
-		titleField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				event.setTitle(titleInput.getText());
-			}
-		});
-		titleField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				titleDisplay.setText(event.getTitle());
-				titleInput.setText(event.getTitle());
-			}
-		});
-		fieldTable.addField(titleField);
+		if (!event.isSaved()) {
+			fieldTable.addField(createTitleField());
+		}
 
 		final Label categoryDisplay = new Label();
 		final RequiredListBox categoryInput = new RequiredListBox();
@@ -320,46 +332,145 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(adultField);
 
+		if (Application.isAuthenticated()) {
+			final Label publicDisplay = new Label();
+			final DefaultListBox publicInput = new DefaultListBox();
+			publicInput.addItem("No", 0);
+			publicInput.addItem("Yes", 1);
+			FormField publicField = form.createFormField("Public event:", publicInput, publicDisplay);
+			publicField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					publicDisplay.setText(Common.yesNo(event.getPublicEvent()));
+					publicInput.setValue(event.getPublicEvent() ? 1 : 0);
+				}
+			});
+			publicField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					event.setPublicEvent(publicInput.getIntValue() == 1);
+				}
+			});
+			fieldTable.addField(publicField);
+		}
+
+		final Label groupDisplay = new Label();
+		WidgetCreator groupCreator = new WidgetCreator() {
+			@Override
+			public Widget createWidget() {
+				return new GroupListBox(event.getGroupId());
+			}
+		};
+		final FormField groupField = form.createFormField("Group:", groupCreator, groupDisplay);
+		groupField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				groupDisplay.setText(Common.getDefaultIfNull(event.getGroupName(), "All groups"));
+				if (groupField.inputIsCreated()) {
+					((GroupListBox) groupField.getInputWidget()).setValue(event.getGroupId());
+				}
+			}
+		});
+		groupField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				event.setGroupId(((GroupListBox) groupField.getInputWidget()).getIntValue());
+			}
+		});
+		fieldTable.addField(groupField);
+
 		if (event.isSaved() && Application.isAuthenticated()) {
 			fieldTable.addField("Added by:", event.getAddedByFullName());
 			fieldTable.addField("Added date:", Formatter.formatDateTime(event.getAddedDate()));
 		}
 
-		final HTML descriptionDisplay = new HTML();
-		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
-		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
-		descriptionField.setRequired(true);
-		descriptionField.setInitializer(new Command() {
+		if (!event.isSaved()) {
+			fieldTable.addField(createDescriptionField());
+		}
+	}
+
+	private FormField createTitleField() {
+		final RequiredTextBox titleInput = new RequiredTextBox();
+		final Label titleDisplay = new Label();
+		titleInput.addStyleName("hugeText");
+		titleInput.setVisibleLength(65);
+		titleInput.setMaxLength(100);
+		FormField titleField = form.createFormField("Title:", titleInput, titleDisplay);
+		titleField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				descriptionDisplay.setHTML(event.getDescription());
-				descriptionInput.getTextArea().setHTML(event.getDescription());
+				event.setTitle(titleInput.getText());
 			}
 		});
-		descriptionField.setDtoUpdater(new Command() {
+		titleField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				event.setDescription(descriptionInput.getTextArea().getHTML());
+				titleDisplay.setText(event.getTitle());
+				titleInput.setText(event.getTitle());
 			}
 		});
-		fieldTable.addField(descriptionField);
+
+		return titleField;
 	}
 
 	private void initializePage() {
-		String title = event.isSaved() ? event.getTitle() : "New Event";
+		final String title = event.isSaved() ? event.getTitle() : "New Event";
 		createFieldTable();
 		form.initialize();
 
-		page.add(WidgetFactory.newSection(title, fieldTable));
-
 		if (!event.isSaved()) {
 			form.configureForAdd(fieldTable);
+			page.add(WidgetFactory.newSection(title, fieldTable));
 		} else {
+			tabPanel = new TabPage();
 			form.emancipate();
+
+			tabPanel.add("Event", new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					if (!Application.isAuthenticated()) {
+						Label title = new Label(event.getTitle());
+						title.addStyleName("hugeText bold");
+						tabBody.add(title);
+
+						HTML h = new HTML(event.getDescription());
+						tabBody.add(h);
+						tabBody.setSpacing(10);
+					} else {
+						FieldTable ft = new FieldTable();
+						ft.addField(createTitleField());
+						ft.addField(createDescriptionField());
+						tabBody.add(WidgetFactory.newSection(title, ft));
+						// we need to do this again in case we started on another tab
+						form.initialize();
+						form.emancipate();
+					}
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
+
+			tabPanel.add("Information", new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					tabBody.add(WidgetFactory.newSection(title, fieldTable));
+
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
+
+			tabPanel.add("Map", new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					tabBody.add(new GoogleMap(event.getAddress()));
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
 
 			if (!Application.isAuthenticated()) {
 				form.setEnabled(false);
 			}
+
+			page.add(tabPanel);
 		}
 
 		Application.getLayout().setPage(title, page);

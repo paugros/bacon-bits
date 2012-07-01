@@ -12,8 +12,9 @@ public class ArticleWidget extends Composite {
 
 	public ArticleWidget(Article article) {
 		VerticalPanel vp = new VerticalPanel();
+		vp.setSpacing(10);
 		Hyperlink title = new Hyperlink(article.getTitle(), PageUrl.article(article.getId()));
-		title.addStyleName("hugeText");
+		title.addStyleName("hugeText bold");
 		vp.add(title);
 		vp.add(new HTML(article.getArticle()));
 

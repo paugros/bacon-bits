@@ -14,6 +14,10 @@ public final class Article extends EntityDto<Article> {
 	private int addedById;
 	private Date startDate, endDate, addedDate;
 	private Integer groupId;
+	private boolean publicArticle = false;
+
+	// auxiliary
+	private String groupName;
 
 	public int getAddedById() {
 		return addedById;
@@ -36,6 +40,14 @@ public final class Article extends EntityDto<Article> {
 			return null;
 		}
 		return groupId;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public boolean getPublicArticle() {
+		return publicArticle;
 	}
 
 	public Date getStartDate() {
@@ -64,6 +76,14 @@ public final class Article extends EntityDto<Article> {
 
 	public void setGroupId(Integer groupId) {
 		this.groupId = groupId;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+
+	public void setPublicArticle(boolean publicArticle) {
+		this.publicArticle = publicArticle;
 	}
 
 	public void setStartDate(Date startDate) {

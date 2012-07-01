@@ -29,6 +29,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -160,6 +161,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 	@Override
 	public ArrayList<User> list(ArgMap<UserArg> args) {
 		String sql = SELECT;
+		sql += "where 1 = 1 ";
+		if (args.getStatus() != Status.ALL) {
+			sql += "and isActive(u.startDate, u.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
+		}
 		ArrayList<User> data = query(sql, new UserMapper());
 
 		return data;
@@ -173,7 +178,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		String sql = "select * from groups g ";
 		if (userId > 0) {
 			sql += "join userGroupMembers ugm on ugm.groupId = g.id ";
-			sql += "where ugm.userId = ? ";
+		}
+		sql += "where 1 = 1 ";
+		if (args.getStatus() != Status.ALL) {
+			sql += "and isActive(g.startDate, g.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
+		}
+		if (userId > 0) {
+			sql += "and ugm.userId = ? ";
 			sqlArgs.add(userId);
 		}
 		sql += "order by groupName asc";

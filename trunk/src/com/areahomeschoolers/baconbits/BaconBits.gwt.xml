@@ -2,6 +2,7 @@
 <module rename-to='baconbits'>
   <!-- Inherit the core Web Toolkit stuff.                        -->
   <inherits name='com.google.gwt.user.User'/>
+  <inherits name="com.google.gwt.maps.GoogleMaps" />
 
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
@@ -13,6 +14,11 @@
   
   <extend-property name="locale" values="en_US"/>
   <set-property name="locale" value="en_US"/>
+  
+  <extend-configuration-property name="rpc.blacklist"	value="com.google.gwt.user.client.ui.ChangeListenerCollection" />
+  <extend-configuration-property name="rpc.blacklist"	value="com.google.gwt.user.client.ui.ClickListenerCollection" />
+  <extend-configuration-property name="rpc.blacklist"	value="com.google.gwt.user.client.ui.FocusListenerCollection" />
+  <extend-configuration-property name="rpc.blacklist"	value="com.google.gwt.user.client.ui.KeyboardListenerCollection" />
 
   <!-- Other module inherits                                      -->
 
