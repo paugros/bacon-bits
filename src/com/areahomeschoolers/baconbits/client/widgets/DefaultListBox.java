@@ -72,7 +72,10 @@ public class DefaultListBox extends ListBox {
 		option.getStyle().setDisplay((visible ? Display.BLOCK : Display.NONE));
 	}
 
-	public boolean setValue(int value) {
+	public boolean setValue(Integer value) {
+		if (value == null) {
+			value = 0;
+		}
 		return setValue(Integer.toString(value));
 	}
 

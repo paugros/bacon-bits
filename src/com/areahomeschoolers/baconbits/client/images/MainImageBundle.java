@@ -51,6 +51,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource logo();
 
+	ImageResource mapShadow();
+
 	ImageResource pixel();
 
 	ImageResource refresh();
