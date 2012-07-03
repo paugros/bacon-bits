@@ -16,6 +16,10 @@ public final class Banner extends EntityDto<Banner> {
 
 	private Date startDate, endDate, addedDate;
 
+	public Banner() {
+
+	}
+
 	public int getAddedById() {
 		return addedById;
 	}

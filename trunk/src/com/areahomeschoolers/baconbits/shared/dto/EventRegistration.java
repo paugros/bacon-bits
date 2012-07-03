@@ -17,6 +17,10 @@ public final class EventRegistration extends EntityDto<EventRegistration> {
 	private Date startDate, endDate, addedDate;
 	private int eventId;
 
+	public EventRegistration() {
+
+	}
+
 	public int getAddedById() {
 		return userId;
 	}

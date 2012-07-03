@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.content.Layout;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
+import com.areahomeschoolers.baconbits.client.content.event.EventListPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventPage;
 import com.areahomeschoolers.baconbits.client.content.home.HomePage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
@@ -96,6 +97,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new UserPage(vp);
 		} else if ("UserList".equals(page)) {
 			new UserListPage(vp);
+		} else if ("EventList".equals(page)) {
+			new EventListPage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

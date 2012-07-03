@@ -29,6 +29,10 @@ public final class User extends EntityDto<User> {
 	// aux
 	private boolean generatePassword;
 
+	public User() {
+
+	}
+
 	public Date getAddedDate() {
 		return addedDate;
 	}

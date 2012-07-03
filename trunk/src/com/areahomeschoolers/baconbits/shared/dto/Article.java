@@ -19,6 +19,10 @@ public final class Article extends EntityDto<Article> {
 	// auxiliary
 	private String groupName;
 
+	public Article() {
+
+	}
+
 	public int getAddedById() {
 		return addedById;
 	}

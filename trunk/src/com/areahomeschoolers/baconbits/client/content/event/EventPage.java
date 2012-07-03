@@ -32,6 +32,8 @@ import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
@@ -428,6 +430,22 @@ public class EventPage implements Page {
 			tabPanel.add("Event", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
+					if (!Common.isNullOrEmpty(pageData.getAgeGroups())) {
+						EventAgeGroupCellTable ageTable = new EventAgeGroupCellTable(new ArgMap<EventArg>());
+						ageTable.populate(pageData.getAgeGroups());
+						ageTable.setTitle("Pricing");
+						ageTable.disablePaging();
+						tabBody.add(WidgetFactory.newSection(ageTable));
+					}
+
+					if (!Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
+						EventVolunteerPositionCellTable volunteerTable = new EventVolunteerPositionCellTable(new ArgMap<EventArg>());
+						volunteerTable.populate(pageData.getVolunteerPositions());
+						volunteerTable.setTitle("Volunteer Positions");
+						volunteerTable.disablePaging();
+						tabBody.add(WidgetFactory.newSection(volunteerTable));
+					}
+
 					if (!Application.isAuthenticated()) {
 						Label title = new Label(event.getTitle());
 						title.addStyleName("hugeText bold");

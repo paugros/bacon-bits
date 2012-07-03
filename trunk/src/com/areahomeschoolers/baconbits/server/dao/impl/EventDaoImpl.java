@@ -22,7 +22,9 @@ import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
+import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 @Repository
 public class EventDaoImpl extends SpringWrapper implements EventDao {
@@ -85,6 +87,38 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			if (pd.getEvent() == null) {
 				return null;
 			}
+
+			String sql = "select * from eventAgeGroups where eventId = ?";
+			pd.setAgeGroups(query(sql, new RowMapper<EventAgeGroup>() {
+				@Override
+				public EventAgeGroup mapRow(ResultSet rs, int rowNum) throws SQLException {
+					EventAgeGroup g = new EventAgeGroup();
+					g.setId(rs.getInt("id"));
+					g.setEventId(rs.getInt("eventId"));
+					g.setMaximumAge(rs.getInt("maximumAge"));
+					g.setMinimumAge(rs.getInt("minimumAge"));
+					g.setMaximumParticipants(rs.getInt("maximumParticipants"));
+					g.setMinimumParticipants(rs.getInt("minimumParticipants"));
+					g.setPrice(rs.getDouble("price"));
+					return g;
+				}
+			}, id));
+
+			sql = "select * from eventVolunteerPositions where eventId = ?";
+			pd.setVolunteerPositions(query(sql, new RowMapper<EventVolunteerPosition>() {
+				@Override
+				public EventVolunteerPosition mapRow(ResultSet rs, int rowNum) throws SQLException {
+					EventVolunteerPosition e = new EventVolunteerPosition();
+					e.setId(rs.getInt("id"));
+					e.setEventId(rs.getInt("eventId"));
+					e.setDescription(rs.getString("description"));
+					e.setDiscount(rs.getDouble("discount"));
+					e.setJobTitle(rs.getString("jobTitle"));
+					e.setPositionCount(rs.getInt("positionCount"));
+					return e;
+				}
+			}, id));
+
 		} else {
 			Event e = new Event();
 			e.setRegistrationStartDate(new Date());
