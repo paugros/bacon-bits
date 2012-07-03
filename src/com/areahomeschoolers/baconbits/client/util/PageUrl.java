@@ -12,6 +12,10 @@ public class PageUrl {
 		return (id == 0) ? url : url + "&eventId=" + id;
 	}
 
+	public static String eventList() {
+		return "page=EventList";
+	}
+
 	public static String home() {
 		return "page=Home";
 	}

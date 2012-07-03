@@ -9,6 +9,10 @@ public final class HomePageModule extends EntityDto<HomePageModule> {
 
 	private String name;
 
+	public HomePageModule() {
+
+	}
+
 	public String getType() {
 		return name;
 	}

@@ -151,6 +151,7 @@ public final class MainMenu extends MenuBar {
 		if (Application.isAuthenticated()) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
 		}
+		addLinkToMenu(menu, "List Events", PageUrl.eventList());
 
 		menu.addSeparator(new MenuItemSeparator());
 		addLinkToMenu(menu, "Mixed Class Day", "");

@@ -52,6 +52,10 @@ public final class Document extends EntityDto<Document> {
 	private int linkId;
 	private DocumentLinkType linkType;
 
+	public Document() {
+
+	}
+
 	public Integer getAddedById() {
 		return addedById;
 	}

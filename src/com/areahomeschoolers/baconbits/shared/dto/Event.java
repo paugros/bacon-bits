@@ -29,6 +29,10 @@ public final class Event extends EntityDto<Event> {
 	private String groupName;
 	private String addedByFullName;
 
+	public Event() {
+
+	}
+
 	public boolean getActive() {
 		return active;
 	}

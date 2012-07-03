@@ -600,6 +600,12 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		}
 	}
 
+	public void disablePaging() {
+		if (titleBar != null) {
+			titleBar.removePagingControl();
+		}
+	}
+
 	public void disableUserSorting() {
 		sortPolicy = CellSortPolicy.ON_USER_DISABLED;
 	}

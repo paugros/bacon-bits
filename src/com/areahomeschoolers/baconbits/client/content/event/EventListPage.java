@@ -1,24 +1,24 @@
-package com.areahomeschoolers.baconbits.client.content.user;
+package com.areahomeschoolers.baconbits.client.content.event;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public final class UserListPage implements Page {
-	public UserListPage(final VerticalPanel page) {
-		ArgMap<UserArg> args = new ArgMap<UserArg>();
-		final String title = "Users";
-		UserCellTable table = new UserCellTable(args);
+public final class EventListPage implements Page {
+	public EventListPage(final VerticalPanel page) {
+		ArgMap<EventArg> args = new ArgMap<EventArg>();
+		final String title = "Events";
+		EventCellTable table = new EventCellTable(args);
 		table.setTitle(title);
 		if (Application.isAuthenticated()) {
-			Hyperlink addLink = new Hyperlink("Add", PageUrl.user(0));
+			Hyperlink addLink = new Hyperlink("Add", PageUrl.event(0));
 			table.getTitleBar().addLink(addLink);
 		}
 

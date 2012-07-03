@@ -9,6 +9,10 @@ public class UserGroup extends EntityDto<UserGroup> {
 	// for membership records
 	private boolean isAdministrator;
 
+	public UserGroup() {
+
+	}
+
 	public boolean getAdministrator() {
 		return isAdministrator;
 	}
