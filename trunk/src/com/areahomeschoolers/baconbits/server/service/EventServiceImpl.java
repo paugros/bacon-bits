@@ -12,7 +12,9 @@ import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
+import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 @Controller
 @RequestMapping("/event")
@@ -44,6 +46,16 @@ public class EventServiceImpl extends GwtController implements EventService {
 	@Override
 	public Event save(Event event) {
 		return dao.save(event);
+	}
+
+	@Override
+	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup) {
+		return dao.saveAgeGroup(ageGroup);
+	}
+
+	@Override
+	public EventVolunteerPosition saveVolunteerPosition(EventVolunteerPosition position) {
+		return dao.saveVolunteerPosition(position);
 	}
 
 }

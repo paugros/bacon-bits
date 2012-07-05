@@ -42,7 +42,7 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 	}
 
 	private EventCellTable() {
-		setDefaultSortColumn(EventColumn.TITLE, SortDirection.SORT_ASC);
+		setDefaultSortColumn(EventColumn.START_DATE, SortDirection.SORT_DESC);
 		setDisplayColumns(EventColumn.TITLE, EventColumn.START_DATE, EventColumn.END_DATE, EventColumn.CATEGORY);
 	}
 

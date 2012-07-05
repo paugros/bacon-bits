@@ -1,5 +1,8 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
+import java.util.Date;
+
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
@@ -24,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg, UserGroupColumn> {
 	public enum UserGroupColumn implements EntityCellTableColumn<UserGroupColumn> {
-		NAME("Name"), DESCRIPTION("Description"), ADMINISTRATOR("Administrator");
+		NAME("Name"), DESCRIPTION("Description"), START_DATE("Start"), END_DATE("End"), ADMINISTRATOR("Administrator");
 
 		private String title;
 
@@ -39,6 +42,7 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 	}
 
 	private User user;
+	private UserGroupEditDialog dialog = new UserGroupEditDialog(this);
 
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
@@ -50,6 +54,9 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 	private UserGroupCellTable() {
 		setDefaultSortColumn(UserGroupColumn.NAME, SortDirection.SORT_ASC);
 		setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION);
+
+		disablePaging();
+		dialog.setText("Edit Group");
 	}
 
 	public User getUser() {
@@ -70,12 +77,26 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 		for (UserGroupColumn col : getDisplayColumns()) {
 			switch (col) {
 			case NAME:
-				addTextColumn(col, new ValueGetter<String, UserGroup>() {
-					@Override
-					public String get(UserGroup item) {
-						return item.getGroupName();
-					}
-				});
+				if (user == null && Application.isAdministrator()) {
+					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
+						@Override
+						protected Widget createWidget(final UserGroup item) {
+							return new ClickLabel(item.getGroupName(), new MouseDownHandler() {
+								@Override
+								public void onMouseDown(MouseDownEvent event) {
+									dialog.center(item);
+								}
+							});
+						}
+					});
+				} else {
+					addTextColumn(col, new ValueGetter<String, UserGroup>() {
+						@Override
+						public String get(UserGroup item) {
+							return item.getGroupName();
+						}
+					});
+				}
 				break;
 			case DESCRIPTION:
 				addTextColumn(col, new ValueGetter<String, UserGroup>() {
@@ -124,6 +145,22 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 						}
 					});
 				}
+				break;
+			case END_DATE:
+				addDateColumn(col, new ValueGetter<Date, UserGroup>() {
+					@Override
+					public Date get(UserGroup item) {
+						return item.getEndDate();
+					}
+				});
+				break;
+			case START_DATE:
+				addDateColumn(col, new ValueGetter<Date, UserGroup>() {
+					@Override
+					public Date get(UserGroup item) {
+						return item.getStartDate();
+					}
+				});
 				break;
 			default:
 				new AssertionError();

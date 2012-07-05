@@ -108,9 +108,23 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 
 	public void setRange(double min, double max) {
 		fromInput.setMinimumValue(min);
+		fromInput.setText(Double.toString(min));
 		toInput.setMinimumValue(min);
 
 		fromInput.setMaximumValue(max);
+		toInput.setText(Double.toString(max));
+		toInput.setMaximumValue(max);
+
+		hasRange = true;
+	}
+
+	public void setRange(int min, int max) {
+		fromInput.setMinimumValue(min);
+		fromInput.setText(Integer.toString(min));
+		toInput.setMinimumValue(min);
+
+		fromInput.setMaximumValue(max);
+		toInput.setText(Integer.toString(max));
 		toInput.setMaximumValue(max);
 
 		hasRange = true;

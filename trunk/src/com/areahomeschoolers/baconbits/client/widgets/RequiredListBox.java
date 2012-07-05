@@ -4,18 +4,15 @@ import com.areahomeschoolers.baconbits.client.validation.HasValidator;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 
-import com.google.gwt.dom.client.OptionElement;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 
 public class RequiredListBox extends DefaultListBox implements HasValidator {
 
 	protected boolean isRequired = true;
-	private final String defaultItemText;
-	private final int defaultMinItemWidth;
+	private String defaultItemText;
 
-	private final Validator validator = new Validator(this, new ValidatorCommand() {
+	private Validator validator = new Validator(this, new ValidatorCommand() {
 		@Override
 		public void validate(Validator validator) {
 			if (getSelectedIndex() == 0) {
@@ -25,13 +22,13 @@ public class RequiredListBox extends DefaultListBox implements HasValidator {
 	});
 
 	public RequiredListBox() {
-		this("", 100);
+		this("");
 	}
 
-	public RequiredListBox(String defaultItemText, int defaultMinItemWidth) {
+	public RequiredListBox(String defaultItemText) {
 		super();
 		this.defaultItemText = defaultItemText;
-		this.defaultMinItemWidth = defaultMinItemWidth;
+		addStyleName("RequiredListBox");
 		addDefaultItem();
 		validator.setRequired(true);
 		addChangeHandler(new ChangeHandler() {
@@ -91,7 +88,6 @@ public class RequiredListBox extends DefaultListBox implements HasValidator {
 
 	private void addDefaultItem() {
 		insertItem(defaultItemText, "-999999999", 0);
-		OptionElement option = (OptionElement) getElement().getFirstChild();
-		option.getStyle().setWidth(defaultMinItemWidth, Unit.PX);
 	}
+
 }

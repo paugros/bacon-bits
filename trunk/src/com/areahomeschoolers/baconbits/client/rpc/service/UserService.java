@@ -29,6 +29,8 @@ public interface UserService extends RemoteService {
 
 	public ServerResponseData<User> save(User user);
 
+	public UserGroup saveUserGroup(UserGroup group);
+
 	public ServerResponseData<String> validatePassword(String password);
 
 	void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add);

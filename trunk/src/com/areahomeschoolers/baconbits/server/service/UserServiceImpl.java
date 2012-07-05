@@ -91,6 +91,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 	}
 
 	@Override
+	public UserGroup saveUserGroup(UserGroup group) {
+		return dao.saveUserGroup(group);
+	}
+
+	@Override
 	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add) {
 		dao.updateUserGroupRelation(users, g, add);
 	}

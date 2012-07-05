@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.content.event.EventPage;
 import com.areahomeschoolers.baconbits.client.content.home.HomePage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.user.UserGroupListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserPage;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
@@ -39,6 +40,10 @@ public final class Application implements ValueChangeHandler<String> {
 	public static final String APPLICATION_NAME = "AHS";
 	private static boolean confirmNavigation = false;
 
+	public static boolean administratorOf(Integer groupId) {
+		return isAuthenticated() && applicationData.getCurrentUser().administratorOf(groupId);
+	}
+
 	public static ApplicationData getApplicationData() {
 		return applicationData;
 	}
@@ -63,12 +68,20 @@ public final class Application implements ValueChangeHandler<String> {
 		return applicationData.getUserPreferences();
 	}
 
+	public static boolean isAdministrator() {
+		return isAuthenticated() && applicationData.getCurrentUser().getSystemAdministrator();
+	}
+
 	public static boolean isAuthenticated() {
 		return applicationData.getCurrentUser() != null;
 	}
 
 	public static boolean isLive() {
 		return applicationData.isLive();
+	}
+
+	public static boolean memberOf(Integer groupId) {
+		return isAuthenticated() && applicationData.getCurrentUser().memberOf(groupId);
 	}
 
 	public static void reloadPage() {
@@ -99,6 +112,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new UserListPage(vp);
 		} else if ("EventList".equals(page)) {
 			new EventListPage(vp);
+		} else if ("UserGroupList".equals(page)) {
+			new UserGroupListPage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

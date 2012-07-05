@@ -37,7 +37,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 		User user;
 
-		String sql = "select u.id, u.email, u.passwordDigest, ";
+		String sql = "select u.id, u.email, u.passwordDigest, u.isSystemAdministrator, ";
 		sql += "isActive(u.StartDate, u.EndDate) as isEnabled from users u ";
 		sql += "where u.email = ? and u.passwordDigest is not null limit 1";
 
@@ -58,6 +58,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 	private List<GrantedAuthority> getAuthorities(ResultSet rs) throws SQLException {
 		List<GrantedAuthority> authList = new ArrayList<GrantedAuthority>();
 		authList.add(new SimpleGrantedAuthority("ROLE_BASIC_USER"));
+		if (rs.getBoolean("isSystemAdministrator")) {
+			authList.add(new SimpleGrantedAuthority("ROLE_SYSTEM_ADMINISTRATOR"));
+		}
 
 		return authList;
 	}

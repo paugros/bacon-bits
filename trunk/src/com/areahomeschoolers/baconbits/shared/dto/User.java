@@ -1,7 +1,7 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 public final class User extends EntityDto<User> {
 	private static final long serialVersionUID = 1L;
@@ -15,7 +15,6 @@ public final class User extends EntityDto<User> {
 	private String lastName;
 	private String passwordDigest;
 	private String homePhone;
-	private ArrayList<Integer> groupIds;
 	// only for setting
 	private String password;
 
@@ -23,7 +22,7 @@ public final class User extends EntityDto<User> {
 	private boolean active;
 	private boolean systemAdministrator;
 	private boolean resetPassword;
-
+	private HashMap<Integer, Boolean> groups;
 	private Date startDate, endDate, addedDate, lastLoginDate;
 
 	// aux
@@ -31,6 +30,14 @@ public final class User extends EntityDto<User> {
 
 	public User() {
 
+	}
+
+	public boolean administratorOf(Integer groupId) {
+		if (systemAdministrator) {
+			return true;
+		}
+
+		return groups.get(groupId) == Boolean.TRUE;
 	}
 
 	public Date getAddedDate() {
@@ -57,8 +64,8 @@ public final class User extends EntityDto<User> {
 		return generatePassword;
 	}
 
-	public ArrayList<Integer> getGroupIds() {
-		return groupIds;
+	public HashMap<Integer, Boolean> getGroups() {
+		return groups;
 	}
 
 	public String getHomePhone() {
@@ -105,6 +112,10 @@ public final class User extends EntityDto<User> {
 		return active;
 	}
 
+	public boolean memberOf(int groupId) {
+		return groups.keySet().contains(groupId);
+	}
+
 	public void setActive(boolean active) {
 		this.active = active;
 	}
@@ -132,8 +143,8 @@ public final class User extends EntityDto<User> {
 		}
 	}
 
-	public void setGroupIds(ArrayList<Integer> groupIds) {
-		this.groupIds = groupIds;
+	public void setGroups(HashMap<Integer, Boolean> groups) {
+		this.groups = groups;
 	}
 
 	public void setHomePhone(String homePhone) {

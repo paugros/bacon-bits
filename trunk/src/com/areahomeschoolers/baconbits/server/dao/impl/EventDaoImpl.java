@@ -172,4 +172,45 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		return getById(event.getId());
 	}
 
+	@Override
+	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(ageGroup);
+
+		if (ageGroup.isSaved()) {
+			String sql = "update eventAgeGroups set minimumAge = :minimumAge, maximumAge = :maximumAge, minimumParticipants = :minimumParticipants, ";
+			sql += "maximumParticipants = :maximumParticipants, price = :price where id = :id";
+			update(sql, namedParams);
+		} else {
+			String sql = "insert into eventAgeGroups (eventId, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price) ";
+			sql += "values(:eventId, :minimumAge, :maximumAge, :minimumParticipants, :maximumParticipants, :price)";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			ageGroup.setId(ServerUtils.getIdFromKeys(keys));
+		}
+
+		return ageGroup;
+	}
+
+	@Override
+	public EventVolunteerPosition saveVolunteerPosition(EventVolunteerPosition position) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(position);
+
+		if (position.isSaved()) {
+			String sql = "update eventVolunteerPositions set jobTitle = :jobTitle, description = :description, discount = :discount, positionCount = :positionCount where id = :id ";
+			update(sql, namedParams);
+		} else {
+			String sql = "insert into eventVolunteerPositions(eventId, jobTitle, description, discount, positionCount) ";
+			sql += "values(:eventId, :jobTitle, :description, :discount, :positionCount)";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			position.setId(ServerUtils.getIdFromKeys(keys));
+		}
+
+		return position;
+	}
+
 }

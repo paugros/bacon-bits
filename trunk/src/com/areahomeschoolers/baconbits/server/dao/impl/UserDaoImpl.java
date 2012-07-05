@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -123,7 +124,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 
 	@Override
 	public User getById(int userId) {
-		return queryForObject(SELECT + "where u.id = ?", new UserMapper(), userId);
+		User u = queryForObject(SELECT + "where u.id = ?", new UserMapper(), userId);
+
+		u.setGroups(getSecurityGroups(u.getId()));
+
+		return u;
 	}
 
 	@Override
@@ -154,6 +159,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		if (user == null) {
 			throw new UsernameNotFoundException("Username not found or duplicate: " + username);
 		}
+
+		user.setGroups(getSecurityGroups(user.getId()));
 
 		return user;
 	}
@@ -244,6 +251,28 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 
 		retData.setData(getById(user.getId()));
 		return retData;
+	}
+
+	@Override
+	public UserGroup saveUserGroup(UserGroup group) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(group);
+
+		if (group.isSaved()) {
+			String sql = "update groups set groupName = :groupName, description = :description, startDate = :startDate, endDate = :endDate where id = :id";
+			update(sql, namedParams);
+		} else {
+			if (group.getStartDate() == null) {
+				group.setStartDate(new Date());
+			}
+			String sql = "insert into groups (groupName, description, startDate, endDate) values(:groupName, :description, :startDate, :endDate)";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			group.setId(Integer.parseInt(keys.getKeys().get(Constants.GENERATED_KEY_TOKEN).toString()));
+		}
+
+		return group;
 	}
 
 	@Override
@@ -425,7 +454,25 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		group.setId(rs.getInt("id"));
 		group.setGroupName(rs.getString("groupName"));
 		group.setDescription(rs.getString("description"));
+		group.setStartDate(rs.getTimestamp("startDate"));
+		group.setEndDate(rs.getTimestamp("endDate"));
 		return group;
+	}
+
+	private HashMap<Integer, Boolean> getSecurityGroups(int id) {
+		String sql = "select groupId, isAdministrator from userGroupMembers where userId = ?";
+		final HashMap<Integer, Boolean> ret = new HashMap<Integer, Boolean>();
+
+		query(sql, new RowMapper<Void>() {
+
+			@Override
+			public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+				ret.put(rs.getInt("groupId"), rs.getBoolean("isAdministrator"));
+				return null;
+			}
+		}, id);
+
+		return ret;
 	}
 
 }
