@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
+import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -23,5 +25,9 @@ public interface EventService extends RemoteService {
 	public ArrayList<Event> list(ArgMap<EventArg> args);
 
 	public Event save(Event event);
+
+	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup);
+
+	public EventVolunteerPosition saveVolunteerPosition(EventVolunteerPosition position);
 
 }

@@ -1,9 +1,7 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 
@@ -37,10 +35,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  * Composite widget composed of a {@link Grid} containing a {@link MapWidget} and a {@link VerticalPanel} (for errors).
  */
 public class GoogleMap extends Composite {
-	private static Map<String, String> apiKeys = new HashMap<String, String>();
-
 	public static void loadMapsApi(Runnable runnable) {
-		Maps.loadMapsApi(apiKeys.get("dash.dscicorp.com"), "2", false, runnable);
+		Maps.loadMapsApi("AIzaSyBPxbeFCFBNAUxprA4_FSRcJ6AOVAQJr9A", "2", false, runnable);
 	}
 
 	private MapWidget map;
@@ -52,10 +48,6 @@ public class GoogleMap extends Composite {
 	private Grid grid = new Grid(2, 1);
 	private VerticalPanel errorPanel = new VerticalPanel();
 	private List<Command> queueCommands = new ArrayList<Command>();
-
-	static {
-		apiKeys.put("dash.dscicorp.com", "ABQIAAAAMN3S9MR9TXzzAEhTW6gmzBSTmqdp7D9DJW6fmwPkrCTk6dT-lhTwoUMRaus7mc2fSspRly19YUFQsA");
-	}
 
 	public GoogleMap() {
 		initWidget(grid);

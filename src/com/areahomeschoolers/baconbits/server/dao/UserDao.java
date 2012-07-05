@@ -26,6 +26,8 @@ public interface UserDao {
 	@PreAuthorize("hasRole('ROLE_BASIC_USER')")
 	public ServerResponseData<User> save(User user);
 
+	public UserGroup saveUserGroup(UserGroup group);
+
 	public boolean sendPasswordResetEmail(String username);
 
 	public User setPasswordFromDigest(int id, String digest);

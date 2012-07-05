@@ -30,6 +30,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Grid;
@@ -146,14 +147,28 @@ public final class Layout {
 				@Override
 				public void onMouseDown(MouseDownEvent event) {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
-					final LoginDialog ld = new LoginDialog(loginService);
-					ld.setLoginHandler(new LoginHandler() {
-						@Override
-						public void onLogin(ApplicationData ap) {
-							Window.Location.reload();
-						}
-					});
-					ld.center();
+
+					if (GWT.isProdMode()) {
+						final LoginDialog ld = new LoginDialog(loginService);
+						ld.setLoginHandler(new LoginHandler() {
+							@Override
+							public void onLogin(ApplicationData ap) {
+								Window.Location.reload();
+							}
+						});
+						ld.center();
+					} else {
+						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "Om5a5abav", new AsyncCallback<ApplicationData>() {
+							@Override
+							public void onFailure(Throwable caught) {
+							}
+
+							@Override
+							public void onSuccess(ApplicationData result) {
+								Window.Location.reload();
+							}
+						});
+					}
 				}
 			});
 		}

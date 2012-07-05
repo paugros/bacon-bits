@@ -25,6 +25,8 @@ public interface UserServiceAsync {
 
 	void save(User user, AsyncCallback<ServerResponseData<User>> callback);
 
+	void saveUserGroup(UserGroup group, AsyncCallback<UserGroup> callback);
+
 	void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add, AsyncCallback<Void> callback);
 
 	void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add, AsyncCallback<Void> callback);

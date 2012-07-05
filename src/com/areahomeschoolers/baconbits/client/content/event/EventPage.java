@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeBox;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeRangeBox;
@@ -36,10 +37,15 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
+import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,7 +59,7 @@ public class EventPage implements Page {
 	});
 	private VerticalPanel page;
 	private final FieldTable fieldTable = new FieldTable();
-	private Event event = new Event();
+	private Event calendarEvent = new Event();
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private EventPageData pageData;
 	private TabPage tabPanel;
@@ -75,7 +81,7 @@ public class EventPage implements Page {
 					return;
 				}
 
-				event = result.getEvent();
+				calendarEvent = result.getEvent();
 				pageData = result;
 				initializePage();
 			}
@@ -90,14 +96,14 @@ public class EventPage implements Page {
 		descriptionField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				descriptionDisplay.setHTML(event.getDescription());
-				descriptionInput.getTextArea().setHTML(event.getDescription());
+				descriptionDisplay.setHTML(calendarEvent.getDescription());
+				descriptionInput.getTextArea().setHTML(calendarEvent.getDescription());
 			}
 		});
 		descriptionField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				event.setDescription(descriptionInput.getTextArea().getHTML());
+				calendarEvent.setDescription(descriptionInput.getTextArea().getHTML());
 			}
 		});
 
@@ -107,7 +113,7 @@ public class EventPage implements Page {
 	private void createFieldTable() {
 		fieldTable.setWidth("100%");
 
-		if (!event.isSaved()) {
+		if (!calendarEvent.isSaved()) {
 			fieldTable.addField(createTitleField());
 		}
 
@@ -120,14 +126,14 @@ public class EventPage implements Page {
 		categoryField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				categoryDisplay.setText(event.getCategory());
-				categoryInput.setValue(event.getCategoryId());
+				categoryDisplay.setText(calendarEvent.getCategory());
+				categoryInput.setValue(calendarEvent.getCategoryId());
 			}
 		});
 		categoryField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				event.setCategoryId(categoryInput.getIntValue());
+				calendarEvent.setCategoryId(categoryInput.getIntValue());
 			}
 		});
 		fieldTable.addField(categoryField);
@@ -141,14 +147,14 @@ public class EventPage implements Page {
 		addressField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				addressDisplay.setText(event.getAddress());
-				addressInput.setText(event.getAddress());
+				addressDisplay.setText(calendarEvent.getAddress());
+				addressInput.setText(calendarEvent.getAddress());
 			}
 		});
 		addressField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				event.setAddress(addressInput.getText());
+				calendarEvent.setAddress(addressInput.getText());
 			}
 		});
 		fieldTable.addField(addressField);
@@ -160,16 +166,17 @@ public class EventPage implements Page {
 		eventDatesField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				eventDatesDisplay.setText(Formatter.formatDateTime(event.getStartDate()) + " to " + Formatter.formatDateTime(event.getEndDate()));
-				eventDatesInput.setStartDate(event.getStartDate());
-				eventDatesInput.setEndDate(event.getEndDate());
+				eventDatesDisplay.setText(Formatter.formatDateTime(calendarEvent.getStartDate()) + " to "
+						+ Formatter.formatDateTime(calendarEvent.getEndDate()));
+				eventDatesInput.setStartDate(calendarEvent.getStartDate());
+				eventDatesInput.setEndDate(calendarEvent.getEndDate());
 			}
 		});
 		eventDatesField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				event.setStartDate(eventDatesInput.getStartDate());
-				event.setEndDate(eventDatesInput.getEndDate());
+				calendarEvent.setStartDate(eventDatesInput.getStartDate());
+				calendarEvent.setEndDate(eventDatesInput.getEndDate());
 			}
 		});
 		fieldTable.addField(eventDatesField);
@@ -181,17 +188,17 @@ public class EventPage implements Page {
 		registrationDatesField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				registrationDatesDisplay.setText(Formatter.formatDateTime(event.getRegistrationStartDate()) + " to "
-						+ Formatter.formatDateTime(event.getRegistrationEndDate()));
-				registrationDatesInput.setStartDate(event.getRegistrationStartDate());
-				registrationDatesInput.setEndDate(event.getRegistrationEndDate());
+				registrationDatesDisplay.setText(Formatter.formatDateTime(calendarEvent.getRegistrationStartDate()) + " to "
+						+ Formatter.formatDateTime(calendarEvent.getRegistrationEndDate()));
+				registrationDatesInput.setStartDate(calendarEvent.getRegistrationStartDate());
+				registrationDatesInput.setEndDate(calendarEvent.getRegistrationEndDate());
 			}
 		});
 		registrationDatesField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				event.setRegistrationStartDate(registrationDatesInput.getStartDate());
-				event.setRegistrationEndDate(registrationDatesInput.getEndDate());
+				calendarEvent.setRegistrationStartDate(registrationDatesInput.getStartDate());
+				calendarEvent.setRegistrationEndDate(registrationDatesInput.getEndDate());
 			}
 		});
 		fieldTable.addField(registrationDatesField);
@@ -204,14 +211,14 @@ public class EventPage implements Page {
 			publishDateField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					publishDateDisplay.setText(Formatter.formatDate(event.getPublishDate()));
-					publishDateInput.setValue(event.getPublishDate());
+					publishDateDisplay.setText(Formatter.formatDate(calendarEvent.getPublishDate()));
+					publishDateInput.setValue(calendarEvent.getPublishDate());
 				}
 			});
 			publishDateField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					event.setPublishDate(publishDateInput.getValue());
+					calendarEvent.setPublishDate(publishDateInput.getValue());
 				}
 			});
 			fieldTable.addField(publishDateField);
@@ -224,14 +231,14 @@ public class EventPage implements Page {
 			activeField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					activeDisplay.setText(Common.yesNo(event.getActive()));
-					activeInput.setValue(event.getActive() ? 1 : 0);
+					activeDisplay.setText(Common.yesNo(calendarEvent.getActive()));
+					activeInput.setValue(calendarEvent.getActive() ? 1 : 0);
 				}
 			});
 			activeField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					event.setActive(activeInput.getIntValue() == 1);
+					calendarEvent.setActive(activeInput.getIntValue() == 1);
 				}
 			});
 			fieldTable.addField(activeField);
@@ -246,14 +253,14 @@ public class EventPage implements Page {
 			emailField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					emailDisplay.setText(event.getNotificationEmail());
-					emailInput.setText(event.getNotificationEmail());
+					emailDisplay.setText(calendarEvent.getNotificationEmail());
+					emailInput.setText(calendarEvent.getNotificationEmail());
 				}
 			});
 			emailField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					event.setNotificationEmail(emailInput.getText());
+					calendarEvent.setNotificationEmail(emailInput.getText());
 				}
 			});
 			fieldTable.addField(emailField);
@@ -265,14 +272,14 @@ public class EventPage implements Page {
 			costField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					costDisplay.setText(Formatter.formatCurrency(event.getCost()));
-					costInput.setValue(event.getCost());
+					costDisplay.setText(Formatter.formatCurrency(calendarEvent.getCost()));
+					costInput.setValue(calendarEvent.getCost());
 				}
 			});
 			costField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					event.setCost(costInput.getDouble());
+					calendarEvent.setCost(costInput.getDouble());
 				}
 			});
 			fieldTable.addField(costField);
@@ -283,14 +290,14 @@ public class EventPage implements Page {
 			minParticipantsField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					minParticipantsDisplay.setText(Integer.toString(event.getMinimumParticipants()));
-					minParticipantsInput.setValue(event.getMinimumParticipants());
+					minParticipantsDisplay.setText(Integer.toString(calendarEvent.getMinimumParticipants()));
+					minParticipantsInput.setValue(calendarEvent.getMinimumParticipants());
 				}
 			});
 			minParticipantsField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					event.setMinimumParticipants(minParticipantsInput.getInteger());
+					calendarEvent.setMinimumParticipants(minParticipantsInput.getInteger());
 				}
 			});
 			fieldTable.addField(minParticipantsField);
@@ -301,14 +308,14 @@ public class EventPage implements Page {
 			maxParticipantsField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					maxParticipantsDisplay.setText(Integer.toString(event.getMaximumParticipants()));
-					maxParticipantsInput.setValue(event.getMaximumParticipants());
+					maxParticipantsDisplay.setText(Integer.toString(calendarEvent.getMaximumParticipants()));
+					maxParticipantsInput.setValue(calendarEvent.getMaximumParticipants());
 				}
 			});
 			maxParticipantsField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					event.setMaximumParticipants(maxParticipantsInput.getInteger());
+					calendarEvent.setMaximumParticipants(maxParticipantsInput.getInteger());
 				}
 			});
 			fieldTable.addField(maxParticipantsField);
@@ -322,14 +329,14 @@ public class EventPage implements Page {
 		adultField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				adultDisplay.setText(Common.yesNo(event.getAdultRequired()));
-				adultInput.setValue(event.getAdultRequired() ? 1 : 0);
+				adultDisplay.setText(Common.yesNo(calendarEvent.getAdultRequired()));
+				adultInput.setValue(calendarEvent.getAdultRequired() ? 1 : 0);
 			}
 		});
 		adultField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				event.setAdultRequired(adultInput.getIntValue() == 1);
+				calendarEvent.setAdultRequired(adultInput.getIntValue() == 1);
 			}
 		});
 		fieldTable.addField(adultField);
@@ -343,14 +350,14 @@ public class EventPage implements Page {
 			publicField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					publicDisplay.setText(Common.yesNo(event.getPublicEvent()));
-					publicInput.setValue(event.getPublicEvent() ? 1 : 0);
+					publicDisplay.setText(Common.yesNo(calendarEvent.getPublicEvent()));
+					publicInput.setValue(calendarEvent.getPublicEvent() ? 1 : 0);
 				}
 			});
 			publicField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					event.setPublicEvent(publicInput.getIntValue() == 1);
+					calendarEvent.setPublicEvent(publicInput.getIntValue() == 1);
 				}
 			});
 			fieldTable.addField(publicField);
@@ -360,33 +367,33 @@ public class EventPage implements Page {
 		WidgetCreator groupCreator = new WidgetCreator() {
 			@Override
 			public Widget createWidget() {
-				return new GroupListBox(event.getGroupId());
+				return new GroupListBox(calendarEvent.getGroupId());
 			}
 		};
 		final FormField groupField = form.createFormField("Group:", groupCreator, groupDisplay);
 		groupField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				groupDisplay.setText(Common.getDefaultIfNull(event.getGroupName(), "All groups"));
+				groupDisplay.setText(Common.getDefaultIfNull(calendarEvent.getGroupName(), "All groups"));
 				if (groupField.inputIsCreated()) {
-					((GroupListBox) groupField.getInputWidget()).setValue(event.getGroupId());
+					((GroupListBox) groupField.getInputWidget()).setValue(calendarEvent.getGroupId());
 				}
 			}
 		});
 		groupField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				event.setGroupId(((GroupListBox) groupField.getInputWidget()).getIntValue());
+				calendarEvent.setGroupId(((GroupListBox) groupField.getInputWidget()).getIntValue());
 			}
 		});
 		fieldTable.addField(groupField);
 
-		if (event.isSaved() && Application.isAuthenticated()) {
-			fieldTable.addField("Added by:", event.getAddedByFullName());
-			fieldTable.addField("Added date:", Formatter.formatDateTime(event.getAddedDate()));
+		if (calendarEvent.isSaved() && Application.isAuthenticated()) {
+			fieldTable.addField("Added by:", calendarEvent.getAddedByFullName());
+			fieldTable.addField("Added date:", Formatter.formatDateTime(calendarEvent.getAddedDate()));
 		}
 
-		if (!event.isSaved()) {
+		if (!calendarEvent.isSaved()) {
 			fieldTable.addField(createDescriptionField());
 		}
 	}
@@ -401,14 +408,14 @@ public class EventPage implements Page {
 		titleField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				event.setTitle(titleInput.getText());
+				calendarEvent.setTitle(titleInput.getText());
 			}
 		});
 		titleField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				titleDisplay.setText(event.getTitle());
-				titleInput.setText(event.getTitle());
+				titleDisplay.setText(calendarEvent.getTitle());
+				titleInput.setText(calendarEvent.getTitle());
 			}
 		});
 
@@ -416,11 +423,11 @@ public class EventPage implements Page {
 	}
 
 	private void initializePage() {
-		final String title = event.isSaved() ? event.getTitle() : "New Event";
+		final String title = calendarEvent.isSaved() ? calendarEvent.getTitle() : "New Event";
 		createFieldTable();
 		form.initialize();
 
-		if (!event.isSaved()) {
+		if (!calendarEvent.isSaved()) {
 			form.configureForAdd(fieldTable);
 			page.add(WidgetFactory.newSection(title, fieldTable));
 		} else {
@@ -430,28 +437,66 @@ public class EventPage implements Page {
 			tabPanel.add("Event", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					if (!Common.isNullOrEmpty(pageData.getAgeGroups())) {
-						EventAgeGroupCellTable ageTable = new EventAgeGroupCellTable(new ArgMap<EventArg>());
+					HorizontalPanel hp = new HorizontalPanel();
+					hp.setWidth("100%");
+
+					if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getAgeGroups())) {
+						final EventAgeGroupCellTable ageTable = new EventAgeGroupCellTable(new ArgMap<EventArg>());
 						ageTable.populate(pageData.getAgeGroups());
 						ageTable.setTitle("Pricing");
 						ageTable.disablePaging();
-						tabBody.add(WidgetFactory.newSection(ageTable));
+						hp.add(WidgetFactory.newSection(ageTable));
+
+						if (Application.administratorOf(calendarEvent.getGroupId())) {
+							ageTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
+								@Override
+								public void onMouseDown(MouseDownEvent event) {
+									AgeGroupEditDialog dialog = new AgeGroupEditDialog(ageTable);
+									dialog.setText("Add Age Group");
+									EventAgeGroup a = new EventAgeGroup();
+									a.setEventId(calendarEvent.getId());
+									dialog.center(a);
+								}
+							}));
+						}
 					}
 
-					if (!Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
-						EventVolunteerPositionCellTable volunteerTable = new EventVolunteerPositionCellTable(new ArgMap<EventArg>());
+					if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
+						if (hp.getWidgetCount() > 0) {
+							hp.setCellWidth(hp.getWidget(0), "50%");
+							hp.add(new HTML("&nbsp;"));
+						}
+
+						final EventVolunteerPositionCellTable volunteerTable = new EventVolunteerPositionCellTable(new ArgMap<EventArg>());
 						volunteerTable.populate(pageData.getVolunteerPositions());
 						volunteerTable.setTitle("Volunteer Positions");
 						volunteerTable.disablePaging();
-						tabBody.add(WidgetFactory.newSection(volunteerTable));
+						hp.add(WidgetFactory.newSection(volunteerTable));
+
+						if (Application.administratorOf(calendarEvent.getGroupId())) {
+							volunteerTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
+								@Override
+								public void onMouseDown(MouseDownEvent event) {
+									VolunteerPositionEditDialog dialog = new VolunteerPositionEditDialog(volunteerTable);
+									dialog.setText("Add Volunteer Position");
+									EventVolunteerPosition p = new EventVolunteerPosition();
+									p.setEventId(calendarEvent.getId());
+									dialog.center(p);
+								}
+							}));
+						}
+					}
+
+					if (hp.getWidgetCount() > 0) {
+						tabBody.add(hp);
 					}
 
 					if (!Application.isAuthenticated()) {
-						Label title = new Label(event.getTitle());
+						Label title = new Label(calendarEvent.getTitle());
 						title.addStyleName("hugeText bold");
 						tabBody.add(title);
 
-						HTML h = new HTML(event.getDescription());
+						HTML h = new HTML(calendarEvent.getDescription());
 						tabBody.add(h);
 						tabBody.setSpacing(10);
 					} else {
@@ -467,7 +512,7 @@ public class EventPage implements Page {
 				}
 			});
 
-			tabPanel.add("Information", new TabPageCommand() {
+			tabPanel.add("Details", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
 					tabBody.add(WidgetFactory.newSection(title, fieldTable));
@@ -479,7 +524,7 @@ public class EventPage implements Page {
 			tabPanel.add("Map", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					tabBody.add(new GoogleMap(event.getAddress()));
+					tabBody.add(new GoogleMap(calendarEvent.getAddress()));
 					tabPanel.selectTabNow(tabBody);
 				}
 			});
@@ -495,13 +540,13 @@ public class EventPage implements Page {
 	}
 
 	private void save(final FormField field) {
-		eventService.save(event, new Callback<Event>() {
+		eventService.save(calendarEvent, new Callback<Event>() {
 			@Override
 			protected void doOnSuccess(Event e) {
 				if (!Url.isParamValidId("eventId")) {
 					HistoryToken.set(PageUrl.event(e.getId()));
 				} else {
-					event = e;
+					calendarEvent = e;
 					form.setDto(e);
 					field.setInputVisibility(false);
 				}

@@ -212,6 +212,10 @@ img {
 	vertical-align: middle;
 }
 
+.RequiredListBox {
+	min-width: 100px;
+}
+
 .ctEvenRow, .ctEvenRow td {
 	background-color: #FFFFFF;
 }
