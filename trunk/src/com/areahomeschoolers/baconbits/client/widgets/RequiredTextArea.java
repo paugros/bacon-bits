@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.validation.HasValidator;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
@@ -35,8 +36,8 @@ public class RequiredTextArea extends TextArea implements HasValidator {
 		validator.setRequired(required);
 
 		if (required) {
-			// setCharacterWidth(WidgetFactory.DEFAULT_TEXT_AREA_WIDTH);
-			// setVisibleLines(WidgetFactory.DEFAULT_TEXT_AREA_HEIGHT);
+			setCharacterWidth(WidgetFactory.DEFAULT_TEXT_AREA_WIDTH);
+			setVisibleLines(WidgetFactory.DEFAULT_TEXT_AREA_HEIGHT);
 		}
 	}
 }

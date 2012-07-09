@@ -23,7 +23,9 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
+import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 @Repository
@@ -76,6 +78,28 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		String sql = SELECT + "where e.id = ?";
 
 		return queryForObject(sql, new EventMapper(), id);
+	}
+
+	@Override
+	public ArrayList<EventField> getFieldsForAgeGroup(int ageGroupId) {
+		String sql = "select ef.*, et.type ";
+		sql += "from eventFields ef ";
+		sql += "join eventFieldTypes et on et.id = ef.eventFieldTypeId ";
+		sql += "where ef.eventAgeGroupId = ?";
+
+		return query(sql, new RowMapper<EventField>() {
+			@Override
+			public EventField mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return createBaseEventField(rs);
+			}
+		}, ageGroupId);
+	}
+
+	@Override
+	public ArrayList<EventField> getFieldsForRegistration(EventRegistration registration) {
+		String sql = "";
+
+		return null;
 	}
 
 	@Override
@@ -211,6 +235,19 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		return position;
+	}
+
+	private EventField createBaseEventField(ResultSet rs) throws SQLException {
+		EventField f = new EventField();
+		f.setId(rs.getInt("id"));
+		f.setEventId(rs.getInt("eventId"));
+		f.setEventAgeGroupId(rs.getInt("eventAgeGroupId"));
+		f.setName(rs.getString("name"));
+		f.setTypeId(rs.getInt("eventFieldTypeId"));
+		f.setType(rs.getString("type"));
+		f.setOptions(rs.getString("options"));
+		f.setRequired(rs.getBoolean("required"));
+		return f;
 	}
 
 }
