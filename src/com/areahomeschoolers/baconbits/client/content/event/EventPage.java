@@ -512,6 +512,19 @@ public class EventPage implements Page {
 				}
 			});
 
+			if (Application.administratorOf(calendarEvent.getGroupId())) {
+				tabPanel.add("Fields", new TabPageCommand() {
+					@Override
+					public void execute(VerticalPanel tabBody) {
+						tabBody.add(new EventFieldsTab(pageData));
+
+						tabPanel.selectTabNow(tabBody);
+					}
+				});
+			} else {
+				tabPanel.addSkipIndex();
+			}
+
 			tabPanel.add("Details", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
