@@ -31,6 +31,9 @@ public class DefaultListBox extends ListBox {
 	}
 
 	public int getIntValue() {
+		if (getValue() == null) {
+			return 0;
+		}
 		return Integer.parseInt(getValue());
 	}
 
@@ -39,6 +42,9 @@ public class DefaultListBox extends ListBox {
 	}
 
 	public String getValue() {
+		if (getSelectedIndex() == -1) {
+			return null;
+		}
 		return getValue(getSelectedIndex());
 	}
 

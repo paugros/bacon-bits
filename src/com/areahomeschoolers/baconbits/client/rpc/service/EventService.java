@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
@@ -22,6 +23,8 @@ public interface EventService extends RemoteService {
 
 	public Event getById(int id);
 
+	public ArrayList<Data> getEventFieldTypes();
+
 	public ArrayList<EventField> getFieldsForAgeGroup(int ageGroupId);
 
 	public ArrayList<EventField> getFieldsForRegistration(EventRegistration registration);
@@ -33,6 +36,8 @@ public interface EventService extends RemoteService {
 	public Event save(Event event);
 
 	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup);
+
+	public EventField saveEventField(EventField field);
 
 	public EventVolunteerPosition saveVolunteerPosition(EventVolunteerPosition position);
 

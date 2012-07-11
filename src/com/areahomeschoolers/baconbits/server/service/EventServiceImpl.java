@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.server.dao.EventDao;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
@@ -33,6 +34,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	@Override
 	public Event getById(int id) {
 		return dao.getById(id);
+	}
+
+	@Override
+	public ArrayList<Data> getEventFieldTypes() {
+		return dao.getEventFieldTypes();
 	}
 
 	@Override
@@ -63,6 +69,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	@Override
 	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup) {
 		return dao.saveAgeGroup(ageGroup);
+	}
+
+	@Override
+	public EventField saveEventField(EventField field) {
+		return dao.saveField(field);
 	}
 
 	@Override

@@ -3,14 +3,14 @@ package com.areahomeschoolers.baconbits.shared.dto;
 public class EventField extends EntityDto<EventField> {
 	private int typeId;
 	private String type;
-	private int eventId;
-	private int eventAgeGroupId;
+	private Integer eventAgeGroupId;
 	private String name;
 	private boolean required;
 	private String options;
 	private String value;
 	private int valueId;
 	private int eventRegistrationId;
+	private Integer eventId;
 
 	private static final long serialVersionUID = 1L;
 
@@ -18,11 +18,17 @@ public class EventField extends EntityDto<EventField> {
 
 	}
 
-	public int getEventAgeGroupId() {
+	public Integer getEventAgeGroupId() {
+		if (eventAgeGroupId == 0) {
+			return null;
+		}
 		return eventAgeGroupId;
 	}
 
-	public int getEventId() {
+	public Integer getEventId() {
+		if (eventId == 0) {
+			return null;
+		}
 		return eventId;
 	}
 

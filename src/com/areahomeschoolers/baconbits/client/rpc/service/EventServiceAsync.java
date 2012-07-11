@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
@@ -17,6 +18,8 @@ public interface EventServiceAsync {
 
 	void getById(int id, AsyncCallback<Event> callback);
 
+	void getEventFieldTypes(AsyncCallback<ArrayList<Data>> callback);
+
 	void getFieldsForAgeGroup(int ageGroupId, AsyncCallback<ArrayList<EventField>> callback);
 
 	void getFieldsForRegistration(EventRegistration registration, AsyncCallback<ArrayList<EventField>> callback);
@@ -28,6 +31,8 @@ public interface EventServiceAsync {
 	void save(Event event, AsyncCallback<Event> callback);
 
 	void saveAgeGroup(EventAgeGroup ageGroup, AsyncCallback<EventAgeGroup> callback);
+
+	void saveEventField(EventField field, AsyncCallback<EventField> callback);
 
 	void saveVolunteerPosition(EventVolunteerPosition position, AsyncCallback<EventVolunteerPosition> callback);
 
