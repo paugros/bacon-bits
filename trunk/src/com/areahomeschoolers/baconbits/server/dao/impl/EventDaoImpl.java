@@ -21,6 +21,7 @@ import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
@@ -81,6 +82,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
+	public ArrayList<Data> getEventFieldTypes() {
+		String sql = "select * from eventFieldTypes order by type";
+
+		return query(sql, ServerUtils.getGenericRowMapper());
+	}
+
+	@Override
 	public ArrayList<EventField> getFieldsForAgeGroup(int ageGroupId) {
 		String sql = "select ef.*, et.type ";
 		sql += "from eventFields ef ";
@@ -97,7 +105,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	@Override
 	public ArrayList<EventField> getFieldsForRegistration(EventRegistration registration) {
-		String sql = "";
 
 		return null;
 	}
@@ -215,6 +222,26 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		return ageGroup;
+	}
+
+	@Override
+	public EventField saveField(EventField field) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(field);
+
+		if (field.isSaved()) {
+			String sql = "update eventFields set name = :name, required = :required, options = :options, eventFieldTypeId = :typeId where id = :id";
+			update(sql, namedParams);
+		} else {
+			String sql = "insert into eventFields (eventAgeGroupId, name, eventFieldTypeId, required, options, eventId) ";
+			sql += "values(:eventAgeGroupId, :name, :typeId, :required, :options, :eventId)";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			field.setId(ServerUtils.getIdFromKeys(keys));
+		}
+
+		return field;
 	}
 
 	@Override
