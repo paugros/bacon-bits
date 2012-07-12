@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -26,7 +27,6 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 @Repository
@@ -75,6 +75,15 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
+	public void deleteEventField(int fieldId) {
+		String sql = "delete from eventFieldValues where eventFieldId = ?";
+		update(sql, fieldId);
+
+		sql = "delete from eventFields where id = ?";
+		update(sql, fieldId);
+	}
+
+	@Override
 	public Event getById(int id) {
 		String sql = SELECT + "where e.id = ?";
 
@@ -89,24 +98,30 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public ArrayList<EventField> getFieldsForAgeGroup(int ageGroupId) {
+	public ArrayList<EventField> getFields(ArgMap<EventArg> args) {
+		List<Object> params = new ArrayList<Object>();
+		int ageGroupId = args.getInt(EventArg.AGE_GROUP_ID);
+		int eventId = args.getInt(EventArg.EVENT_ID);
+
 		String sql = "select ef.*, et.type ";
 		sql += "from eventFields ef ";
 		sql += "join eventFieldTypes et on et.id = ef.eventFieldTypeId ";
-		sql += "where ef.eventAgeGroupId = ?";
+		sql += "where 1 = 1 ";
+		if (ageGroupId > 0) {
+			sql += "and ef.eventAgeGroupId = ? ";
+			params.add(ageGroupId);
+		} else if (eventId > 0) {
+			sql += "and ef.eventId = ? and ef.eventAgeGroupId is null ";
+			params.add(eventId);
+		}
+		sql += "order by ef.id";
 
 		return query(sql, new RowMapper<EventField>() {
 			@Override
 			public EventField mapRow(ResultSet rs, int rowNum) throws SQLException {
 				return createBaseEventField(rs);
 			}
-		}, ageGroupId);
-	}
-
-	@Override
-	public ArrayList<EventField> getFieldsForRegistration(EventRegistration registration) {
-
-		return null;
+		}, params.toArray());
 	}
 
 	@Override
