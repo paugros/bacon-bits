@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.widgets.FormField.ButtonPlacement;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 
 import com.google.gwt.user.client.ui.CheckBox;
@@ -81,6 +82,10 @@ public class EventFormField {
 		Label displayWidget = new Label();
 
 		formField = new FormField(field.getName(), inputWidget, displayWidget);
+
+		if (field.getTypeId() == 4) {
+			formField.setButtonPlacement(ButtonPlacement.BOTTOM);
+		}
 
 		if (field.getValueId() == 0) {
 			formField.configureForAdd();

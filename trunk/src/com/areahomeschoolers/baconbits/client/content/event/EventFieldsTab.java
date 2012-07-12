@@ -3,16 +3,22 @@ package com.areahomeschoolers.baconbits.client.content.event;
 import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EventFormField;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
+import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
+import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
@@ -24,7 +30,10 @@ import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class EventFieldsTab extends Composite {
 	private EventPageData pageData;
@@ -52,14 +61,15 @@ public class EventFieldsTab extends Composite {
 		});
 
 		ageGroupListBox = new DefaultListBox();
-		ageGroupListBox.addItem("", 0);
 		for (EventAgeGroup group : pageData.getAgeGroups()) {
 			ageGroupListBox.addItem(
 					group.getMinimumAge() + "-" + group.getMaximumAge() + " yrs / " + group.getMinimumParticipants() + "-" + group.getMaximumParticipants()
 							+ " participants", group.getId());
 		}
 
-		vp.add(ageGroupListBox);
+		if (!Common.isNullOrEmpty(pageData.getAgeGroups())) {
+			vp.add(ageGroupListBox);
+		}
 
 		TitleBar tb = new TitleBar("Fields", TitleBarStyle.SECTION);
 		tb.addLink(new ClickLabel("Add", new MouseDownHandler() {
@@ -80,21 +90,62 @@ public class EventFieldsTab extends Composite {
 			}
 		});
 
-		showEmptyTable();
+		refreshTable();
 
 		initWidget(vp);
 	}
 
 	private void refreshTable() {
-		eventService.getFieldsForAgeGroup(ageGroupListBox.getIntValue(), new Callback<ArrayList<EventField>>() {
+		ArgMap<EventArg> args = new ArgMap<EventArg>();
+		int ageGroupId = ageGroupListBox.getIntValue();
+		if (ageGroupId == 0) {
+			args.put(EventArg.EVENT_ID, pageData.getEvent().getId());
+		} else {
+			args.put(EventArg.AGE_GROUP_ID, ageGroupId);
+		}
+
+		eventService.getFields(args, new Callback<ArrayList<EventField>>() {
 			@Override
 			protected void doOnSuccess(ArrayList<EventField> result) {
 				fieldTable.removeAllRows();
 
-				for (EventField f : result) {
+				for (final EventField f : result) {
 					EventFormField ff = new EventFormField(f);
-
-					fieldTable.addField(ff.getFormField());
+					Widget previewWidget = ff.getFormField().getInputWidget();
+					HorizontalPanel hp = new HorizontalPanel();
+					hp.setWidth("400px");
+					hp.add(previewWidget);
+					LinkPanel lp = new LinkPanel();
+					lp.add(new ClickLabel("Edit", new MouseDownHandler() {
+						@Override
+						public void onMouseDown(MouseDownEvent event) {
+							dialog.center(f);
+						}
+					}));
+					lp.add(new ClickLabel("X", new MouseDownHandler() {
+						@Override
+						public void onMouseDown(MouseDownEvent event) {
+							ConfirmDialog.confirm("Delete " + f.getName() + "? Any filled-out values for this field will also be deleted.",
+									new ConfirmHandler() {
+										@Override
+										public void onConfirm() {
+											eventService.deleteEventField(f.getId(), new Callback<Void>() {
+												@Override
+												protected void doOnSuccess(Void result) {
+													refreshTable();
+												}
+											});
+										}
+									});
+						}
+					}));
+					hp.add(lp);
+					hp.setCellHorizontalAlignment(lp, HasHorizontalAlignment.ALIGN_RIGHT);
+					String label = ff.getFormField().getLabelText();
+					if (f.getRequired()) {
+						label = "*" + label;
+					}
+					fieldTable.addField(label, hp);
 				}
 
 				if (result.isEmpty()) {

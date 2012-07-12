@@ -11,18 +11,17 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 public interface EventDao {
+
+	public void deleteEventField(int fieldId);
 
 	public Event getById(int id);
 
 	public ArrayList<Data> getEventFieldTypes();
 
-	public ArrayList<EventField> getFieldsForAgeGroup(int ageGroupId);
-
-	public ArrayList<EventField> getFieldsForRegistration(EventRegistration registration);
+	public ArrayList<EventField> getFields(ArgMap<EventArg> args);
 
 	public EventPageData getPageData(int id);
 
