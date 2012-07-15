@@ -27,7 +27,9 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 @Repository
 public class EventDaoImpl extends SpringWrapper implements EventDao {
@@ -150,7 +152,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				}
 			}, id));
 
-			sql = "select * from eventVolunteerPositions where eventId = ?";
+			sql = "select *, p.positionCount - (select count(id) from eventVolunteerMapping where eventVolunteerPositionId = p.id) as openPositionCount ";
+			sql += "from eventVolunteerPositions p ";
+			sql += "where p.eventId = ?";
 			pd.setVolunteerPositions(query(sql, new RowMapper<EventVolunteerPosition>() {
 				@Override
 				public EventVolunteerPosition mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -161,6 +165,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 					e.setDiscount(rs.getDouble("discount"));
 					e.setJobTitle(rs.getString("jobTitle"));
 					e.setPositionCount(rs.getInt("positionCount"));
+					e.setOpenPositionCount(rs.getInt("openPositionCount"));
 					return e;
 				}
 			}, id));
@@ -257,6 +262,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		return field;
+	}
+
+	@Override
+	public ServerResponseData<EventRegistration> saveRegistration(EventRegistration registration) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

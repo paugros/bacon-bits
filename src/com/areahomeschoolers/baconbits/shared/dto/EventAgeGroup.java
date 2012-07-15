@@ -3,10 +3,6 @@ package com.areahomeschoolers.baconbits.shared.dto;
 public final class EventAgeGroup extends EntityDto<EventAgeGroup> {
 	private static final long serialVersionUID = 1L;
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
 	private int eventId;
 	private int minimumAge;
 	private int maximumAge;

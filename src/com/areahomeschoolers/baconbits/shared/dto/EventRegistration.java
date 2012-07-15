@@ -1,80 +1,75 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public final class EventRegistration extends EntityDto<EventRegistration> {
 	private static final long serialVersionUID = 1L;
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
-	private int peopleCount;
-	private String description;
-
-	private int userId;
-
-	private Date startDate, endDate, addedDate;
+	private Date addedDate;
 	private int eventId;
+	private boolean waiting, canceled, attended;
+	private ArrayList<EventRegistrationParticipant> participants = new ArrayList<EventRegistrationParticipant>();
+	private ArrayList<EventVolunteerPosition> volunteerPositions = new ArrayList<EventVolunteerPosition>();
 
 	public EventRegistration() {
 
-	}
-
-	public int getAddedById() {
-		return userId;
 	}
 
 	public Date getAddedDate() {
 		return addedDate;
 	}
 
-	public String getDescription() {
-		return description;
+	public boolean getAttended() {
+		return attended;
 	}
 
-	public Date getEndDate() {
-		return endDate;
+	public boolean getCanceled() {
+		return canceled;
 	}
 
 	public int getEventTypeId() {
 		return eventId;
 	}
 
-	public int getPeopleCount() {
-		return peopleCount;
+	public ArrayList<EventRegistrationParticipant> getParticipants() {
+		return participants;
 	}
 
-	public Date getStartDate() {
-		return startDate;
-	}
-
-	public void setAddedById(int addedById) {
-		this.userId = addedById;
+	public boolean getWaiting() {
+		return waiting;
 	}
 
 	public void setAddedDate(Date addedDate) {
 		this.addedDate = addedDate;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setAttended(boolean attended) {
+		this.attended = attended;
 	}
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
+	public void setCanceled(boolean canceled) {
+		this.canceled = canceled;
 	}
 
 	public void setEventTypeId(int eventTypeId) {
 		this.eventId = eventTypeId;
 	}
 
-	public void setPeopleCount(int peopleCount) {
-		this.peopleCount = peopleCount;
+	public void setParticipants(ArrayList<EventRegistrationParticipant> participants) {
+		this.participants = participants;
 	}
 
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
+	public void setWaiting(boolean waiting) {
+		this.waiting = waiting;
+	}
+
+	public ArrayList<EventVolunteerPosition> getVolunteerPositions() {
+		return volunteerPositions;
+	}
+
+	public void setVolunteerPositions(ArrayList<EventVolunteerPosition> volunteerPositions) {
+		this.volunteerPositions = volunteerPositions;
 	}
 
 }
