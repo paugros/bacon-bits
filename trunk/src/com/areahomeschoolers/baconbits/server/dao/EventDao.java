@@ -11,7 +11,9 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 public interface EventDao {
 
@@ -33,6 +35,8 @@ public interface EventDao {
 	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup);
 
 	public EventField saveField(EventField field);
+
+	public ServerResponseData<EventRegistration> saveRegistration(EventRegistration registration);
 
 	public EventVolunteerPosition saveVolunteerPosition(EventVolunteerPosition position);
 

@@ -16,7 +16,9 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 @Controller
 @RequestMapping("/event")
@@ -73,6 +75,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	@Override
 	public EventField saveEventField(EventField field) {
 		return dao.saveField(field);
+	}
+
+	@Override
+	public ServerResponseData<EventRegistration> saveRegistration(EventRegistration registration) {
+		return dao.saveRegistration(registration);
 	}
 
 	@Override

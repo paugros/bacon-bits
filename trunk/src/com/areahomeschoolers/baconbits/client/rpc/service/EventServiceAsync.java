@@ -9,7 +9,9 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -32,6 +34,8 @@ public interface EventServiceAsync {
 	void saveAgeGroup(EventAgeGroup ageGroup, AsyncCallback<EventAgeGroup> callback);
 
 	void saveEventField(EventField field, AsyncCallback<EventField> callback);
+
+	void saveRegistration(EventRegistration registration, AsyncCallback<ServerResponseData<EventRegistration>> callback);
 
 	void saveVolunteerPosition(EventVolunteerPosition position, AsyncCallback<EventVolunteerPosition> callback);
 
