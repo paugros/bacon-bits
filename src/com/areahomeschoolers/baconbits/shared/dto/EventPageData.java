@@ -6,6 +6,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class EventPageData implements IsSerializable {
 	private Event event;
+	private EventRegistration registration;
 	private ArrayList<Data> categories;
 	private ArrayList<EventAgeGroup> ageGroups;
 	private ArrayList<EventVolunteerPosition> volunteerPositions;
@@ -26,6 +27,10 @@ public class EventPageData implements IsSerializable {
 		return event;
 	}
 
+	public EventRegistration getRegistration() {
+		return registration;
+	}
+
 	public ArrayList<EventVolunteerPosition> getVolunteerPositions() {
 		return volunteerPositions;
 	}
@@ -40,6 +45,10 @@ public class EventPageData implements IsSerializable {
 
 	public void setEvent(Event event) {
 		this.event = event;
+	}
+
+	public void setRegistration(EventRegistration registration) {
+		this.registration = registration;
 	}
 
 	public void setVolunteerPositions(ArrayList<EventVolunteerPosition> volunteerPositions) {

@@ -84,7 +84,7 @@ public class Form {
 	 * 
 	 * @param widget
 	 */
-	public void addFormField(FormField widget) {
+	public void addField(FormField widget) {
 		allFormFields.add(widget);
 		if (!enabled) {
 			widget.setEnabled(false);

@@ -28,6 +28,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
@@ -136,7 +137,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				return null;
 			}
 
-			String sql = "select * from eventAgeGroups where eventId = ?";
+			String sql = "select * from eventAgeGroups where eventId = ? order by minimumAge";
 			pd.setAgeGroups(query(sql, new RowMapper<EventAgeGroup>() {
 				@Override
 				public EventAgeGroup mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -152,23 +153,51 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				}
 			}, id));
 
-			sql = "select *, p.positionCount - (select count(id) from eventVolunteerMapping where eventVolunteerPositionId = p.id) as openPositionCount ";
-			sql += "from eventVolunteerPositions p ";
-			sql += "where p.eventId = ?";
-			pd.setVolunteerPositions(query(sql, new RowMapper<EventVolunteerPosition>() {
-				@Override
-				public EventVolunteerPosition mapRow(ResultSet rs, int rowNum) throws SQLException {
-					EventVolunteerPosition e = new EventVolunteerPosition();
-					e.setId(rs.getInt("id"));
-					e.setEventId(rs.getInt("eventId"));
-					e.setDescription(rs.getString("description"));
-					e.setDiscount(rs.getDouble("discount"));
-					e.setJobTitle(rs.getString("jobTitle"));
-					e.setPositionCount(rs.getInt("positionCount"));
-					e.setOpenPositionCount(rs.getInt("openPositionCount"));
-					return e;
+			pd.setVolunteerPositions(getVolunteerPositions(id, 0));
+
+			sql = "select * from eventRegistrations where eventId = ? and addedById = ?";
+
+			if (ServerContext.isAuthenticated()) {
+				EventRegistration r = queryForObject(sql, new RowMapper<EventRegistration>() {
+					@Override
+					public EventRegistration mapRow(ResultSet rs, int row) throws SQLException {
+						EventRegistration r = new EventRegistration();
+						r.setId(rs.getInt("id"));
+						r.setEventId(rs.getInt("eventId"));
+						r.setAddedDate(rs.getTimestamp("addedDate"));
+						r.setAttended(rs.getBoolean("attended"));
+						r.setCanceled(rs.getBoolean("canceled"));
+						r.setWaiting(rs.getBoolean("waiting"));
+						return r;
+					}
+				}, id, ServerContext.getCurrentUser().getId());
+
+				if (r != null) {
+					pd.setRegistration(r);
+
+					sql = "select * from eventRegistrationParticipants where eventRegistrationId = ? order by firstName";
+
+					r.setParticipants(query(sql, new RowMapper<EventRegistrationParticipant>() {
+
+						@Override
+						public EventRegistrationParticipant mapRow(ResultSet rs, int row) throws SQLException {
+							EventRegistrationParticipant p = new EventRegistrationParticipant();
+							p.setId(rs.getInt("id"));
+							p.setAgeGroupId(rs.getInt("ageGroupId"));
+							p.setEventRegistrationId(rs.getInt("eventRegistrationId"));
+							p.setFirstName(rs.getString("firstName"));
+							p.setLastName(rs.getString("lastName"));
+							return p;
+						}
+					}, r.getId()));
+
+					r.setVolunteerPositions(getVolunteerPositions(id, r.getId()));
 				}
-			}, id));
+			}
+
+			if (pd.getRegistration() == null) {
+				pd.setRegistration(new EventRegistration());
+			}
 
 		} else {
 			Event e = new Event();
@@ -301,6 +330,43 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		f.setOptions(rs.getString("options"));
 		f.setRequired(rs.getBoolean("required"));
 		return f;
+	}
+
+	private ArrayList<EventVolunteerPosition> getVolunteerPositions(int eventId, final int registrationId) {
+		List<Object> sqlArgs = new ArrayList<Object>();
+		sqlArgs.add(eventId);
+		String sql = "select p.*, p.positionCount - (select count(id) from eventVolunteerMapping where eventVolunteerPositionId = p.id) as openPositionCount ";
+		if (registrationId > 0) {
+			sql += ", m.volunteerCount ";
+			sqlArgs.add(registrationId);
+		}
+		sql += "from eventVolunteerPositions p ";
+		if (registrationId > 0) {
+			sql += "join eventVolunteerMapping m on m.eventVolunteerPositionId = p.id ";
+		}
+		sql += "where p.eventId = ? ";
+		if (registrationId > 0) {
+			sql += "and m.eventRegistrationId = ? ";
+		}
+		sql += "order by jobTitle";
+		return query(sql, new RowMapper<EventVolunteerPosition>() {
+			@Override
+			public EventVolunteerPosition mapRow(ResultSet rs, int rowNum) throws SQLException {
+				EventVolunteerPosition e = new EventVolunteerPosition();
+				e.setId(rs.getInt("id"));
+				e.setEventId(rs.getInt("eventId"));
+				e.setDescription(rs.getString("description"));
+				e.setDiscount(rs.getDouble("discount"));
+				e.setJobTitle(rs.getString("jobTitle"));
+				e.setPositionCount(rs.getInt("positionCount"));
+				e.setOpenPositionCount(rs.getInt("openPositionCount"));
+				if (registrationId > 0) {
+					e.setEventRegistrationId(registrationId);
+					e.setRegisterPositionCount(rs.getInt("volunteerCount"));
+				}
+				return e;
+			}
+		}, sqlArgs.toArray());
 	}
 
 }
