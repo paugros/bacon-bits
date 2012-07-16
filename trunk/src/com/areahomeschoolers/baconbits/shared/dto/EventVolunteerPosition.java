@@ -11,6 +11,9 @@ public final class EventVolunteerPosition extends EntityDto<EventVolunteerPositi
 	private int openPositionCount;
 	// used when registering
 	private int registerPositionCount;
+	private int mappingId;
+	private int eventRegistrationId;
+
 	private String description;
 	private String jobTitle;
 	private double discount;
@@ -32,8 +35,16 @@ public final class EventVolunteerPosition extends EntityDto<EventVolunteerPositi
 		return eventId;
 	}
 
+	public int getEventRegistrationId() {
+		return eventRegistrationId;
+	}
+
 	public String getJobTitle() {
 		return jobTitle;
+	}
+
+	public int getMappingId() {
+		return mappingId;
 	}
 
 	public int getOpenPositionCount() {
@@ -60,8 +71,16 @@ public final class EventVolunteerPosition extends EntityDto<EventVolunteerPositi
 		this.eventId = eventTypeId;
 	}
 
+	public void setEventRegistrationId(int eventRegistrationId) {
+		this.eventRegistrationId = eventRegistrationId;
+	}
+
 	public void setJobTitle(String jobTitle) {
 		this.jobTitle = jobTitle;
+	}
+
+	public void setMappingId(int mappingId) {
+		this.mappingId = mappingId;
 	}
 
 	public void setOpenPositionCount(int openPositionCount) {

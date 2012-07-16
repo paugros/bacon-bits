@@ -3,15 +3,15 @@ package com.areahomeschoolers.baconbits.shared.dto;
 public final class EventRegistrationParticipant extends EntityDto<EventRegistrationParticipant> {
 	private static final long serialVersionUID = 1L;
 	private String firstName, lastName;
-	private int age;
 	private int eventRegistrationId;
+	private int ageGroupId;
 
 	public EventRegistrationParticipant() {
 
 	}
 
-	public int getAge() {
-		return age;
+	public int getAgeGroupId() {
+		return ageGroupId;
 	}
 
 	public int getEventRegistrationId() {
@@ -26,8 +26,8 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		return lastName;
 	}
 
-	public void setAge(int age) {
-		this.age = age;
+	public void setAgeGroupId(int ageGroupId) {
+		this.ageGroupId = ageGroupId;
 	}
 
 	public void setEventRegistrationId(int eventRegistrationId) {

@@ -52,8 +52,8 @@ public final class EventRegistration extends EntityDto<EventRegistration> {
 		this.canceled = canceled;
 	}
 
-	public void setEventTypeId(int eventTypeId) {
-		this.eventId = eventTypeId;
+	public void setEventId(int eventId) {
+		this.eventId = eventId;
 	}
 
 	public void setParticipants(ArrayList<EventRegistrationParticipant> participants) {
