@@ -70,6 +70,10 @@ public class ValidatorManager {
 		return false;
 	}
 
+	public void removeValidator(Validator validator) {
+		validators.remove(validator);
+	}
+
 	/**
 	 * Executes {@link Validator#validate()} on every member Validator.
 	 */

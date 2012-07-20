@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
@@ -34,6 +35,8 @@ public interface EventServiceAsync {
 	void saveAgeGroup(EventAgeGroup ageGroup, AsyncCallback<EventAgeGroup> callback);
 
 	void saveEventField(EventField field, AsyncCallback<EventField> callback);
+
+	void saveParticipant(EventRegistrationParticipant participant, AsyncCallback<EventRegistrationParticipant> callback);
 
 	void saveRegistration(EventRegistration registration, AsyncCallback<ServerResponseData<EventRegistration>> callback);
 

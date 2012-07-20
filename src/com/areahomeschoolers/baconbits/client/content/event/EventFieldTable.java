@@ -27,6 +27,8 @@ public class EventFieldTable extends FieldTable {
 			form.addField(ff.getFormField());
 			addField(ff.getFormField());
 		}
+
+		form.initialize();
 	}
 
 	public Form getForm() {
