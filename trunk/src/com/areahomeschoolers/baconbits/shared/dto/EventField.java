@@ -9,8 +9,8 @@ public class EventField extends EntityDto<EventField> {
 	private String options;
 	private String value;
 	private int valueId;
-	private int eventRegistrationId;
 	private Integer eventId;
+	private Integer participantId;
 
 	private static final long serialVersionUID = 1L;
 
@@ -32,16 +32,19 @@ public class EventField extends EntityDto<EventField> {
 		return eventId;
 	}
 
-	public int getEventRegistrationId() {
-		return eventRegistrationId;
-	}
-
 	public String getName() {
 		return name;
 	}
 
 	public String getOptions() {
 		return options;
+	}
+
+	public Integer getParticipantId() {
+		if (participantId == 0) {
+			return null;
+		}
+		return participantId;
 	}
 
 	public boolean getRequired() {
@@ -64,6 +67,10 @@ public class EventField extends EntityDto<EventField> {
 		return valueId;
 	}
 
+	public boolean hasValue() {
+		return valueId > 0;
+	}
+
 	public void setEventAgeGroupId(int eventAgeGroupId) {
 		this.eventAgeGroupId = eventAgeGroupId;
 	}
@@ -72,16 +79,16 @@ public class EventField extends EntityDto<EventField> {
 		this.eventId = eventId;
 	}
 
-	public void setEventRegistrationId(int eventRegistrationId) {
-		this.eventRegistrationId = eventRegistrationId;
-	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	public void setOptions(String options) {
 		this.options = options;
+	}
+
+	public void setParticipantId(Integer participantId) {
+		this.participantId = participantId;
 	}
 
 	public void setRequired(boolean required) {

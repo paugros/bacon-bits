@@ -9,6 +9,7 @@ public final class EventRegistration extends EntityDto<EventRegistration> {
 	private Date addedDate;
 	private int eventId;
 	private boolean waiting, canceled, attended;
+	private int addedById;
 	private ArrayList<EventRegistrationParticipant> participants = new ArrayList<EventRegistrationParticipant>();
 	private ArrayList<EventVolunteerPosition> volunteerPositions = new ArrayList<EventVolunteerPosition>();
 
@@ -28,12 +29,16 @@ public final class EventRegistration extends EntityDto<EventRegistration> {
 		return canceled;
 	}
 
-	public int getEventTypeId() {
+	public int getEventId() {
 		return eventId;
 	}
 
 	public ArrayList<EventRegistrationParticipant> getParticipants() {
 		return participants;
+	}
+
+	public ArrayList<EventVolunteerPosition> getVolunteerPositions() {
+		return volunteerPositions;
 	}
 
 	public boolean getWaiting() {
@@ -60,16 +65,20 @@ public final class EventRegistration extends EntityDto<EventRegistration> {
 		this.participants = participants;
 	}
 
+	public void setVolunteerPositions(ArrayList<EventVolunteerPosition> volunteerPositions) {
+		this.volunteerPositions = volunteerPositions;
+	}
+
 	public void setWaiting(boolean waiting) {
 		this.waiting = waiting;
 	}
 
-	public ArrayList<EventVolunteerPosition> getVolunteerPositions() {
-		return volunteerPositions;
+	public int getAddedById() {
+		return addedById;
 	}
 
-	public void setVolunteerPositions(ArrayList<EventVolunteerPosition> volunteerPositions) {
-		this.volunteerPositions = volunteerPositions;
+	public void setAddedById(int addedById) {
+		this.addedById = addedById;
 	}
 
 }

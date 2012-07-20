@@ -20,6 +20,7 @@ import com.areahomeschoolers.baconbits.server.dao.EventDao;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
@@ -102,29 +103,43 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	@Override
 	public ArrayList<EventField> getFields(ArgMap<EventArg> args) {
-		List<Object> params = new ArrayList<Object>();
+		List<Object> sqlArgs = new ArrayList<Object>();
 		int ageGroupId = args.getInt(EventArg.AGE_GROUP_ID);
 		int eventId = args.getInt(EventArg.EVENT_ID);
+		final int participantId = args.getInt(EventArg.REGISTRATION_PARTICIPANT_ID);
 
 		String sql = "select ef.*, et.type ";
+		if (participantId > 0) {
+			sql += ", ev.Value, ev.id as valueId ";
+		}
 		sql += "from eventFields ef ";
 		sql += "join eventFieldTypes et on et.id = ef.eventFieldTypeId ";
+		if (participantId > 0) {
+			sql += "join eventFieldValues ev on ev.eventFieldId = ef.id and ev.participantId = ? ";
+			sqlArgs.add(participantId);
+		}
 		sql += "where 1 = 1 ";
 		if (ageGroupId > 0) {
 			sql += "and ef.eventAgeGroupId = ? ";
-			params.add(ageGroupId);
+			sqlArgs.add(ageGroupId);
 		} else if (eventId > 0) {
 			sql += "and ef.eventId = ? and ef.eventAgeGroupId is null ";
-			params.add(eventId);
+			sqlArgs.add(eventId);
 		}
 		sql += "order by ef.id";
 
 		return query(sql, new RowMapper<EventField>() {
 			@Override
 			public EventField mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return createBaseEventField(rs);
+				EventField f = createBaseEventField(rs);
+				if (participantId > 0) {
+					f.setParticipantId(participantId);
+					f.setValue(rs.getString("value"));
+					f.setValueId(rs.getInt("valueId"));
+				}
+				return f;
 			}
-		}, params.toArray());
+		}, sqlArgs.toArray());
 	}
 
 	@Override
@@ -164,6 +179,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 						EventRegistration r = new EventRegistration();
 						r.setId(rs.getInt("id"));
 						r.setEventId(rs.getInt("eventId"));
+						r.setAddedById(rs.getInt("addedById"));
 						r.setAddedDate(rs.getTimestamp("addedDate"));
 						r.setAttended(rs.getBoolean("attended"));
 						r.setCanceled(rs.getBoolean("canceled"));
@@ -294,9 +310,54 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
+	public EventRegistrationParticipant saveParticipant(EventRegistrationParticipant participant) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);
+
+		if (participant.isSaved()) {
+			String sql = "update eventRegistrationParticipants set firstName = :firstName, lastName = :lastName, ageGroupId = :ageGroupId, age = :age where id = :id ";
+			update(sql, namedParams);
+		} else {
+			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, firstName, lastName, ageGroupId, age) ";
+			sql += "values(:eventRegistrationId, :firstName, :lastName, :ageGroupId, :age)";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			participant.setId(ServerUtils.getIdFromKeys(keys));
+		}
+
+		if (!Common.isNullOrEmpty(participant.getEventFields())) {
+			for (EventField f : participant.getEventFields()) {
+				f.setParticipantId(participant.getId());
+				saveFieldValue(f);
+			}
+		}
+
+		return participant;
+	}
+
+	@Override
 	public ServerResponseData<EventRegistration> saveRegistration(EventRegistration registration) {
-		// TODO Auto-generated method stub
-		return null;
+		ServerResponseData<EventRegistration> rd = new ServerResponseData<EventRegistration>();
+
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(registration);
+		if (registration.isSaved()) {
+			String sql = "update eventRegistrations set waiting = :waiting, canceled = :canceled, attended = :attended where id = :id ";
+			update(sql, namedParams);
+		} else {
+			registration.setAddedById(ServerContext.getCurrentUser().getId());
+			String sql = "insert into eventRegistrations(eventId, waiting, addedDate, canceled, attended, addedById) ";
+			sql += "values(:eventId, :waiting, now(), :canceled, :attended, :addedById)";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			registration.setId(ServerUtils.getIdFromKeys(keys));
+		}
+
+		rd.setData(registration);
+
+		return rd;
 	}
 
 	@Override
@@ -367,6 +428,23 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				return e;
 			}
 		}, sqlArgs.toArray());
+	}
+
+	private void saveFieldValue(EventField field) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(field);
+
+		if (field.hasValue()) {
+			String sql = "update eventFieldValues set value = :value where id = :valueId ";
+			update(sql, namedParams);
+		} else {
+			String sql = "insert into eventFieldValues(eventFieldId, value, participantId) ";
+			sql += "values(:id, :value, :participantId)";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			field.setId(ServerUtils.getIdFromKeys(keys));
+		}
 	}
 
 }

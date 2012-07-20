@@ -70,24 +70,22 @@ public class Form {
 		submitHandlers.add(formSubmitHandler);
 	}
 
-	public void addFields(Set<FormField> fields) {
-		for (FormField field : fields) {
-			allFormFields.add(field);
-			if (field.getValidator() != null) {
-				validatorFormFields.add(field);
-			}
-		}
-	}
-
 	/**
 	 * Adds a {@link FormField}.
 	 * 
-	 * @param widget
+	 * @param field
 	 */
-	public void addField(FormField widget) {
-		allFormFields.add(widget);
+	public void addField(FormField field) {
+		allFormFields.add(field);
+		field.setForm(this);
 		if (!enabled) {
-			widget.setEnabled(false);
+			field.setEnabled(false);
+		}
+	}
+
+	public void addFields(Set<FormField> fields) {
+		for (FormField field : fields) {
+			addField(field);
 		}
 	}
 
@@ -106,10 +104,18 @@ public class Form {
 	 * 
 	 * @param vc
 	 */
-	public void addFormValidatorCommand(ValidatorCommand vc) {
-		Validator validator = new Validator(null, vc);
+	public HandlerRegistration addFormValidatorCommand(ValidatorCommand vc) {
+		final Validator validator = new Validator(null, vc);
 		validatorManager.addValidator(validator);
 		submitValidators.add(validator);
+
+		return new HandlerRegistration() {
+			@Override
+			public void removeHandler() {
+				validatorManager.removeValidator(validator);
+				submitValidators.remove(validator);
+			}
+		};
 	}
 
 	public void addPartner(Form form) {
@@ -128,6 +134,10 @@ public class Form {
 		for (FormField field : validatorFormFields) {
 			field.getLabelPanel().removeStyleName("errorText");
 		}
+	}
+
+	public void clearPartners() {
+		partners.clear();
 	}
 
 	/**

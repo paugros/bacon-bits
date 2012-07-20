@@ -53,7 +53,7 @@ public class EventRegistrationSection extends Composite {
 	}
 
 	private void addParticipantSection() {
-		TitleBar tb = new TitleBar("Enter Attendees", TitleBarStyle.SUBSECTION);
+		TitleBar tb = new TitleBar("Attendees", TitleBarStyle.SUBSECTION);
 		tb.addLink(new ClickLabel("Add", new MouseDownHandler() {
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
