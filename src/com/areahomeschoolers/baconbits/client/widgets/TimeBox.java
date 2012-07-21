@@ -40,15 +40,15 @@ public class TimeBox extends Composite implements HasValue<Date>, HasValidator, 
 		HOUR, HALF_HOUR
 	}
 
-	private final TextBox textBox = new TextBox();
-	private final PopupPanel popup = new PopupPanel(true);
-	private final ScrollPanel scrollPanel = new ScrollPanel();
-	private final VerticalPanel optionsPanel = new VerticalPanel();
+	private TextBox textBox = new TextBox();
+	private PopupPanel popup = new PopupPanel(true);
+	private ScrollPanel scrollPanel = new ScrollPanel();
+	private VerticalPanel optionsPanel = new VerticalPanel();
 	private Label selectedOption;
 	private boolean freezeMouseOverEvents = false;
 	private Date setDate; // This stores the day, month, year data of the date set in setValue
 
-	private final MouseOverHandler optionOver = new MouseOverHandler() {
+	private MouseOverHandler optionOver = new MouseOverHandler() {
 		@Override
 		public void onMouseOver(MouseOverEvent event) {
 			if (freezeMouseOverEvents) {
@@ -60,7 +60,7 @@ public class TimeBox extends Composite implements HasValue<Date>, HasValidator, 
 		}
 	};
 
-	private final ClickHandler optionClick = new ClickHandler() {
+	private ClickHandler optionClick = new ClickHandler() {
 		@Override
 		public void onClick(ClickEvent event) {
 			Label option = (Label) event.getSource();
@@ -70,7 +70,7 @@ public class TimeBox extends Composite implements HasValue<Date>, HasValidator, 
 		}
 	};
 
-	private final Validator validator = new Validator(textBox, new ValidatorCommand() {
+	private Validator validator = new Validator(textBox, new ValidatorCommand() {
 		@Override
 		public void validate(Validator validator) {
 			validator.setError(hasErrors());
@@ -205,6 +205,10 @@ public class TimeBox extends Composite implements HasValue<Date>, HasValidator, 
 		}
 
 		return false;
+	}
+
+	public boolean isEnabled() {
+		return textBox.isEnabled();
 	}
 
 	@Override

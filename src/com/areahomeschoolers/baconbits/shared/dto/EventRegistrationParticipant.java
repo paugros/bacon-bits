@@ -7,7 +7,8 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 	private static final long serialVersionUID = 1L;
 	private String firstName, lastName;
 	private int eventRegistrationId;
-	private int ageGroupId;
+	private Integer ageGroupId;
+	private boolean canceled;
 	private int age;
 
 	private List<EventField> eventFields = new ArrayList<EventField>();
@@ -20,8 +21,15 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		return age;
 	}
 
-	public int getAgeGroupId() {
+	public Integer getAgeGroupId() {
+		if (ageGroupId == null || ageGroupId == 0) {
+			return null;
+		}
 		return ageGroupId;
+	}
+
+	public boolean getCanceled() {
+		return canceled;
 	}
 
 	public List<EventField> getEventFields() {
@@ -44,8 +52,12 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		this.age = age;
 	}
 
-	public void setAgeGroupId(int ageGroupId) {
+	public void setAgeGroupId(Integer ageGroupId) {
 		this.ageGroupId = ageGroupId;
+	}
+
+	public void setCanceled(boolean canceled) {
+		this.canceled = canceled;
 	}
 
 	public void setEventFields(List<EventField> eventFields) {
