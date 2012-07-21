@@ -525,7 +525,7 @@ public class EventPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			tabPanel.add("Register/ Details", new TabPageCommand() {
+			tabPanel.add("Register / Details", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
 					tabBody.add(new EventRegistrationSection(pageData));

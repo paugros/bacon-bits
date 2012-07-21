@@ -16,13 +16,13 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 
 public class DateTimeBox extends Composite implements HasValue<Date>, HasValidator, CustomFocusWidget {
-	private final FocusPanel focusPanel = new FocusPanel();
-	private final HorizontalPanel boxPanel = new HorizontalPanel();
-	private final ValidatorDateBox dateBox = new ValidatorDateBox();
-	private final TimeBox timeBox = new TimeBox();
+	private FocusPanel focusPanel = new FocusPanel();
+	private HorizontalPanel boxPanel = new HorizontalPanel();
+	private ValidatorDateBox dateBox = new ValidatorDateBox();
+	private TimeBox timeBox = new TimeBox();
 	private boolean timeValidationEnabled = true;
 
-	private final Validator validator = new Validator(focusPanel, new ValidatorCommand() {
+	private Validator validator = new Validator(focusPanel, new ValidatorCommand() {
 		@Override
 		public void validate(Validator validator) {
 			// if we are not required
@@ -140,6 +140,11 @@ public class DateTimeBox extends Composite implements HasValue<Date>, HasValidat
 		validator.setRequired(required);
 	}
 
+	public void setTimeEnabled(boolean enabled) {
+		timeBox.setEnabled(enabled);
+		timeBox.setValue(null);
+	}
+
 	public void setTimeValidationEnabled(boolean timeValidationEnabled) {
 		this.timeValidationEnabled = timeValidationEnabled;
 	}
@@ -152,11 +157,25 @@ public class DateTimeBox extends Composite implements HasValue<Date>, HasValidat
 	@Override
 	public void setValue(Date value, boolean fireEvents) {
 		dateBox.setValue(value);
-		timeBox.setValue(value);
+		if (timeBox.isEnabled()) {
+			timeBox.setValue(value);
+		}
 
 		if (fireEvents) {
 			fireEvent(new ValueChangeEvent<Date>(value) {
 			});
 		}
+	}
+
+	public void syncDateWith(final DateTimeBox dateTimeBox) {
+		dateBox.addValueChangeHandler(new ValueChangeHandler<Date>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Date> event) {
+				Date newStart = event.getValue();
+				if (newStart != null && dateTimeBox.dateBox.getValue() == null) {
+					dateTimeBox.dateBox.setValue(newStart);
+				}
+			}
+		});
 	}
 }

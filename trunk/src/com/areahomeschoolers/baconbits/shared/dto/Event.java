@@ -18,8 +18,9 @@ public final class Event extends EntityDto<Event> {
 	private double cost;
 	private String address;
 	private boolean adultRequired = false;
-	private boolean publicEvent = false;
+	private boolean publicEvent = true;
 	private boolean active = true;
+	private boolean finished, registrationFinished;
 	private boolean sendSurvey;
 	private int minimumParticipants, maximumParticipants;
 	private String notificationEmail;
@@ -31,6 +32,10 @@ public final class Event extends EntityDto<Event> {
 
 	public Event() {
 
+	}
+
+	public boolean allowRegistrations() {
+		return active && !finished && !registrationFinished;
 	}
 
 	public boolean getActive() {
@@ -77,6 +82,10 @@ public final class Event extends EntityDto<Event> {
 		return endDate;
 	}
 
+	public boolean getFinished() {
+		return finished;
+	}
+
 	public Integer getGroupId() {
 		if (groupId == null || groupId == 0) {
 			return null;
@@ -110,6 +119,10 @@ public final class Event extends EntityDto<Event> {
 
 	public Date getRegistrationEndDate() {
 		return registrationEndDate;
+	}
+
+	public boolean getRegistrationFinished() {
+		return registrationFinished;
 	}
 
 	public Date getRegistrationStartDate() {
@@ -172,6 +185,10 @@ public final class Event extends EntityDto<Event> {
 		this.endDate = endDate;
 	}
 
+	public void setFinished(boolean finished) {
+		this.finished = finished;
+	}
+
 	public void setGroupId(Integer groupId) {
 		this.groupId = groupId;
 	}
@@ -202,6 +219,10 @@ public final class Event extends EntityDto<Event> {
 
 	public void setRegistrationEndDate(Date registrationEndDate) {
 		this.registrationEndDate = registrationEndDate;
+	}
+
+	public void setRegistrationFinished(boolean registrationFinished) {
+		this.registrationFinished = registrationFinished;
 	}
 
 	public void setRegistrationStartDate(Date registrationStartDate) {

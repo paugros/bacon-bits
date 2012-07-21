@@ -20,6 +20,10 @@ public interface EventDao {
 
 	public void deleteEventField(int fieldId);
 
+	public void deleteEventParticipant(EventRegistrationParticipant participant);
+
+	public void deleteVolunteerPositionMapping(EventVolunteerPosition position);
+
 	public Event getById(int id);
 
 	public ArrayList<Data> getEventFieldTypes();

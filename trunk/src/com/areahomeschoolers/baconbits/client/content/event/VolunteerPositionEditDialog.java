@@ -60,7 +60,7 @@ public class VolunteerPositionEditDialog extends EntityEditDialog<EventVolunteer
 		ft.addField(titleField);
 
 		final TextBox descriptionInput = new TextBox();
-		descriptionInput.setMaxLength(100);
+		descriptionInput.setMaxLength(500);
 		FormField descriptionField = form.createFormField("Description:", descriptionInput, null);
 		descriptionField.setInitializer(new Command() {
 			@Override

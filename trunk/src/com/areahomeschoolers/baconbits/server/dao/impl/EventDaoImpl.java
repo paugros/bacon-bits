@@ -62,6 +62,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setTitle(rs.getString("title"));
 			event.setGroupName(rs.getString("groupName"));
 			event.setPublicEvent(rs.getBoolean("isPublic"));
+			event.setFinished(rs.getBoolean("finished"));
+			event.setRegistrationFinished(rs.getBoolean("registrationFinished"));
 			event.setAddedByFullName(rs.getString("firstName") + " " + rs.getString("lastName"));
 			return event;
 		}
@@ -72,7 +74,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	@Autowired
 	public EventDaoImpl(DataSource dataSource) {
 		super(dataSource);
-		SELECT = "select e.*, g.groupName, c.category, u.firstName, u.lastName from events e \n";
+		SELECT = "select e.*, g.groupName, c.category, u.firstName, u.lastName, ";
+		SELECT += "(e.endDate < now()) as finished, (e.registrationEndDate is not null and e.registrationEndDate < now()) as registrationFinished ";
+		SELECT += "from events e \n";
 		SELECT += "left join groups g on g.id = e.groupId \n";
 		SELECT += "join eventCategories c on c.id = e.categoryId \n";
 		SELECT += "join users u on u.id = e.addedById \n";
@@ -85,6 +89,18 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		sql = "delete from eventFields where id = ?";
 		update(sql, fieldId);
+	}
+
+	@Override
+	public void deleteEventParticipant(EventRegistrationParticipant participant) {
+		String sql = "delete from eventRegistrationParticipants where id = ?";
+		update(sql, participant.getId());
+	}
+
+	@Override
+	public void deleteVolunteerPositionMapping(EventVolunteerPosition position) {
+		String sql = "delete from eventVolunteerMapping where id = ?";
+		update(sql, position.getMappingId());
 	}
 
 	@Override
@@ -203,6 +219,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 							p.setEventRegistrationId(rs.getInt("eventRegistrationId"));
 							p.setFirstName(rs.getString("firstName"));
 							p.setLastName(rs.getString("lastName"));
+							p.setCanceled(rs.getBoolean("canceled"));
 							return p;
 						}
 					}, r.getId()));
@@ -314,7 +331,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);
 
 		if (participant.isSaved()) {
-			String sql = "update eventRegistrationParticipants set firstName = :firstName, lastName = :lastName, ageGroupId = :ageGroupId, age = :age where id = :id ";
+			String sql = "update eventRegistrationParticipants set firstName = :firstName, lastName = :lastName, ageGroupId = :ageGroupId, age = :age, canceled = :canceled where id = :id ";
 			update(sql, namedParams);
 		} else {
 			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, firstName, lastName, ageGroupId, age) ";
@@ -344,6 +361,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		if (registration.isSaved()) {
 			String sql = "update eventRegistrations set waiting = :waiting, canceled = :canceled, attended = :attended where id = :id ";
 			update(sql, namedParams);
+
+			if (registration.getCanceled()) {
+				sql = "delete from eventVolunteerMapping where eventRegistrationId = :id";
+				update(sql, namedParams);
+			}
 		} else {
 			registration.setAddedById(ServerContext.getCurrentUser().getId());
 			String sql = "insert into eventRegistrations(eventId, waiting, addedDate, canceled, attended, addedById) ";
@@ -364,17 +386,27 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	public EventVolunteerPosition saveVolunteerPosition(EventVolunteerPosition position) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(position);
 
-		if (position.isSaved()) {
+		if (position.isSaved() && position.getEventRegistrationId() == 0) {
 			String sql = "update eventVolunteerPositions set jobTitle = :jobTitle, description = :description, discount = :discount, positionCount = :positionCount where id = :id ";
 			update(sql, namedParams);
 		} else {
-			String sql = "insert into eventVolunteerPositions(eventId, jobTitle, description, discount, positionCount) ";
-			sql += "values(:eventId, :jobTitle, :description, :discount, :positionCount)";
+			String sql = "";
+			if (position.getEventRegistrationId() > 0) {
+				sql = "insert into eventVolunteerMapping (eventVolunteerPositionId, eventRegistrationId, volunteerCount) ";
+				sql += "values(:id, :eventRegistrationId, :registerPositionCount)";
+			} else {
+				sql = "insert into eventVolunteerPositions(eventId, jobTitle, description, discount, positionCount) ";
+				sql += "values(:eventId, :jobTitle, :description, :discount, :positionCount)";
+			}
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
 
-			position.setId(ServerUtils.getIdFromKeys(keys));
+			if (position.getEventRegistrationId() > 0) {
+				position.setMappingId(ServerUtils.getIdFromKeys(keys));
+			} else {
+				position.setId(ServerUtils.getIdFromKeys(keys));
+			}
 		}
 
 		return position;
@@ -398,7 +430,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sqlArgs.add(eventId);
 		String sql = "select p.*, p.positionCount - (select count(id) from eventVolunteerMapping where eventVolunteerPositionId = p.id) as openPositionCount ";
 		if (registrationId > 0) {
-			sql += ", m.volunteerCount ";
+			sql += ", m.volunteerCount, m.id as mappingId ";
 			sqlArgs.add(registrationId);
 		}
 		sql += "from eventVolunteerPositions p ";
@@ -424,6 +456,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				if (registrationId > 0) {
 					e.setEventRegistrationId(registrationId);
 					e.setRegisterPositionCount(rs.getInt("volunteerCount"));
+					e.setMappingId(rs.getInt("mappingId"));
 				}
 				return e;
 			}

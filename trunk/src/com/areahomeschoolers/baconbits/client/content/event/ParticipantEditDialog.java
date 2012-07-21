@@ -3,12 +3,12 @@ package com.areahomeschoolers.baconbits.client.content.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
@@ -38,11 +38,13 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 	private MaxHeightScrollPanel fieldsPanel;
 	private EventRegistration registration;
 	private List<EventField> eventFields;
+	private Command refreshCommand;
 
-	public ParticipantEditDialog(EventPageData pd) {
+	public ParticipantEditDialog(EventPageData pd, Command refreshCommand) {
 		setText("Register Attendee");
 		pageData = pd;
 		registration = pd.getRegistration();
+		this.refreshCommand = refreshCommand;
 
 		addFormSubmitHandler(new FormSubmitHandler() {
 			@Override
@@ -64,6 +66,12 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 		});
 	}
 
+	@Override
+	public void show() {
+		super.show();
+		form.getSubmitButton().setEnabled(pageData.getEvent().allowRegistrations());
+	}
+
 	private void saveParticipant() {
 		entity.setEventRegistrationId(registration.getId());
 		entity.setEventFields(eventFields);
@@ -71,7 +79,9 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 		eventService.saveParticipant(entity, new Callback<EventRegistrationParticipant>() {
 			@Override
 			protected void doOnSuccess(EventRegistrationParticipant result) {
-				Application.reloadPage();
+				registration.getParticipants().remove(result);
+				registration.getParticipants().add(result);
+				refreshCommand.execute();
 			}
 		});
 	}
@@ -79,10 +89,14 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 	private void setFields(List<EventField> fields) {
 		eventFields = fields;
 		form.clearPartners();
-		final EventFieldTable eventFieldsTable = new EventFieldTable(fields);
-		form.addPartner(eventFieldsTable.getForm());
-		eventFieldsTable.setWidth(dialogWidth + "px");
-		fieldsPanel.setWidget(eventFieldsTable);
+		if (fields.isEmpty()) {
+			fieldsPanel.clear();
+		} else {
+			final EventFieldTable eventFieldsTable = new EventFieldTable(fields);
+			form.addPartner(eventFieldsTable.getForm());
+			eventFieldsTable.setWidth(dialogWidth + "px");
+			fieldsPanel.setWidget(eventFieldsTable);
+		}
 		centerDeferred();
 	}
 
@@ -144,39 +158,49 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 		});
 		fieldTable.addField(ageField);
 
-		final RequiredListBox ageGroupInput = new RequiredListBox();
-		FormField ageGroupField = form.createFormField("Age group:", ageGroupInput, null);
-		ageGroupField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				ageGroupInput.setValue(entity.getAgeGroupId());
-			}
-		});
-		ageGroupField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				entity.setAgeGroupId(ageGroupInput.getIntValue());
-			}
-		});
-		fieldTable.addField(ageGroupField);
-
 		fieldsPanel = new MaxHeightScrollPanel(200);
+		if (pageData.getAgeGroups().isEmpty()) {
+			eventService.getFields(new ArgMap<EventArg>(EventArg.EVENT_ID, pageData.getEvent().getId()), new Callback<ArrayList<EventField>>() {
+				@Override
+				protected void doOnSuccess(ArrayList<EventField> result) {
+					setFields(result);
+				}
+			});
+		} else {
+			final RequiredListBox ageGroupInput = new RequiredListBox();
+			FormField ageGroupField = form.createFormField("Age group:", ageGroupInput, null);
+			ageGroupField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					ageGroupInput.setValue(entity.getAgeGroupId());
+				}
+			});
+			ageGroupField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					entity.setAgeGroupId(ageGroupInput.getIntValue());
+				}
+			});
+			fieldTable.addField(ageGroupField);
 
-		for (EventAgeGroup a : pageData.getAgeGroups()) {
-			ageGroupInput.addItem(a.getMinimumAge() + ((a.getMaximumAge() == 0) ? "+" : "-" + a.getMaximumAge()) + " yrs", a.getId());
-		}
-
-		ageGroupInput.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				eventService.getFields(new ArgMap<EventArg>(EventArg.AGE_GROUP_ID, ageGroupInput.getIntValue()), new Callback<ArrayList<EventField>>() {
-					@Override
-					protected void doOnSuccess(ArrayList<EventField> result) {
-						setFields(result);
-					}
-				});
+			for (EventAgeGroup a : pageData.getAgeGroups()) {
+				String text = a.getMinimumAge() + ((a.getMaximumAge() == 0) ? "+" : "-" + a.getMaximumAge()) + " yrs";
+				text += " - " + Formatter.formatCurrency(a.getPrice());
+				ageGroupInput.addItem(text, a.getId());
 			}
-		});
+
+			ageGroupInput.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					eventService.getFields(new ArgMap<EventArg>(EventArg.AGE_GROUP_ID, ageGroupInput.getIntValue()), new Callback<ArrayList<EventField>>() {
+						@Override
+						protected void doOnSuccess(ArrayList<EventField> result) {
+							setFields(result);
+						}
+					});
+				}
+			});
+		}
 
 		if (entity.isSaved()) {
 			eventService.getFields(new ArgMap<EventArg>(EventArg.REGISTRATION_PARTICIPANT_ID, entity.getId()), new Callback<ArrayList<EventField>>() {

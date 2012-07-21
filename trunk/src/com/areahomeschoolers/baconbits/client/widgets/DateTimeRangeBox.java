@@ -8,13 +8,14 @@ import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.Label;
 
 public class DateTimeRangeBox extends Composite implements HasValidator, CustomFocusWidget {
-	private final PaddedPanel panel = new PaddedPanel();
-	private final FocusPanel focusPanel = new FocusPanel(panel);
-	private final DateTimeBox startDateBox = new DateTimeBox();
-	private final DateTimeBox endDateBox = new DateTimeBox();
-	private final Validator validator = new Validator(focusPanel, new ValidatorCommand() {
+	private PaddedPanel panel = new PaddedPanel();
+	private FocusPanel focusPanel = new FocusPanel(panel);
+	private DateTimeBox startDateBox = new DateTimeBox();
+	private DateTimeBox endDateBox = new DateTimeBox();
+	private Validator validator = new Validator(focusPanel, new ValidatorCommand() {
 		@Override
 		public void validate(Validator validator) {
 			if (!startDateBox.getValidator().validate() || !endDateBox.getValidator().validate()) {
@@ -34,8 +35,11 @@ public class DateTimeRangeBox extends Composite implements HasValidator, CustomF
 		}
 	});
 
+	private boolean allDay = false;
+
 	public DateTimeRangeBox() {
 		panel.add(startDateBox);
+		panel.add(new Label(" to "));
 		panel.add(endDateBox);
 
 		initWidget(focusPanel);
@@ -43,6 +47,8 @@ public class DateTimeRangeBox extends Composite implements HasValidator, CustomF
 		setRequired(false);
 		startDateBox.getValidator().useErrorBorder(false);
 		endDateBox.getValidator().useErrorBorder(false);
+
+		startDateBox.syncDateWith(endDateBox);
 	}
 
 	public Date getEndDate() {
@@ -58,9 +64,20 @@ public class DateTimeRangeBox extends Composite implements HasValidator, CustomF
 		return validator;
 	}
 
+	public boolean isAllDay() {
+		return allDay;
+	}
+
 	@Override
 	public boolean isRequired() {
 		return validator.isRequired();
+	}
+
+	public void setAllDay(boolean allDay) {
+		endDateBox.setValue(null);
+		endDateBox.setEnabled(!allDay);
+		startDateBox.setTimeEnabled(!allDay);
+		this.allDay = allDay;
 	}
 
 	@Override
@@ -92,5 +109,10 @@ public class DateTimeRangeBox extends Composite implements HasValidator, CustomF
 
 	public void setStartDate(Date startDate) {
 		startDateBox.setValue(startDate);
+	}
+
+	public void setTimeEnabled(boolean enabled) {
+		startDateBox.setTimeEnabled(enabled);
+		endDateBox.setTimeEnabled(enabled);
 	}
 }

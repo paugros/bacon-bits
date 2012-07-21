@@ -20,6 +20,10 @@ public interface EventServiceAsync {
 
 	void deleteEventField(int fieldId, AsyncCallback<Void> callback);
 
+	void deleteEventParticipant(EventRegistrationParticipant participant, AsyncCallback<Void> callback);
+
+	void deleteVolunteerPositionMapping(EventVolunteerPosition position, AsyncCallback<Void> callback);
+
 	void getById(int id, AsyncCallback<Event> callback);
 
 	void getEventFieldTypes(AsyncCallback<ArrayList<Data>> callback);
