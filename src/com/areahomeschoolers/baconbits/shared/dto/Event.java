@@ -16,12 +16,13 @@ public final class Event extends EntityDto<Event> {
 	private Integer groupId;
 	private int categoryId;
 	private double cost;
+	private double price;
 	private String address;
 	private boolean adultRequired = false;
-	private boolean publicEvent = true;
 	private boolean active = true;
 	private boolean finished, registrationFinished;
 	private boolean sendSurvey;
+	private boolean requiresRegistration = true;
 	private int minimumParticipants, maximumParticipants;
 	private String notificationEmail;
 
@@ -109,8 +110,8 @@ public final class Event extends EntityDto<Event> {
 		return notificationEmail;
 	}
 
-	public boolean getPublicEvent() {
-		return publicEvent;
+	public double getPrice() {
+		return price;
 	}
 
 	public Date getPublishDate() {
@@ -127,6 +128,10 @@ public final class Event extends EntityDto<Event> {
 
 	public Date getRegistrationStartDate() {
 		return registrationStartDate;
+	}
+
+	public boolean getRequiresRegistration() {
+		return requiresRegistration;
 	}
 
 	public boolean getSendSurvey() {
@@ -209,8 +214,8 @@ public final class Event extends EntityDto<Event> {
 		this.notificationEmail = notificationEmail;
 	}
 
-	public void setPublicEvent(boolean publicEvent) {
-		this.publicEvent = publicEvent;
+	public void setPrice(double price) {
+		this.price = price;
 	}
 
 	public void setPublishDate(Date publishDate) {
@@ -227,6 +232,10 @@ public final class Event extends EntityDto<Event> {
 
 	public void setRegistrationStartDate(Date registrationStartDate) {
 		this.registrationStartDate = registrationStartDate;
+	}
+
+	public void setRequiresRegistration(boolean requiresRegistration) {
+		this.requiresRegistration = requiresRegistration;
 	}
 
 	public void setSendSurvey(boolean sendSurvey) {

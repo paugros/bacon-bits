@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.validation.HasValidator;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -49,6 +50,14 @@ public class DateTimeRangeBox extends Composite implements HasValidator, CustomF
 		endDateBox.getValidator().useErrorBorder(false);
 
 		startDateBox.syncDateWith(endDateBox);
+	}
+
+	public void addEndValueChangeHandler(ValueChangeHandler<Date> handler) {
+		endDateBox.addValueChangeHandler(handler);
+	}
+
+	public void addStartValueChangeHandler(ValueChangeHandler<Date> handler) {
+		startDateBox.addValueChangeHandler(handler);
 	}
 
 	public Date getEndDate() {

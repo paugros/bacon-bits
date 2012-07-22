@@ -16,11 +16,12 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class EventCellTable extends EntityCellTable<Event, EventArg, EventColumn> {
 	public enum EventColumn implements EntityCellTableColumn<EventColumn> {
-		TITLE("Title"), START_DATE("Start"), END_DATE("End"), CATEGORY("Category");
+		TITLE("Title"), START_DATE("Start"), END_DATE("End"), CATEGORY("Category"), REGISTER("");
 
 		private String title;
 
@@ -43,7 +44,7 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 
 	private EventCellTable() {
 		setDefaultSortColumn(EventColumn.START_DATE, SortDirection.SORT_DESC);
-		setDisplayColumns(EventColumn.TITLE, EventColumn.START_DATE, EventColumn.END_DATE, EventColumn.CATEGORY);
+		setDisplayColumns(EventColumn.TITLE, EventColumn.START_DATE, EventColumn.END_DATE, EventColumn.CATEGORY, EventColumn.REGISTER);
 	}
 
 	@Override
@@ -89,6 +90,18 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 					@Override
 					public Date get(Event item) {
 						return item.getStartDate();
+					}
+				});
+				break;
+			case REGISTER:
+				addCompositeWidgetColumn(col, new WidgetCellCreator<Event>() {
+					@Override
+					protected Widget createWidget(Event item) {
+						if (!item.allowRegistrations() || !item.getRequiresRegistration()) {
+							return new Label("");
+						}
+
+						return new Hyperlink("Register", PageUrl.event(item.getId()) + "&tab=2");
 					}
 				});
 				break;

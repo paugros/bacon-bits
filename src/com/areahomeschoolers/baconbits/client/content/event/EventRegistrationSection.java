@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -65,7 +66,7 @@ public class EventRegistrationSection extends Composite {
 	}
 
 	private void addParticipantSection() {
-		TitleBar tb = new TitleBar("Attendees", TitleBarStyle.SUBSECTION);
+		TitleBar tb = new TitleBar("Participants", TitleBarStyle.SUBSECTION);
 
 		if (pageData.getEvent().allowRegistrations()) {
 			final ClickLabel cancel = new ClickLabel(getCancelRegistrationLabelText());
@@ -228,6 +229,7 @@ public class EventRegistrationSection extends Composite {
 
 	private void populateParticipants() {
 		participantTable.removeAllRows();
+		double totalPrice = 0;
 		for (int i = 0; i < registration.getParticipants().size(); i++) {
 			final EventRegistrationParticipant p = registration.getParticipants().get(i);
 			String text = p.getFirstName() + " " + p.getLastName();
@@ -246,6 +248,13 @@ public class EventRegistrationSection extends Composite {
 				editText = "Remove";
 			}
 			participantTable.setWidget(i, 0, editLabel);
+
+			participantTable.setText(i, 1, Formatter.formatCurrency(p.getPrice()));
+			if (p.getCanceled() || registration.getCanceled()) {
+				participantTable.getCellFormatter().addStyleName(i, 1, "strikeText");
+			} else {
+				totalPrice += p.getPrice();
+			}
 
 			if (!registration.getCanceled() && pageData.getEvent().allowRegistrations()) {
 				ClickLabel cl = new ClickLabel(editText, new MouseDownHandler() {
@@ -272,11 +281,15 @@ public class EventRegistrationSection extends Composite {
 						});
 					}
 				});
-				participantTable.setWidget(i, 1, cl);
-				participantTable.getCellFormatter().setHorizontalAlignment(i, 1, HasHorizontalAlignment.ALIGN_RIGHT);
-			}
 
+				participantTable.setWidget(i, 2, cl);
+				participantTable.getCellFormatter().setHorizontalAlignment(i, 2, HasHorizontalAlignment.ALIGN_RIGHT);
+			}
 		}
+
+		int row = participantTable.getRowCount();
+		participantTable.setText(row, 1, Formatter.formatCurrency(totalPrice));
+		participantTable.getCellFormatter().addStyleName(row, 1, "totalCell");
 
 		if (registration.getParticipants().isEmpty()) {
 			participantTable.setWidget(0, 0, new Label("You haven't registered anyone yet."));

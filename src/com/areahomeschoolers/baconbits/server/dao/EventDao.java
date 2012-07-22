@@ -18,6 +18,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 public interface EventDao {
 
+	public void deleteAgeGroup(EventAgeGroup ageGroup);
+
 	public void deleteEventField(int fieldId);
 
 	public void deleteEventParticipant(EventRegistrationParticipant participant);

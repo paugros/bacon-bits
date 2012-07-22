@@ -1,8 +1,14 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.event.EventAgeGroupCellTable.EventAgeGroupColumn;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
+import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -13,6 +19,8 @@ import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class EventAgeGroupCellTable extends EntityCellTable<EventAgeGroup, EventArg, EventAgeGroupColumn> {
@@ -31,7 +39,9 @@ public final class EventAgeGroupCellTable extends EntityCellTable<EventAgeGroup,
 		}
 	}
 
-	// private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
+	private boolean showDeleteColumn;
+
+	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private AgeGroupEditDialog dialog = new AgeGroupEditDialog(this);
 
 	public EventAgeGroupCellTable(ArgMap<EventArg> args) {
@@ -44,6 +54,14 @@ public final class EventAgeGroupCellTable extends EntityCellTable<EventAgeGroup,
 		setDisplayColumns(EventAgeGroupColumn.AGE_RANGE, EventAgeGroupColumn.PARTICIPANTS, EventAgeGroupColumn.PRICE);
 
 		dialog.setText("Edit Age Group");
+	}
+
+	public boolean getShowDeleteColumn() {
+		return showDeleteColumn;
+	}
+
+	public void setShowDeleteColumn(boolean showDeleteColumn) {
+		this.showDeleteColumn = showDeleteColumn;
 	}
 
 	private String getRangeText(EventAgeGroup item) {
@@ -67,6 +85,14 @@ public final class EventAgeGroupCellTable extends EntityCellTable<EventAgeGroup,
 		for (EventAgeGroupColumn col : getDisplayColumns()) {
 			switch (col) {
 			case AGE_RANGE:
+				ValueGetter<Integer, EventAgeGroup> sortGetter = new ValueGetter<Integer, EventAgeGroup>() {
+
+					@Override
+					public Integer get(EventAgeGroup item) {
+						return item.getMinimumAge();
+					}
+				};
+
 				if (Application.isAdministrator()) {
 					addCompositeWidgetColumn(col, new WidgetCellCreator<EventAgeGroup>() {
 						@Override
@@ -78,14 +104,14 @@ public final class EventAgeGroupCellTable extends EntityCellTable<EventAgeGroup,
 								}
 							});
 						}
-					});
+					}, sortGetter);
 				} else {
 					addTextColumn(col, new ValueGetter<String, EventAgeGroup>() {
 						@Override
 						public String get(EventAgeGroup item) {
 							return getRangeText(item);
 						}
-					});
+					}, sortGetter);
 				}
 				break;
 			case PARTICIPANTS:
@@ -107,6 +133,12 @@ public final class EventAgeGroupCellTable extends EntityCellTable<EventAgeGroup,
 
 						return range;
 					}
+				}, new ValueGetter<Integer, EventAgeGroup>() {
+
+					@Override
+					public Integer get(EventAgeGroup item) {
+						return item.getMinimumParticipants();
+					}
 				});
 				break;
 			case PRICE:
@@ -121,6 +153,36 @@ public final class EventAgeGroupCellTable extends EntityCellTable<EventAgeGroup,
 				new AssertionError();
 				break;
 			}
+		}
+
+		if (showDeleteColumn) {
+			addCompositeWidgetColumn("", new WidgetCellCreator<EventAgeGroup>() {
+				@Override
+				protected Widget createWidget(final EventAgeGroup item) {
+					if (item.getRegisterCount() > 0) {
+						return new Label("");
+					}
+
+					final ClickLabel remove = new ClickLabel("X");
+					remove.addMouseDownHandler(new MouseDownHandler() {
+						@Override
+						public void onMouseDown(MouseDownEvent event) {
+							ConfirmDialog.confirm("Really delete this age group?", new ConfirmHandler() {
+								@Override
+								public void onConfirm() {
+									removeItem(item);
+									eventService.deleteAgeGroup(item, new Callback<Void>(false) {
+										@Override
+										protected void doOnSuccess(Void result) {
+										}
+									});
+								}
+							});
+						}
+					});
+					return remove;
+				}
+			}).setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		}
 
 	}

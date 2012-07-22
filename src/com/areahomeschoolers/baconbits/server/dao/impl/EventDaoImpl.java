@@ -48,6 +48,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setCategory(rs.getString("category"));
 			event.setCategoryId(rs.getInt("categoryId"));
 			event.setCost(rs.getDouble("cost"));
+			event.setPrice(rs.getDouble("price"));
 			event.setDescription(rs.getString("description"));
 			event.setEndDate(rs.getTimestamp("endDate"));
 			event.setGroupId(rs.getInt("groupId"));
@@ -61,10 +62,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setStartDate(rs.getTimestamp("startDate"));
 			event.setTitle(rs.getString("title"));
 			event.setGroupName(rs.getString("groupName"));
-			event.setPublicEvent(rs.getBoolean("isPublic"));
 			event.setFinished(rs.getBoolean("finished"));
 			event.setRegistrationFinished(rs.getBoolean("registrationFinished"));
 			event.setAddedByFullName(rs.getString("firstName") + " " + rs.getString("lastName"));
+			event.setRequiresRegistration(rs.getBoolean("requiresRegistration"));
 			return event;
 		}
 	}
@@ -80,6 +81,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		SELECT += "left join groups g on g.id = e.groupId \n";
 		SELECT += "join eventCategories c on c.id = e.categoryId \n";
 		SELECT += "join users u on u.id = e.addedById \n";
+	}
+
+	@Override
+	public void deleteAgeGroup(EventAgeGroup ageGroup) {
+		String sql = "delete from eventAgeGroups where id = ?";
+		update(sql, ageGroup.getId());
 	}
 
 	@Override
@@ -168,7 +175,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				return null;
 			}
 
-			String sql = "select * from eventAgeGroups where eventId = ? order by minimumAge";
+			String sql = "select a.*, (select count(id) from eventRegistrationParticipants where ageGroupId = a.id) as registerCount ";
+			sql += "from eventAgeGroups a where a.eventId = ? order by a.minimumAge";
 			pd.setAgeGroups(query(sql, new RowMapper<EventAgeGroup>() {
 				@Override
 				public EventAgeGroup mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -180,6 +188,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 					g.setMaximumParticipants(rs.getInt("maximumParticipants"));
 					g.setMinimumParticipants(rs.getInt("minimumParticipants"));
 					g.setPrice(rs.getDouble("price"));
+					g.setRegisterCount(rs.getInt("registerCount"));
 					return g;
 				}
 			}, id));
@@ -207,7 +216,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				if (r != null) {
 					pd.setRegistration(r);
 
-					sql = "select * from eventRegistrationParticipants where eventRegistrationId = ? order by firstName";
+					sql = "select p.*, a.price from eventRegistrationParticipants p ";
+					sql += "join eventAgeGroups a on a.id = p.ageGroupId ";
+					sql += "where p.eventRegistrationId = ? order by p.firstName";
 
 					r.setParticipants(query(sql, new RowMapper<EventRegistrationParticipant>() {
 
@@ -220,6 +231,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 							p.setFirstName(rs.getString("firstName"));
 							p.setLastName(rs.getString("lastName"));
 							p.setCanceled(rs.getBoolean("canceled"));
+							p.setPrice(rs.getDouble("price"));
 							return p;
 						}
 					}, r.getId()));
@@ -262,8 +274,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			String sql = "update events set title = :title, description = :description, startDate = :startDate, endDate = :endDate, ";
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
-			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, ";
-			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, isPublic = :publicEvent ";
+			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, requiresRegistration = :requiresRegistration, ";
+			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -271,10 +283,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, ";
-			sql += "publishDate, active, isPublic) values ";
+			sql += "publishDate, active, isPublic, price, requiresRegistration) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, ";
-			sql += ":publishDate, :active, :publicEvent)";
+			sql += ":publishDate, :active, :price, :requiresRegistration)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
