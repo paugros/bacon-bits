@@ -293,14 +293,13 @@ img {
 	background-color: #77B4E8;
 }
 
-.DataTable .totalCell {
+.totalCell {
 	background-color: #EDFFED;
-	/*
 	border-top: 1px solid #9EE699;
+	font-weight: bold;
 	border-bottom: none;
 	border-left: none;
 	border-right: none;
-	*/
 }
 
 .DndVerticalPanel {

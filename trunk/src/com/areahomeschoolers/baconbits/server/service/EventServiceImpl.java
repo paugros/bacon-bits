@@ -34,6 +34,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	}
 
 	@Override
+	public void deleteAgeGroup(EventAgeGroup ageGroup) {
+		dao.deleteAgeGroup(ageGroup);
+	}
+
+	@Override
 	public void deleteEventField(int fieldId) {
 		dao.deleteEventField(fieldId);
 	}

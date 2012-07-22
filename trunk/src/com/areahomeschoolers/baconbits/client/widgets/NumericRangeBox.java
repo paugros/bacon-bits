@@ -15,6 +15,7 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 	private final NumericTextBox fromInput;
 	private final NumericTextBox toInput;
 	private boolean allowSameVal = true;
+	private boolean allowZeroForNoLimit = false;
 	private boolean hasRange = false;
 
 	private final Validator validator = new Validator(focusPanel, new ValidatorCommand() {
@@ -40,7 +41,7 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 			double fromVal = fromInput.getDouble();
 			double toVal = toInput.getDouble();
 
-			if (fromVal > toVal || (!allowSameVal && fromVal == toVal)) {
+			if (((!allowZeroForNoLimit || toVal != 0) && fromVal > toVal) || (!allowSameVal && fromVal == toVal)) {
 				validator.setError(true);
 				validator.setErrorMessage("Left value must be less than " + (allowSameVal ? "or equal to" : "") + " right value.");
 				return;
@@ -73,6 +74,10 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 		initWidget(focusPanel);
 	}
 
+	public boolean getAllowZeroForNoLimit() {
+		return allowZeroForNoLimit;
+	}
+
 	public double getFromValue() {
 		return fromInput.getDouble();
 	}
@@ -95,6 +100,10 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 		this.allowSameVal = allow;
 	}
 
+	public void setAllowZeroForNoLimit(boolean allowZeroForNoLimit) {
+		this.allowZeroForNoLimit = allowZeroForNoLimit;
+	}
+
 	@Override
 	public void setEnabled(boolean enabled) {
 		fromInput.setEnabled(enabled);
@@ -109,11 +118,9 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 	public void setRange(double min, double max) {
 		fromInput.setMinimumValue(min);
 		fromInput.setText(Double.toString(min));
-		toInput.setMinimumValue(min);
 
 		fromInput.setMaximumValue(max);
 		toInput.setText(Double.toString(max));
-		toInput.setMaximumValue(max);
 
 		hasRange = true;
 	}
@@ -121,11 +128,9 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 	public void setRange(int min, int max) {
 		fromInput.setMinimumValue(min);
 		fromInput.setText(Integer.toString(min));
-		toInput.setMinimumValue(min);
 
 		fromInput.setMaximumValue(max);
 		toInput.setText(Integer.toString(max));
-		toInput.setMaximumValue(max);
 
 		hasRange = true;
 	}

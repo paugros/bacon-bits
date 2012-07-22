@@ -41,7 +41,7 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 	private Command refreshCommand;
 
 	public ParticipantEditDialog(EventPageData pd, Command refreshCommand) {
-		setText("Register Attendee");
+		setText("Register Participant");
 		pageData = pd;
 		registration = pd.getRegistration();
 		this.refreshCommand = refreshCommand;

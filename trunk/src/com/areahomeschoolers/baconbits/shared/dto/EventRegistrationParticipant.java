@@ -11,6 +11,8 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 	private boolean canceled;
 	private int age;
 
+	// aux
+	private double price;
 	private List<EventField> eventFields = new ArrayList<EventField>();
 
 	public EventRegistrationParticipant() {
@@ -74,6 +76,14 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
 	}
 
 }

@@ -10,6 +10,9 @@ public final class EventAgeGroup extends EntityDto<EventAgeGroup> {
 	private int maximumParticipants;
 	private double price;
 
+	// aux
+	private int registerCount;
+
 	public EventAgeGroup() {
 
 	}
@@ -38,6 +41,10 @@ public final class EventAgeGroup extends EntityDto<EventAgeGroup> {
 		return price;
 	}
 
+	public int getRegisterCount() {
+		return registerCount;
+	}
+
 	public void setEventId(int eventId) {
 		this.eventId = eventId;
 	}
@@ -60,6 +67,10 @@ public final class EventAgeGroup extends EntityDto<EventAgeGroup> {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void setRegisterCount(int registerCount) {
+		this.registerCount = registerCount;
 	}
 
 }

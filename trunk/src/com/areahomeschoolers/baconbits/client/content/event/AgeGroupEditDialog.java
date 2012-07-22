@@ -42,6 +42,7 @@ public class AgeGroupEditDialog extends EntityEditDialog<EventAgeGroup> {
 		FieldTable ft = new FieldTable();
 
 		final NumericRangeBox ageInput = new NumericRangeBox();
+		ageInput.setAllowZeroForNoLimit(true);
 		FormField ageField = form.createFormField("Age range:", ageInput, null);
 		ageField.setInitializer(new Command() {
 			@Override
@@ -59,7 +60,8 @@ public class AgeGroupEditDialog extends EntityEditDialog<EventAgeGroup> {
 		ft.addField(ageField);
 
 		final NumericRangeBox participantsInput = new NumericRangeBox();
-		FormField participantsField = form.createFormField("Min/max participants:", participantsInput, null);
+		participantsInput.setAllowZeroForNoLimit(true);
+		FormField participantsField = form.createFormField("Min / max participants:", participantsInput, null);
 		participantsField.setInitializer(new Command() {
 			@Override
 			public void execute() {

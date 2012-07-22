@@ -79,7 +79,7 @@ public class DateTimeBox extends Composite implements HasValue<Date>, HasValidat
 
 	@Override
 	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Date> handler) {
-		return addHandler(handler, ValueChangeEvent.getType());
+		return dateBox.addHandler(handler, ValueChangeEvent.getType());
 	}
 
 	public void enableTimeValidation(boolean enable) {
