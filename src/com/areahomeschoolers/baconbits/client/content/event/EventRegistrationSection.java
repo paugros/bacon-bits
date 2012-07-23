@@ -12,7 +12,6 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
@@ -34,7 +33,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -52,6 +50,7 @@ public class EventRegistrationSection extends Composite {
 			populateParticipants();
 		}
 	};
+	private Button volunteerAddButton;
 
 	public EventRegistrationSection(EventPageData pd) {
 		initWidget(vp);
@@ -66,7 +65,7 @@ public class EventRegistrationSection extends Composite {
 	}
 
 	private void addParticipantSection() {
-		TitleBar tb = new TitleBar("Participants", TitleBarStyle.SUBSECTION);
+		TitleBar tb = new TitleBar("Registered Participants", TitleBarStyle.SUBSECTION);
 
 		if (pageData.getEvent().allowRegistrations()) {
 			final ClickLabel cancel = new ClickLabel(getCancelRegistrationLabelText());
@@ -123,7 +122,7 @@ public class EventRegistrationSection extends Composite {
 			return;
 		}
 
-		vp.add(new TitleBar("Volunteer?", TitleBarStyle.SUBSECTION));
+		vp.add(new TitleBar("Register to Volunteer", TitleBarStyle.SUBSECTION));
 		if (pageData.getEvent().allowRegistrations()) {
 			HorizontalPanel pp = new PaddedPanel();
 			final DefaultListBox lb = new DefaultListBox();
@@ -131,39 +130,29 @@ public class EventRegistrationSection extends Composite {
 			lb.addItem("", 0);
 			final Map<Integer, EventVolunteerPosition> vMap = new HashMap<Integer, EventVolunteerPosition>();
 			for (EventVolunteerPosition p : pageData.getVolunteerPositions()) {
+				if (p.getOpenPositionCount() == 0) {
+					continue;
+				}
 				if (!registration.getVolunteerPositions().contains(p)) {
-					lb.addItem(p.getJobTitle() + ": " + p.getOpenPositionCount() + " needed", p.getId());
+					lb.addItem(p.getJobTitle(), p.getId());
 					vMap.put(p.getId(), p);
 				}
 			}
 			pp.add(lb);
 
-			final NumericTextBox tb = new NumericTextBox();
-			tb.setVisibleLength(1);
-			tb.setMaxLength(1);
-			pp.add(tb);
-			Label l = new Label("people");
-			l.addStyleName("smallText");
-			pp.add(tb);
-			pp.add(l);
-			pp.setCellVerticalAlignment(l, HasVerticalAlignment.ALIGN_MIDDLE);
-
 			final Label description = new Label();
 			description.addStyleName("mediumPadding grayText");
 
-			Button b = new Button("Add", new ClickHandler() {
+			volunteerAddButton = new Button("Volunteer!");
+			volunteerAddButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					int positionId = lb.getIntValue();
 
 					if (positionId > 0) {
+						volunteerAddButton.setEnabled(false);
 						final EventVolunteerPosition position = vMap.get(positionId);
-						int count = tb.getInteger();
-
-						if (count == 0) {
-							count = 1;
-						}
-						position.setRegisterPositionCount(count);
+						position.setRegisterPositionCount(1);
 
 						if (!registration.isSaved()) {
 							registration.setEventId(pageData.getEvent().getId());
@@ -181,12 +170,11 @@ public class EventRegistrationSection extends Composite {
 
 						lb.removeItem(lb.getSelectedIndex());
 						lb.setSelectedIndex(0);
-						tb.setText("");
 						description.setText("");
 					}
 				}
 			});
-			pp.add(b);
+			pp.add(volunteerAddButton);
 
 			lb.addChangeHandler(new ChangeHandler() {
 				@Override
@@ -194,10 +182,8 @@ public class EventRegistrationSection extends Composite {
 					int positionId = lb.getIntValue();
 
 					if (positionId > 0) {
-						tb.setValue(1);
 						description.setText(vMap.get(positionId).getDescription());
 					} else {
-						tb.setText("");
 						description.setText("");
 					}
 				}
@@ -208,7 +194,7 @@ public class EventRegistrationSection extends Composite {
 		}
 
 		positionTable = new FlexTable();
-		positionTable.setWidth("300px");
+		positionTable.setWidth("250px");
 
 		populateVolunteerPositions();
 
@@ -245,7 +231,7 @@ public class EventRegistrationSection extends Composite {
 				editLabel.addStyleName("strikeText");
 				editText = "Restore";
 			} else {
-				editText = "Remove";
+				editText = "X";
 			}
 			participantTable.setWidget(i, 0, editLabel);
 
@@ -300,7 +286,7 @@ public class EventRegistrationSection extends Composite {
 		positionTable.removeAllRows();
 		for (int i = 0; i < registration.getVolunteerPositions().size(); i++) {
 			final EventVolunteerPosition p = registration.getVolunteerPositions().get(i);
-			positionTable.setWidget(i, 0, new Label(p.getJobTitle() + ": " + p.getRegisterPositionCount()));
+			positionTable.setWidget(i, 0, new Label(p.getJobTitle()));
 
 			if (pageData.getEvent().allowRegistrations()) {
 				ClickLabel cl = new ClickLabel("X", new MouseDownHandler() {
@@ -335,6 +321,7 @@ public class EventRegistrationSection extends Composite {
 			protected void doOnSuccess(EventVolunteerPosition result) {
 				registration.getVolunteerPositions().add(result);
 				populateVolunteerPositions();
+				volunteerAddButton.setEnabled(true);
 			}
 		});
 	}
