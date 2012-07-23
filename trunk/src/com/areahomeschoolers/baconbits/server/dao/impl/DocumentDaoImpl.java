@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -20,6 +21,7 @@ import com.areahomeschoolers.baconbits.server.dao.DocumentDao;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.DocumentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
@@ -52,7 +54,8 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 	@Override
 	public void delete(int documentId) {
 		if (documentId > 0) {
-			// update("delete from documentsMapping where documentId = ?", documentId);
+			update("delete from documentArticleMapping where documentId = ?", documentId);
+			update("delete from documentEventMapping where documentId = ?", documentId);
 			update("delete from documents where id = ?", documentId);
 		}
 	}
@@ -66,8 +69,23 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 
 	@Override
 	public ArrayList<Document> list(ArgMap<DocumentArg> args) {
-		String sql = "select id, fileName, fileType, fileExtension, addedById, startDate, endDate, addedDate, description from documents";
-		ArrayList<Document> data = query(sql, new DocumentMapper());
+		int articleId = args.getInt(DocumentArg.ARTICLE_ID);
+		int eventId = args.getInt(DocumentArg.EVENT_ID);
+		List<Object> sqlArgs = new ArrayList<Object>();
+
+		String sql = "select d.* from documents d ";
+		if (articleId > 0) {
+			sql += "join documentArticleMapping da on da.documentId = d.id and da.articleId = ? ";
+			sqlArgs.add(articleId);
+		}
+
+		if (eventId > 0) {
+			sql += "join documentEventMapping da on da.documentId = d.id and da.eventId = ? ";
+			sqlArgs.add(eventId);
+		}
+		sql += "order by d.description";
+
+		ArrayList<Document> data = query(sql, new DocumentMapper(), sqlArgs.toArray());
 
 		return data;
 	}
@@ -105,6 +123,10 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 			update(sql, namedParams, keys);
 
 			document.setId(ServerUtils.getIdFromKeys(keys));
+
+			if (document.getLinkType() != null && document.getLinkId() > 0) {
+				link(document);
+			}
 		}
 
 		return getById(document.getId());
@@ -121,6 +143,15 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		document.setEndDate(rs.getTimestamp("endDate"));
 		document.setAddedDate(rs.getTimestamp("addedDate"));
 		document.setDescription(rs.getString("description"));
+		return document;
+	}
+
+	private Document link(Document document) {
+		String entityType = document.getLinkType().getEntityType();
+
+		String sql = "insert into document" + Common.ucWords(entityType) + "Mapping (documentId, " + entityType + "Id) values (?, ?)";
+		update(sql, document.getId(), document.getLinkId());
+
 		return document;
 	}
 

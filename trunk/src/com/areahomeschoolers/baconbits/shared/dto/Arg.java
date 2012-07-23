@@ -8,7 +8,7 @@ public interface Arg {
 	}
 
 	public enum DocumentArg implements Arg, IsSerializable {
-
+		ARTICLE_ID, EVENT_ID
 	}
 
 	public enum EventArg implements Arg, IsSerializable {

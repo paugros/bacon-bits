@@ -9,14 +9,14 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public final class Document extends EntityDto<Document> {
 	public enum DocumentLinkType implements IsSerializable {
-		ARTICLE("articles"), EVENT("events");
+		ARTICLE("article"), EVENT("event");
 
-		private String table;
+		private String entityType;
 		private static final Map<String, DocumentLinkType> lookup = new HashMap<String, DocumentLinkType>();
 
 		static {
 			for (DocumentLinkType s : EnumSet.allOf(DocumentLinkType.class)) {
-				lookup.put(s.getTable(), s);
+				lookup.put(s.getEntityType(), s);
 			}
 		}
 
@@ -24,12 +24,12 @@ public final class Document extends EntityDto<Document> {
 			return lookup.get(tableName);
 		}
 
-		private DocumentLinkType(String table) {
-			this.table = table;
+		private DocumentLinkType(String entityType) {
+			this.entityType = entityType;
 		}
 
-		public String getTable() {
-			return table;
+		public String getEntityType() {
+			return entityType;
 		}
 	}
 
@@ -118,6 +118,7 @@ public final class Document extends EntityDto<Document> {
 
 	public void setData(byte[] data) {
 		this.data = data;
+		fileSize = data.length;
 	}
 
 	public void setDescription(String bannerText) {

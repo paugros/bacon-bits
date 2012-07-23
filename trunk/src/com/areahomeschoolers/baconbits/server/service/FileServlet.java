@@ -1,18 +1,20 @@
 package com.areahomeschoolers.baconbits.server.service;
 
 import java.io.IOException;
-import java.util.List;
+import java.io.InputStream;
+import java.io.StringWriter;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -121,31 +123,38 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 	}
 
 	private void handlePost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		FileItemFactory factory = new DiskFileItemFactory();
-		ServletFileUpload upload = new ServletFileUpload(factory);
+		// FileItemFactory factory = new DiskFileItemFactory();
+		ServletFileUpload upload = new ServletFileUpload();
 
 		try {
 			if (ServletFileUpload.isMultipartContent(request)) {
 				// loop through multipart form initializing document dto
-				List<FileItem> items = upload.parseRequest(request);
+				// List<FileItem> items = upload.parseRequest(request);
+				FileItemIterator iterator = upload.getItemIterator(request);
 
 				String responseMsg;
 
-				responseMsg = processDocumentUploadRequest(items);
+				responseMsg = processDocumentUploadRequest(iterator);
 				response.getWriter().write(responseMsg);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			response.getWriter().write("Unknown file upload error.");
 		}
 	}
 
-	private String processDocumentUploadRequest(List<FileItem> items) {
+	private String processDocumentUploadRequest(FileItemIterator iterator) throws NumberFormatException, FileUploadException, IOException {
 		Document document = new Document();
 
-		for (FileItem item : items) {
+		while (iterator.hasNext()) {
+			FileItemStream item = iterator.next();
+			InputStream stream = item.openStream();
+
 			if (item.isFormField()) {
 				String name = item.getFieldName();
-				String value = item.getString();
+				StringWriter writer = new StringWriter();
+				IOUtils.copy(stream, writer);
+				String value = writer.toString();
 
 				if ("description".equals(name)) {
 					document.setDescription(value);
@@ -164,7 +173,6 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 				}
 
 			} else {
-				document.setFileSize((int) item.getSize());
 				document.setFileType(item.getContentType());
 				if (document.getFileName() == null) {
 					document.setFileName(FilenameUtils.getName(item.getName()));
@@ -182,7 +190,7 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 					return "The file extension '" + document.getFileExtension() + "' is not an allowed extension.";
 				}
 
-				document.setData(item.get());
+				document.setData(IOUtils.toByteArray(stream));
 			}
 		}
 
