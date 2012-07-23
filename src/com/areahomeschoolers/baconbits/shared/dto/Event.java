@@ -25,6 +25,8 @@ public final class Event extends EntityDto<Event> {
 	private boolean requiresRegistration = true;
 	private int minimumParticipants, maximumParticipants;
 	private String notificationEmail;
+	private String website;
+	private String phone;
 
 	// auxilliary
 	private String category;
@@ -110,6 +112,10 @@ public final class Event extends EntityDto<Event> {
 		return notificationEmail;
 	}
 
+	public String getPhone() {
+		return phone;
+	}
+
 	public double getPrice() {
 		return price;
 	}
@@ -144,6 +150,10 @@ public final class Event extends EntityDto<Event> {
 
 	public String getTitle() {
 		return title;
+	}
+
+	public String getWebsite() {
+		return website;
 	}
 
 	public void setActive(boolean active) {
@@ -214,6 +224,10 @@ public final class Event extends EntityDto<Event> {
 		this.notificationEmail = notificationEmail;
 	}
 
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
 	public void setPrice(double price) {
 		this.price = price;
 	}
@@ -248,6 +262,10 @@ public final class Event extends EntityDto<Event> {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public void setWebsite(String website) {
+		this.website = website;
 	}
 
 }

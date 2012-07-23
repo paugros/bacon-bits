@@ -33,6 +33,7 @@ import com.areahomeschoolers.baconbits.client.widgets.GroupListBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
@@ -56,6 +57,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -176,11 +178,13 @@ public class EventPage implements Page {
 			}
 		}
 
-		volunteerTable.setWidth("400px");
+		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
+			volunteerTable.setWidth("400px");
 
-		populateVolunteerPositions();
+			populateVolunteerPositions();
 
-		fieldTable.addField("Volunteer positions:", volunteerTable);
+			fieldTable.addField("Volunteer positions:", volunteerTable);
+		}
 
 		if (Application.administratorOf(calendarEvent.getGroupId())) {
 			final Label categoryDisplay = new Label();
@@ -248,6 +252,51 @@ public class EventPage implements Page {
 			}
 		});
 		fieldTable.addField(eventDatesField);
+
+		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrBlank(calendarEvent.getPhone())) {
+			final Label phoneDisplay = new Label();
+			final PhoneTextBox phoneInput = new PhoneTextBox();
+			FormField phoneField = form.createFormField("Phone:", phoneInput, phoneDisplay);
+			phoneField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					phoneDisplay.setText(Common.getDefaultIfNull(calendarEvent.getPhone()));
+					phoneInput.setText(calendarEvent.getPhone());
+				}
+			});
+			phoneField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setPhone(phoneInput.getText());
+				}
+			});
+			fieldTable.addField(phoneField);
+		}
+
+		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrBlank(calendarEvent.getWebsite())) {
+			final HTML websiteDisplay = new HTML();
+			final TextBox websiteInput = new TextBox();
+			websiteInput.setMaxLength(512);
+			FormField websiteField = form.createFormField("Website:", websiteInput, websiteDisplay);
+			websiteField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					if (Common.isNullOrBlank(calendarEvent.getWebsite())) {
+						websiteDisplay.setText(Common.getDefaultIfNull(null));
+					} else {
+						websiteDisplay.setHTML("<a href=\"" + calendarEvent.getWebsite() + "\" target=\"_blank\">" + calendarEvent.getWebsite() + "</a>");
+					}
+					websiteInput.setText(calendarEvent.getWebsite());
+				}
+			});
+			websiteField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setWebsite(websiteInput.getText());
+				}
+			});
+			fieldTable.addField(websiteField);
+		}
 
 		if (Application.administratorOf(calendarEvent.getGroupId())) {
 			final Label registrationDatesDisplay = new Label();
