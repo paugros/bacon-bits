@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
+import java.util.List;
+
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -17,10 +19,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class AgeGroupEditDialog extends EntityEditDialog<EventAgeGroup> {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
-	private EventAgeGroupCellTable table;
 
-	public AgeGroupEditDialog(EventAgeGroupCellTable groupTable) {
-		this.table = groupTable;
+	public AgeGroupEditDialog(final List<EventAgeGroup> ageGroups, final Command refreshCommand) {
 
 		addFormSubmitHandler(new FormSubmitHandler() {
 			@Override
@@ -28,9 +28,9 @@ public class AgeGroupEditDialog extends EntityEditDialog<EventAgeGroup> {
 				eventService.saveAgeGroup(entity, new Callback<EventAgeGroup>() {
 					@Override
 					protected void doOnSuccess(EventAgeGroup result) {
-						hide();
-						table.addItem(result);
-						table.refresh();
+						ageGroups.remove(result);
+						ageGroups.add(result);
+						refreshCommand.execute();
 					}
 				});
 			}

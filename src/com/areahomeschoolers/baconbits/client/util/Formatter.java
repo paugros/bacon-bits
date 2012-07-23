@@ -227,6 +227,17 @@ public abstract class Formatter {
 		return NumberFormat.getFormat(format).format(Double.parseDouble(number));
 	}
 
+	public static String formatNumberRange(int min, int max) {
+		String range = Integer.toString(min);
+		if (max == 0) {
+			range += "+";
+		} else {
+			range += "-" + max;
+		}
+
+		return range;
+	}
+
 	/**
 	 * Formats a string of numbers according to the default telephone number format.
 	 * 

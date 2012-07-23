@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
+import java.util.List;
+
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -18,10 +20,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class VolunteerPositionEditDialog extends EntityEditDialog<EventVolunteerPosition> {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
-	private EventVolunteerPositionCellTable table;
 
-	public VolunteerPositionEditDialog(EventVolunteerPositionCellTable groupTable) {
-		this.table = groupTable;
+	public VolunteerPositionEditDialog(final List<EventVolunteerPosition> positions, final Command refreshCommand) {
 
 		addFormSubmitHandler(new FormSubmitHandler() {
 			@Override
@@ -29,9 +29,9 @@ public class VolunteerPositionEditDialog extends EntityEditDialog<EventVolunteer
 				eventService.saveVolunteerPosition(entity, new Callback<EventVolunteerPosition>() {
 					@Override
 					protected void doOnSuccess(EventVolunteerPosition result) {
-						hide();
-						table.addItem(result);
-						table.refresh();
+						positions.remove(result);
+						positions.add(result);
+						refreshCommand.execute();
 					}
 				});
 			}
