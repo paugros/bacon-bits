@@ -9,7 +9,6 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 	private int eventRegistrationId;
 	private Integer ageGroupId;
 	private boolean canceled;
-	private int age;
 
 	// aux
 	private double price;
@@ -17,10 +16,6 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 
 	public EventRegistrationParticipant() {
 
-	}
-
-	public int getAge() {
-		return age;
 	}
 
 	public Integer getAgeGroupId() {
@@ -50,8 +45,8 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		return lastName;
 	}
 
-	public void setAge(int age) {
-		this.age = age;
+	public double getPrice() {
+		return price;
 	}
 
 	public void setAgeGroupId(Integer ageGroupId) {
@@ -76,10 +71,6 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-
-	public double getPrice() {
-		return price;
 	}
 
 	public void setPrice(double price) {
