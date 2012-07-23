@@ -10,6 +10,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface DocumentServiceAsync {
 
+	void delete(int documentId, AsyncCallback<Void> callback);
+
 	void getById(int documentId, AsyncCallback<Document> callback);
 
 	void list(ArgMap<DocumentArg> args, AsyncCallback<ArrayList<Document>> callback);

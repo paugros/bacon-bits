@@ -27,6 +27,11 @@ public class DocumentServiceImpl extends GwtController implements DocumentServic
 	}
 
 	@Override
+	public void delete(int documentId) {
+		dao.delete(documentId);
+	}
+
+	@Override
 	public Document getById(int documentId) {
 		return dao.getById(documentId);
 	}

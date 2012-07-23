@@ -14,6 +14,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("service/document")
 public interface DocumentService extends RemoteService {
+	public void delete(int documentId);
+
 	public Document getById(int documentId);
 
 	public ArrayList<Document> list(ArgMap<DocumentArg> args);
