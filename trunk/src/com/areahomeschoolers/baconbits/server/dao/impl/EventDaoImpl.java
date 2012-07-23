@@ -66,6 +66,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setRegistrationFinished(rs.getBoolean("registrationFinished"));
 			event.setAddedByFullName(rs.getString("firstName") + " " + rs.getString("lastName"));
 			event.setRequiresRegistration(rs.getBoolean("requiresRegistration"));
+			event.setPhone(rs.getString("phone"));
+			event.setWebsite(rs.getString("website"));
 			return event;
 		}
 	}
@@ -263,7 +265,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, requiresRegistration = :requiresRegistration, ";
-			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price ";
+			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price, phone = :phone, website = :website ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -271,10 +273,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, ";
-			sql += "publishDate, active, isPublic, price, requiresRegistration) values ";
+			sql += "publishDate, active, isPublic, price, requiresRegistration, phone, website) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, ";
-			sql += ":publishDate, :active, :price, :requiresRegistration)";
+			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
