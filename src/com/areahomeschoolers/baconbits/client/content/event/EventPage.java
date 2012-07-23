@@ -141,35 +141,39 @@ public class EventPage implements Page {
 
 		fieldTable.addField(titleField);
 
-		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getAgeGroups())) {
-			ageTable.setWidth("150px");
+		if (calendarEvent.getRequiresRegistration()) {
+			if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getAgeGroups())) {
+				ageTable.setWidth("150px");
 
-			populateAgeGroups();
+				populateAgeGroups();
 
-			fieldTable.addField("Price:", ageTable);
-		} else {
-			final Label priceDisplay = new Label();
-			final NumericTextBox priceInput = new NumericTextBox(2);
-			priceInput.setMaxLength(10);
-			FormField priceField = form.createFormField("Price:", priceInput, priceDisplay);
-			priceField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					String text = Formatter.formatCurrency(calendarEvent.getPrice());
-					if (calendarEvent.getPrice() == 0) {
-						text = "Free";
+				fieldTable.addField("Price:", ageTable);
+			}
+
+			if (Common.isNullOrEmpty(pageData.getAgeGroups())) {
+				final Label priceDisplay = new Label();
+				final NumericTextBox priceInput = new NumericTextBox(2);
+				priceInput.setMaxLength(10);
+				FormField priceField = form.createFormField("Price:", priceInput, priceDisplay);
+				priceField.setInitializer(new Command() {
+					@Override
+					public void execute() {
+						String text = Formatter.formatCurrency(calendarEvent.getPrice());
+						if (calendarEvent.getPrice() == 0) {
+							text = "Free";
+						}
+						priceDisplay.setText(text);
+						priceInput.setValue(calendarEvent.getPrice());
 					}
-					priceDisplay.setText(text);
-					priceInput.setValue(calendarEvent.getPrice());
-				}
-			});
-			priceField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setPrice(priceInput.getDouble());
-				}
-			});
-			fieldTable.addField(priceField);
+				});
+				priceField.setDtoUpdater(new Command() {
+					@Override
+					public void execute() {
+						calendarEvent.setPrice(priceInput.getDouble());
+					}
+				});
+				fieldTable.addField(priceField);
+			}
 		}
 
 		volunteerTable.setWidth("400px");
