@@ -174,15 +174,16 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public EventPageData getPageData(int id) {
+	public EventPageData getPageData(int eventId) {
 		EventPageData pd = new EventPageData();
-		if (id > 0) {
-			pd.setEvent(getById(id));
+		if (eventId > 0) {
+			pd.setEvent(getById(eventId));
 
 			if (pd.getEvent() == null) {
 				return null;
 			}
 
+			// age groups
 			String sql = "select a.*, (select count(id) from eventRegistrationParticipants where ageGroupId = a.id) as registerCount ";
 			sql += "from eventAgeGroups a where a.eventId = ? order by a.minimumAge";
 			pd.setAgeGroups(query(sql, new RowMapper<EventAgeGroup>() {
@@ -199,13 +200,14 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 					g.setRegisterCount(rs.getInt("registerCount"));
 					return g;
 				}
-			}, id));
+			}, eventId));
 
-			pd.setVolunteerPositions(getVolunteerPositions(id, 0));
-
-			sql = "select * from eventRegistrations where eventId = ? and addedById = ?";
+			// volunteer positions
+			pd.setVolunteerPositions(getVolunteerPositions(eventId, 0));
 
 			if (ServerContext.isAuthenticated()) {
+				// registration
+				sql = "select * from eventRegistrations where eventId = ? and addedById = ?";
 				EventRegistration r = queryForObject(sql, new RowMapper<EventRegistration>() {
 					@Override
 					public EventRegistration mapRow(ResultSet rs, int row) throws SQLException {
@@ -219,14 +221,14 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 						r.setWaiting(rs.getBoolean("waiting"));
 						return r;
 					}
-				}, id, ServerContext.getCurrentUser().getId());
+				}, eventId, ServerContext.getCurrentUser().getId());
 
 				if (r != null) {
 					pd.setRegistration(r);
 
 					r.setParticipants(getParticipants(r.getId(), 0));
 
-					r.setVolunteerPositions(getVolunteerPositions(id, r.getId()));
+					r.setVolunteerPositions(getVolunteerPositions(eventId, r.getId()));
 				}
 			}
 
