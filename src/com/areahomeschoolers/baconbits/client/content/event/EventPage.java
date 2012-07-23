@@ -89,9 +89,9 @@ public class EventPage implements Page {
 	private TabPage tabPanel;
 	private FlexTable ageTable = new FlexTable();
 	private FlexTable volunteerTable = new FlexTable();
+	private FlexTable documentTable = new FlexTable();
 	private VolunteerPositionEditDialog volunteerDialog;
 	private AgeGroupEditDialog ageDialog;
-	private VerticalPanel documentPanel;
 
 	public EventPage(VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -542,6 +542,7 @@ public class EventPage implements Page {
 		fieldTable.addField(descriptionField);
 
 		if (calendarEvent.isSaved()) {
+			documentTable.setWidth("200px");
 			populateDocuments();
 		}
 
@@ -689,42 +690,58 @@ public class EventPage implements Page {
 					return;
 				}
 
-				if (documentPanel == null) {
-					VerticalPanel vp = new VerticalPanel();
-					documentPanel = new VerticalPanel();
-					documentPanel.setSpacing(4);
+				documentTable.removeAllRows();
 
-					if (Application.administratorOf(calendarEvent.getGroupId())) {
-						ClickLabel cl = new ClickLabel("Add", new MouseDownHandler() {
-							@Override
-							public void onMouseDown(MouseDownEvent event) {
-								FileUploadDialog dialog = new FileUploadDialog(DocumentLinkType.EVENT, calendarEvent.getId(), new UploadCompleteHandler() {
-									@Override
-									public void onUploadComplete(int documentId) {
-										populateDocuments();
-									}
-								});
-
-								dialog.center();
-							}
-						});
-						cl.addStyleName("bold");
-						vp.add(cl);
-					}
-					vp.add(documentPanel);
-					fieldTable.addField("Documents:", vp);
+				if (!documentTable.isAttached()) {
+					fieldTable.addField("Documents:", documentTable);
 				}
 
-				documentPanel.clear();
+				if (Application.administratorOf(calendarEvent.getGroupId())) {
+					ClickLabel cl = new ClickLabel("Add", new MouseDownHandler() {
+						@Override
+						public void onMouseDown(MouseDownEvent event) {
+							FileUploadDialog dialog = new FileUploadDialog(DocumentLinkType.EVENT, calendarEvent.getId(), new UploadCompleteHandler() {
+								@Override
+								public void onUploadComplete(int documentId) {
+									populateDocuments();
+								}
+							});
 
-				for (Document d : result) {
+							dialog.center();
+						}
+					});
+					cl.addStyleName("bold");
+					documentTable.setWidget(0, 0, cl);
+				}
+
+				for (final Document d : result) {
+					final int row = documentTable.getRowCount();
 					Image icon = new Image(FileUploadDialog.getFileIconResourceFromExtension(d.getFileExtension()));
 					PaddedPanel hp = new PaddedPanel();
 					hp.add(icon);
 					Widget name;
 					name = new Anchor(d.getDescription(), "/baconbits/service/file?id=" + d.getId());
 					hp.add(name);
-					documentPanel.add(hp);
+					documentTable.setWidget(row, 0, hp);
+
+					if (Application.administratorOf(calendarEvent.getGroupId())) {
+						documentTable.setWidget(row, 1, new ClickLabel("X", new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								ConfirmDialog.confirm("Really delete \"" + d.getDescription() + "\"?", new ConfirmHandler() {
+									@Override
+									public void onConfirm() {
+										documentService.delete(d.getId(), new Callback<Void>() {
+											@Override
+											protected void doOnSuccess(Void result) {
+												documentTable.removeRow(row);
+											}
+										});
+									}
+								});
+							}
+						}));
+					}
 				}
 
 			}
