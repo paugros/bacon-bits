@@ -13,7 +13,6 @@ import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
-import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
@@ -139,24 +138,6 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 			}
 		});
 		fieldTable.addField(lastNameField);
-
-		final NumericTextBox ageInput = new NumericTextBox();
-		ageInput.setMaxLength(2);
-		FormField ageField = form.createFormField("Age:", ageInput, null);
-		ageField.setRequired(true);
-		ageField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				ageInput.setValue(entity.getAge());
-			}
-		});
-		ageField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				entity.setAge(ageInput.getInteger());
-			}
-		});
-		fieldTable.addField(ageField);
 
 		fieldsPanel = new MaxHeightScrollPanel(200);
 		if (pageData.getAgeGroups().isEmpty()) {

@@ -88,6 +88,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 			user.setLastLoginDate(rs.getTimestamp("lastLoginDate"));
 			user.setActive(rs.getBoolean("isEnabled"));
 			user.setSystemAdministrator(rs.getBoolean("isSystemAdministrator"));
+			user.setBirthDate(rs.getTimestamp("birthDate"));
+			user.setParentId(rs.getInt("parentId"));
 			return user;
 		}
 	}
@@ -236,14 +238,17 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 
 		if (user.isSaved()) {
 			String sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, isSystemAdministrator = :systemAdministrator, ";
-			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, lastLoginDate = :lastLoginDate, passwordDigest = :passwordDigest where id = :id";
+			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, lastLoginDate = :lastLoginDate, ";
+			sql += "birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (user.getStartDate() == null) {
 				user.setStartDate(new Date());
 			}
-			String sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, isSystemAdministrator, resetPassword) values ";
-			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, :systemAdministrator, :resetPassword)";
+			String sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
+			sql += "isSystemAdministrator, resetPassword, birthDate, parentId) values ";
+			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
+			sql += ":systemAdministrator, :resetPassword, :birthDate, :parentId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

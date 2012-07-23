@@ -335,11 +335,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);
 
 		if (participant.isSaved()) {
-			String sql = "update eventRegistrationParticipants set firstName = :firstName, lastName = :lastName, ageGroupId = :ageGroupId, age = :age, canceled = :canceled where id = :id ";
+			String sql = "update eventRegistrationParticipants set firstName = :firstName, lastName = :lastName, ageGroupId = :ageGroupId, canceled = :canceled where id = :id ";
 			update(sql, namedParams);
 		} else {
-			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, firstName, lastName, ageGroupId, age) ";
-			sql += "values(:eventRegistrationId, :firstName, :lastName, :ageGroupId, :age)";
+			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, firstName, lastName, ageGroupId) ";
+			sql += "values(:eventRegistrationId, :firstName, :lastName, :ageGroupId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

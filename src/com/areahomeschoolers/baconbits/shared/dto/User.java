@@ -23,7 +23,8 @@ public final class User extends EntityDto<User> {
 	private boolean systemAdministrator;
 	private boolean resetPassword;
 	private HashMap<Integer, Boolean> groups;
-	private Date startDate, endDate, addedDate, lastLoginDate;
+	private Date startDate, endDate, addedDate, lastLoginDate, birthDate;
+	private Integer parentId;
 
 	// aux
 	private boolean generatePassword;
@@ -42,6 +43,10 @@ public final class User extends EntityDto<User> {
 
 	public Date getAddedDate() {
 		return addedDate;
+	}
+
+	public Date getBirthDate() {
+		return birthDate;
 	}
 
 	public String getEmail() {
@@ -84,6 +89,13 @@ public final class User extends EntityDto<User> {
 		return mobilePhone;
 	}
 
+	public Integer getParentId() {
+		if (parentId == null || parentId == 0) {
+			return null;
+		}
+		return parentId;
+	}
+
 	public String getPassword() {
 		return password;
 	}
@@ -124,6 +136,10 @@ public final class User extends EntityDto<User> {
 		this.addedDate = addedDate;
 	}
 
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -161,6 +177,10 @@ public final class User extends EntityDto<User> {
 
 	public void setMobilePhone(String mobilePhone) {
 		this.mobilePhone = mobilePhone;
+	}
+
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
 	}
 
 	public void setPassword(String password) {
