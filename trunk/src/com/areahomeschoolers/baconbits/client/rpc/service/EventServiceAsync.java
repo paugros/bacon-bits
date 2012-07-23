@@ -24,6 +24,8 @@ public interface EventServiceAsync {
 
 	void deleteEventParticipant(EventRegistrationParticipant participant, AsyncCallback<Void> callback);
 
+	void deleteVolunteerPosition(EventVolunteerPosition position, AsyncCallback<Void> callback);
+
 	void deleteVolunteerPositionMapping(EventVolunteerPosition position, AsyncCallback<Void> callback);
 
 	void getById(int id, AsyncCallback<Event> callback);

@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -18,6 +19,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeBox;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeRangeBox;
@@ -37,21 +39,21 @@ import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
-import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -70,6 +72,10 @@ public class EventPage implements Page {
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private EventPageData pageData;
 	private TabPage tabPanel;
+	private FlexTable ageTable = new FlexTable();
+	private FlexTable volunteerTable = new FlexTable();
+	private VolunteerPositionEditDialog volunteerDialog;
+	private AgeGroupEditDialog ageDialog;
 
 	public EventPage(VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -90,6 +96,20 @@ public class EventPage implements Page {
 
 				calendarEvent = result.getEvent();
 				pageData = result;
+				ageDialog = new AgeGroupEditDialog(pageData.getAgeGroups(), new Command() {
+					@Override
+					public void execute() {
+						populateAgeGroups();
+					}
+				});
+
+				volunteerDialog = new VolunteerPositionEditDialog(pageData.getVolunteerPositions(), new Command() {
+					@Override
+					public void execute() {
+						populateVolunteerPositions();
+					}
+				});
+
 				initializePage();
 			}
 		});
@@ -120,6 +140,43 @@ public class EventPage implements Page {
 		});
 
 		fieldTable.addField(titleField);
+
+		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getAgeGroups())) {
+			ageTable.setWidth("150px");
+
+			populateAgeGroups();
+
+			fieldTable.addField("Price:", ageTable);
+		} else {
+			final Label priceDisplay = new Label();
+			final NumericTextBox priceInput = new NumericTextBox(2);
+			priceInput.setMaxLength(10);
+			FormField priceField = form.createFormField("Price:", priceInput, priceDisplay);
+			priceField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					String text = Formatter.formatCurrency(calendarEvent.getPrice());
+					if (calendarEvent.getPrice() == 0) {
+						text = "Free";
+					}
+					priceDisplay.setText(text);
+					priceInput.setValue(calendarEvent.getPrice());
+				}
+			});
+			priceField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setPrice(priceInput.getDouble());
+				}
+			});
+			fieldTable.addField(priceField);
+		}
+
+		volunteerTable.setWidth("400px");
+
+		populateVolunteerPositions();
+
+		fieldTable.addField("Volunteer positions:", volunteerTable);
 
 		if (Application.administratorOf(calendarEvent.getGroupId())) {
 			final Label categoryDisplay = new Label();
@@ -165,31 +222,6 @@ public class EventPage implements Page {
 			}
 		});
 		fieldTable.addField(addressField);
-
-		if (Common.isNullOrEmpty(pageData.getAgeGroups())) {
-			final Label priceDisplay = new Label();
-			final NumericTextBox priceInput = new NumericTextBox(2);
-			priceInput.setMaxLength(10);
-			FormField priceField = form.createFormField("Price:", priceInput, priceDisplay);
-			priceField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					String text = Formatter.formatCurrency(calendarEvent.getPrice());
-					if (calendarEvent.getPrice() == 0) {
-						text = "Free";
-					}
-					priceDisplay.setText(text);
-					priceInput.setValue(calendarEvent.getPrice());
-				}
-			});
-			priceField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setCost(priceInput.getDouble());
-				}
-			});
-			fieldTable.addField(priceField);
-		}
 
 		final Label eventDatesDisplay = new Label();
 		final DateTimeRangeBox eventDatesInput = new DateTimeRangeBox();
@@ -458,63 +490,6 @@ public class EventPage implements Page {
 			tabPanel.add("Event", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					HorizontalPanel hp = new HorizontalPanel();
-					hp.setWidth("100%");
-
-					if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getAgeGroups())) {
-						final EventAgeGroupCellTable ageTable = new EventAgeGroupCellTable(new ArgMap<EventArg>());
-						if (Application.administratorOf(calendarEvent.getGroupId())) {
-							ageTable.setShowDeleteColumn(true);
-						}
-						ageTable.populate(pageData.getAgeGroups());
-						ageTable.setTitle("Pricing");
-						ageTable.disablePaging();
-						hp.add(WidgetFactory.newSection(ageTable));
-
-						if (Application.administratorOf(calendarEvent.getGroupId())) {
-							ageTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
-								@Override
-								public void onMouseDown(MouseDownEvent event) {
-									AgeGroupEditDialog dialog = new AgeGroupEditDialog(ageTable);
-									dialog.setText("Add Age Group");
-									EventAgeGroup a = new EventAgeGroup();
-									a.setEventId(calendarEvent.getId());
-									dialog.center(a);
-								}
-							}));
-						}
-					}
-
-					if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
-						if (hp.getWidgetCount() > 0) {
-							hp.setCellWidth(hp.getWidget(0), "50%");
-							hp.add(new HTML("&nbsp;"));
-						}
-
-						final EventVolunteerPositionCellTable volunteerTable = new EventVolunteerPositionCellTable(new ArgMap<EventArg>());
-						volunteerTable.populate(pageData.getVolunteerPositions());
-						volunteerTable.setTitle("Volunteer Positions");
-						volunteerTable.disablePaging();
-						hp.add(WidgetFactory.newSection(volunteerTable));
-
-						if (Application.administratorOf(calendarEvent.getGroupId())) {
-							volunteerTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
-								@Override
-								public void onMouseDown(MouseDownEvent event) {
-									VolunteerPositionEditDialog dialog = new VolunteerPositionEditDialog(volunteerTable);
-									dialog.setText("Add Volunteer Position");
-									EventVolunteerPosition p = new EventVolunteerPosition();
-									p.setEventId(calendarEvent.getId());
-									dialog.center(p);
-								}
-							}));
-						}
-					}
-
-					if (hp.getWidgetCount() > 0 && calendarEvent.getRequiresRegistration()) {
-						tabBody.add(hp);
-					}
-
 					tabBody.add(WidgetFactory.newSection(title, fieldTable));
 
 					// we need to do this again in case we started on another tab
@@ -577,6 +552,122 @@ public class EventPage implements Page {
 		}
 
 		Application.getLayout().setPage(title, page);
+	}
+
+	private void populateAgeGroups() {
+		ageTable.removeAllRows();
+		if (Application.administratorOf(calendarEvent.getGroupId())) {
+			ageTable.setWidget(0, 0, new ClickLabel("Add", new MouseDownHandler() {
+				@Override
+				public void onMouseDown(MouseDownEvent event) {
+					ageDialog.setText("Add Age Group");
+					EventAgeGroup a = new EventAgeGroup();
+					a.setEventId(calendarEvent.getId());
+					ageDialog.center(a);
+				}
+			}));
+			ageTable.getCellFormatter().addStyleName(0, 0, "bold");
+		}
+
+		for (final EventAgeGroup g : pageData.getAgeGroups()) {
+			int row = ageTable.getRowCount();
+			String ageText = "Ages " + Formatter.formatNumberRange(g.getMinimumAge(), g.getMaximumAge());
+			if (Application.administratorOf(calendarEvent.getGroupId())) {
+				ageTable.setWidget(row, 0, new ClickLabel(ageText, new MouseDownHandler() {
+					@Override
+					public void onMouseDown(MouseDownEvent event) {
+						ageDialog.setText("Edit Age Group");
+						ageDialog.center(g);
+					}
+				}));
+			} else {
+				ageTable.setWidget(row, 0, new Label(ageText));
+			}
+
+			ageTable.setText(row, 1, Formatter.formatCurrency(g.getPrice()));
+
+			if (Application.administratorOf(calendarEvent.getGroupId())) {
+				ageTable.setWidget(row, 2, new ClickLabel("X", new MouseDownHandler() {
+					@Override
+					public void onMouseDown(MouseDownEvent event) {
+						ConfirmDialog.confirm("Really delete this age group?", new ConfirmHandler() {
+							@Override
+							public void onConfirm() {
+								eventService.deleteAgeGroup(g, new Callback<Void>() {
+									@Override
+									protected void doOnSuccess(Void result) {
+										pageData.getAgeGroups().remove(g);
+										populateAgeGroups();
+									}
+								});
+							}
+						});
+					}
+				}));
+			}
+
+		}
+	}
+
+	private void populateVolunteerPositions() {
+		volunteerTable.removeAllRows();
+
+		if (Application.administratorOf(calendarEvent.getGroupId())) {
+			volunteerTable.setWidget(0, 0, new ClickLabel("Add", new MouseDownHandler() {
+				@Override
+				public void onMouseDown(MouseDownEvent event) {
+					volunteerDialog.setText("Add Volunteer Position");
+					EventVolunteerPosition v = new EventVolunteerPosition();
+					v.setEventId(calendarEvent.getId());
+					volunteerDialog.center(v);
+				}
+			}));
+			volunteerTable.getCellFormatter().addStyleName(0, 0, "bold");
+		}
+
+		for (final EventVolunteerPosition v : pageData.getVolunteerPositions()) {
+			int row = volunteerTable.getRowCount();
+			VerticalPanel vp = new VerticalPanel();
+			if (Application.administratorOf(calendarEvent.getGroupId())) {
+				vp.add(new ClickLabel(v.getJobTitle(), new MouseDownHandler() {
+					@Override
+					public void onMouseDown(MouseDownEvent event) {
+						volunteerDialog.setText("Edit Volunteer Position");
+						volunteerDialog.center(v);
+					}
+				}));
+			} else {
+				vp.add(new Label(v.getJobTitle()));
+			}
+			Label description = new Label(v.getDescription());
+			description.addStyleName("smallText");
+			description.getElement().getStyle().setMarginLeft(5, Unit.PX);
+			vp.add(description);
+			volunteerTable.setWidget(row, 0, vp);
+
+			if (Application.administratorOf(calendarEvent.getGroupId()) && v.getOpenPositionCount() == v.getPositionCount()) {
+				volunteerTable.setWidget(row, 1, new ClickLabel("X", new MouseDownHandler() {
+					@Override
+					public void onMouseDown(MouseDownEvent event) {
+						ConfirmDialog.confirm("Really delete this volunteer position?", new ConfirmHandler() {
+							@Override
+							public void onConfirm() {
+								eventService.deleteVolunteerPosition(v, new Callback<Void>() {
+									@Override
+									protected void doOnSuccess(Void result) {
+										pageData.getVolunteerPositions().remove(v);
+										populateAgeGroups();
+									}
+								});
+							}
+						});
+					}
+				}));
+
+				volunteerTable.getCellFormatter().setVerticalAlignment(row, 1, HasVerticalAlignment.ALIGN_TOP);
+			}
+
+		}
 	}
 
 	private void save(final FormField field) {

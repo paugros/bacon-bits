@@ -49,6 +49,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	}
 
 	@Override
+	public void deleteVolunteerPosition(EventVolunteerPosition position) {
+		dao.deleteVolunteerPosition(position);
+	}
+
+	@Override
 	public void deleteVolunteerPositionMapping(EventVolunteerPosition position) {
 		dao.deleteVolunteerPositionMapping(position);
 	}

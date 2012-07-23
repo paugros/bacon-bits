@@ -105,6 +105,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
+	public void deleteVolunteerPosition(EventVolunteerPosition position) {
+		String sql = "delete from eventVolunteerPositions where id = ?";
+		update(sql, position.getId());
+	}
+
+	@Override
 	public void deleteVolunteerPositionMapping(EventVolunteerPosition position) {
 		String sql = "delete from eventVolunteerMapping where id = ?";
 		update(sql, position.getMappingId());

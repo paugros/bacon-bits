@@ -29,6 +29,8 @@ public interface EventService extends RemoteService {
 
 	public void deleteEventParticipant(EventRegistrationParticipant participant);
 
+	public void deleteVolunteerPosition(EventVolunteerPosition position);
+
 	public void deleteVolunteerPositionMapping(EventVolunteerPosition position);
 
 	public Event getById(int id);

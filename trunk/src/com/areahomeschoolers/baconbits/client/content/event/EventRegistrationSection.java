@@ -287,12 +287,12 @@ public class EventRegistrationSection extends Composite {
 			}
 		}
 
-		int row = participantTable.getRowCount();
-		participantTable.setText(row, 1, Formatter.formatCurrency(totalPrice));
-		participantTable.getCellFormatter().addStyleName(row, 1, "totalCell");
-
 		if (registration.getParticipants().isEmpty()) {
 			participantTable.setWidget(0, 0, new Label("You haven't registered anyone yet."));
+		} else {
+			int row = participantTable.getRowCount();
+			participantTable.setText(row, 1, Formatter.formatCurrency(totalPrice));
+			participantTable.getCellFormatter().addStyleName(row, 1, "totalCell");
 		}
 	}
 
