@@ -226,7 +226,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 				cur.setPasswordDigest(digest);
 				cur.setResetPassword(false);
 			} else {
-				user.setResetPassword(true);
+				if (user.getGeneratePassword()) {
+					user.setResetPassword(true);
+				}
 			}
 			user.setPasswordDigest(digest);
 			user.setPassword(null);

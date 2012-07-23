@@ -1,7 +1,9 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import com.areahomeschoolers.baconbits.client.content.user.CreateUserDialog;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
+import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style.Unit;
@@ -16,7 +18,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
@@ -41,6 +43,7 @@ public class LoginDialog extends DialogBox {
 	private static final String BAD_CREDENTIALS = "The username or password you entered is incorrect.";
 	private static final String SESSION_EXPIRED = "Your session has expired.  Please sign in again.";
 	private static boolean isShown;
+	private CreateUserDialog createDialog = new CreateUserDialog();
 
 	public LoginDialog(LoginServiceAsync loginService) {
 		this(loginService, false);
@@ -80,9 +83,9 @@ public class LoginDialog extends DialogBox {
 			}
 		});
 
-		PaddedPanel padded = new PaddedPanel();
-		padded.add(submit);
-		padded.add(cancel);
+		PaddedPanel buttons = new PaddedPanel();
+		buttons.add(submit);
+		buttons.add(cancel);
 
 		KeyDownHandler kdh = new KeyDownHandler() {
 			@Override
@@ -99,8 +102,17 @@ public class LoginDialog extends DialogBox {
 		usernameInput.setWidth("180px");
 		passwordInput.setWidth("180px");
 
-		VerticalPanel pp = new VerticalPanel();
-		pp.add(passwordInput);
+		VerticalPanel password = new VerticalPanel();
+		password.add(passwordInput);
+
+		ClickLabel create = new ClickLabel("Create new account", new MouseDownHandler() {
+			@Override
+			public void onMouseDown(MouseDownEvent event) {
+				createDialog.center(new User());
+				hide();
+			}
+		});
+		create.addStyleName("bold mediumPadding");
 
 		ClickLabel forgot = new ClickLabel("Forgot password?", new MouseDownHandler() {
 			@Override
@@ -116,28 +128,29 @@ public class LoginDialog extends DialogBox {
 			}
 		});
 		forgot.addStyleName("smallText");
-		pp.add(forgot);
+		password.add(forgot);
 
-		Grid g = new Grid(3, 2);
-		g.setCellPadding(5);
-		g.setWidget(0, 0, new Label("Email:"));
-		g.setWidget(0, 1, usernameInput);
+		FlexTable table = new FlexTable();
+		table.setCellPadding(5);
+		table.setWidget(0, 1, create);
+		table.setWidget(1, 0, new Label("Email:"));
+		table.setWidget(1, 1, usernameInput);
 		Label pl = new Label("Password:");
 		pl.getElement().getStyle().setPaddingTop(3, Unit.PX);
-		g.setWidget(1, 0, pl);
-		g.getCellFormatter().setVerticalAlignment(1, 0, HasVerticalAlignment.ALIGN_TOP);
+		table.setWidget(2, 0, pl);
+		table.getCellFormatter().setVerticalAlignment(1, 0, HasVerticalAlignment.ALIGN_TOP);
 		if (sessionExpired) {
-			g.setWidget(1, 1, passwordInput);
+			table.setWidget(2, 1, passwordInput);
 		} else {
-			g.setWidget(1, 1, pp);
+			table.setWidget(2, 1, password);
 		}
-		g.setWidget(2, 1, padded);
-		g.getCellFormatter().setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_LEFT);
-		g.getCellFormatter().setHorizontalAlignment(0, 1, HasHorizontalAlignment.ALIGN_LEFT);
-		g.getCellFormatter().setHorizontalAlignment(1, 0, HasHorizontalAlignment.ALIGN_LEFT);
-		g.getCellFormatter().setHorizontalAlignment(1, 1, HasHorizontalAlignment.ALIGN_LEFT);
-		g.getCellFormatter().setHorizontalAlignment(2, 1, HasHorizontalAlignment.ALIGN_LEFT);
-		vp.add(g);
+		table.setWidget(3, 1, buttons);
+		table.getCellFormatter().setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_LEFT);
+		table.getCellFormatter().setHorizontalAlignment(0, 1, HasHorizontalAlignment.ALIGN_LEFT);
+		table.getCellFormatter().setHorizontalAlignment(1, 0, HasHorizontalAlignment.ALIGN_LEFT);
+		table.getCellFormatter().setHorizontalAlignment(1, 1, HasHorizontalAlignment.ALIGN_LEFT);
+		table.getCellFormatter().setHorizontalAlignment(2, 1, HasHorizontalAlignment.ALIGN_LEFT);
+		vp.add(table);
 
 		setWidget(vp);
 	}
