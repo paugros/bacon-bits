@@ -3,19 +3,25 @@ package com.areahomeschoolers.baconbits.client.content.event;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
+import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
@@ -29,6 +35,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -101,6 +108,11 @@ public class EventRegistrationSection extends Composite {
 			tb.addLink(new ClickLabel("Add", new MouseDownHandler() {
 				@Override
 				public void onMouseDown(MouseDownEvent event) {
+					if (!Application.isAuthenticated()) {
+						showLogin();
+						return;
+					}
+
 					EventRegistrationParticipant rp = new EventRegistrationParticipant();
 					rp.setEventRegistrationId(registration.getId());
 					new ParticipantEditDialog(pageData, refreshParticipants).center(rp);
@@ -147,6 +159,11 @@ public class EventRegistrationSection extends Composite {
 			volunteerAddButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
+					if (!Application.isAuthenticated()) {
+						showLogin();
+						return;
+					}
+
 					int positionId = lb.getIntValue();
 
 					if (positionId > 0) {
@@ -324,5 +341,17 @@ public class EventRegistrationSection extends Composite {
 				volunteerAddButton.setEnabled(true);
 			}
 		});
+	}
+
+	private void showLogin() {
+		LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
+		final LoginDialog ld = new LoginDialog(loginService);
+		ld.setLoginHandler(new LoginHandler() {
+			@Override
+			public void onLogin(ApplicationData ap) {
+				Window.Location.reload();
+			}
+		});
+		ld.center();
 	}
 }
