@@ -50,7 +50,7 @@ public class ButtonPanel extends Composite {
 				dialog.hide();
 			}
 		});
-		rightPanel.add(closeButton);
+		leftPanel.add(closeButton);
 	}
 
 	public void addCenterButton(Button button) {

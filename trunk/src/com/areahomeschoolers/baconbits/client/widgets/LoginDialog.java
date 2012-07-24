@@ -39,7 +39,7 @@ public class LoginDialog extends DialogBox {
 	private final Button submit;
 	private LoginHandler loginHandler;
 	private final boolean sessionExpired;
-	private static final String TITLE = "AHS - Area Homeschoolers";
+	private static final String TITLE = "Log in";
 	private static final String BAD_CREDENTIALS = "The username or password you entered is incorrect.";
 	private static final String SESSION_EXPIRED = "Your session has expired.  Please sign in again.";
 	private static boolean isShown;
@@ -84,8 +84,8 @@ public class LoginDialog extends DialogBox {
 		});
 
 		PaddedPanel buttons = new PaddedPanel();
-		buttons.add(submit);
 		buttons.add(cancel);
+		buttons.add(submit);
 
 		KeyDownHandler kdh = new KeyDownHandler() {
 			@Override

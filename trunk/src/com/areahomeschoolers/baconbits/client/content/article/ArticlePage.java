@@ -39,7 +39,7 @@ public class ArticlePage implements Page {
 	private Form form = new Form(new FormSubmitHandler() {
 		@Override
 		public void onFormSubmit(FormField formField) {
-			save();
+			save(formField);
 		}
 	});
 	private VerticalPanel page;
@@ -157,7 +157,7 @@ public class ArticlePage implements Page {
 			}
 		});
 
-		form.getButtonPanel().addCenterButton(cancelButton);
+		form.getButtonPanel().insertCenterButton(cancelButton, 0);
 	}
 
 	private void createReadOnlyPage() {
@@ -191,11 +191,17 @@ public class ArticlePage implements Page {
 		}
 	}
 
-	private void save() {
+	private void save(final FormField field) {
 		articleService.save(article, new Callback<Article>() {
 			@Override
 			protected void doOnSuccess(Article a) {
-				HistoryToken.set(PageUrl.home());
+				if (!Url.isParamValidId("articleId")) {
+					HistoryToken.set(PageUrl.event(a.getId()));
+				} else {
+					article = a;
+					form.setDto(a);
+					field.setInputVisibility(false);
+				}
 			}
 		});
 	}

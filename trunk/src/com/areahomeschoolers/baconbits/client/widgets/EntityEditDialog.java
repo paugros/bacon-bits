@@ -27,7 +27,7 @@ public abstract class EntityEditDialog<T> extends DefaultDialog {
 		vp.add(contentPanel);
 
 		buttonPanel = new ButtonPanel(this);
-		buttonPanel.addLeftButton(form.getSubmitButton());
+		buttonPanel.addRightButton(form.getSubmitButton());
 		vp.add(form.getErrorPanel());
 		aboveButtonPanel.setWidth("100%");
 		vp.add(aboveButtonPanel);
