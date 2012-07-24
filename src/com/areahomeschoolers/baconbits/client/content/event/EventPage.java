@@ -1,21 +1,17 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.document.FileUploadDialog;
+import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
-import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
-import com.areahomeschoolers.baconbits.client.rpc.service.DocumentService;
-import com.areahomeschoolers.baconbits.client.rpc.service.DocumentServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
@@ -38,7 +34,6 @@ import com.areahomeschoolers.baconbits.client.widgets.GroupListBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
@@ -46,11 +41,8 @@ import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.DocumentArg;
-import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
-import com.areahomeschoolers.baconbits.shared.dto.Document;
-import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
+import com.areahomeschoolers.baconbits.shared.dto.EntityType;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
@@ -62,12 +54,10 @@ import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -84,12 +74,10 @@ public class EventPage implements Page {
 	private final FieldTable fieldTable = new FieldTable();
 	private Event calendarEvent = new Event();
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
-	private final DocumentServiceAsync documentService = (DocumentServiceAsync) ServiceCache.getService(DocumentService.class);
 	private EventPageData pageData;
 	private TabPage tabPanel;
 	private FlexTable ageTable = new FlexTable();
 	private FlexTable volunteerTable = new FlexTable();
-	private FlexTable documentTable = new FlexTable();
 	private VolunteerPositionEditDialog volunteerDialog;
 	private AgeGroupEditDialog ageDialog;
 
@@ -542,8 +530,9 @@ public class EventPage implements Page {
 		fieldTable.addField(descriptionField);
 
 		if (calendarEvent.isSaved()) {
-			documentTable.setWidth("200px");
-			populateDocuments();
+			DocumentSection ds = new DocumentSection(fieldTable, EntityType.EVENT, calendarEvent.getId(), Application.administratorOf(calendarEvent
+					.getGroupId()));
+			ds.populate();
 		}
 
 	}
@@ -680,72 +669,6 @@ public class EventPage implements Page {
 			}
 
 		}
-	}
-
-	private void populateDocuments() {
-		documentService.list(new ArgMap<DocumentArg>(DocumentArg.EVENT_ID, calendarEvent.getId()), new Callback<ArrayList<Document>>() {
-			@Override
-			protected void doOnSuccess(ArrayList<Document> result) {
-				if (!Application.administratorOf(calendarEvent.getGroupId()) && Common.isNullOrEmpty(result)) {
-					return;
-				}
-
-				documentTable.removeAllRows();
-
-				if (!documentTable.isAttached()) {
-					fieldTable.addField("Documents:", documentTable);
-				}
-
-				if (Application.administratorOf(calendarEvent.getGroupId())) {
-					ClickLabel cl = new ClickLabel("Add", new MouseDownHandler() {
-						@Override
-						public void onMouseDown(MouseDownEvent event) {
-							FileUploadDialog dialog = new FileUploadDialog(DocumentLinkType.EVENT, calendarEvent.getId(), new UploadCompleteHandler() {
-								@Override
-								public void onUploadComplete(int documentId) {
-									populateDocuments();
-								}
-							});
-
-							dialog.center();
-						}
-					});
-					cl.addStyleName("bold");
-					documentTable.setWidget(0, 0, cl);
-				}
-
-				for (final Document d : result) {
-					final int row = documentTable.getRowCount();
-					Image icon = new Image(FileUploadDialog.getFileIconResourceFromExtension(d.getFileExtension()));
-					PaddedPanel hp = new PaddedPanel();
-					hp.add(icon);
-					Widget name;
-					name = new Anchor(d.getDescription(), "/baconbits/service/file?id=" + d.getId());
-					hp.add(name);
-					documentTable.setWidget(row, 0, hp);
-
-					if (Application.administratorOf(calendarEvent.getGroupId())) {
-						documentTable.setWidget(row, 1, new ClickLabel("X", new MouseDownHandler() {
-							@Override
-							public void onMouseDown(MouseDownEvent event) {
-								ConfirmDialog.confirm("Really delete \"" + d.getDescription() + "\"?", new ConfirmHandler() {
-									@Override
-									public void onConfirm() {
-										documentService.delete(d.getId(), new Callback<Void>() {
-											@Override
-											protected void doOnSuccess(Void result) {
-												documentTable.removeRow(row);
-											}
-										});
-									}
-								});
-							}
-						}));
-					}
-				}
-
-			}
-		});
 	}
 
 	private void populateVolunteerPositions() {
