@@ -14,7 +14,6 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
@@ -98,26 +97,6 @@ public class ArticlePage implements Page {
 		fieldTable.addField(titleField);
 
 		if (Application.isAuthenticated()) {
-			final Label publicDisplay = new Label();
-			final DefaultListBox publicInput = new DefaultListBox();
-			publicInput.addItem("No", 0);
-			publicInput.addItem("Yes", 1);
-			FormField publicField = form.createFormField("Public article:", publicInput, publicDisplay);
-			publicField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					publicDisplay.setText(Common.yesNo(article.getPublicArticle()));
-					publicInput.setValue(article.getPublicArticle() ? 1 : 0);
-				}
-			});
-			publicField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					article.setPublicArticle(publicInput.getIntValue() == 1);
-				}
-			});
-			fieldTable.addField(publicField);
-
 			final Label groupDisplay = new Label();
 			WidgetCreator groupCreator = new WidgetCreator() {
 				@Override
