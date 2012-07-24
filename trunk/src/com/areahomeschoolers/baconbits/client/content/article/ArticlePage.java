@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.article;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
@@ -22,6 +23,7 @@ import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
+import com.areahomeschoolers.baconbits.shared.dto.EntityType;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
@@ -125,6 +127,7 @@ public class ArticlePage implements Page {
 
 		final ControlledRichTextArea dataInput = new ControlledRichTextArea();
 		final HTML dataDisplay = new HTML();
+		dataDisplay.setWidth("800px");
 		FormField dataField = form.createFormField("", dataInput, dataDisplay);
 		dataField.setDtoUpdater(new Command() {
 			@Override
@@ -140,6 +143,11 @@ public class ArticlePage implements Page {
 			}
 		});
 		fieldTable.addField(dataField);
+
+		if (article.isSaved()) {
+			DocumentSection ds = new DocumentSection(fieldTable, EntityType.ARTICLE, article.getId(), Application.administratorOf(article.getGroupId()));
+			ds.populate();
+		}
 
 		Button cancelButton = new Button("Cancel");
 		cancelButton.addMouseDownHandler(new MouseDownHandler() {
