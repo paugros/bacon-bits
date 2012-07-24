@@ -142,8 +142,96 @@ public class EventPage implements Page {
 				titleInput.setText(calendarEvent.getTitle());
 			}
 		});
-
 		fieldTable.addField(titleField);
+
+		final Label eventDatesDisplay = new Label();
+		final DateTimeRangeBox eventDatesInput = new DateTimeRangeBox();
+		FormField eventDatesField = form.createFormField("Event date/time:", eventDatesInput, eventDatesDisplay);
+		eventDatesField.setRequired(true);
+		eventDatesField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				eventDatesDisplay.setText(Formatter.formatDateTime(calendarEvent.getStartDate()) + " to "
+						+ Formatter.formatDateTime(calendarEvent.getEndDate()));
+				eventDatesInput.setStartDate(calendarEvent.getStartDate());
+				eventDatesInput.setEndDate(calendarEvent.getEndDate());
+			}
+		});
+		eventDatesField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				calendarEvent.setStartDate(eventDatesInput.getStartDate());
+				calendarEvent.setEndDate(eventDatesInput.getEndDate());
+			}
+		});
+		fieldTable.addField(eventDatesField);
+
+		final Hyperlink addressDisplay = new Hyperlink();
+		final MaxLengthTextArea addressInput = new MaxLengthTextArea(200);
+		addressInput.setVisibleLines(3);
+		addressInput.setCharacterWidth(50);
+		FormField addressField = form.createFormField("Address:", addressInput, addressDisplay);
+		addressField.setRequired(true);
+		addressField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				addressDisplay.setText(calendarEvent.getAddress());
+				addressDisplay.setTargetHistoryToken(PageUrl.event(calendarEvent.getId()) + "&tab=3");
+				addressInput.setText(calendarEvent.getAddress());
+			}
+		});
+		addressField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				calendarEvent.setAddress(addressInput.getText());
+			}
+		});
+		fieldTable.addField(addressField);
+
+		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrBlank(calendarEvent.getWebsite())) {
+			final HTML websiteDisplay = new HTML();
+			final TextBox websiteInput = new TextBox();
+			websiteInput.setMaxLength(512);
+			FormField websiteField = form.createFormField("Website:", websiteInput, websiteDisplay);
+			websiteField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					if (Common.isNullOrBlank(calendarEvent.getWebsite())) {
+						websiteDisplay.setText(Common.getDefaultIfNull(null));
+					} else {
+						websiteDisplay.setHTML("<a href=\"" + calendarEvent.getWebsite() + "\" target=\"_blank\">" + calendarEvent.getWebsite() + "</a>");
+					}
+					websiteInput.setText(calendarEvent.getWebsite());
+				}
+			});
+			websiteField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setWebsite(websiteInput.getText());
+				}
+			});
+			fieldTable.addField(websiteField);
+		}
+
+		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrBlank(calendarEvent.getPhone())) {
+			final Label phoneDisplay = new Label();
+			final PhoneTextBox phoneInput = new PhoneTextBox();
+			FormField phoneField = form.createFormField("Phone:", phoneInput, phoneDisplay);
+			phoneField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					phoneDisplay.setText(Common.getDefaultIfNull(calendarEvent.getPhone()));
+					phoneInput.setText(calendarEvent.getPhone());
+				}
+			});
+			phoneField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setPhone(phoneInput.getText());
+				}
+			});
+			fieldTable.addField(phoneField);
+		}
 
 		if (calendarEvent.getRequiresRegistration()) {
 			if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
@@ -151,7 +239,7 @@ public class EventPage implements Page {
 
 				populateAgeGroups();
 
-				fieldTable.addField("Price:", ageTable);
+				fieldTable.addField("Pricing:", ageTable);
 			}
 
 			if (Common.isNullOrEmpty(pageData.getAgeGroups())) {
@@ -210,95 +298,6 @@ public class EventPage implements Page {
 			});
 			fieldTable.addField(categoryField);
 		}
-
-		final Hyperlink addressDisplay = new Hyperlink();
-		final MaxLengthTextArea addressInput = new MaxLengthTextArea(200);
-		addressInput.setVisibleLines(3);
-		addressInput.setCharacterWidth(50);
-		FormField addressField = form.createFormField("Address:", addressInput, addressDisplay);
-		addressField.setRequired(true);
-		addressField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				addressDisplay.setText(calendarEvent.getAddress());
-				addressDisplay.setTargetHistoryToken(PageUrl.event(calendarEvent.getId()) + "&tab=3");
-				addressInput.setText(calendarEvent.getAddress());
-			}
-		});
-		addressField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				calendarEvent.setAddress(addressInput.getText());
-			}
-		});
-		fieldTable.addField(addressField);
-
-		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrBlank(calendarEvent.getPhone())) {
-			final Label phoneDisplay = new Label();
-			final PhoneTextBox phoneInput = new PhoneTextBox();
-			FormField phoneField = form.createFormField("Phone:", phoneInput, phoneDisplay);
-			phoneField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					phoneDisplay.setText(Common.getDefaultIfNull(calendarEvent.getPhone()));
-					phoneInput.setText(calendarEvent.getPhone());
-				}
-			});
-			phoneField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setPhone(phoneInput.getText());
-				}
-			});
-			fieldTable.addField(phoneField);
-		}
-
-		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrBlank(calendarEvent.getWebsite())) {
-			final HTML websiteDisplay = new HTML();
-			final TextBox websiteInput = new TextBox();
-			websiteInput.setMaxLength(512);
-			FormField websiteField = form.createFormField("Website:", websiteInput, websiteDisplay);
-			websiteField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					if (Common.isNullOrBlank(calendarEvent.getWebsite())) {
-						websiteDisplay.setText(Common.getDefaultIfNull(null));
-					} else {
-						websiteDisplay.setHTML("<a href=\"" + calendarEvent.getWebsite() + "\" target=\"_blank\">" + calendarEvent.getWebsite() + "</a>");
-					}
-					websiteInput.setText(calendarEvent.getWebsite());
-				}
-			});
-			websiteField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setWebsite(websiteInput.getText());
-				}
-			});
-			fieldTable.addField(websiteField);
-		}
-
-		final Label eventDatesDisplay = new Label();
-		final DateTimeRangeBox eventDatesInput = new DateTimeRangeBox();
-		FormField eventDatesField = form.createFormField("Event date/time:", eventDatesInput, eventDatesDisplay);
-		eventDatesField.setRequired(true);
-		eventDatesField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				eventDatesDisplay.setText(Formatter.formatDateTime(calendarEvent.getStartDate()) + " to "
-						+ Formatter.formatDateTime(calendarEvent.getEndDate()));
-				eventDatesInput.setStartDate(calendarEvent.getStartDate());
-				eventDatesInput.setEndDate(calendarEvent.getEndDate());
-			}
-		});
-		eventDatesField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				calendarEvent.setStartDate(eventDatesInput.getStartDate());
-				calendarEvent.setEndDate(eventDatesInput.getEndDate());
-			}
-		});
-		fieldTable.addField(eventDatesField);
 
 		if (Application.administratorOf(calendarEvent.getGroupId())) {
 			final Label registrationDatesDisplay = new Label();

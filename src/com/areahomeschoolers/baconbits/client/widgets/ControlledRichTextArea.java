@@ -8,6 +8,8 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -347,6 +349,14 @@ public class ControlledRichTextArea extends Composite {
 		textArea.setWidth("800px");
 		textArea.setHeight("600px");
 		textArea.setStyleName("body");
+
+		textArea.addFocusHandler(new FocusHandler() {
+			@Override
+			public void onFocus(FocusEvent event) {
+				textArea.getFormatter().setFontName("Arial");
+			}
+		});
+
 		addStyleName("ControlledRichTextArea");
 	}
 
