@@ -37,7 +37,6 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			article.setAddedDate(rs.getTimestamp("addedDate"));
 			article.setTitle(rs.getString("title"));
 			article.setArticle(rs.getString("article"));
-			article.setPublicArticle(rs.getBoolean("isPublic"));
 			article.setGroupName(rs.getString("groupName"));
 			return article;
 		}
@@ -72,8 +71,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(article);
 
 		if (article.isSaved()) {
-			String sql = "update articles set title = :title, article = :article, startDate = :startDate, endDate = :endDate, groupId = :groupId, ";
-			sql += "isPublic = :publicArticle where id = :id";
+			String sql = "update articles set title = :title, article = :article, startDate = :startDate, endDate = :endDate, groupId = :groupId ";
+			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (article.getStartDate() == null) {
@@ -81,8 +80,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			}
 			article.setAddedById(ServerContext.getCurrentUser().getId());
 
-			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId, isPublic) values ";
-			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId, :publicArticle)";
+			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId) values ";
+			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
