@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.FormField.ButtonPlacement;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -10,6 +11,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventField;
 
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -34,6 +36,8 @@ public class EventFormField {
 		Widget inputWidget = new Label();
 		Command initializer = null, dtoUpdater = null;
 
+		final HTML displayWidget = new HTML();
+
 		switch (field.getTypeId()) {
 		case 1:
 			if (field.getRequired()) {
@@ -46,6 +50,7 @@ public class EventFormField {
 			initializer = new Command() {
 				@Override
 				public void execute() {
+					displayWidget.setText(field.getValue());
 					tb.setText(field.getValue());
 				}
 			};
@@ -70,6 +75,7 @@ public class EventFormField {
 			initializer = new Command() {
 				@Override
 				public void execute() {
+					displayWidget.setText(field.getValue());
 					lb.setValue(field.getValue());
 				}
 			};
@@ -96,6 +102,7 @@ public class EventFormField {
 			initializer = new Command() {
 				@Override
 				public void execute() {
+					displayWidget.setText(field.getValue());
 					ta.setText(field.getValue());
 				}
 			};
@@ -126,6 +133,8 @@ public class EventFormField {
 						String test = Common.getDefaultIfNull(field.getValue(), "");
 						c.setValue(test.contains(c.getText() + "\n"));
 					}
+
+					displayWidget.setHTML(Formatter.formatNoteText(field.getValue()));
 				}
 			};
 
@@ -153,6 +162,7 @@ public class EventFormField {
 			initializer = new Command() {
 				@Override
 				public void execute() {
+					displayWidget.setText(field.getValue());
 					t.setText(field.getValue());
 				}
 			};
@@ -167,8 +177,6 @@ public class EventFormField {
 		default:
 			break;
 		}
-
-		Label displayWidget = new Label();
 
 		formField = new FormField(field.getName(), inputWidget, displayWidget);
 		formField.setInitializer(initializer);

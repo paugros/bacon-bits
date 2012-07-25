@@ -6,6 +6,7 @@ import java.util.Map;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
@@ -34,7 +35,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -51,9 +51,11 @@ public class EventRegistrationSection extends Composite {
 	private EventRegistration registration;
 	private FlexTable positionTable;
 	private FlexTable participantTable;
-	private Command refreshParticipants = new Command() {
+	private ParameterHandler<EventRegistration> refreshParticipants = new ParameterHandler<EventRegistration>() {
 		@Override
-		public void execute() {
+		public void execute(EventRegistration item) {
+			registration = item;
+			pageData.setRegistration(item);
 			populateParticipants();
 		}
 	};

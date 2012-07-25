@@ -438,13 +438,7 @@ public class EventPage implements Page {
 				participantField.setInitializer(new Command() {
 					@Override
 					public void execute() {
-						String range = Integer.toString(calendarEvent.getMinimumParticipants());
-						if (calendarEvent.getMaximumParticipants() == 0) {
-							range += "+";
-						} else {
-							range += "-" + calendarEvent.getMaximumParticipants();
-						}
-						participantDisplay.setText(range);
+						participantDisplay.setText(Formatter.formatNumberRange(calendarEvent.getMinimumParticipants(), calendarEvent.getMaximumParticipants()));
 						participantInput.setRange(calendarEvent.getMinimumParticipants(), calendarEvent.getMaximumParticipants());
 					}
 				});
