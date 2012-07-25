@@ -68,6 +68,14 @@ public class FieldTable extends Composite {
 		parentRows.put(field, (TableRowElement) element);
 	}
 
+	public void addField(FormField field, int insertBefore) {
+		flexTable.insertRow(insertBefore);
+		addField(field.getLabelPanel(), field, insertBefore);
+
+		Element element = flexTable.getRowFormatter().getElement(insertBefore);
+		parentRows.put(field, (TableRowElement) element);
+	}
+
 	public void addField(Label label, String value) {
 		addField(label, new Label(value));
 	}
@@ -179,10 +187,13 @@ public class FieldTable extends Composite {
 	}
 
 	private void addField(Widget label, Widget content) {
-		int newRowNumber = flexTable.getRowCount();
+		addField(label, content, flexTable.getRowCount());
+	}
+
+	private void addField(Widget label, Widget content, int rowNumber) {
 		label.getElement().getStyle().setMarginRight(5, Unit.PX);
-		flexTable.getCellFormatter().setVerticalAlignment(newRowNumber, 0, HasVerticalAlignment.ALIGN_TOP);
-		flexTable.setWidget(newRowNumber, 0, label);
-		flexTable.setWidget(newRowNumber, 1, content);
+		flexTable.getCellFormatter().setVerticalAlignment(rowNumber, 0, HasVerticalAlignment.ALIGN_TOP);
+		flexTable.setWidget(rowNumber, 0, label);
+		flexTable.setWidget(rowNumber, 1, content);
 	}
 }

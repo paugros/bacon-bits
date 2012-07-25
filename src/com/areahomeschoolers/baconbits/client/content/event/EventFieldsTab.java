@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
@@ -61,10 +62,10 @@ public class EventFieldsTab extends Composite {
 		});
 
 		ageGroupListBox = new DefaultListBox();
-		for (EventAgeGroup group : pageData.getAgeGroups()) {
+		for (EventAgeGroup g : pageData.getAgeGroups()) {
 			ageGroupListBox.addItem(
-					group.getMinimumAge() + "-" + group.getMaximumAge() + " yrs / " + group.getMinimumParticipants() + "-" + group.getMaximumParticipants()
-							+ " participants", group.getId());
+					Formatter.formatNumberRange(g.getMinimumAge(), g.getMaximumAge()) + " yrs / "
+							+ Formatter.formatNumberRange(g.getMinimumParticipants(), g.getMaximumParticipants()) + " participants", g.getId());
 		}
 
 		if (!Common.isNullOrEmpty(pageData.getAgeGroups())) {

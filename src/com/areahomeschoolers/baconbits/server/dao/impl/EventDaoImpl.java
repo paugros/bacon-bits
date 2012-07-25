@@ -17,6 +17,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.EventDao;
+import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
@@ -32,6 +33,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.User;
 
 @Repository
 public class EventDaoImpl extends SpringWrapper implements EventDao {
@@ -216,7 +218,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 						r.setEventId(rs.getInt("eventId"));
 						r.setAddedById(rs.getInt("addedById"));
 						r.setAddedDate(rs.getTimestamp("addedDate"));
-						r.setAttended(rs.getBoolean("attended"));
 						r.setCanceled(rs.getBoolean("canceled"));
 						r.setWaiting(rs.getBoolean("waiting"));
 						return r;
@@ -335,11 +336,25 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);
 
 		if (participant.isSaved()) {
-			String sql = "update eventRegistrationParticipants set firstName = :firstName, lastName = :lastName, ageGroupId = :ageGroupId, canceled = :canceled where id = :id ";
+			String sql = "update eventRegistrationParticipants set canceled = :canceled, attended = :attended where id = :id ";
 			update(sql, namedParams);
 		} else {
-			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, firstName, lastName, ageGroupId) ";
-			sql += "values(:eventRegistrationId, :firstName, :lastName, :ageGroupId)";
+			// create or update the associated user
+			User u = participant.getUser();
+			if (u == null) {
+				u = new User();
+			}
+			u.setFirstName(participant.getFirstName());
+			u.setLastName(participant.getLastName());
+			u.setBirthDate(participant.getBirthDate());
+			u.setParentId(ServerContext.getCurrentUser().getId());
+
+			UserDao userDao = ServerContext.getDaoImpl("user");
+			u = userDao.save(u).getData();
+			participant.setUserId(u.getId());
+
+			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, userId, ageGroupId) ";
+			sql += "values(:eventRegistrationId, :userId, :ageGroupId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -363,7 +378,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(registration);
 		if (registration.isSaved()) {
-			String sql = "update eventRegistrations set waiting = :waiting, canceled = :canceled, attended = :attended where id = :id ";
+			String sql = "update eventRegistrations set waiting = :waiting, canceled = :canceled where id = :id ";
 			update(sql, namedParams);
 
 			if (registration.getCanceled()) {
@@ -372,8 +387,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			}
 		} else {
 			registration.setAddedById(ServerContext.getCurrentUser().getId());
-			String sql = "insert into eventRegistrations(eventId, waiting, addedDate, canceled, attended, addedById) ";
-			sql += "values(:eventId, :waiting, now(), :canceled, :attended, :addedById)";
+			String sql = "insert into eventRegistrations(eventId, waiting, addedDate, canceled, addedById) ";
+			sql += "values(:eventId, :waiting, now(), :canceled, :addedById)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -431,8 +446,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	private ArrayList<EventRegistrationParticipant> getParticipants(int registrationId, int participantId) {
 		List<Object> sqlArgs = new ArrayList<Object>();
-		String sql = "select p.*, case isnull(a.price) when true then e.price else a.price end as price ";
+		String sql = "select p.*, u.firstName, u.lastName, u.birthDate, u.parentId, ";
+		sql += "up.firstName as parentFirstName, up.lastName as parentLastName, ";
+		sql += "case isnull(a.price) when true then e.price else a.price end as price ";
 		sql += "from eventRegistrationParticipants p ";
+		sql += "join users u on u.id = p.userId ";
+		sql += "join users up on up.id = u.parentId ";
 		sql += "left join eventAgeGroups a on a.id = p.ageGroupId ";
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId ";
 		sql += "join events e on e.id = r.eventId ";
@@ -445,10 +464,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "and p.id = ? ";
 			sqlArgs.add(participantId);
 		}
-		sql += "order by p.firstName";
+		sql += "order by u.firstName";
 
 		return query(sql, new RowMapper<EventRegistrationParticipant>() {
-
 			@Override
 			public EventRegistrationParticipant mapRow(ResultSet rs, int row) throws SQLException {
 				EventRegistrationParticipant p = new EventRegistrationParticipant();
@@ -459,6 +477,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setLastName(rs.getString("lastName"));
 				p.setCanceled(rs.getBoolean("canceled"));
 				p.setPrice(rs.getDouble("price"));
+				p.setBirthDate(rs.getDate("birthDate"));
+				p.setParentFirstName(rs.getString("parentFirstName"));
+				p.setParentLastName(rs.getString("parentLastName"));
+				p.setParentId(rs.getInt("parentId"));
+				p.setUserId(rs.getInt("userId"));
 				return p;
 			}
 		}, sqlArgs.toArray());

@@ -16,7 +16,7 @@ public interface Arg {
 	}
 
 	public enum UserArg implements Arg, IsSerializable {
-		USER_ID
+		USER_ID, PARENT_ID, NOT_ON_REGISTRATION_ID
 	}
 
 }

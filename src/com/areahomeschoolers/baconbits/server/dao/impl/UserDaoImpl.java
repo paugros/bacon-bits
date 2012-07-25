@@ -130,6 +130,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 
 		u.setGroups(getSecurityGroups(u.getId()));
 
+		// ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
+		// args.put(UserArg.PARENT_ID, u.getId());
+		// u.setChildren(list(args));
+
 		return u;
 	}
 
@@ -164,17 +168,42 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 
 		user.setGroups(getSecurityGroups(user.getId()));
 
+		// ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
+		// args.put(UserArg.PARENT_ID, user.getId());
+		// user.setChildren(list(args));
+
 		return user;
 	}
 
 	@Override
 	public ArrayList<User> list(ArgMap<UserArg> args) {
+		List<Object> sqlArgs = new ArrayList<Object>();
+
+		int parentId = args.getInt(UserArg.PARENT_ID);
+		int registrationId = args.getInt(UserArg.NOT_ON_REGISTRATION_ID);
+
 		String sql = SELECT;
+		if (registrationId > 0) {
+			sql += "left join eventRegistrationParticipants p on p.userId = u.id and p.eventRegistrationId = ? ";
+			sqlArgs.add(registrationId);
+		}
 		sql += "where 1 = 1 ";
+
 		if (args.getStatus() != Status.ALL) {
 			sql += "and isActive(u.startDate, u.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
 		}
-		ArrayList<User> data = query(sql, new UserMapper());
+
+		if (registrationId > 0) {
+			sql += "and p.id is null ";
+		}
+
+		if (parentId > 0) {
+			sql += "and u.parentId = ? ";
+			sqlArgs.add(parentId);
+		}
+
+		sql += "order by u.lastName, u.firstName";
+		ArrayList<User> data = query(sql, new UserMapper(), sqlArgs.toArray());
 
 		return data;
 	}

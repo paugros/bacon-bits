@@ -51,16 +51,19 @@ public class MonthPicker extends Composite implements CustomFocusWidget {
 	public void setMonth(Date date) {
 		if (date != null) {
 			setMonth(ClientDateUtils.getMonth(date));
+		} else {
+			listBox.setSelectedIndex(0);
 		}
 	}
 
 	public void setMonth(int month) {
-		listBox.setSelectedIndex(month - 1);
+		listBox.setSelectedIndex(month);
 	}
 
 	// Use 1 - 12, not 0 - 11
 	public void setMonthRange(int startMonth, int endMonth) {
 		listBox.clear();
+		listBox.addItem("", 0);
 		int currentMonth = ClientDateUtils.getMonth(new Date());
 
 		int index = 1;

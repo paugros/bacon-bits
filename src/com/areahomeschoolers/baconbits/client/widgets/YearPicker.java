@@ -49,7 +49,8 @@ public class YearPicker extends Composite implements CustomFocusWidget {
 		}
 
 		listBox.clear();
-		for (int i = currentYear + 1; i >= startYear; i--) {
+		listBox.addItem("", 0);
+		for (int i = currentYear; i >= startYear; i--) {
 			listBox.addItem(Integer.toString(i));
 		}
 		listBox.setSelectedIndex(1);
@@ -58,6 +59,8 @@ public class YearPicker extends Composite implements CustomFocusWidget {
 	public void setYear(Date date) {
 		if (date != null) {
 			setYear(ClientDateUtils.getYear(date));
+		} else {
+			listBox.setSelectedIndex(0);
 		}
 	}
 

@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
+import com.areahomeschoolers.baconbits.client.validation.HasValidator;
+import com.areahomeschoolers.baconbits.client.validation.Validator;
+import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -14,19 +17,28 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 
-public class MonthYearPicker extends Composite implements CustomFocusWidget {
+public class MonthYearPicker extends Composite implements CustomFocusWidget, HasValidator {
 
 	private final FocusPanel focusPanel = new FocusPanel();
 	private final MonthPicker monthPicker = new MonthPicker();
 	private final YearPicker yearPicker = new YearPicker();
 	private final List<Command> changeCommands = new ArrayList<Command>();
+	private Validator validator;
 
 	private int earliestMonth = 0;
 	private int earliestYear = 0;
 	private int latestMonth = 0;
 	private int latestYear = 0;
+	private boolean required;
 
 	public MonthYearPicker() {
+		validator = new Validator(focusPanel, new ValidatorCommand() {
+			@Override
+			public void validate(Validator validator) {
+				validator.setError(required && getValue() == null);
+			}
+		});
+
 		HorizontalPanel hp = new HorizontalPanel();
 
 		hp.add(monthPicker);
@@ -38,8 +50,6 @@ public class MonthYearPicker extends Composite implements CustomFocusWidget {
 		yearPicker.getListBox().addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				setAllowedMonths();
-
 				for (Command command : changeCommands) {
 					command.execute();
 				}
@@ -72,12 +82,27 @@ public class MonthYearPicker extends Composite implements CustomFocusWidget {
 		setAllowedMonths();
 	}
 
+	public void fireValueChangeCommands() {
+		for (Command command : changeCommands) {
+			command.execute();
+		}
+	}
+
 	public int getMonth() {
 		return monthPicker.getMonth();
 	}
 
+	@Override
+	public Validator getValidator() {
+		return validator;
+	}
+
 	// @Override
 	public Date getValue() {
+		if (yearPicker.getYear() == 0 || monthPicker.getMonth() == 0) {
+			return null;
+		}
+
 		DateTimeFormat dtf = DateTimeFormat.getFormat("yyyy/M/d");
 		String dateStr = yearPicker.getYear() + "/" + monthPicker.getMonth() + "/1";
 
@@ -86,6 +111,11 @@ public class MonthYearPicker extends Composite implements CustomFocusWidget {
 
 	public int getYear() {
 		return yearPicker.getYear();
+	}
+
+	@Override
+	public boolean isRequired() {
+		return required;
 	}
 
 	/**
@@ -112,6 +142,11 @@ public class MonthYearPicker extends Composite implements CustomFocusWidget {
 	@Override
 	public void setFocus(boolean focus) {
 		focusPanel.setFocus(focus);
+	}
+
+	@Override
+	public void setRequired(boolean required) {
+		this.required = required;
 	}
 
 	public void setValue(Date value) {

@@ -57,6 +57,10 @@ public class ServerContext implements ApplicationContextAware {
 		return (User) session.getAttribute("user");
 	}
 
+	public static <T> T getDaoImpl(String dao) {
+		return (T) getApplicationContext().getBean(dao + "DaoImpl");
+	}
+
 	/**
 	 * Returns a URL query string containing the value of the "gwt.codesvr" parameter.
 	 * 

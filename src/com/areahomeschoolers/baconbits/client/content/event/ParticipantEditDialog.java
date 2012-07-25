@@ -1,32 +1,48 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.validation.Validator;
+import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
-import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
+import com.areahomeschoolers.baconbits.client.widgets.MonthYearPicker;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -37,9 +53,12 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 	private MaxHeightScrollPanel fieldsPanel;
 	private EventRegistration registration;
 	private List<EventField> eventFields;
-	private Command refreshCommand;
+	private ParameterHandler<EventRegistration> refreshCommand;
+	private FieldTable fieldTable;
+	private MonthYearPicker birthDateInput;
+	private List<User> children;
 
-	public ParticipantEditDialog(EventPageData pd, Command refreshCommand) {
+	public ParticipantEditDialog(EventPageData pd, ParameterHandler<EventRegistration> refreshCommand) {
 		setText("Register Participant");
 		pageData = pd;
 		registration = pd.getRegistration();
@@ -71,7 +90,63 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 		form.getSubmitButton().setEnabled(pageData.getEvent().allowRegistrations());
 	}
 
+	private void insertChildListBox(List<User> children) {
+		final DefaultListBox childInput = new DefaultListBox();
+		childInput.addItem("", 0);
+		final Map<Integer, User> childMap = new HashMap<Integer, User>();
+		for (User u : children) {
+			childInput.addItem(u.getFullName(), u.getId());
+			childMap.put(u.getId(), u);
+		}
+		childInput.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				User u = childMap.get(childInput.getIntValue());
+				if (u == null) {
+					u = new User();
+				}
+
+				entity.setUser(u);
+				entity.setFirstName(u.getFirstName());
+				entity.setLastName(u.getLastName());
+				entity.setBirthDate(u.getBirthDate());
+				entity.setUserId(u.getId());
+
+				form.initialize();
+				birthDateInput.fireValueChangeCommands();
+			}
+		});
+		FormField childField = form.createFormField("Quick-select:", childInput, null);
+		childField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				childInput.setValue(entity.getUserId());
+			}
+		});
+		childField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				entity.setUserId(childInput.getIntValue());
+			}
+		});
+
+		if (childInput.getItemCount() > 1) {
+			fieldTable.addField(childField, 0);
+		}
+	}
+
 	private void saveParticipant() {
+		if (!Common.isNullOrEmpty(children)) {
+			String name = Common.stripWhiteSpace(entity.getFirstName() + entity.getLastName()).toLowerCase();
+			for (User u : children) {
+				String testName = Common.stripWhiteSpace(u.getFirstName() + u.getLastName()).toLowerCase();
+				if (name != null && testName != null && name.equals(testName)) {
+					entity.setUser(u);
+					entity.setUserId(u.getId());
+				}
+			}
+		}
+
 		entity.setEventRegistrationId(registration.getId());
 		entity.setEventFields(eventFields);
 
@@ -80,7 +155,7 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 			protected void doOnSuccess(EventRegistrationParticipant result) {
 				registration.getParticipants().remove(result);
 				registration.getParticipants().add(result);
-				refreshCommand.execute();
+				refreshCommand.execute(registration);
 			}
 		});
 	}
@@ -92,6 +167,9 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 			fieldsPanel.clear();
 		} else {
 			final EventFieldTable eventFieldsTable = new EventFieldTable(fields);
+			if (entity.isSaved()) {
+				eventFieldsTable.getForm().setEnabled(false);
+			}
 			form.addPartner(eventFieldsTable.getForm());
 			eventFieldsTable.setWidth(dialogWidth + "px");
 			fieldsPanel.setWidget(eventFieldsTable);
@@ -103,14 +181,32 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 	protected Widget createContent() {
 		VerticalPanel vp = new VerticalPanel();
 		vp.setWidth(dialogWidth + "px");
-		FieldTable fieldTable = new FieldTable();
+		fieldTable = new FieldTable();
 
+		if (!entity.isSaved()) {
+			UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
+			ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
+			args.put(UserArg.PARENT_ID, Application.getCurrentUser().getId());
+			args.put(UserArg.NOT_ON_REGISTRATION_ID, registration.getId());
+			userService.list(args, new Callback<ArrayList<User>>() {
+				@Override
+				protected void doOnSuccess(ArrayList<User> result) {
+					if (!result.isEmpty()) {
+						insertChildListBox(result);
+						children = result;
+					}
+				}
+			});
+		}
+
+		final Label firstNameDisplay = new Label();
 		final RequiredTextBox firstNameInput = new RequiredTextBox();
 		firstNameInput.setMaxLength(50);
-		FormField firstNameField = form.createFormField("First name:", firstNameInput, null);
+		FormField firstNameField = form.createFormField("First name:", firstNameInput, firstNameDisplay);
 		firstNameField.setInitializer(new Command() {
 			@Override
 			public void execute() {
+				firstNameDisplay.setText(entity.getFirstName());
 				firstNameInput.setText(entity.getFirstName());
 			}
 		});
@@ -122,12 +218,14 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 		});
 		fieldTable.addField(firstNameField);
 
+		final Label lastNameDisplay = new Label();
 		final RequiredTextBox lastNameInput = new RequiredTextBox();
 		lastNameInput.setMaxLength(50);
-		FormField lastNameField = form.createFormField("Last name:", lastNameInput, null);
+		FormField lastNameField = form.createFormField("Last name:", lastNameInput, lastNameDisplay);
 		lastNameField.setInitializer(new Command() {
 			@Override
 			public void execute() {
+				lastNameDisplay.setText(entity.getLastName());
 				lastNameInput.setText(entity.getLastName());
 			}
 		});
@@ -140,49 +238,6 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 		fieldTable.addField(lastNameField);
 
 		fieldsPanel = new MaxHeightScrollPanel(200);
-		if (pageData.getAgeGroups().isEmpty()) {
-			eventService.getFields(new ArgMap<EventArg>(EventArg.EVENT_ID, pageData.getEvent().getId()), new Callback<ArrayList<EventField>>() {
-				@Override
-				protected void doOnSuccess(ArrayList<EventField> result) {
-					setFields(result);
-				}
-			});
-		} else {
-			final RequiredListBox ageGroupInput = new RequiredListBox();
-			FormField ageGroupField = form.createFormField("Age group:", ageGroupInput, null);
-			ageGroupField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					ageGroupInput.setValue(entity.getAgeGroupId());
-				}
-			});
-			ageGroupField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					entity.setAgeGroupId(ageGroupInput.getIntValue());
-				}
-			});
-			fieldTable.addField(ageGroupField);
-
-			for (EventAgeGroup a : pageData.getAgeGroups()) {
-				String text = a.getMinimumAge() + ((a.getMaximumAge() == 0) ? "+" : "-" + a.getMaximumAge()) + " yrs";
-				text += " - " + Formatter.formatCurrency(a.getPrice());
-				ageGroupInput.addItem(text, a.getId());
-			}
-
-			ageGroupInput.addChangeHandler(new ChangeHandler() {
-				@Override
-				public void onChange(ChangeEvent event) {
-					eventService.getFields(new ArgMap<EventArg>(EventArg.AGE_GROUP_ID, ageGroupInput.getIntValue()), new Callback<ArrayList<EventField>>() {
-						@Override
-						protected void doOnSuccess(ArrayList<EventField> result) {
-							setFields(result);
-						}
-					});
-				}
-			});
-		}
-
 		if (entity.isSaved()) {
 			eventService.getFields(new ArgMap<EventArg>(EventArg.REGISTRATION_PARTICIPANT_ID, entity.getId()), new Callback<ArrayList<EventField>>() {
 				@Override
@@ -190,10 +245,80 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 					setFields(result);
 				}
 			});
+		} else if (pageData.getAgeGroups().isEmpty()) {
+			eventService.getFields(new ArgMap<EventArg>(EventArg.EVENT_ID, pageData.getEvent().getId()), new Callback<ArrayList<EventField>>() {
+				@Override
+				protected void doOnSuccess(ArrayList<EventField> result) {
+					setFields(result);
+				}
+			});
 		}
+
+		birthDateInput = new MonthYearPicker();
+		birthDateInput.setEarliestMonth(1930, 1);
+
+		if (!Common.isNullOrEmpty(pageData.getAgeGroups())) {
+			birthDateInput.addValueChangeCommand(new Command() {
+				@Override
+				public void execute() {
+					Date d = birthDateInput.getValue();
+					if (d != null) {
+						int age = (int) (ClientDateUtils.daysBetween(d, new Date()) / 365);
+
+						for (EventAgeGroup g : pageData.getAgeGroups()) {
+							if (age >= g.getMinimumAge() && (age <= g.getMaximumAge() || (g.getMaximumAge() == 0))) {
+								entity.setAgeGroupId(g.getId());
+								eventService.getFields(new ArgMap<EventArg>(EventArg.AGE_GROUP_ID, g.getId()), new Callback<ArrayList<EventField>>() {
+									@Override
+									protected void doOnSuccess(ArrayList<EventField> result) {
+										setFields(result);
+									}
+								});
+								break;
+							}
+						}
+					}
+				}
+			});
+
+			birthDateInput.getValidator().addValidatorCommand(new ValidatorCommand() {
+				@Override
+				public void validate(Validator validator) {
+					if (entity.getAgeGroupId() == null || entity.getAgeGroupId() == 0) {
+						validator.setError(true);
+						validator.setErrorMessage("There is no age group that matches this participant's age.");
+					} else {
+						validator.setError(false);
+					}
+				}
+			});
+		}
+
+		final Label birthDateDisplay = new Label();
+		FormField birthDateField = form.createFormField("Birth month / year:", birthDateInput, birthDateDisplay);
+		birthDateField.setRequired(true);
+		birthDateField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				birthDateDisplay.setText(Formatter.formatDate(entity.getBirthDate()));
+				birthDateInput.setValue(entity.getBirthDate());
+			}
+		});
+		birthDateField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				entity.setBirthDate(birthDateInput.getValue());
+			}
+		});
+		fieldTable.addField(birthDateField);
 
 		vp.add(fieldTable);
 		vp.add(fieldsPanel);
+
+		if (entity.isSaved()) {
+			form.setEnabled(false);
+			form.getSubmitButton().removeFromParent();
+		}
 
 		return vp;
 	}
