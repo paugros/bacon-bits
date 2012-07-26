@@ -276,7 +276,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, ";
-			sql += "publishDate, active, isPublic, price, requiresRegistration, phone, website) values ";
+			sql += "publishDate, active, price, requiresRegistration, phone, website) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website)";
