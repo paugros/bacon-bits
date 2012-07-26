@@ -22,7 +22,7 @@ public class HomePage implements Page {
 	public HomePage(VerticalPanel p) {
 		page = p;
 
-		articleService.list(new ArgMap<ArticleArg>(), new Callback<ArrayList<Article>>() {
+		articleService.list(new ArgMap<ArticleArg>(ArticleArg.MOST_RECENT, 5), new Callback<ArrayList<Article>>() {
 			@Override
 			protected void doOnSuccess(ArrayList<Article> result) {
 				for (Article item : result) {

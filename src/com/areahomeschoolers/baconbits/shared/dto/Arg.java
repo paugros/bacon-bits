@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public interface Arg {
 	public enum ArticleArg implements Arg, IsSerializable {
-
+		MOST_RECENT
 	}
 
 	public enum DocumentArg implements Arg, IsSerializable {
