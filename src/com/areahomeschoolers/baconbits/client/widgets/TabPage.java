@@ -19,7 +19,7 @@ public class TabPage extends LazyDecoratedTabPanel {
 		dp.addStyleName("borderlessTabBottom");
 	}
 
-	public VerticalPanel add(String tabText, boolean enableCaching, final TabPageCommand command) {
+	public VerticalPanel add(String tabText, final boolean enableCaching, final TabPageCommand command) {
 		final VerticalPanel vp = new VerticalPanel();
 		vp.setWidth("100%");
 		vp.setSpacing(spacing);
@@ -27,6 +27,9 @@ public class TabPage extends LazyDecoratedTabPanel {
 		Command cmd = new Command() {
 			@Override
 			public void execute() {
+				if (!enableCaching) {
+					vp.clear();
+				}
 				command.execute(vp);
 			}
 		};
@@ -38,38 +41,6 @@ public class TabPage extends LazyDecoratedTabPanel {
 	public VerticalPanel add(String tabText, TabPageCommand command) {
 		return this.add(tabText, true, command);
 	}
-
-	// public <T extends EntityDto<T>> NoteSection<T> addNoteSection(final NoteType type, final T entity) {
-	// final NoteSection<T> noteSection = new NoteSection<T>(type, entity);
-	// final NoteCellTable noteTable = noteSection.getCellTable();
-	//
-	// final VerticalPanel tabBody = add("Notes", new TabPageCommand() {
-	// @Override
-	// public void execute(final VerticalPanel tabBody) {
-	// if (entity instanceof HasRequest) {
-	// int requestId = ((HasRequest) entity).getRequestId();
-	// if (requestId > 0) {
-	// noteSection.mergeWith(NoteType.REQUEST, requestId);
-	// }
-	// }
-	// if (!noteTable.hasBeenPopulated()) {
-	// noteTable.populate();
-	// }
-	// tabBody.add(noteSection);
-	// }
-	// });
-	//
-	// noteTable.addDataReturnHandler(new DataReturnHandler() {
-	// @Override
-	// public void onDataReturn() {
-	// selectTab(tabBody);
-	// }
-	// });
-	//
-	// NoteChangeAlertManager.startNoteChangePolling(noteSection, entity);
-	//
-	// return noteSection;
-	// }
 
 	public int getSpacing() {
 		return spacing;

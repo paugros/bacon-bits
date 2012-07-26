@@ -186,7 +186,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			}
 
 			// age groups
-			String sql = "select a.*, (select count(id) from eventRegistrationParticipants where ageGroupId = a.id) as registerCount ";
+			String sql = "select a.*, (select count(id) from eventRegistrationParticipants where ageGroupId = a.id) as registerCount, ";
+			sql += "(select count(id) from eventFields where eventAgeGroupId = a.id) as fieldCount ";
 			sql += "from eventAgeGroups a where a.eventId = ? order by a.minimumAge";
 			pd.setAgeGroups(query(sql, new RowMapper<EventAgeGroup>() {
 				@Override
@@ -200,6 +201,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 					g.setMinimumParticipants(rs.getInt("minimumParticipants"));
 					g.setPrice(rs.getDouble("price"));
 					g.setRegisterCount(rs.getInt("registerCount"));
+					g.setFieldCount(rs.getInt("fieldCount"));
 					return g;
 				}
 			}, eventId));
@@ -227,7 +229,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				if (r != null) {
 					pd.setRegistration(r);
 
-					r.setParticipants(getParticipants(r.getId(), 0));
+					r.setParticipants(getParticipants(new ArgMap<EventArg>(EventArg.REGISTRATION_ID, r.getId())));
 
 					r.setVolunteerPositions(getVolunteerPositions(eventId, r.getId()));
 				}
@@ -249,6 +251,60 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		pd.setCategories(query(sql, ServerUtils.getGenericRowMapper()));
 
 		return pd;
+	}
+
+	@Override
+	public ArrayList<EventRegistrationParticipant> getParticipants(ArgMap<EventArg> args) {
+		int registrationId = args.getInt(EventArg.REGISTRATION_ID);
+		int participantId = args.getInt(EventArg.REGISTRATION_PARTICIPANT_ID);
+		int eventId = args.getInt(EventArg.EVENT_ID);
+
+		List<Object> sqlArgs = new ArrayList<Object>();
+		String sql = "select p.*, u.firstName, u.lastName, u.birthDate, u.parentId, ";
+		sql += "up.firstName as parentFirstName, up.lastName as parentLastName, r.waiting, ";
+		sql += "case isnull(a.price) when true then e.price else a.price end as price ";
+		sql += "from eventRegistrationParticipants p ";
+		sql += "join users u on u.id = p.userId ";
+		sql += "join users up on up.id = u.parentId ";
+		sql += "left join eventAgeGroups a on a.id = p.ageGroupId ";
+		sql += "join eventRegistrations r on r.id = p.eventRegistrationId ";
+		sql += "join events e on e.id = r.eventId ";
+		sql += "where 1 = 1 ";
+		if (registrationId > 0) {
+			sql += "and p.eventRegistrationId = ? ";
+			sqlArgs.add(registrationId);
+		}
+		if (participantId > 0) {
+			sql += "and p.id = ? ";
+			sqlArgs.add(participantId);
+		}
+		if (eventId > 0) {
+			sql += "and r.eventId = ? ";
+			sqlArgs.add(eventId);
+		}
+		sql += "order by u.lastName, u.firstName";
+
+		return query(sql, new RowMapper<EventRegistrationParticipant>() {
+			@Override
+			public EventRegistrationParticipant mapRow(ResultSet rs, int row) throws SQLException {
+				EventRegistrationParticipant p = new EventRegistrationParticipant();
+				p.setId(rs.getInt("id"));
+				p.setAgeGroupId(rs.getInt("ageGroupId"));
+				p.setEventRegistrationId(rs.getInt("eventRegistrationId"));
+				p.setFirstName(rs.getString("firstName"));
+				p.setLastName(rs.getString("lastName"));
+				p.setCanceled(rs.getBoolean("canceled"));
+				p.setPrice(rs.getDouble("price"));
+				p.setBirthDate(rs.getDate("birthDate"));
+				p.setParentFirstName(rs.getString("parentFirstName"));
+				p.setParentLastName(rs.getString("parentLastName"));
+				p.setWaiting(rs.getBoolean("waiting"));
+				p.setParentId(rs.getInt("parentId"));
+				p.setUserId(rs.getInt("userId"));
+				p.setAddedDate(rs.getTimestamp("addedDate"));
+				return p;
+			}
+		}, sqlArgs.toArray());
 	}
 
 	@Override
@@ -353,8 +409,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			u = userDao.save(u).getData();
 			participant.setUserId(u.getId());
 
-			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, userId, ageGroupId) ";
-			sql += "values(:eventRegistrationId, :userId, :ageGroupId)";
+			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, userId, ageGroupId, addedDate) ";
+			sql += "values(:eventRegistrationId, :userId, :ageGroupId, now())";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -369,7 +425,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			}
 		}
 
-		return getParticipants(0, participant.getId()).get(0);
+		return getParticipants(new ArgMap<EventArg>(EventArg.REGISTRATION_PARTICIPANT_ID, participant.getId())).get(0);
 	}
 
 	@Override
@@ -442,49 +498,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		f.setOptions(rs.getString("options"));
 		f.setRequired(rs.getBoolean("required"));
 		return f;
-	}
-
-	private ArrayList<EventRegistrationParticipant> getParticipants(int registrationId, int participantId) {
-		List<Object> sqlArgs = new ArrayList<Object>();
-		String sql = "select p.*, u.firstName, u.lastName, u.birthDate, u.parentId, ";
-		sql += "up.firstName as parentFirstName, up.lastName as parentLastName, ";
-		sql += "case isnull(a.price) when true then e.price else a.price end as price ";
-		sql += "from eventRegistrationParticipants p ";
-		sql += "join users u on u.id = p.userId ";
-		sql += "join users up on up.id = u.parentId ";
-		sql += "left join eventAgeGroups a on a.id = p.ageGroupId ";
-		sql += "join eventRegistrations r on r.id = p.eventRegistrationId ";
-		sql += "join events e on e.id = r.eventId ";
-		sql += "where 1 = 1 ";
-		if (registrationId > 0) {
-			sql += "and p.eventRegistrationId = ? ";
-			sqlArgs.add(registrationId);
-		}
-		if (participantId > 0) {
-			sql += "and p.id = ? ";
-			sqlArgs.add(participantId);
-		}
-		sql += "order by u.firstName";
-
-		return query(sql, new RowMapper<EventRegistrationParticipant>() {
-			@Override
-			public EventRegistrationParticipant mapRow(ResultSet rs, int row) throws SQLException {
-				EventRegistrationParticipant p = new EventRegistrationParticipant();
-				p.setId(rs.getInt("id"));
-				p.setAgeGroupId(rs.getInt("ageGroupId"));
-				p.setEventRegistrationId(rs.getInt("eventRegistrationId"));
-				p.setFirstName(rs.getString("firstName"));
-				p.setLastName(rs.getString("lastName"));
-				p.setCanceled(rs.getBoolean("canceled"));
-				p.setPrice(rs.getDouble("price"));
-				p.setBirthDate(rs.getDate("birthDate"));
-				p.setParentFirstName(rs.getString("parentFirstName"));
-				p.setParentLastName(rs.getString("parentLastName"));
-				p.setParentId(rs.getInt("parentId"));
-				p.setUserId(rs.getInt("userId"));
-				return p;
-			}
-		}, sqlArgs.toArray());
 	}
 
 	private ArrayList<EventVolunteerPosition> getVolunteerPositions(int eventId, final int registrationId) {

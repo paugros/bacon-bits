@@ -12,6 +12,7 @@ public final class EventAgeGroup extends EntityDto<EventAgeGroup> {
 
 	// aux
 	private int registerCount;
+	private int fieldCount;
 
 	public EventAgeGroup() {
 
@@ -19,6 +20,10 @@ public final class EventAgeGroup extends EntityDto<EventAgeGroup> {
 
 	public int getEventId() {
 		return eventId;
+	}
+
+	public int getFieldCount() {
+		return fieldCount;
 	}
 
 	public int getMaximumAge() {
@@ -47,6 +52,10 @@ public final class EventAgeGroup extends EntityDto<EventAgeGroup> {
 
 	public void setEventId(int eventId) {
 		this.eventId = eventId;
+	}
+
+	public void setFieldCount(int fieldCount) {
+		this.fieldCount = fieldCount;
 	}
 
 	public void setMaximumAge(int maximumAge) {

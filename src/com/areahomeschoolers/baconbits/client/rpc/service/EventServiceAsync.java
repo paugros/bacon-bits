@@ -36,6 +36,8 @@ public interface EventServiceAsync {
 
 	void getPageData(int id, AsyncCallback<EventPageData> callback);
 
+	void getParticipants(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventRegistrationParticipant>> callback);
+
 	void list(ArgMap<EventArg> args, AsyncCallback<ArrayList<Event>> callback);
 
 	void save(Event event, AsyncCallback<Event> callback);

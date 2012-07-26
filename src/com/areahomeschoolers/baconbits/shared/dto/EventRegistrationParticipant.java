@@ -12,17 +12,23 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 	private boolean attended;
 	private boolean canceled;
 	private int userId;
+	private Date addedDate;
 
 	// aux
 	private User user;
 	private Date birthDate;
 	private double price;
+	private boolean waiting;
 	private List<EventField> eventFields = new ArrayList<EventField>();
 	private String parentFirstName, parentLastName;
 	private int parentId;
 
 	public EventRegistrationParticipant() {
 
+	}
+
+	public Date getAddedDate() {
+		return addedDate;
 	}
 
 	public Integer getAgeGroupId() {
@@ -84,6 +90,14 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		return userId;
 	}
 
+	public boolean getWaiting() {
+		return waiting;
+	}
+
+	public void setAddedDate(Date addedDate) {
+		this.addedDate = addedDate;
+	}
+
 	public void setAgeGroupId(Integer ageGroupId) {
 		this.ageGroupId = ageGroupId;
 	}
@@ -138,6 +152,10 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 
 	public void setUserId(int userId) {
 		this.userId = userId;
+	}
+
+	public void setWaiting(boolean waiting) {
+		this.waiting = waiting;
 	}
 
 }

@@ -79,6 +79,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	}
 
 	@Override
+	public ArrayList<EventRegistrationParticipant> getParticipants(ArgMap<EventArg> args) {
+		return dao.getParticipants(args);
+	}
+
+	@Override
 	public ArrayList<Event> list(ArgMap<EventArg> args) {
 		return dao.list(args);
 	}

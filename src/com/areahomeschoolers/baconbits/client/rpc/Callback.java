@@ -48,7 +48,7 @@ public abstract class Callback<T> implements AsyncCallback<T> {
 				GWT.log("RPC call failed", caught);
 			}
 		} else if (caught instanceof IncompatibleRemoteServiceException) {
-			String message = "This version of Dash is out of date. Click below to update.";
+			String message = "This version of the application is out of date. Click below to update.";
 			Label label = new Label(message);
 			label.setWidth("300px");
 			AlertDialog dialog = new AlertDialog("Application Out of Date", label);

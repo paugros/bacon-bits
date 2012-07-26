@@ -59,7 +59,7 @@ public class ConfirmDialog extends DefaultDialog {
 			}
 		});
 		continueButton = new Button(getConfirmText(type));
-		buttons.addLeftButton(continueButton);
+		buttons.addRightButton(continueButton);
 
 		continueButton.addClickHandler(new ClickHandler() {
 			@Override
