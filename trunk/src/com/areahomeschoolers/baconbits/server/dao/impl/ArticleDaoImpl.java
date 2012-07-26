@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -60,8 +61,16 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 
 	@Override
 	public ArrayList<Article> list(ArgMap<ArticleArg> args) {
+		List<Object> sqlArgs = new ArrayList<Object>();
+		int top = args.getInt(ArticleArg.MOST_RECENT);
+
 		String sql = SELECT;
-		ArrayList<Article> data = query(sql, new ArticleMapper());
+
+		if (top > 0) {
+			sql += "order by id desc limit ?";
+			sqlArgs.add(top);
+		}
+		ArrayList<Article> data = query(sql, new ArticleMapper(), sqlArgs.toArray());
 
 		return data;
 	}
