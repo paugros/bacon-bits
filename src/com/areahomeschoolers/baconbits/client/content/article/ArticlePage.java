@@ -196,7 +196,7 @@ public class ArticlePage implements Page {
 			@Override
 			protected void doOnSuccess(Article a) {
 				if (!Url.isParamValidId("articleId")) {
-					HistoryToken.set(PageUrl.event(a.getId()));
+					HistoryToken.set(PageUrl.article(a.getId()));
 				} else {
 					article = a;
 					form.setDto(a);
