@@ -41,6 +41,8 @@ import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.EntityType;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
@@ -430,7 +432,8 @@ public class EventPage implements Page {
 			});
 			fieldTable.addField(costField);
 
-			if (Common.isNullOrEmpty(pageData.getAgeGroups()) || !calendarEvent.getRequiresRegistration()) {
+			if ((Common.isNullOrEmpty(pageData.getAgeGroups()) || Application.administratorOf(calendarEvent.getGroupId()))
+					|| !calendarEvent.getRequiresRegistration()) {
 				final NumericRangeBox participantInput = new NumericRangeBox();
 				final Label participantDisplay = new Label();
 				participantInput.setAllowZeroForNoLimit(true);
@@ -542,7 +545,7 @@ public class EventPage implements Page {
 			tabPanel = new TabPage();
 			form.emancipate();
 
-			tabPanel.add("Event", new TabPageCommand() {
+			tabPanel.add("Event", false, new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
 					tabBody.add(WidgetFactory.newSection(title, fieldTable));
@@ -555,7 +558,7 @@ public class EventPage implements Page {
 			});
 
 			if (Application.administratorOf(calendarEvent.getGroupId())) {
-				tabPanel.add("Fields", new TabPageCommand() {
+				tabPanel.add("Fields", false, new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
 						tabBody.add(new EventFieldsTab(pageData));
@@ -568,7 +571,7 @@ public class EventPage implements Page {
 			}
 
 			if (calendarEvent.getRequiresRegistration()) {
-				tabPanel.add("Register", new TabPageCommand() {
+				tabPanel.add("Register", false, new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
 						tabBody.add(new EventRegistrationSection(pageData));
@@ -581,10 +584,15 @@ public class EventPage implements Page {
 			}
 
 			if (calendarEvent.getRequiresRegistration() && Application.administratorOf(calendarEvent.getGroupId())) {
-				tabPanel.add("Registrations", new TabPageCommand() {
+				tabPanel.add("Participants", false, new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
-
+						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
+						EventParticipantCellTable table = new EventParticipantCellTable(args);
+						table.populate();
+						table.setTitle("Participants");
+						tabBody.add(WidgetFactory.newSection(table));
+						tabPanel.selectTabNow(tabBody);
 					}
 				});
 			} else {
@@ -641,7 +649,7 @@ public class EventPage implements Page {
 
 			ageTable.setText(row, 1, Formatter.formatCurrency(g.getPrice()));
 
-			if (Application.administratorOf(calendarEvent.getGroupId())) {
+			if (Application.administratorOf(calendarEvent.getGroupId()) && (g.getRegisterCount() + g.getFieldCount()) == 0) {
 				ageTable.setWidget(row, 2, new ClickLabel("X", new MouseDownHandler() {
 					@Override
 					public void onMouseDown(MouseDownEvent event) {
@@ -695,7 +703,6 @@ public class EventPage implements Page {
 				vp.add(new Label(v.getJobTitle()));
 			}
 			Label description = new Label(v.getDescription());
-			description.addStyleName("smallText");
 			description.getElement().getStyle().setMarginLeft(5, Unit.PX);
 			vp.add(description);
 			volunteerTable.setWidget(row, 0, vp);

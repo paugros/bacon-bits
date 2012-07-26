@@ -155,7 +155,7 @@ public class EventRegistrationSection extends Composite {
 			pp.add(lb);
 
 			final Label description = new Label();
-			description.addStyleName("mediumPadding grayText");
+			description.addStyleName("mediumPadding");
 
 			volunteerAddButton = new Button("Volunteer!");
 			volunteerAddButton.addClickHandler(new ClickHandler() {

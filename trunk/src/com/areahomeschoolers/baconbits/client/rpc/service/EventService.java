@@ -41,6 +41,8 @@ public interface EventService extends RemoteService {
 
 	public EventPageData getPageData(int id);
 
+	public ArrayList<EventRegistrationParticipant> getParticipants(ArgMap<EventArg> args);
+
 	public ArrayList<Event> list(ArgMap<EventArg> args);
 
 	public Event save(Event event);
