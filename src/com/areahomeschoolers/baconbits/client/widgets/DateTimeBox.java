@@ -173,7 +173,7 @@ public class DateTimeBox extends Composite implements HasValue<Date>, HasValidat
 			public void onValueChange(ValueChangeEvent<Date> event) {
 				Date newStart = event.getValue();
 				if (newStart != null && dateTimeBox.dateBox.getValue() == null) {
-					dateTimeBox.dateBox.setValue(newStart);
+					dateTimeBox.dateBox.setValue(newStart, true);
 				}
 			}
 		});

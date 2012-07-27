@@ -97,8 +97,10 @@ public class EventRegistrationSection extends Composite {
 								protected void doOnSuccess(ServerResponseData<EventRegistration> result) {
 									if (registration.getCanceled()) {
 										registration.getVolunteerPositions().clear();
+										loadSection();
+									} else {
+										Application.reloadPage();
 									}
-									loadSection();
 								}
 							});
 						}
@@ -246,7 +248,7 @@ public class EventRegistrationSection extends Composite {
 			});
 
 			String editText = "";
-			if (p.getCanceled() || registration.getCanceled()) {
+			if (p.isCanceled() || registration.getCanceled()) {
 				editLabel.addStyleName("strikeText");
 				editText = "Restore";
 			} else {
@@ -255,7 +257,7 @@ public class EventRegistrationSection extends Composite {
 			participantTable.setWidget(i, 0, editLabel);
 
 			participantTable.setText(i, 1, Formatter.formatCurrency(p.getPrice()));
-			if (p.getCanceled() || registration.getCanceled()) {
+			if (p.isCanceled() || registration.getCanceled()) {
 				participantTable.getCellFormatter().addStyleName(i, 1, "strikeText");
 			} else {
 				totalPrice += p.getPrice();
@@ -266,7 +268,7 @@ public class EventRegistrationSection extends Composite {
 					@Override
 					public void onMouseDown(MouseDownEvent event) {
 						String confirmText = "";
-						if (p.getCanceled()) {
+						if (p.isCanceled()) {
 							confirmText = "Restore registration for " + p.getFirstName() + "?";
 						} else {
 							confirmText = "Really remove " + p.getFirstName() + " from the attendee list?";
@@ -274,7 +276,8 @@ public class EventRegistrationSection extends Composite {
 						ConfirmDialog.confirm(confirmText, new ConfirmHandler() {
 							@Override
 							public void onConfirm() {
-								p.setCanceled(!p.getCanceled());
+								// TODO do wait list check here
+								p.setStatusId(p.isCanceled() ? 1 : 5);
 
 								eventService.saveParticipant(p, new Callback<EventRegistrationParticipant>() {
 									@Override

@@ -281,7 +281,7 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 				}
 			});
 
-			birthDateInput.getValidator().addValidatorCommand(new ValidatorCommand() {
+			form.addFormValidatorCommand(new ValidatorCommand() {
 				@Override
 				public void validate(Validator validator) {
 					if (entity.getAgeGroupId() == null || entity.getAgeGroupId() == 0) {
