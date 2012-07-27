@@ -9,16 +9,15 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 	private String firstName, lastName;
 	private int eventRegistrationId;
 	private Integer ageGroupId;
-	private boolean attended;
-	private boolean canceled;
 	private int userId;
 	private Date addedDate;
+	private int statusId;
 
 	// aux
+	private String status;
 	private User user;
 	private Date birthDate;
 	private double price;
-	private boolean waiting;
 	private List<EventField> eventFields = new ArrayList<EventField>();
 	private String parentFirstName, parentLastName;
 	private int parentId;
@@ -38,16 +37,8 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		return ageGroupId;
 	}
 
-	public boolean getAttended() {
-		return attended;
-	}
-
 	public Date getBirthDate() {
 		return birthDate;
-	}
-
-	public boolean getCanceled() {
-		return canceled;
 	}
 
 	public List<EventField> getEventFields() {
@@ -82,6 +73,14 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		return price;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public int getStatusId() {
+		return statusId;
+	}
+
 	public User getUser() {
 		return user;
 	}
@@ -90,8 +89,16 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		return userId;
 	}
 
-	public boolean getWaiting() {
-		return waiting;
+	public boolean hasAttended() {
+		return statusId == 4;
+	}
+
+	public boolean isCanceled() {
+		return statusId == 5;
+	}
+
+	public boolean isWaiting() {
+		return statusId == 3;
 	}
 
 	public void setAddedDate(Date addedDate) {
@@ -102,16 +109,8 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		this.ageGroupId = ageGroupId;
 	}
 
-	public void setAttended(boolean attended) {
-		this.attended = attended;
-	}
-
 	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
-	}
-
-	public void setCanceled(boolean canceled) {
-		this.canceled = canceled;
 	}
 
 	public void setEventFields(List<EventField> eventFields) {
@@ -146,16 +145,20 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		this.price = price;
 	}
 
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public void setStatusId(int statusId) {
+		this.statusId = statusId;
+	}
+
 	public void setUser(User user) {
 		this.user = user;
 	}
 
 	public void setUserId(int userId) {
 		this.userId = userId;
-	}
-
-	public void setWaiting(boolean waiting) {
-		this.waiting = waiting;
 	}
 
 }

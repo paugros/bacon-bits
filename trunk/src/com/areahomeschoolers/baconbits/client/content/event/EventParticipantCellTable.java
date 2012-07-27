@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCell
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -18,8 +19,7 @@ import com.google.gwt.cell.client.FieldUpdater;
 
 public final class EventParticipantCellTable extends EntityCellTable<EventRegistrationParticipant, EventArg, ParticipantColumn> {
 	public enum ParticipantColumn implements EntityCellTableColumn<ParticipantColumn> {
-		REGISTRANT_FNAME("Registrant first name"), REGISTRANT_LNAME("Registrant last name"), PARTICIPANT_FNAME("Participant first name"), PARTICIPANT_LNAME(
-				"Participant last name"), ADDED_DATE("Added"), STATUS("Status");
+		REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE("Age"), STATUS("Status");
 
 		private String title;
 
@@ -41,9 +41,9 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 	}
 
 	private EventParticipantCellTable() {
-		setDefaultSortColumn(ParticipantColumn.PARTICIPANT_LNAME, SortDirection.SORT_ASC);
-		setDisplayColumns(ParticipantColumn.REGISTRANT_FNAME, ParticipantColumn.REGISTRANT_LNAME, ParticipantColumn.PARTICIPANT_FNAME,
-				ParticipantColumn.PARTICIPANT_LNAME, ParticipantColumn.ADDED_DATE, ParticipantColumn.STATUS);
+		setDefaultSortColumn(ParticipantColumn.PARTICIPANT_NAME, SortDirection.SORT_ASC);
+		setDisplayColumns(ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE, ParticipantColumn.AGE,
+				ParticipantColumn.STATUS);
 	}
 
 	@Override
@@ -56,12 +56,18 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 		addCheckboxColumn("Attended", new ValueGetter<Boolean, EventRegistrationParticipant>() {
 			@Override
 			public Boolean get(EventRegistrationParticipant item) {
-				return item.getAttended();
+				return item.getStatusId() == 4;
 			}
 		}, new FieldUpdater<EventRegistrationParticipant, Boolean>() {
 			@Override
 			public void update(int index, EventRegistrationParticipant item, Boolean value) {
-				item.setAttended(value);
+				if (item.hasAttended()) {
+					item.setStatusId(2);
+					item.setStatus("Confirmed");
+				} else {
+					item.setStatusId(4);
+					item.setStatus("Attended");
+				}
 				eventService.saveParticipant(item, new Callback<EventRegistrationParticipant>(false) {
 					@Override
 					protected void doOnSuccess(EventRegistrationParticipant result) {
@@ -81,35 +87,19 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 					}
 				});
 				break;
-			case PARTICIPANT_FNAME:
+			case PARTICIPANT_NAME:
 				addTextColumn(col, new ValueGetter<String, EventRegistrationParticipant>() {
 					@Override
 					public String get(EventRegistrationParticipant item) {
-						return item.getFirstName();
+						return item.getFirstName() + " " + item.getLastName();
 					}
 				});
 				break;
-			case PARTICIPANT_LNAME:
+			case REGISTRANT_NAME:
 				addTextColumn(col, new ValueGetter<String, EventRegistrationParticipant>() {
 					@Override
 					public String get(EventRegistrationParticipant item) {
-						return item.getLastName();
-					}
-				});
-				break;
-			case REGISTRANT_FNAME:
-				addTextColumn(col, new ValueGetter<String, EventRegistrationParticipant>() {
-					@Override
-					public String get(EventRegistrationParticipant item) {
-						return item.getParentFirstName();
-					}
-				});
-				break;
-			case REGISTRANT_LNAME:
-				addTextColumn(col, new ValueGetter<String, EventRegistrationParticipant>() {
-					@Override
-					public String get(EventRegistrationParticipant item) {
-						return item.getParentLastName();
+						return item.getParentFirstName() + " " + item.getParentLastName();
 					}
 				});
 				break;
@@ -117,15 +107,19 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 				addTextColumn(col, new ValueGetter<String, EventRegistrationParticipant>() {
 					@Override
 					public String get(EventRegistrationParticipant item) {
-						if (item.getCanceled()) {
-							return "Canceled";
-						} else if (item.getWaiting()) {
-							return "Waiting";
-						} else if (item.getAttended()) {
-							return "Attended";
+						return item.getStatus();
+					}
+				});
+				break;
+			case AGE:
+				addNumberColumn(col, new ValueGetter<Number, EventRegistrationParticipant>() {
+					@Override
+					public Number get(EventRegistrationParticipant item) {
+						if (item.getBirthDate() == null) {
+							return 0;
 						}
 
-						return "Confirmed";
+						return (int) (ClientDateUtils.daysBetween(item.getBirthDate(), new Date()) / 365);
 					}
 				});
 				break;
