@@ -54,7 +54,6 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 	@Override
 	protected void setColumns() {
 		addCheckboxColumn("Attended", new ValueGetter<Boolean, EventRegistrationParticipant>() {
-
 			@Override
 			public Boolean get(EventRegistrationParticipant item) {
 				return item.getAttended();
