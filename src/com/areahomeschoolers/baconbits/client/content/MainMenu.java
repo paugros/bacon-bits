@@ -9,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -69,7 +70,7 @@ public final class MainMenu extends MenuBar {
 		addItem("Educational Resources", getEducationMenu());
 		addItem("Support", getSupportMenu());
 		addItem("Resources", getResourcesMenu());
-		if (Application.isAdministrator()) {
+		if (Application.isSystemAdministrator()) {
 			addItem("Admin", getAdminMenu());
 		}
 	}
@@ -138,7 +139,7 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getEventsMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Events", PageUrl.eventList());
-		if (Application.isAuthenticated()) {
+		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
 		}
 

@@ -18,6 +18,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -69,7 +70,11 @@ public final class Application implements ValueChangeHandler<String> {
 		return applicationData.getUserPreferences();
 	}
 
-	public static boolean isAdministrator() {
+	public static boolean hasRole(AccessLevel level) {
+		return isAuthenticated() && applicationData.getCurrentUser().hasRole(level);
+	}
+
+	public static boolean isSystemAdministrator() {
 		return isAuthenticated() && applicationData.getCurrentUser().getSystemAdministrator();
 	}
 

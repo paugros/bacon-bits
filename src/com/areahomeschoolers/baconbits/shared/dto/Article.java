@@ -16,13 +16,23 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 	private int addedById;
 	private Date startDate, endDate, addedDate;
 	private Integer groupId;
+	private int accessLevelId;
 
 	// auxiliary
+	private String accessLevel;
 	private String groupName;
 	private int documentCount;
 
 	public Article() {
 
+	}
+
+	public String getAccessLevel() {
+		return accessLevel;
+	}
+
+	public int getAccessLevelId() {
+		return accessLevelId;
 	}
 
 	public int getAddedById() {
@@ -73,6 +83,14 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 	@Override
 	public boolean hasDocuments() {
 		return documentCount > 0;
+	}
+
+	public void setAccessLevel(String accessLevel) {
+		this.accessLevel = accessLevel;
+	}
+
+	public void setAccessLevelId(int accessLevelId) {
+		this.accessLevelId = accessLevelId;
 	}
 
 	public void setAddedById(int addedById) {

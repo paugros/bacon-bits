@@ -9,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -479,6 +480,24 @@ public class EventPage implements Page {
 			});
 			fieldTable.addField(registerField);
 
+			final Label accessDisplay = new Label();
+			final DefaultListBox accessInput = new AccessLevelListBox(calendarEvent.getGroupId());
+			FormField accessField = form.createFormField("Visible to:", accessInput, accessDisplay);
+			accessField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					accessDisplay.setText(calendarEvent.getAccessLevel());
+					accessInput.setValue(calendarEvent.getAccessLevelId());
+				}
+			});
+			accessField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setAccessLevelId(accessInput.getIntValue());
+				}
+			});
+			fieldTable.addField(accessField);
+
 			final Label groupDisplay = new Label();
 			WidgetCreator groupCreator = new WidgetCreator() {
 				@Override
@@ -490,7 +509,7 @@ public class EventPage implements Page {
 			groupField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					groupDisplay.setText(Common.getDefaultIfNull(calendarEvent.getGroupName(), "All groups"));
+					groupDisplay.setText(Common.getDefaultIfNull(calendarEvent.getGroupName(), "None"));
 					if (groupField.inputIsCreated()) {
 						((GroupListBox) groupField.getInputWidget()).setValue(calendarEvent.getGroupId());
 					}

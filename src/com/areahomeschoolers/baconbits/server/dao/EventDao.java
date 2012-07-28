@@ -18,12 +18,15 @@ import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 public interface EventDao {
 
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void deleteAgeGroup(EventAgeGroup ageGroup);
 
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void deleteEventField(int fieldId);
 
 	public void deleteEventParticipant(EventRegistrationParticipant participant);
 
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void deleteVolunteerPosition(EventVolunteerPosition position);
 
 	public void deleteVolunteerPositionMapping(EventVolunteerPosition position);
@@ -42,7 +45,7 @@ public interface EventDao {
 
 	public ArrayList<Event> list(ArgMap<EventArg> args);
 
-	@PreAuthorize("hasRole('ROLE_BASIC_USER')")
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public Event save(Event event);
 
 	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup);

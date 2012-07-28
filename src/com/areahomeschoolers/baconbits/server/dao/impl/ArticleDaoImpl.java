@@ -41,24 +41,39 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			article.setArticle(rs.getString("article"));
 			article.setGroupName(rs.getString("groupName"));
 			article.setDocumentCount(rs.getInt("documentCount"));
+			article.setAccessLevel(rs.getString("accessLevel"));
+			article.setAccessLevelId(rs.getInt("accessLevelId"));
 			return article;
 		}
 	}
 
-	private static String SELECT;
-
 	@Autowired
 	public ArticleDaoImpl(DataSource dataSource) {
 		super(dataSource);
-		SELECT = "select a.*, g.groupName, ";
-		SELECT += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount ";
-		SELECT += "from articles a ";
-		SELECT += "left join groups g on g.id = a.groupId ";
+	}
+
+	public String createSqlBase() {
+		String sql = "select a.*, g.groupName, l.accessLevel, \n";
+		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount \n";
+		sql += "from articles a \n";
+		sql += "left join groups g on g.id = a.groupId \n";
+		sql += "join userAccessLevels l on l.id = a.accessLevelId \n";
+
+		int userId = ServerContext.isAuthenticated() ? ServerContext.getCurrentUser().getId() : 0;
+		sql += "left join userGroupMembers ugm on ugm.groupId = a.groupId and ugm.userId = " + userId + " \n";
+		sql += "where 1 = 1 \n";
+
+		if (!ServerContext.isSystemAdministrator()) {
+			int auth = ServerContext.isAuthenticated() ? 1 : 0;
+			sql += "and case a.accessLevelId when 1 then 1 when 2 then " + auth + " when 3 then ugm.id when 4 then ugm.isAdministrator else 0 end > 0 \n";
+		}
+
+		return sql;
 	}
 
 	@Override
 	public Article getById(int articleId) {
-		String sql = SELECT + " where a.id = ?";
+		String sql = createSqlBase() + "and a.id = ?";
 
 		return queryForObject(sql, new ArticleMapper(), articleId);
 	}
@@ -69,9 +84,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		int top = args.getInt(ArticleArg.MOST_RECENT);
 		String idString = args.getString(ArticleArg.IDS);
 
-		String sql = SELECT;
-
-		sql += "where 1 = 1 ";
+		String sql = createSqlBase();
 
 		if (!Common.isNullOrBlank(idString)) {
 			List<String> scrubbedIds = new ArrayList<String>();
@@ -101,7 +114,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(article);
 
 		if (article.isSaved()) {
-			String sql = "update articles set title = :title, article = :article, startDate = :startDate, endDate = :endDate, groupId = :groupId ";
+			String sql = "update articles set title = :title, article = :article, startDate = :startDate, endDate = :endDate, ";
+			sql += "groupId = :groupId, accessLevelId = :accessLevelId ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -110,8 +124,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			}
 			article.setAddedById(ServerContext.getCurrentUser().getId());
 
-			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId) values ";
-			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId)";
+			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId, accessLevelId) values ";
+			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId, :accessLevelId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
