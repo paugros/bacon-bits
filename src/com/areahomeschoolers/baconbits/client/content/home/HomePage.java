@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -71,14 +72,17 @@ public class HomePage implements Page {
 
 					ep.add(link);
 
-					HTML h = new HTML();
-					h.setHTML(e.getDescription());
+					Label date = new Label(Formatter.formatDate(e.getStartDate()));
+					date.addStyleName("italic");
+					ep.add(date);
 
+					HTML h = new HTML();
+					h.setHTML(e.getDescription().replaceAll("<br>", "\n"));
 					String text = h.getText();
 					if (text.length() > 100) {
 						text = text.substring(0, 101) + "...";
 					}
-					ep.add(new Label(text));
+					ep.add(new HTML(Formatter.formatNoteText(text)));
 
 					vp.add(ep);
 				}
