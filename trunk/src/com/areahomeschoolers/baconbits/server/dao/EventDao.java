@@ -38,6 +38,8 @@ public interface EventDao {
 
 	public ArrayList<EventRegistrationParticipant> getParticipants(ArgMap<EventArg> args);
 
+	public ArrayList<Data> getVolunteers(int eventId);
+
 	public ArrayList<Event> list(ArgMap<EventArg> args);
 
 	@PreAuthorize("hasRole('ROLE_BASIC_USER')")
