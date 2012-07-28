@@ -270,6 +270,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int registrationId = args.getInt(EventArg.REGISTRATION_ID);
 		int participantId = args.getInt(EventArg.REGISTRATION_PARTICIPANT_ID);
 		int eventId = args.getInt(EventArg.EVENT_ID);
+		boolean includeFields = args.getBoolean(EventArg.INCLUDE_FIELDS);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, ";
