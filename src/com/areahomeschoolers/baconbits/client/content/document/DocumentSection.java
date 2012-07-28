@@ -58,7 +58,7 @@ public class DocumentSection extends Composite {
 		documentTable.removeAllRows();
 
 		if (isAdmin) {
-			ClickLabel cl = new ClickLabel("Add", new MouseDownHandler() {
+			ClickLabel cl = new ClickLabel("Add document", new MouseDownHandler() {
 				@Override
 				public void onMouseDown(MouseDownEvent event) {
 					FileUploadDialog dialog = new FileUploadDialog(linkType, entityId, new UploadCompleteHandler() {
