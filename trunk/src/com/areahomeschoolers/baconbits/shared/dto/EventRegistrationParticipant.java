@@ -15,6 +15,7 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 
 	// aux
 	private String status;
+	private String fieldValues;
 	private User user;
 	private Date birthDate;
 	private double price;
@@ -47,6 +48,10 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 
 	public int getEventRegistrationId() {
 		return eventRegistrationId;
+	}
+
+	public String getFieldValues() {
+		return fieldValues;
 	}
 
 	public String getFirstName() {
@@ -119,6 +124,10 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 
 	public void setEventRegistrationId(int eventRegistrationId) {
 		this.eventRegistrationId = eventRegistrationId;
+	}
+
+	public void setFieldValues(String fieldValues) {
+		this.fieldValues = fieldValues;
 	}
 
 	public void setFirstName(String firstName) {
