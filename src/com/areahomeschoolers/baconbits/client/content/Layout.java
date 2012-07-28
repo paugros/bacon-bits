@@ -163,7 +163,7 @@ public final class Layout {
 						});
 						ld.center();
 					} else {
-						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "Om5a5abav", new AsyncCallback<ApplicationData>() {
+						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "Borrow99dolls?", new AsyncCallback<ApplicationData>() {
 							@Override
 							public void onFailure(Throwable caught) {
 							}

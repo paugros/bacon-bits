@@ -77,8 +77,9 @@ public class HomePage implements Page {
 					ep.add(date);
 
 					HTML h = new HTML();
-					h.setHTML(e.getDescription().replaceAll("<br>", "\n"));
+					h.setHTML(e.getDescription());
 					String text = h.getText();
+					text = text.replaceAll("(\n)+", "\n");
 					if (text.length() > 100) {
 						text = text.substring(0, 101) + "...";
 					}
