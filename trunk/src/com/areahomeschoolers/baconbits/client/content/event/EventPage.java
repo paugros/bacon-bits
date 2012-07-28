@@ -328,7 +328,11 @@ public class EventPage implements Page {
 				@Override
 				public void onValueChange(ValueChangeEvent<Date> event) {
 					Date d = event.getValue();
-					registrationDatesInput.setEndDate(ClientDateUtils.addDays(d, -14));
+					if (d == null) {
+						return;
+					}
+
+					registrationDatesInput.setEndDate(ClientDateUtils.addHours(d, (-14 * 24) + 3));
 				}
 			});
 
