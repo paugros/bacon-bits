@@ -77,13 +77,12 @@ public class HomePage implements Page {
 					ep.add(date);
 
 					HTML h = new HTML();
-					h.setHTML(e.getDescription());
+					h.setHTML(e.getDescription().replaceAll("<br>", " "));
 					String text = h.getText();
-					text = text.replaceAll("(\n)+", "\n");
 					if (text.length() > 100) {
 						text = text.substring(0, 101) + "...";
 					}
-					ep.add(new HTML(Formatter.formatNoteText(text)));
+					ep.add(new Label(text));
 
 					vp.add(ep);
 				}

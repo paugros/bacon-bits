@@ -15,13 +15,14 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class EventCellTable extends EntityCellTable<Event, EventArg, EventColumn> {
 	public enum EventColumn implements EntityCellTableColumn<EventColumn> {
-		TITLE("Title"), START_DATE("Start"), END_DATE("End"), CATEGORY("Category"), REGISTER("");
+		TITLE("Title"), DESCRIPTION("Description"), START_DATE("Start"), END_DATE("End"), CATEGORY("Category"), REGISTER("");
 
 		private String title;
 
@@ -44,7 +45,7 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 
 	private EventCellTable() {
 		setDefaultSortColumn(EventColumn.START_DATE, SortDirection.SORT_ASC);
-		setDisplayColumns(EventColumn.TITLE, EventColumn.START_DATE, EventColumn.END_DATE, EventColumn.CATEGORY, EventColumn.REGISTER);
+		setDisplayColumns(EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.END_DATE, EventColumn.CATEGORY, EventColumn.REGISTER);
 	}
 
 	@Override
@@ -56,6 +57,20 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 	protected void setColumns() {
 		for (EventColumn col : getDisplayColumns()) {
 			switch (col) {
+			case DESCRIPTION:
+				addTextColumn(col, new ValueGetter<String, Event>() {
+					@Override
+					public String get(Event item) {
+						HTML h = new HTML();
+						h.setHTML(item.getDescription().replaceAll("<br>", " "));
+						String text = h.getText();
+						if (text.length() > 100) {
+							text = text.substring(0, 101) + "...";
+						}
+						return text;
+					}
+				});
+				break;
 			case TITLE:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Event>() {
 					@Override

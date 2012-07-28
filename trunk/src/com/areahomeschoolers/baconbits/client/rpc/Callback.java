@@ -48,18 +48,22 @@ public abstract class Callback<T> implements AsyncCallback<T> {
 				GWT.log("RPC call failed", caught);
 			}
 		} else if (caught instanceof IncompatibleRemoteServiceException) {
-			String message = "This version of the application is out of date. Click below to update.";
-			Label label = new Label(message);
-			label.setWidth("300px");
-			AlertDialog dialog = new AlertDialog("Application Out of Date", label);
-			dialog.getButton().setText("Update");
-			dialog.getButton().addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					Window.Location.reload();
-				}
-			});
-			dialog.center();
+			if (GWT.isProdMode()) {
+				Window.Location.reload();
+			} else {
+				String message = "This version of the application is out of date. Click below to update.";
+				Label label = new Label(message);
+				label.setWidth("300px");
+				AlertDialog dialog = new AlertDialog("Application Out of Date", label);
+				dialog.getButton().setText("Update");
+				dialog.getButton().addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						Window.Location.reload();
+					}
+				});
+				dialog.center();
+			}
 		} else {
 			String message = "Sorry, Dash could not reach the server. ";
 			message += "If the problem persists, please stop working until you are able to re-establish a network connection, as your unsaved changes may be lost.";
