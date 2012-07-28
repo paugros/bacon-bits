@@ -333,6 +333,19 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
+	public ArrayList<Data> getVolunteers(int eventId) {
+		String sql = "select u.firstName, u.lastName, p.jobTitle ";
+		sql += "from eventVolunteerMapping m ";
+		sql += "join eventVolunteerPositions p on p.id = m.eventVolunteerPositionId ";
+		sql += "join eventRegistrations r on r.id = m.eventRegistrationId ";
+		sql += "join users u on u.id = r.addedById ";
+		sql += "where r.eventId = ? ";
+		sql += "order by p.jobTitle, u.lastName, u.firstName";
+
+		return query(sql, ServerUtils.getGenericRowMapper(), eventId);
+	}
+
+	@Override
 	public ArrayList<Event> list(ArgMap<EventArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int upcoming = args.getInt(EventArg.UPCOMING_NUMBER);

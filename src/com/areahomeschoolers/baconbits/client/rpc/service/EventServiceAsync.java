@@ -38,6 +38,8 @@ public interface EventServiceAsync {
 
 	void getParticipants(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventRegistrationParticipant>> callback);
 
+	void getVolunteers(int eventId, AsyncCallback<ArrayList<Data>> callback);
+
 	void list(ArgMap<EventArg> args, AsyncCallback<ArrayList<Event>> callback);
 
 	void save(Event event, AsyncCallback<Event> callback);

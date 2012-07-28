@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.Application;
@@ -585,7 +586,39 @@ public class EventPage implements Page {
 			if (calendarEvent.getRequiresRegistration() && Application.administratorOf(calendarEvent.getGroupId())) {
 				tabPanel.add("Participants", false, new TabPageCommand() {
 					@Override
-					public void execute(VerticalPanel tabBody) {
+					public void execute(final VerticalPanel tabBody) {
+						if (!Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
+							eventService.getVolunteers(calendarEvent.getId(), new Callback<ArrayList<Data>>() {
+								@Override
+								protected void doOnSuccess(ArrayList<Data> result) {
+									VerticalPanel vp = new VerticalPanel();
+									Label label = new Label("Volunteers");
+									label.addStyleName("largeText");
+
+									FlexTable ft = new FlexTable();
+
+									for (Data item : result) {
+										int row = ft.getRowCount();
+
+										Label name = new Label(item.get("firstName") + " " + item.get("lastName"));
+										name.getElement().getStyle().setMarginRight(30, Unit.PX);
+										ft.setWidget(row, 0, name);
+										ft.setText(row, 1, item.get("jobTitle"));
+									}
+
+									vp.add(label);
+									if (!result.isEmpty()) {
+										vp.add(ft);
+									} else {
+										Label none = new Label("None");
+										none.addStyleName("mediumPadding");
+										vp.add(none);
+									}
+									tabBody.insert(vp, 0);
+								}
+							});
+						}
+
 						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
 						args.put(EventArg.INCLUDE_FIELDS);
 						EventParticipantCellTable table = new EventParticipantCellTable(args);
