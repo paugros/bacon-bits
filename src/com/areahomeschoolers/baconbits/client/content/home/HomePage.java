@@ -88,6 +88,10 @@ public class HomePage implements Page {
 					vp.add(ep);
 				}
 
+				HTML fb = new HTML();
+				fb.setHTML("<p><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" mce_href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" target=\"_TOP\" style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; font-variant: normal; font-style: normal; font-weight: normal; color: #3B5998; text-decoration: none;\" mce_style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; font-variant: normal; font-style: normal; font-weight: normal; color: #3B5998; text-decoration: none;\" title=\"WeAre Home Educators\">WeAre Home Educators</a><br><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" mce_href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" target=\"_TOP\" title=\"WeAre Home Educators\"><img src=\"http://badge.facebook.com/badge/111756708899702.553.1216136535.png\" mce_src=\"http://badge.facebook.com/badge/111756708899702.553.1216136535.png\" width=\"120\" height=\"179\" style=\"border: 0px;\" mce_style=\"border: 0px;\"></a><br><a href=\"http://www.facebook.com/business/dashboard/\" mce_href=\"http://www.facebook.com/business/dashboard/\" target=\"_TOP\" style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; font-variant: normal; font-style: normal; font-weight: normal; color: #3B5998; text-decoration: none;\" mce_style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; font-variant: normal; font-style: normal; font-weight: normal; color: #3B5998; text-decoration: none;\" title=\"Make your own badge!\"></a></p>");
+				vp.add(fb);
+
 				eventPanel.setWidget(vp);
 			}
 		});

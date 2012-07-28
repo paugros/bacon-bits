@@ -588,6 +588,7 @@ public class EventPage implements Page {
 					@Override
 					public void execute(VerticalPanel tabBody) {
 						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
+						args.put(EventArg.INCLUDE_FIELDS);
 						EventParticipantCellTable table = new EventParticipantCellTable(args);
 						table.populate();
 						table.setTitle("Participants");

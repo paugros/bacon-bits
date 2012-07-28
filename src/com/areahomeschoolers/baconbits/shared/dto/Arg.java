@@ -12,7 +12,7 @@ public interface Arg {
 	}
 
 	public enum EventArg implements Arg, IsSerializable {
-		EVENT_ID, AGE_GROUP_ID, REGISTRATION_ID, REGISTRATION_PARTICIPANT_ID, UPCOMING_NUMBER
+		EVENT_ID, AGE_GROUP_ID, REGISTRATION_ID, REGISTRATION_PARTICIPANT_ID, UPCOMING_NUMBER, INCLUDE_FIELDS
 	}
 
 	public enum UserArg implements Arg, IsSerializable {
