@@ -270,33 +270,39 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int registrationId = args.getInt(EventArg.REGISTRATION_ID);
 		int participantId = args.getInt(EventArg.REGISTRATION_PARTICIPANT_ID);
 		int eventId = args.getInt(EventArg.EVENT_ID);
-		boolean includeFields = args.getBoolean(EventArg.INCLUDE_FIELDS);
+		final boolean includeFields = args.getBoolean(EventArg.INCLUDE_FIELDS);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
-		String sql = "select p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, ";
-		sql += "up.firstName as parentFirstName, up.lastName as parentLastName, ";
-		sql += "case isnull(a.price) when true then e.price else a.price end as price ";
-		sql += "from eventRegistrationParticipants p ";
-		sql += "join users u on u.id = p.userId ";
-		sql += "join users up on up.id = u.parentId ";
-		sql += "join eventParticipantStatus s on s.id = p.statusId ";
-		sql += "left join eventAgeGroups a on a.id = p.ageGroupId ";
-		sql += "join eventRegistrations r on r.id = p.eventRegistrationId ";
-		sql += "join events e on e.id = r.eventId ";
-		sql += "where 1 = 1 ";
+		String sql = "select p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
+		sql += "up.firstName as parentFirstName, up.lastName as parentLastName, \n";
+		if (includeFields) {
+			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n\n";
+			sql += "from eventFieldValues v \n";
+			sql += "join eventFields f on f.id = v.eventFieldId \n";
+			sql += "where v.participantId = p.id) as fieldValues, \n";
+		}
+		sql += "case isnull(a.price) when true then e.price else a.price end as price \n";
+		sql += "from eventRegistrationParticipants p \n";
+		sql += "join users u on u.id = p.userId \n";
+		sql += "join users up on up.id = u.parentId \n";
+		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
+		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
+		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
+		sql += "join events e on e.id = r.eventId \n";
+		sql += "where 1 = 1 \n";
 		if (registrationId > 0) {
-			sql += "and p.eventRegistrationId = ? ";
+			sql += "and p.eventRegistrationId = ? \n";
 			sqlArgs.add(registrationId);
 		}
 		if (participantId > 0) {
-			sql += "and p.id = ? ";
+			sql += "and p.id = ? \n";
 			sqlArgs.add(participantId);
 		}
 		if (eventId > 0) {
-			sql += "and r.eventId = ? ";
+			sql += "and r.eventId = ? \n";
 			sqlArgs.add(eventId);
 		}
-		sql += "order by u.lastName, u.firstName";
+		sql += "order by u.lastName, u.firstName \n";
 
 		return query(sql, new RowMapper<EventRegistrationParticipant>() {
 			@Override
@@ -316,6 +322,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setParentId(rs.getInt("parentId"));
 				p.setUserId(rs.getInt("userId"));
 				p.setAddedDate(rs.getTimestamp("addedDate"));
+				if (includeFields) {
+					p.setFieldValues(rs.getString("fieldValues"));
+				}
 				return p;
 			}
 		}, sqlArgs.toArray());
