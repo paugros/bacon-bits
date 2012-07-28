@@ -24,6 +24,7 @@ import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
@@ -321,8 +322,23 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	@Override
 	public ArrayList<Event> list(ArgMap<EventArg> args) {
+		List<Object> sqlArgs = new ArrayList<Object>();
+		int upcoming = args.getInt(EventArg.UPCOMING_NUMBER);
+
 		String sql = SELECT;
-		ArrayList<Event> data = query(sql, new EventMapper());
+
+		sql += "where 1 = 1 ";
+
+		if (args.getStatus() != Status.ALL) {
+			sql += "and e.endDate " + (args.getStatus() == Status.ACTIVE ? ">" : "<") + " now() \n";
+		}
+
+		if (upcoming > 0) {
+			sql += "order by id desc limit ? ";
+			sqlArgs.add(upcoming);
+		}
+
+		ArrayList<Event> data = query(sql, new EventMapper(), sqlArgs.toArray());
 
 		return data;
 	}
