@@ -40,6 +40,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			article.setTitle(rs.getString("title"));
 			article.setArticle(rs.getString("article"));
 			article.setGroupName(rs.getString("groupName"));
+			article.setDocumentCount(rs.getInt("documentCount"));
 			return article;
 		}
 	}
@@ -49,7 +50,9 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 	@Autowired
 	public ArticleDaoImpl(DataSource dataSource) {
 		super(dataSource);
-		SELECT = "select a.*, g.groupName from articles a ";
+		SELECT = "select a.*, g.groupName, ";
+		SELECT += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount ";
+		SELECT += "from articles a ";
 		SELECT += "left join groups g on g.id = a.groupId ";
 	}
 

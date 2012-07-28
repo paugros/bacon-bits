@@ -2,7 +2,9 @@ package com.areahomeschoolers.baconbits.shared.dto;
 
 import java.util.Date;
 
-public final class Event extends EntityDto<Event> {
+import com.areahomeschoolers.baconbits.client.content.document.HasDocuments;
+
+public final class Event extends EntityDto<Event> implements HasDocuments {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
@@ -29,6 +31,7 @@ public final class Event extends EntityDto<Event> {
 	private String phone;
 
 	// auxilliary
+	private int documentCount;
 	private String category;
 	private String groupName;
 	private String addedByFullName;
@@ -81,8 +84,18 @@ public final class Event extends EntityDto<Event> {
 		return description;
 	}
 
+	@Override
+	public int getDocumentCount() {
+		return documentCount;
+	}
+
 	public Date getEndDate() {
 		return endDate;
+	}
+
+	@Override
+	public EntityType getEntityType() {
+		return EntityType.EVENT;
 	}
 
 	public boolean getFinished() {
@@ -156,6 +169,11 @@ public final class Event extends EntityDto<Event> {
 		return website;
 	}
 
+	@Override
+	public boolean hasDocuments() {
+		return documentCount > 0;
+	}
+
 	public void setActive(boolean active) {
 		this.active = active;
 	}
@@ -194,6 +212,10 @@ public final class Event extends EntityDto<Event> {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public void setDocumentCount(int documentCount) {
+		this.documentCount = documentCount;
 	}
 
 	public void setEndDate(Date endDate) {

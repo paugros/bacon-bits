@@ -71,6 +71,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setRequiresRegistration(rs.getBoolean("requiresRegistration"));
 			event.setPhone(rs.getString("phone"));
 			event.setWebsite(rs.getString("website"));
+			event.setDocumentCount(rs.getInt("documentCount"));
 			return event;
 		}
 	}
@@ -81,6 +82,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	public EventDaoImpl(DataSource dataSource) {
 		super(dataSource);
 		SELECT = "select e.*, g.groupName, c.category, u.firstName, u.lastName, ";
+		SELECT += "(select count(id) from documentEventMapping where eventId = e.id) as documentCount, ";
 		SELECT += "(e.endDate < now()) as finished, (e.registrationEndDate is not null and e.registrationEndDate < now()) as registrationFinished ";
 		SELECT += "from events e \n";
 		SELECT += "left join groups g on g.id = e.groupId \n";

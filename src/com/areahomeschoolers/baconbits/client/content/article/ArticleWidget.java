@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.article;
 
+import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 
@@ -17,6 +19,12 @@ public class ArticleWidget extends Composite {
 		title.addStyleName("hugeText bold");
 		vp.add(title);
 		vp.add(new HTML(article.getArticle()));
+
+		if (article.isSaved() && (article.hasDocuments() || Application.administratorOf(article.getGroupId()))) {
+			DocumentSection ds = new DocumentSection(article, Application.administratorOf(article.getGroupId()));
+			ds.populate();
+			vp.add(ds);
+		}
 
 		initWidget(vp);
 	}
