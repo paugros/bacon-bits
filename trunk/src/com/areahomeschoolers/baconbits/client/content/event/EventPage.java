@@ -44,7 +44,6 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
-import com.areahomeschoolers.baconbits.shared.dto.EntityType;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
@@ -525,10 +524,10 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(descriptionField);
 
-		if (calendarEvent.isSaved()) {
-			DocumentSection ds = new DocumentSection(fieldTable, EntityType.EVENT, calendarEvent.getId(), Application.administratorOf(calendarEvent
-					.getGroupId()));
+		if (calendarEvent.isSaved() && (calendarEvent.hasDocuments() || Application.administratorOf(calendarEvent.getGroupId()))) {
+			DocumentSection ds = new DocumentSection(calendarEvent, Application.administratorOf(calendarEvent.getGroupId()));
 			ds.populate();
+			fieldTable.addField("Documents:", ds);
 		}
 
 	}

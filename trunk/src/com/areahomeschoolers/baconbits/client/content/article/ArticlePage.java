@@ -23,7 +23,6 @@ import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
-import com.areahomeschoolers.baconbits.shared.dto.EntityType;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
@@ -145,9 +144,10 @@ public class ArticlePage implements Page {
 		});
 		fieldTable.addField(dataField);
 
-		if (article.isSaved()) {
-			DocumentSection ds = new DocumentSection(fieldTable, EntityType.ARTICLE, article.getId(), Application.administratorOf(article.getGroupId()));
+		if (article.isSaved() && (article.hasDocuments() || Application.administratorOf(article.getGroupId()))) {
+			DocumentSection ds = new DocumentSection(article, Application.administratorOf(article.getGroupId()));
 			ds.populate();
+			fieldTable.addField("Documents:", ds);
 		}
 
 		Button cancelButton = new Button("Cancel");
