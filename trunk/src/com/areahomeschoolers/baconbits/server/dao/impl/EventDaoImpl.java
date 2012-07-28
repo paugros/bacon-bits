@@ -330,11 +330,16 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "where 1 = 1 ";
 
 		if (args.getStatus() != Status.ALL) {
-			sql += "and e.endDate " + (args.getStatus() == Status.ACTIVE ? ">" : "<") + " now() \n";
+			if (args.getStatus() == Status.ACTIVE) {
+				sql += "and e.endDate > now() and active = 1 \n";
+			} else {
+				sql += "(and e.endDate < now() or active = 0) \n";
+			}
+
 		}
 
 		if (upcoming > 0) {
-			sql += "order by id desc limit ? ";
+			sql += "order by e.startDate limit ? ";
 			sqlArgs.add(upcoming);
 		}
 
