@@ -3,6 +3,8 @@ package com.areahomeschoolers.baconbits.server.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
@@ -23,16 +25,20 @@ public interface UserDao {
 
 	public ServerResponseData<User> save(User user);
 
+	@PreAuthorize("hasRole('SYSTEM_ADMINISTRATORS')")
 	public UserGroup saveUserGroup(UserGroup group);
 
 	public boolean sendPasswordResetEmail(String username);
 
 	public User setPasswordFromDigest(int id, String digest);
 
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add);
 
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add);
 
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void updateUserGroupRelation(User u, UserGroup g, boolean add);
 
 	public List<String> validatePassword(String password);

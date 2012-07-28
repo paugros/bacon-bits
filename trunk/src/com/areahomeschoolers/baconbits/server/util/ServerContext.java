@@ -111,6 +111,10 @@ public class ServerContext implements ApplicationContextAware {
 		return isLive;
 	}
 
+	public static boolean isSystemAdministrator() {
+		return isAuthenticated() && getCurrentUser().getSystemAdministrator();
+	}
+
 	public static void loadContext(HttpServletRequest request, HttpServletResponse response, ServletContext servletContext) {
 		ServerContext sc = new ServerContext();
 		sc.request = request;
@@ -141,6 +145,7 @@ public class ServerContext implements ApplicationContextAware {
 
 	private ServletContext servletContext;
 	private HttpServletRequest request;
+
 	private HttpServletResponse response;
 
 	@Override

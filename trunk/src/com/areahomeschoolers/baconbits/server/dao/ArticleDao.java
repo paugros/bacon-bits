@@ -13,6 +13,6 @@ public interface ArticleDao {
 
 	public ArrayList<Article> list(ArgMap<ArticleArg> args);
 
-	@PreAuthorize("hasRole('ROLE_BASIC_USER')")
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public Article save(Article article);
 }

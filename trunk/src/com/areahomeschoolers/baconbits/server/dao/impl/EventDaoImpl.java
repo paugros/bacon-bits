@@ -72,22 +72,16 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setPhone(rs.getString("phone"));
 			event.setWebsite(rs.getString("website"));
 			event.setDocumentCount(rs.getInt("documentCount"));
+			event.setAccessLevel(rs.getString("accessLevel"));
+			event.setAccessLevelId(rs.getInt("accessLevelId"));
 			return event;
 		}
 	}
 
-	private static String SELECT;
-
 	@Autowired
 	public EventDaoImpl(DataSource dataSource) {
 		super(dataSource);
-		SELECT = "select e.*, g.groupName, c.category, u.firstName, u.lastName, ";
-		SELECT += "(select count(id) from documentEventMapping where eventId = e.id) as documentCount, ";
-		SELECT += "(e.endDate < now()) as finished, (e.registrationEndDate is not null and e.registrationEndDate < now()) as registrationFinished ";
-		SELECT += "from events e \n";
-		SELECT += "left join groups g on g.id = e.groupId \n";
-		SELECT += "join eventCategories c on c.id = e.categoryId \n";
-		SELECT += "join users u on u.id = e.addedById \n";
+
 	}
 
 	@Override
@@ -125,8 +119,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	@Override
 	public Event getById(int id) {
-		String sql = SELECT + "where e.id = ?";
-
+		String sql = createSqlBase() + "and e.id = ?";
 		return queryForObject(sql, new EventMapper(), id);
 	}
 
@@ -350,9 +343,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int upcoming = args.getInt(EventArg.UPCOMING_NUMBER);
 
-		String sql = SELECT;
-
-		sql += "where 1 = 1 ";
+		String sql = createSqlBase();
 
 		if (args.getStatus() != Status.ALL) {
 			if (args.getStatus() == Status.ACTIVE) {
@@ -378,7 +369,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(event);
 
 		if (event.isSaved()) {
-			String sql = "update events set title = :title, description = :description, startDate = :startDate, endDate = :endDate, ";
+			String sql = "update events set title = :title, description = :description, startDate = :startDate, endDate = :endDate, accessLevelId = :accessLevelId, ";
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, requiresRegistration = :requiresRegistration, ";
@@ -390,10 +381,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, ";
-			sql += "publishDate, active, price, requiresRegistration, phone, website) values ";
+			sql += "publishDate, active, price, requiresRegistration, phone, website, accessLevelId) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, ";
-			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website)";
+			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :accessLevelId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -563,6 +554,28 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		f.setOptions(rs.getString("options"));
 		f.setRequired(rs.getBoolean("required"));
 		return f;
+	}
+
+	private String createSqlBase() {
+		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.accessLevel, \n";
+		sql += "(select count(id) from documentEventMapping where eventId = e.id) as documentCount, \n";
+		sql += "(e.endDate < now()) as finished, (e.registrationEndDate is not null and e.registrationEndDate < now()) as registrationFinished \n";
+		sql += "from events e \n";
+		sql += "left join groups g on g.id = e.groupId \n";
+		sql += "join eventCategories c on c.id = e.categoryId \n";
+		sql += "join users u on u.id = e.addedById \n";
+		sql += "join userAccessLevels l on l.id = e.accessLevelId \n";
+
+		int userId = ServerContext.isAuthenticated() ? ServerContext.getCurrentUser().getId() : 0;
+		sql += "left join userGroupMembers ugm on ugm.groupId = e.groupId and ugm.userId = " + userId + " \n";
+		sql += "where 1 = 1 \n";
+
+		if (!ServerContext.isSystemAdministrator()) {
+			int auth = ServerContext.isAuthenticated() ? 1 : 0;
+			sql += "and case e.accessLevelId when 1 then 1 when 2 then " + auth + " when 3 then ugm.id when 4 then ugm.isAdministrator else 0 end > 0 \n";
+		}
+
+		return sql;
 	}
 
 	private ArrayList<EventVolunteerPosition> getVolunteerPositions(int eventId, final int registrationId) {

@@ -1,10 +1,16 @@
 package com.areahomeschoolers.baconbits.server.service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
@@ -16,6 +22,7 @@ import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 @Controller
 @RequestMapping("/login")
@@ -64,7 +71,15 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 
 			ServerContext.setCurrentUser(username);
 			User user = ServerContext.getCurrentUser();
-			// List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(result.getAuthorities());
+			List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(result.getAuthorities());
+			// populate the roles for use on the client side
+			HashSet<AccessLevel> roles = new HashSet<AccessLevel>();
+			for (AccessLevel role : AccessLevel.values()) {
+				if (authorities.contains(new SimpleGrantedAuthority(role.toString()))) {
+					roles.add(role);
+				}
+			}
+			user.setAccessLevels(roles);
 
 			if (!user.isActive()) {
 				success = false;

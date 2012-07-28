@@ -37,9 +37,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 		User user;
 
-		String sql = "select u.id, u.email, u.passwordDigest, u.isSystemAdministrator, ";
+		String sql = "select u.id, u.email, u.passwordDigest, u.isSystemAdministrator, ugm.isAdministrator, ugm.id as isGroupMember, ";
 		sql += "isActive(u.StartDate, u.EndDate) as isEnabled from users u ";
-		sql += "where u.email = ? and u.passwordDigest is not null limit 1";
+		sql += "left join userGroupMembers ugm on ugm.userId = u.id ";
+		sql += "where u.email = ? and u.passwordDigest is not null ";
+		sql += "order by ugm.isAdministrator desc limit 1";
 
 		try {
 			user = sjt.queryForObject(sql, mapper, username);
@@ -57,9 +59,18 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	private List<GrantedAuthority> getAuthorities(ResultSet rs) throws SQLException {
 		List<GrantedAuthority> authList = new ArrayList<GrantedAuthority>();
-		authList.add(new SimpleGrantedAuthority("ROLE_BASIC_USER"));
+		authList.add(new SimpleGrantedAuthority("SITE_MEMBERS"));
 		if (rs.getBoolean("isSystemAdministrator")) {
-			authList.add(new SimpleGrantedAuthority("ROLE_SYSTEM_ADMINISTRATOR"));
+			authList.add(new SimpleGrantedAuthority("SYSTEM_ADMINISTRATORS"));
+			authList.add(new SimpleGrantedAuthority("GROUP_MEMBERS"));
+			authList.add(new SimpleGrantedAuthority("GROUP_ADMINISTRATORS"));
+		} else {
+			if (rs.getInt("isGroupMember") > 0) {
+				authList.add(new SimpleGrantedAuthority("GROUP_MEMBERS"));
+			}
+			if (rs.getBoolean("isAdministrator")) {
+				authList.add(new SimpleGrantedAuthority("GROUP_ADMINISTRATORS"));
+			}
 		}
 
 		return authList;

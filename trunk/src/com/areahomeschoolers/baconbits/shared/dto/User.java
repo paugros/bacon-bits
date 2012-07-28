@@ -2,6 +2,9 @@ package com.areahomeschoolers.baconbits.shared.dto;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 public final class User extends EntityDto<User> {
 	private static final long serialVersionUID = 1L;
@@ -28,6 +31,7 @@ public final class User extends EntityDto<User> {
 
 	// aux
 	private boolean generatePassword;
+	private HashSet<AccessLevel> accessLevels;
 
 	public User() {
 
@@ -39,6 +43,10 @@ public final class User extends EntityDto<User> {
 		}
 
 		return groups.get(groupId) == Boolean.TRUE;
+	}
+
+	public HashSet<AccessLevel> getAccessLevels() {
+		return accessLevels;
 	}
 
 	public Date getAddedDate() {
@@ -120,12 +128,20 @@ public final class User extends EntityDto<User> {
 		return email;
 	}
 
+	public boolean hasRole(AccessLevel level) {
+		return accessLevels != null && accessLevels.contains(level);
+	}
+
 	public boolean isActive() {
 		return active;
 	}
 
 	public boolean memberOf(int groupId) {
 		return groups.keySet().contains(groupId);
+	}
+
+	public void setAccessLevels(HashSet<AccessLevel> accessLevels) {
+		this.accessLevels = accessLevels;
 	}
 
 	public void setActive(boolean active) {

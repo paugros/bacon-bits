@@ -77,7 +77,7 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 		for (UserGroupColumn col : getDisplayColumns()) {
 			switch (col) {
 			case NAME:
-				if (user == null && Application.isAdministrator()) {
+				if (user == null && Application.isSystemAdministrator()) {
 					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
 						@Override
 						protected Widget createWidget(final UserGroup item) {

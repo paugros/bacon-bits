@@ -29,11 +29,13 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private String notificationEmail;
 	private String website;
 	private String phone;
+	private int accessLevelId;
 
 	// auxilliary
 	private int documentCount;
 	private String category;
 	private String groupName;
+	private String accessLevel;
 	private String addedByFullName;
 
 	public Event() {
@@ -42,6 +44,14 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public boolean allowRegistrations() {
 		return active && !finished && !registrationFinished;
+	}
+
+	public String getAccessLevel() {
+		return accessLevel;
+	}
+
+	public int getAccessLevelId() {
+		return accessLevelId;
 	}
 
 	public boolean getActive() {
@@ -172,6 +182,14 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	@Override
 	public boolean hasDocuments() {
 		return documentCount > 0;
+	}
+
+	public void setAccessLevel(String accessLevel) {
+		this.accessLevel = accessLevel;
+	}
+
+	public void setAccessLevelId(int accessLevelId) {
+		this.accessLevelId = accessLevelId;
 	}
 
 	public void setActive(boolean active) {

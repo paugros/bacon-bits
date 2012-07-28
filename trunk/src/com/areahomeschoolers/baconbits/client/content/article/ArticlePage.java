@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -15,6 +16,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
@@ -99,6 +101,24 @@ public class ArticlePage implements Page {
 		fieldTable.addField(titleField);
 
 		if (Application.isAuthenticated()) {
+			final Label accessDisplay = new Label();
+			final DefaultListBox accessInput = new AccessLevelListBox(article.getGroupId());
+			FormField accessField = form.createFormField("Visible to:", accessInput, accessDisplay);
+			accessField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					accessDisplay.setText(article.getAccessLevel());
+					accessInput.setValue(article.getAccessLevelId());
+				}
+			});
+			accessField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					article.setAccessLevelId(accessInput.getIntValue());
+				}
+			});
+			fieldTable.addField(accessField);
+
 			final Label groupDisplay = new Label();
 			WidgetCreator groupCreator = new WidgetCreator() {
 				@Override
@@ -110,7 +130,7 @@ public class ArticlePage implements Page {
 			groupField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					groupDisplay.setText(Common.getDefaultIfNull(article.getGroupName(), "All groups"));
+					groupDisplay.setText(Common.getDefaultIfNull(article.getGroupName(), "None"));
 					if (groupField.inputIsCreated()) {
 						((GroupListBox) groupField.getInputWidget()).setValue(article.getGroupId());
 					}

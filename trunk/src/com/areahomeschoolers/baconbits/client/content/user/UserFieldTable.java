@@ -106,7 +106,7 @@ public class UserFieldTable extends FieldTable {
 		});
 		addField(emailField);
 
-		if (Application.isAdministrator()) {
+		if (Application.isSystemAdministrator()) {
 			final Label adminDisplay = new Label();
 			final DefaultListBox adminInput = new DefaultListBox();
 			adminInput.addItem("Yes");
