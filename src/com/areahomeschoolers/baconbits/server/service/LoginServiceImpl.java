@@ -58,7 +58,8 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 			Authentication request = new UsernamePasswordAuthenticationToken(username, password);
 			Authentication result = authenticationManager.authenticate(request);
 			SecurityContextHolder.getContext().setAuthentication(result);
-			ServerContext.getSession().setMaxInactiveInterval((60 * 60) * 4);
+			// never time out
+			ServerContext.getSession().setMaxInactiveInterval(-1);
 			ServerContext.getSession().setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 
 			ServerContext.setCurrentUser(username);
