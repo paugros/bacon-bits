@@ -49,6 +49,7 @@ public class ArticlePage implements Page {
 
 	public ArticlePage(VerticalPanel page) {
 		int articleId = Url.getIntegerParameter("articleId");
+
 		if (!Application.isAuthenticated() && articleId < 0) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;

@@ -1888,7 +1888,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		if (Common.isNullOrBlank(title)) {
 			return getDefaultSizePrefName();
 		}
-		return Url.getParam("page") + ";" + title;
+		return Url.getParameter("page") + ";" + title;
 	}
 
 	protected String getSortPrefString() {
@@ -1896,7 +1896,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		if (Common.isNullOrBlank(title)) {
 			return null;
 		}
-		return Url.getParam("page") + ";" + title;
+		return Url.getParameter("page") + ";" + title;
 	}
 
 	protected void onRowDataUpdate(boolean sort, EntityCellTable<T, U, C> callingPartner) {

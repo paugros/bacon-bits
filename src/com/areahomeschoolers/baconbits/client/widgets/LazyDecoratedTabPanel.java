@@ -214,7 +214,7 @@ public class LazyDecoratedTabPanel extends DecoratedTabPanel {
 	}
 
 	protected int getUrlIndex() {
-		String tab = Url.getParam("tab");
+		String tab = Url.getParameter("tab");
 		if (tab == null) {
 			return 0;
 		}
