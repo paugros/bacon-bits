@@ -116,7 +116,7 @@ public final class MainMenu extends MenuBar {
 
 	private MenuBar getClassesMenu() {
 		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Mixed Class Day", PageUrl.articleGroup("38,37"));
+		addLinkToMenu(menu, "Mixed Class Day", PageUrl.articleGroup("37,38"));
 		addLinkToMenu(menu, "Parents' Support Meeting", PageUrl.articleGroup("33"));
 		addLinkToMenu(menu, "PE Activities", PageUrl.articleGroup("36"));
 

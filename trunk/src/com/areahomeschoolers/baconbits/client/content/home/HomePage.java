@@ -72,7 +72,7 @@ public class HomePage implements Page {
 
 					ep.add(link);
 
-					Label date = new Label(Formatter.formatDate(e.getStartDate()));
+					Label date = new Label(Formatter.formatDateTime(e.getStartDate()));
 					date.addStyleName("italic");
 					ep.add(date);
 
