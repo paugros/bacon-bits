@@ -87,7 +87,7 @@ public class Url {
 		return -1;
 	}
 
-	public static String getParam(String token) {
+	public static String getParameter(String token) {
 		return HistoryToken.getElement(token);
 	}
 

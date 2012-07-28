@@ -20,7 +20,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.PopupPanel;
 
 public final class MainMenu extends MenuBar {
@@ -65,11 +64,12 @@ public final class MainMenu extends MenuBar {
 		});
 
 		addItem("About", getHomeMenu());
-		addItem("Events", getEventsMenu());
-		addItem("Blog", getBlogMenu());
-		addItem("All About Books!", getBooksMenu());
-		addItem("Co-op Classes", getCoopMenu());
-		if (Application.isAuthenticated()) {
+		addItem("Event Registration", getEventsMenu());
+		addItem("WHE Classes/Activities", getClassesMenu());
+		addItem("Educational Resources", getEducationMenu());
+		addItem("Support", getSupportMenu());
+		addItem("Resources", getResourcesMenu());
+		if (Application.isAdministrator()) {
 			addItem("Admin", getAdminMenu());
 		}
 	}
@@ -77,6 +77,7 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getAdminMenu() {
 		MenuBar menu = new MenuBar(true);
 
+		addLinkToMenu(menu, "Add Article", PageUrl.article(0));
 		addLinkToMenu(menu, "Add User", PageUrl.user(0));
 		addLinkToMenu(menu, "List Users", PageUrl.userList());
 		addLinkToMenu(menu, "List Groups", PageUrl.userGroupList());
@@ -113,62 +114,62 @@ public final class MainMenu extends MenuBar {
 		return menu;
 	}
 
-	private MenuBar getBlogMenu() {
+	private MenuBar getClassesMenu() {
 		MenuBar menu = new MenuBar(true);
-		if (Application.isAuthenticated()) {
-			addLinkToMenu(menu, "Add Article", PageUrl.article(0));
-		}
-		addLinkToMenu(menu, "Our Homeschool Corner", "");
-		addLinkToMenu(menu, "Latest Newsletter", "");
+		addLinkToMenu(menu, "Mixed Class Day", PageUrl.articleGroup("38,37"));
+		addLinkToMenu(menu, "Parents' Support Meeting", PageUrl.articleGroup("33"));
+		addLinkToMenu(menu, "PE Activities", PageUrl.articleGroup("36"));
 
 		return menu;
 	}
 
-	private MenuBar getBooksMenu() {
+	private MenuBar getEducationMenu() {
 		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Book Club", "");
-		addLinkToMenu(menu, "Scholastic Newsletter", "");
-		addLinkToMenu(menu, "Book Sale", "");
-
-		return menu;
-	}
-
-	private MenuBar getCoopMenu() {
-		MenuBar menu = new MenuBar(true);
-
-		addLinkToMenu(menu, "Overview", "");
-		addLinkToMenu(menu, "LEGO Class", "");
-		addLinkToMenu(menu, "Spanish", "");
-		addLinkToMenu(menu, "Young Inventors' Program", "");
-		addLinkToMenu(menu, "Drama", "");
-		addLinkToMenu(menu, "Apologia Physics Lab", "");
+		addLinkToMenu(menu, "Arts/Crafts", PageUrl.articleGroup("26,23"));
+		addLinkToMenu(menu, "Language Arts", PageUrl.articleGroup("26,23"));
+		addLinkToMenu(menu, "Math", PageUrl.articleGroup("25"));
+		addLinkToMenu(menu, "Preschool", PageUrl.articleGroup("5,23"));
+		addLinkToMenu(menu, "Science", PageUrl.articleGroup("30"));
+		addLinkToMenu(menu, "Seasonal/Holiday", PageUrl.articleGroup("18,19,20,21,22,29"));
 
 		return menu;
 	}
 
 	private MenuBar getEventsMenu() {
 		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Event Calendar", "");
+		addLinkToMenu(menu, "Events", PageUrl.eventList());
 		if (Application.isAuthenticated()) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
 		}
-		addLinkToMenu(menu, "List Events", PageUrl.eventList());
-
-		menu.addSeparator(new MenuItemSeparator());
-		addLinkToMenu(menu, "Mixed Class Day", "");
-		addLinkToMenu(menu, "Mom's Night Out", "");
-		addLinkToMenu(menu, "Parents' Support Meeting and Chess Club", "");
-		addLinkToMenu(menu, "Physical Education Activities", "");
-		addLinkToMenu(menu, "Local Sports Info", "");
 
 		return menu;
 	}
 
 	private MenuBar getHomeMenu() {
 		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "FAQs", "");
-		addLinkToMenu(menu, "Directions", "");
-		addLinkToMenu(menu, "Contact Us", "");
+		addLinkToMenu(menu, "Home", PageUrl.home());
+		addLinkToMenu(menu, "Building Policy", PageUrl.articleGroup("4"));
+		addLinkToMenu(menu, "FAQ", PageUrl.articleGroup("7"));
+
+		return menu;
+	}
+
+	private MenuBar getResourcesMenu() {
+		MenuBar menu = new MenuBar(true);
+		addLinkToMenu(menu, "Helpful Links", PageUrl.articleGroup("39"));
+		addLinkToMenu(menu, "Local Sports League Info", PageUrl.articleGroup("34"));
+
+		return menu;
+	}
+
+	private MenuBar getSupportMenu() {
+		MenuBar menu = new MenuBar(true);
+
+		addLinkToMenu(menu, "Homeschool Stories", PageUrl.articleGroup("8,9,10,11,12,13,14,15,16"));
+		addLinkToMenu(menu, "Homeschooling Methods", PageUrl.articleGroup("40"));
+		addLinkToMenu(menu, "Curriculum Providers", PageUrl.articleGroup("41"));
+		addLinkToMenu(menu, "Managing Schedules", PageUrl.articleGroup("27,28"));
+		addLinkToMenu(menu, "Reluctant Learners", PageUrl.articleGroup("24"));
 
 		return menu;
 	}

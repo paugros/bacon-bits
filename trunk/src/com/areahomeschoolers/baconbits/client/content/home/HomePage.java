@@ -39,13 +39,13 @@ public class HomePage implements Page {
 		hp.add(articlePanel);
 		hp.add(eventPanel);
 		eventPanel.getElement().getStyle().setBackgroundColor("#dddddd");
+		hp.setCellWidth(eventPanel, "250px");
 		page.add(hp);
 
 		articleService.getById(6, new Callback<Article>() {
 			@Override
 			protected void doOnSuccess(Article result) {
 				articlePanel.setWidget(new ArticleWidget(result));
-				hp.setCellWidth(hp.getWidget(0), "85%");
 
 				Application.getLayout().setPage("Home", page);
 			}
@@ -89,8 +89,6 @@ public class HomePage implements Page {
 				}
 
 				eventPanel.setWidget(vp);
-
-				hp.setCellWidth(vp, "15%");
 			}
 		});
 

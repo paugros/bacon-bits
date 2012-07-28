@@ -20,6 +20,7 @@ import com.areahomeschoolers.baconbits.server.dao.ArticleDao;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
@@ -63,13 +64,30 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 	public ArrayList<Article> list(ArgMap<ArticleArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int top = args.getInt(ArticleArg.MOST_RECENT);
+		String idString = args.getString(ArticleArg.IDS);
 
 		String sql = SELECT;
 
+		sql += "where 1 = 1 ";
+
+		if (!Common.isNullOrBlank(idString)) {
+			List<String> scrubbedIds = new ArrayList<String>();
+			scrubbedIds.add("0");
+			String[] ids = idString.split(",");
+			for (int i = 0; i < ids.length; i++) {
+				if (Common.isNumeric(ids[i])) {
+					scrubbedIds.add(ids[i]);
+				}
+			}
+
+			sql += "and a.id in(" + Common.join(scrubbedIds, ", ") + ") ";
+		}
+
 		if (top > 0) {
-			sql += "order by id desc limit ?";
+			sql += "order by a.id desc limit ?";
 			sqlArgs.add(top);
 		}
+
 		ArrayList<Article> data = query(sql, new ArticleMapper(), sqlArgs.toArray());
 
 		return data;
