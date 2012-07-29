@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable;
+import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
@@ -19,6 +21,7 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
@@ -44,6 +47,11 @@ public class UserPage implements Page {
 	private UserFieldTable fieldTable;
 
 	public UserPage(VerticalPanel page) {
+		if (!Application.isAuthenticated()) {
+			new ErrorPage(PageError.NOT_AUTHORIZED);
+			return;
+		}
+
 		int userId = Url.getIntegerParameter("userId");
 		if (!Application.isAuthenticated() && userId < 0) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
@@ -79,9 +87,20 @@ public class UserPage implements Page {
 		page.add(WidgetFactory.newSection(title, fieldTable));
 
 		if (user.isSaved()) {
-			ArgMap<UserArg> args = new ArgMap<UserArg>();
-			args.put(UserArg.USER_ID, user.getId());
-			final UserGroupCellTable groupsTable = new UserGroupCellTable(args);
+			ArgMap<EventArg> eventArgs = new ArgMap<EventArg>(EventArg.USER_ID, user.getId());
+			EventParticipantCellTable eventsTable = new EventParticipantCellTable(eventArgs);
+			eventsTable.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.ADDED_DATE, ParticipantColumn.AGE, ParticipantColumn.PRICE,
+					ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
+			eventsTable.setTitle("Events");
+
+			eventsTable.getTitleBar().addSearchControl();
+			eventsTable.getTitleBar().addExcelControl();
+			page.add(WidgetFactory.newSection(eventsTable));
+			eventsTable.populate();
+
+			ArgMap<UserArg> userArgs = new ArgMap<UserArg>();
+			userArgs.put(UserArg.USER_ID, user.getId());
+			final UserGroupCellTable groupsTable = new UserGroupCellTable(userArgs);
 			groupsTable.setUser(user);
 			groupsTable.setTitle("Group Membership");
 			groupsTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);

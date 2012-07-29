@@ -384,7 +384,7 @@ public final class Layout {
 	}
 
 	private void addPageToBodyPanel(String title, VerticalPanel page) {
-		HTML footer = new HTML("&copy; 2005-2012 Area Homeschoolers. All rights reserved. Proprietary & Confidential.");
+		HTML footer = new HTML("&copy; 2005-2012 WHE. All rights reserved. Proprietary & Confidential.");
 		footer.setStylePrimaryName("footer");
 
 		VerticalPanel vp = new VerticalPanel();

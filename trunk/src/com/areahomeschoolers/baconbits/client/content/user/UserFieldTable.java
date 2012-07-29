@@ -7,6 +7,8 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.validation.Validator;
+import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
@@ -179,7 +181,6 @@ public class UserFieldTable extends FieldTable {
 
 			final PasswordTextBox passwordInput = inputs.getPasswordInput();
 			FormField passwordField = form.createFormField("Password:", passwordInput, null);
-			passwordField.setRequired(true);
 			passwordField.setInitializer(new Command() {
 				@Override
 				public void execute() {
@@ -194,9 +195,17 @@ public class UserFieldTable extends FieldTable {
 			});
 			addField(passwordField);
 
+			Validator v = new Validator(passwordInput, new ValidatorCommand() {
+				@Override
+				public void validate(Validator validator) {
+					validator.setError(Common.isNullOrBlank(passwordInput.getText()));
+				}
+			});
+			passwordField.setValidator(v);
+			passwordField.setRequired(true);
+
 			final PasswordTextBox confirmInput = inputs.getConfirmPasswordInput();
 			FormField confirmField = form.createFormField("Confirm password:", confirmInput, null);
-			confirmField.setRequired(true);
 			confirmField.setInitializer(new Command() {
 				@Override
 				public void execute() {
@@ -209,6 +218,15 @@ public class UserFieldTable extends FieldTable {
 				}
 			});
 			addField(confirmField);
+
+			Validator vv = new Validator(confirmInput, new ValidatorCommand() {
+				@Override
+				public void validate(Validator validator) {
+					validator.setError(Common.isNullOrBlank(confirmInput.getText()));
+				}
+			});
+			confirmField.setValidator(vv);
+			confirmField.setRequired(true);
 		}
 
 		final Label homePhoneDisplay = new Label();
