@@ -16,8 +16,10 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.server.dao.EventDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
+import com.areahomeschoolers.baconbits.server.util.Mailer;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
@@ -700,7 +702,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		String sql = "select p.id, r.eventId, e.title, concat(up.firstName, ' ', up.lastName) as participantName, \n";
-		sql += "concat(ur.firstName, ' ', ur.lastName) as registrantName, ur.email ";
+		sql += "ur.firstName, ur.email, date_format(e.startDate, '%W, %c/%e %l:%i %p') as startDate, \n";
+		sql += "date_format(e.endDate, '%W, %c/%e %l:%i %p') as endDate ";
 		sql += "from eventRegistrationParticipants p \n";
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 		sql += "join users ur on ur.id = r.addedById \n";
@@ -717,23 +720,28 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 		sql += "order by p.addedDate limit 1";
 
-		ArrayList<Data> notify = query(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
+		Data notify = queryForObject(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
 
-		if (notify.isEmpty()) {
+		if (notify == null) {
 			return;
 		}
 
-		List<Integer> ids = new ArrayList<Integer>();
-		for (Data n : notify) {
-			// TODO send email here
-			// System.out.println(n.get("registrantName") + ", " + n.get("participantName") + ", " + n.get("email"));
-			ids.add(n.getId());
-		}
+		sql = "update eventRegistrationParticipants set statusId = 1 where id = ?";
+		update(sql, notify.getId());
 
-		String idString = Common.join(ids, ", ");
-		sql = "update eventRegistrationParticipants set statusId = 1 where id in(" + idString + ")";
-
-		update(sql);
+		Mailer mailer = new Mailer();
+		mailer.addTo(notify.get("email"));
+		String subject = "A spot has opened up for " + notify.get("participantName");
+		String body = "Hello " + notify.get("firstName") + ",\n\n";
+		body += "Due to a cancellation, " + notify.get("participantName") + " has been moved off the waiting list for the following event.\n\n";
+		body += "Event: " + notify.get("title") + "\n";
+		body += "Date: " + notify.get("startDate") + " to " + notify.get("endDate") + "\n";
+		body += "Link: http://www.areahomeschoolers.com/#" + PageUrl.event(notify.getInt("eventId")) + "\n\n";
+		body += "Click the link above to view more event details and your registration status.\n\n";
+		body += "Thank you.";
+		mailer.setSubject(subject);
+		mailer.setBody(body);
+		mailer.send();
 	}
 
 	private void saveFieldValue(EventField field) {
