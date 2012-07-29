@@ -15,7 +15,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.dto.User;
 
 public class Mailer {
 	private final List<String> tos = new ArrayList<String>();
@@ -29,7 +28,6 @@ public class Mailer {
 
 	public Mailer() {
 		Session session = Session.getDefaultInstance(properties, null);
-		session.setDebug(!ServerContext.isLive());
 
 		message = new MimeMessage(session);
 	}
@@ -129,16 +127,18 @@ public class Mailer {
 
 				subjectText = subject;
 				bodyText = body;
-			} else {
-				String email = getUser().getEmail();
 
-				if (email == null) {
-					return;
+				message.setSubject(subjectText);
+				message.setSentDate(new Date());
+
+				if (isHtmlMail) {
+					message.setContent(bodyText, "text/html; charset=UTF-8");
+				} else {
+					message.setContent(bodyText, "text/plain; charset=UTF-8");
 				}
-				InternetAddress[] recipientTo = { new InternetAddress(email) };
-				message.setRecipients(Message.RecipientType.TO, recipientTo);
-
-				subjectText = "RIBEYE TEST: " + subject;
+				Transport.send(message);
+			} else {
+				subjectText = "BACONBITS EMAIL: " + subject;
 
 				String newLine = isHtmlMail ? "<br>" : "\n";
 				bodyText = "/*** HEADERS ***/" + newLine;
@@ -154,17 +154,9 @@ public class Mailer {
 				bodyText += "/*** HEADERS ***/" + newLine + newLine;
 
 				bodyText += body;
-			}
 
-			message.setSubject(subjectText);
-			message.setSentDate(new Date());
-
-			if (isHtmlMail) {
-				message.setContent(bodyText, "text/html; charset=UTF-8");
-			} else {
-				message.setContent(bodyText, "text/plain; charset=UTF-8");
+				System.out.println(subjectText + "\n\n" + bodyText);
 			}
-			Transport.send(message);
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}
@@ -213,12 +205,4 @@ public class Mailer {
 
 		return ret;
 	}
-
-	private User getUser() {
-		if (ServerContext.getCurrentUser() != null) {
-			return ServerContext.getCurrentUser();
-		}
-		return new User();
-	}
-
 }
