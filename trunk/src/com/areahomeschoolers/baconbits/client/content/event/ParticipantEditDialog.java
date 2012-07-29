@@ -35,7 +35,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -45,7 +45,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationParticipant> {
+public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private EventPageData pageData;
 	private int dialogWidth = 600;
@@ -150,9 +150,9 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 		entity.setEventRegistrationId(registration.getId());
 		entity.setEventFields(eventFields);
 
-		eventService.saveParticipant(entity, new Callback<ArrayList<EventRegistrationParticipant>>() {
+		eventService.saveParticipant(entity, new Callback<ArrayList<EventParticipant>>() {
 			@Override
-			protected void doOnSuccess(ArrayList<EventRegistrationParticipant> result) {
+			protected void doOnSuccess(ArrayList<EventParticipant> result) {
 				registration.setParticipants(result);
 				refreshCommand.execute(registration);
 			}
@@ -238,7 +238,7 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 
 		fieldsPanel = new MaxHeightScrollPanel(200);
 		if (entity.isSaved()) {
-			eventService.getFields(new ArgMap<EventArg>(EventArg.REGISTRATION_PARTICIPANT_ID, entity.getId()), new Callback<ArrayList<EventField>>() {
+			eventService.getFields(new ArgMap<EventArg>(EventArg.PARTICIPANT_ID, entity.getId()), new Callback<ArrayList<EventField>>() {
 				@Override
 				protected void doOnSuccess(ArrayList<EventField> result) {
 					setFields(result);

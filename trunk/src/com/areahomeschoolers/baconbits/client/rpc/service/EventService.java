@@ -10,7 +10,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -26,7 +26,7 @@ public interface EventService extends RemoteService {
 
 	public void deleteEventField(int fieldId);
 
-	public void deleteEventParticipant(EventRegistrationParticipant participant);
+	public void deleteEventParticipant(EventParticipant participant);
 
 	public void deleteVolunteerPosition(EventVolunteerPosition position);
 
@@ -40,7 +40,7 @@ public interface EventService extends RemoteService {
 
 	public EventPageData getPageData(int id);
 
-	public ArrayList<EventRegistrationParticipant> getParticipants(ArgMap<EventArg> args);
+	public ArrayList<EventParticipant> getParticipants(ArgMap<EventArg> args);
 
 	public ArrayList<Data> getVolunteers(int eventId);
 
@@ -52,7 +52,7 @@ public interface EventService extends RemoteService {
 
 	public EventField saveEventField(EventField field);
 
-	public ArrayList<EventRegistrationParticipant> saveParticipant(EventRegistrationParticipant participant);
+	public ArrayList<EventParticipant> saveParticipant(EventParticipant participant);
 
 	public EventRegistration saveRegistration(EventRegistration registration);
 

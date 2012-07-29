@@ -17,16 +17,17 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
-public final class EventParticipantCellTable extends EntityCellTable<EventRegistrationParticipant, EventArg, ParticipantColumn> {
+public final class EventParticipantCellTable extends EntityCellTable<EventParticipant, EventArg, ParticipantColumn> {
 	public enum ParticipantColumn implements EntityCellTableColumn<ParticipantColumn> {
-		REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE("Age"), PRICE("Price"), FIELDS("Fields"), STATUS("Status");
+		ATTENDED("Attended"), EVENT("Event"), REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE("Age"), PRICE("Price"), FIELDS(
+				"Fields"), STATUS("Status");
 
 		private String title;
 
@@ -49,8 +50,8 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 
 	private EventParticipantCellTable() {
 		setDefaultSortColumn(ParticipantColumn.PARTICIPANT_NAME, SortDirection.SORT_ASC);
-		setDisplayColumns(ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE, ParticipantColumn.AGE,
-				ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
+		setDisplayColumns(ParticipantColumn.ATTENDED, ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE,
+				ParticipantColumn.AGE, ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
 	}
 
 	@Override
@@ -60,93 +61,102 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 
 	@Override
 	protected void setColumns() {
-		addCheckboxColumn("Attended", new ValueGetter<Boolean, EventRegistrationParticipant>() {
-			@Override
-			public Boolean get(EventRegistrationParticipant item) {
-				if (item.getStatusId() != 2) {
-					// TODO disable checkbox
-				}
-				return item.getStatusId() == 4;
-			}
-		}, new FieldUpdater<EventRegistrationParticipant, Boolean>() {
-			@Override
-			public void update(int index, EventRegistrationParticipant item, Boolean value) {
-				if (item.getStatusId() != 2 && item.getStatusId() != 4) {
-					return;
-				}
-
-				if (item.hasAttended()) {
-					item.setStatusId(2);
-					item.setStatus("Confirmed");
-				} else {
-					item.setStatusId(4);
-					item.setStatus("Attended");
-				}
-				eventService.saveParticipant(item, new Callback<ArrayList<EventRegistrationParticipant>>(false) {
-					@Override
-					protected void doOnSuccess(ArrayList<EventRegistrationParticipant> result) {
-						refresh();
-					}
-				});
-			}
-		});
-
 		for (ParticipantColumn col : getDisplayColumns()) {
 			switch (col) {
-			case PRICE:
-				addCurrencyColumn(col, new ValueGetter<Double, EventRegistrationParticipant>() {
+			case EVENT:
+				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
-					public Double get(EventRegistrationParticipant item) {
+					protected Widget createWidget(EventParticipant item) {
+						return new Hyperlink(item.getEventTitle(), PageUrl.event(item.getEventId()));
+					}
+				});
+				break;
+			case ATTENDED:
+				addCheckboxColumn("Attended", new ValueGetter<Boolean, EventParticipant>() {
+					@Override
+					public Boolean get(EventParticipant item) {
+						if (item.getStatusId() != 2) {
+							// TODO disable checkbox
+						}
+						return item.getStatusId() == 4;
+					}
+				}, new FieldUpdater<EventParticipant, Boolean>() {
+					@Override
+					public void update(int index, EventParticipant item, Boolean value) {
+						if (item.getStatusId() != 2 && item.getStatusId() != 4) {
+							return;
+						}
+
+						if (item.hasAttended()) {
+							item.setStatusId(2);
+							item.setStatus("Confirmed");
+						} else {
+							item.setStatusId(4);
+							item.setStatus("Attended");
+						}
+						eventService.saveParticipant(item, new Callback<ArrayList<EventParticipant>>(false) {
+							@Override
+							protected void doOnSuccess(ArrayList<EventParticipant> result) {
+								refresh();
+							}
+						});
+					}
+				});
+				break;
+			case PRICE:
+				addCurrencyColumn(col, new ValueGetter<Double, EventParticipant>() {
+					@Override
+					public Double get(EventParticipant item) {
 						return item.getPrice();
 					}
 				});
 				break;
 			case ADDED_DATE:
-				addDateTimeColumn(col, new ValueGetter<Date, EventRegistrationParticipant>() {
+				addDateTimeColumn(col, new ValueGetter<Date, EventParticipant>() {
 					@Override
-					public Date get(EventRegistrationParticipant item) {
+					public Date get(EventParticipant item) {
 						return item.getAddedDate();
 					}
 				});
 				break;
 			case FIELDS:
-				addWidgetColumn(col, new WidgetCellCreator<EventRegistrationParticipant>() {
+				addWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
-					protected Widget createWidget(EventRegistrationParticipant item) {
+					protected Widget createWidget(EventParticipant item) {
 						return new HTML(Formatter.formatNoteText(item.getFieldValues()));
 					}
 				});
 				break;
 			case PARTICIPANT_NAME:
-				addCompositeWidgetColumn(col, new WidgetCellCreator<EventRegistrationParticipant>() {
+				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
-					protected Widget createWidget(EventRegistrationParticipant item) {
+					protected Widget createWidget(EventParticipant item) {
 						Hyperlink link = new Hyperlink(item.getFirstName() + " " + item.getLastName(), PageUrl.user(item.getUserId()));
 						return link;
 					}
 				});
 				break;
 			case REGISTRANT_NAME:
-				addCompositeWidgetColumn(col, new WidgetCellCreator<EventRegistrationParticipant>() {
+				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
-					protected Widget createWidget(EventRegistrationParticipant item) {
+					protected Widget createWidget(EventParticipant item) {
 						Hyperlink link = new Hyperlink(item.getParentFirstName() + " " + item.getParentLastName(), PageUrl.user(item.getParentId()));
 						return link;
 					}
 				});
 				break;
 			case STATUS:
-				addTextColumn(col, new ValueGetter<String, EventRegistrationParticipant>() {
+				addTextColumn(col, new ValueGetter<String, EventParticipant>() {
 					@Override
-					public String get(EventRegistrationParticipant item) {
+					public String get(EventParticipant item) {
 						return item.getStatus();
 					}
 				});
 				break;
 			case AGE:
-				addNumberColumn(col, new ValueGetter<Number, EventRegistrationParticipant>() {
+				addNumberColumn(col, new ValueGetter<Number, EventParticipant>() {
 					@Override
-					public Number get(EventRegistrationParticipant item) {
+					public Number get(EventParticipant item) {
 						if (item.getBirthDate() == null) {
 							return 0;
 						}

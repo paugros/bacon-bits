@@ -12,7 +12,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 public interface EventDao {
@@ -23,7 +23,7 @@ public interface EventDao {
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void deleteEventField(int fieldId);
 
-	public void deleteEventParticipant(EventRegistrationParticipant participant);
+	public void deleteEventParticipant(EventParticipant participant);
 
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void deleteVolunteerPosition(EventVolunteerPosition position);
@@ -38,7 +38,7 @@ public interface EventDao {
 
 	public EventPageData getPageData(int id);
 
-	public ArrayList<EventRegistrationParticipant> getParticipants(ArgMap<EventArg> args);
+	public ArrayList<EventParticipant> getParticipants(ArgMap<EventArg> args);
 
 	public ArrayList<Data> getVolunteers(int eventId);
 
@@ -51,7 +51,7 @@ public interface EventDao {
 
 	public EventField saveField(EventField field);
 
-	public ArrayList<EventRegistrationParticipant> saveParticipant(EventRegistrationParticipant participant);
+	public ArrayList<EventParticipant> saveParticipant(EventParticipant participant);
 
 	public EventRegistration saveRegistration(EventRegistration registration);
 
