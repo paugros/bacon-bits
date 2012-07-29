@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
+import com.google.appengine.api.utils.SystemProperty;
+
 /**
  * This class serves as an accessor class for thread specific data (request, response, url), session data (session, user), and the application context
  */
@@ -104,8 +106,7 @@ public class ServerContext implements ApplicationContextAware {
 			return isLive;
 		}
 
-		// String localIp = ServerUtils.getLocalNetworkIp();
-		// isLive = localIp == null || "192.168.108.14".equals(localIp);
+		isLive = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production;
 		isLiveIsSet = true;
 
 		return isLive;
