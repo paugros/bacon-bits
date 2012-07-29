@@ -28,7 +28,6 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
-import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -93,9 +92,11 @@ public class EventRegistrationSection extends Composite {
 						public void onConfirm() {
 							registration.setCanceled(!registration.getCanceled());
 
-							eventService.saveRegistration(registration, new Callback<ServerResponseData<EventRegistration>>() {
+							eventService.saveRegistration(registration, new Callback<EventRegistration>() {
 								@Override
-								protected void doOnSuccess(ServerResponseData<EventRegistration> result) {
+								protected void doOnSuccess(EventRegistration result) {
+									registration = result;
+									pageData.setRegistration(result);
 									if (registration.getCanceled()) {
 										registration.getVolunteerPositions().clear();
 										loadSection();
@@ -179,10 +180,11 @@ public class EventRegistrationSection extends Composite {
 						if (!registration.isSaved()) {
 							registration.setEventId(pageData.getEvent().getId());
 
-							eventService.saveRegistration(registration, new Callback<ServerResponseData<EventRegistration>>() {
+							eventService.saveRegistration(registration, new Callback<EventRegistration>() {
 								@Override
-								protected void doOnSuccess(ServerResponseData<EventRegistration> result) {
-									registration = result.getData();
+								protected void doOnSuccess(EventRegistration result) {
+									registration = result;
+									pageData.setRegistration(result);
 									saveVolunteerPosition(position);
 								}
 							});

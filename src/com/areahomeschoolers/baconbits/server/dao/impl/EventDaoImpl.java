@@ -33,7 +33,6 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
-import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 @Repository
@@ -494,9 +493,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public ServerResponseData<EventRegistration> saveRegistration(EventRegistration registration) {
-		ServerResponseData<EventRegistration> rd = new ServerResponseData<EventRegistration>();
-
+	public synchronized EventRegistration saveRegistration(EventRegistration registration) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(registration);
 		if (registration.isSaved()) {
 			if (registration.getCanceled()) {
@@ -504,10 +501,14 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				update(sql, namedParams);
 			}
 
-			// TODO do wait list check here
-			int statusId = registration.getCanceled() ? 5 : 1;
-			String sql = "update eventRegistrationParticipants set statusId = ? where eventRegistrationId = ?";
-			update(sql, statusId, registration.getId());
+			ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTRATION_ID, registration.getId());
+			ArrayList<EventRegistrationParticipant> participants = getParticipants(args);
+			for (EventRegistrationParticipant p : participants) {
+				p.setStatusId(registration.getCanceled() ? 5 : 1);
+				saveParticipant(p);
+			}
+
+			registration.setParticipants(getParticipants(args));
 		} else {
 			registration.setAddedById(ServerContext.getCurrentUser().getId());
 			String sql = "insert into eventRegistrations(eventId, addedDate, addedById) ";
@@ -519,9 +520,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			registration.setId(ServerUtils.getIdFromKeys(keys));
 		}
 
-		rd.setData(registration);
-
-		return rd;
+		return registration;
 	}
 
 	@Override
