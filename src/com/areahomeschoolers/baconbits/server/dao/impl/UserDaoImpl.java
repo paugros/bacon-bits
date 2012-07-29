@@ -221,7 +221,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		if (args.getStatus() != Status.ALL) {
 			sql += "and isActive(g.startDate, g.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
 		}
-		if (userId > 0 && !ServerContext.isSystemAdministrator()) {
+		if (userId > 0) {
 			sql += "and ugm.userId = ? ";
 			sqlArgs.add(userId);
 		}

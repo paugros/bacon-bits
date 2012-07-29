@@ -73,6 +73,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setDocumentCount(rs.getInt("documentCount"));
 			event.setAccessLevel(rs.getString("accessLevel"));
 			event.setAccessLevelId(rs.getInt("accessLevelId"));
+			event.setCurrentUserParticipantCount(rs.getInt("currentUserParticipantCount"));
+			event.setAgePrices(rs.getString("agePrices"));
 			return event;
 		}
 	}
@@ -567,7 +569,15 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	private String createSqlBase() {
+		int userId = ServerContext.isAuthenticated() ? ServerContext.getCurrentUser().getId() : 0;
 		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.accessLevel, \n";
+		sql += "(select group_concat(price) from eventAgeGroups where eventId = e.id) as agePrices, \n";
+		if (ServerContext.isAuthenticated()) {
+			sql += "(select count(p.id) from eventRegistrationParticipants p join eventRegistrations r on r.id = p.eventRegistrationId and r.addedById = "
+					+ userId + " where r.eventId = e.id) as currentUserParticipantCount, \n";
+		} else {
+			sql += "0 as currentUserParticipantCount, ";
+		}
 		sql += "(select count(id) from documentEventMapping where eventId = e.id) as documentCount, \n";
 		sql += "(e.endDate < now()) as finished, (e.registrationEndDate is not null and e.registrationEndDate < now()) as registrationFinished \n";
 		sql += "from events e \n";
@@ -576,7 +586,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "join users u on u.id = e.addedById \n";
 		sql += "join userAccessLevels l on l.id = e.accessLevelId \n";
 
-		int userId = ServerContext.isAuthenticated() ? ServerContext.getCurrentUser().getId() : 0;
 		sql += "left join userGroupMembers ugm on ugm.groupId = e.groupId and ugm.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
 

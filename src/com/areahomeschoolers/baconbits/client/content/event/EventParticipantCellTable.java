@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -20,11 +21,12 @@ import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
 
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class EventParticipantCellTable extends EntityCellTable<EventRegistrationParticipant, EventArg, ParticipantColumn> {
 	public enum ParticipantColumn implements EntityCellTableColumn<ParticipantColumn> {
-		REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE("Age"), FIELDS("Fields"), STATUS("Status");
+		REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE("Age"), PRICE("Price"), FIELDS("Fields"), STATUS("Status");
 
 		private String title;
 
@@ -48,7 +50,7 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 	private EventParticipantCellTable() {
 		setDefaultSortColumn(ParticipantColumn.PARTICIPANT_NAME, SortDirection.SORT_ASC);
 		setDisplayColumns(ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE, ParticipantColumn.AGE,
-				ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
+				ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
 	}
 
 	@Override
@@ -91,6 +93,14 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 
 		for (ParticipantColumn col : getDisplayColumns()) {
 			switch (col) {
+			case PRICE:
+				addCurrencyColumn(col, new ValueGetter<Double, EventRegistrationParticipant>() {
+					@Override
+					public Double get(EventRegistrationParticipant item) {
+						return item.getPrice();
+					}
+				});
+				break;
 			case ADDED_DATE:
 				addDateTimeColumn(col, new ValueGetter<Date, EventRegistrationParticipant>() {
 					@Override
@@ -108,18 +118,20 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 				});
 				break;
 			case PARTICIPANT_NAME:
-				addTextColumn(col, new ValueGetter<String, EventRegistrationParticipant>() {
+				addCompositeWidgetColumn(col, new WidgetCellCreator<EventRegistrationParticipant>() {
 					@Override
-					public String get(EventRegistrationParticipant item) {
-						return item.getFirstName() + " " + item.getLastName();
+					protected Widget createWidget(EventRegistrationParticipant item) {
+						Hyperlink link = new Hyperlink(item.getFirstName() + " " + item.getLastName(), PageUrl.user(item.getUserId()));
+						return link;
 					}
 				});
 				break;
 			case REGISTRANT_NAME:
-				addTextColumn(col, new ValueGetter<String, EventRegistrationParticipant>() {
+				addCompositeWidgetColumn(col, new WidgetCellCreator<EventRegistrationParticipant>() {
 					@Override
-					public String get(EventRegistrationParticipant item) {
-						return item.getParentFirstName() + " " + item.getParentLastName();
+					protected Widget createWidget(EventRegistrationParticipant item) {
+						Hyperlink link = new Hyperlink(item.getParentFirstName() + " " + item.getParentLastName(), PageUrl.user(item.getParentId()));
+						return link;
 					}
 				});
 				break;
