@@ -21,8 +21,6 @@ public class Mailer {
 	private final List<String> tos = new ArrayList<String>();
 	private final List<String> ccs = new ArrayList<String>();
 	private final List<String> bccs = new ArrayList<String>();
-	private final String sysFrom = "Area Homeschoolers <system@areahomeschoolers.com>";
-	private String from = null;
 	private String subject;
 	private String body;
 	private final Properties properties = new Properties();
@@ -30,7 +28,7 @@ public class Mailer {
 	private final Message message;
 
 	public Mailer() {
-		Session session = Session.getInstance(properties, null);
+		Session session = Session.getDefaultInstance(properties, null);
 		session.setDebug(!ServerContext.isLive());
 
 		message = new MimeMessage(session);
@@ -75,18 +73,19 @@ public class Mailer {
 	}
 
 	public String getFrom() {
-		String from = this.from;
-
-		if (from == null) {
-			User curUser = getUser();
-			if (Common.isValidEmail(curUser.getEmail())) {
-				from = curUser.getFullName() + " <" + curUser.getEmail() + ">";
-			} else {
-				from = sysFrom;
-			}
-		}
-
-		return from;
+		return "paul.augros@gmail.com";
+		// String from = this.from;
+		//
+		// if (from == null) {
+		// User curUser = getUser();
+		// if (Common.isValidEmail(curUser.getEmail())) {
+		// from = curUser.getFullName() + " <" + curUser.getEmail() + ">";
+		// } else {
+		// from = sysFrom;
+		// }
+		// }
+		//
+		// return from;
 	}
 
 	public Message getMessage() {
@@ -175,10 +174,6 @@ public class Mailer {
 		this.body = body;
 	}
 
-	public void setFrom(String from) {
-		this.from = from;
-	}
-
 	public void setHtmlMail(boolean isHtmlMail) {
 		this.isHtmlMail = isHtmlMail;
 	}
@@ -200,10 +195,6 @@ public class Mailer {
 		ret += "\nbody: " + body;
 
 		return ret;
-	}
-
-	public void useSystemFrom() {
-		from = sysFrom;
 	}
 
 	private InternetAddress[] getAddresses(List<String> addresses) throws AddressException {

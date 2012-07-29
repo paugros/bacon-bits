@@ -68,17 +68,16 @@ public class UserServiceImpl extends GwtController implements UserService {
 
 		if (user.getGeneratePassword() && !response.hasErrors()) {
 			Mailer mail = new Mailer();
-			mail.useSystemFrom();
 			mail.addTo(user.getFullName() + " <" + user.getEmail() + ">");
-			mail.setSubject("Area Homeschoolers Login Information");
+			mail.setSubject("WHE Login Information");
 			String msg = "Hello,\n\n";
 			if (!user.isSaved()) {
-				msg += "A login account has been created for you at Area Homeschoolers. \n\n";
+				msg += "A login account has been created for you at WHE. \n\n";
 			} else {
-				msg += "The password for your Area Homeschoolers account has been reset. ";
+				msg += "The password for your WHE account has been reset. ";
 			}
 			msg += "Login information appears below. You will be required to establish a new password upon logging in.\n\n";
-			msg += "Site: http://areahomeschoolers.appspot.com/\n";
+			msg += "Site: http://www.nhhomeeducators.com\n";
 			msg += "User name: " + user.getUserName() + "\n";
 			msg += "Password: " + password + "\n\n";
 			msg += "Thank you.\n\n";
