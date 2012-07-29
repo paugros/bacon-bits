@@ -36,7 +36,6 @@ import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
-import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -70,10 +69,11 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 				if (!registration.isSaved()) {
 					registration.setEventId(pageData.getEvent().getId());
 
-					eventService.saveRegistration(registration, new Callback<ServerResponseData<EventRegistration>>() {
+					eventService.saveRegistration(registration, new Callback<EventRegistration>() {
 						@Override
-						protected void doOnSuccess(ServerResponseData<EventRegistration> result) {
-							registration = result.getData();
+						protected void doOnSuccess(EventRegistration result) {
+							registration = result;
+							pageData.setRegistration(result);
 							saveParticipant();
 						}
 					});

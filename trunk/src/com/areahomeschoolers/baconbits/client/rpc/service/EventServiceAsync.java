@@ -12,7 +12,6 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
-import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -50,7 +49,7 @@ public interface EventServiceAsync {
 
 	void saveParticipant(EventRegistrationParticipant participant, AsyncCallback<ArrayList<EventRegistrationParticipant>> callback);
 
-	void saveRegistration(EventRegistration registration, AsyncCallback<ServerResponseData<EventRegistration>> callback);
+	void saveRegistration(EventRegistration registration, AsyncCallback<EventRegistration> callback);
 
 	void saveVolunteerPosition(EventVolunteerPosition position, AsyncCallback<EventVolunteerPosition> callback);
 

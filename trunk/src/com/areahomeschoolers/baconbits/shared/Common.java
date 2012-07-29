@@ -94,7 +94,6 @@ public abstract class Common {
 		return list;
 	}
 
-	// @SafeVarargs TODO Put these back for Java 7
 	public final static <T> ArrayList<T> asArrayList(T... objects) {
 		ArrayList<T> list = new ArrayList<T>();
 		for (T object : objects) {
