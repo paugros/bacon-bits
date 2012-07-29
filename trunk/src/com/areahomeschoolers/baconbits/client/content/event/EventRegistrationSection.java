@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -127,7 +128,7 @@ public class EventRegistrationSection extends Composite {
 		vp.add(tb);
 
 		participantTable = new FlexTable();
-		participantTable.setWidth("300px");
+		participantTable.setWidth("400px");
 		populateParticipants();
 		vp.add(participantTable);
 	}
@@ -260,8 +261,12 @@ public class EventRegistrationSection extends Composite {
 			if (p.isCanceled() || registration.getCanceled()) {
 				participantTable.getCellFormatter().addStyleName(i, 1, "strikeText");
 			} else {
-				totalPrice += p.getPrice();
+				if (!p.isWaiting()) {
+					totalPrice += p.getPrice();
+				}
 			}
+
+			participantTable.setText(i, 2, p.getStatus());
 
 			if (!registration.getCanceled() && pageData.getEvent().allowRegistrations()) {
 				ClickLabel cl = new ClickLabel(editText, new MouseDownHandler() {
@@ -276,12 +281,12 @@ public class EventRegistrationSection extends Composite {
 						ConfirmDialog.confirm(confirmText, new ConfirmHandler() {
 							@Override
 							public void onConfirm() {
-								// TODO do wait list check here
 								p.setStatusId(p.isCanceled() ? 1 : 5);
 
-								eventService.saveParticipant(p, new Callback<EventRegistrationParticipant>() {
+								eventService.saveParticipant(p, new Callback<ArrayList<EventRegistrationParticipant>>() {
 									@Override
-									protected void doOnSuccess(EventRegistrationParticipant result) {
+									protected void doOnSuccess(ArrayList<EventRegistrationParticipant> result) {
+										registration.setParticipants(result);
 										populateParticipants();
 									}
 								});
@@ -290,8 +295,8 @@ public class EventRegistrationSection extends Composite {
 					}
 				});
 
-				participantTable.setWidget(i, 2, cl);
-				participantTable.getCellFormatter().setHorizontalAlignment(i, 2, HasHorizontalAlignment.ALIGN_RIGHT);
+				participantTable.setWidget(i, 3, cl);
+				participantTable.getCellFormatter().setHorizontalAlignment(i, 3, HasHorizontalAlignment.ALIGN_RIGHT);
 			}
 		}
 
@@ -302,6 +307,10 @@ public class EventRegistrationSection extends Composite {
 			participantTable.setText(row, 1, Formatter.formatCurrency(totalPrice));
 			participantTable.getCellFormatter().addStyleName(row, 1, "totalCell");
 		}
+
+		participantTable.getColumnFormatter().setWidth(0, "180px");
+		participantTable.getColumnFormatter().setWidth(1, "80px");
+		participantTable.getColumnFormatter().setWidth(2, "80px");
 	}
 
 	private void populateVolunteerPositions() {

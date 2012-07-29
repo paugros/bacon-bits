@@ -239,7 +239,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		return column;
 	}
 
-	// @SafeVarargs TODO Put these back for Java 7
 	public final void addColumn(C... columns) {
 		for (C column : columns) {
 			if (displayColumns.contains(column)) {

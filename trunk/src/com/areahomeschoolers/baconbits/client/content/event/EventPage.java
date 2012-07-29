@@ -580,11 +580,11 @@ public class EventPage implements Page {
 				}
 			});
 
-			if (Application.administratorOf(calendarEvent.getGroupId())) {
-				tabPanel.add("Fields", false, new TabPageCommand() {
+			if (calendarEvent.getRequiresRegistration()) {
+				tabPanel.add("Register", false, new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
-						tabBody.add(new EventFieldsTab(pageData));
+						tabBody.add(new EventRegistrationSection(pageData));
 
 						tabPanel.selectTabNow(tabBody);
 					}
@@ -593,11 +593,11 @@ public class EventPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			if (calendarEvent.getRequiresRegistration()) {
-				tabPanel.add("Register", false, new TabPageCommand() {
+			if (Application.administratorOf(calendarEvent.getGroupId())) {
+				tabPanel.add("Fields", false, new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
-						tabBody.add(new EventRegistrationSection(pageData));
+						tabBody.add(new EventFieldsTab(pageData));
 
 						tabPanel.selectTabNow(tabBody);
 					}

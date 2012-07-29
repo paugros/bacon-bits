@@ -150,11 +150,10 @@ public class ParticipantEditDialog extends EntityEditDialog<EventRegistrationPar
 		entity.setEventRegistrationId(registration.getId());
 		entity.setEventFields(eventFields);
 
-		eventService.saveParticipant(entity, new Callback<EventRegistrationParticipant>() {
+		eventService.saveParticipant(entity, new Callback<ArrayList<EventRegistrationParticipant>>() {
 			@Override
-			protected void doOnSuccess(EventRegistrationParticipant result) {
-				registration.getParticipants().remove(result);
-				registration.getParticipants().add(result);
+			protected void doOnSuccess(ArrayList<EventRegistrationParticipant> result) {
+				registration.setParticipants(result);
 				refreshCommand.execute(registration);
 			}
 		});

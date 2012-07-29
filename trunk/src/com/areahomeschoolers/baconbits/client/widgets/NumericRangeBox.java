@@ -16,24 +16,10 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 	private final NumericTextBox toInput;
 	private boolean allowSameVal = true;
 	private boolean allowZeroForNoLimit = false;
-	private boolean hasRange = false;
 
 	private final Validator validator = new Validator(focusPanel, new ValidatorCommand() {
 		@Override
 		public void validate(Validator validator) {
-
-			if (!fromInput.getValidator().validate() || !toInput.getValidator().validate()) {
-				if (hasRange) {
-					String min = fromInput.getPrecision() == 0 ? Long.toString(Math.round(fromInput.getMinimumValue())) : Double.toString(fromInput
-							.getMinimumValue());
-					String max = fromInput.getPrecision() == 0 ? Long.toString(Math.round(fromInput.getMaximumValue())) : Double.toString(fromInput
-							.getMaximumValue());
-					validator.setErrorMessage("Must enter values between " + min + " and " + max + ".");
-				}
-				validator.setError(true);
-				return;
-			}
-
 			if (!isRequired()) {
 				return;
 			}
@@ -121,8 +107,6 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 
 		fromInput.setMaximumValue(max);
 		toInput.setText(Double.toString(max));
-
-		hasRange = true;
 	}
 
 	public void setRange(int min, int max) {
@@ -131,8 +115,6 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 
 		fromInput.setMaximumValue(max);
 		toInput.setText(Integer.toString(max));
-
-		hasRange = true;
 	}
 
 	@Override
