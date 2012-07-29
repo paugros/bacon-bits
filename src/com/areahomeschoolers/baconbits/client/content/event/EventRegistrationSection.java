@@ -26,7 +26,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -119,7 +119,7 @@ public class EventRegistrationSection extends Composite {
 						return;
 					}
 
-					EventRegistrationParticipant rp = new EventRegistrationParticipant();
+					EventParticipant rp = new EventParticipant();
 					rp.setEventRegistrationId(registration.getId());
 					new ParticipantEditDialog(pageData, refreshParticipants).center(rp);
 				}
@@ -241,7 +241,7 @@ public class EventRegistrationSection extends Composite {
 		participantTable.removeAllRows();
 		double totalPrice = 0;
 		for (int i = 0; i < registration.getParticipants().size(); i++) {
-			final EventRegistrationParticipant p = registration.getParticipants().get(i);
+			final EventParticipant p = registration.getParticipants().get(i);
 			String text = p.getFirstName() + " " + p.getLastName();
 			ClickLabel editLabel = new ClickLabel(text, new MouseDownHandler() {
 				@Override
@@ -285,9 +285,9 @@ public class EventRegistrationSection extends Composite {
 							public void onConfirm() {
 								p.setStatusId(p.isCanceled() ? 1 : 5);
 
-								eventService.saveParticipant(p, new Callback<ArrayList<EventRegistrationParticipant>>() {
+								eventService.saveParticipant(p, new Callback<ArrayList<EventParticipant>>() {
 									@Override
-									protected void doOnSuccess(ArrayList<EventRegistrationParticipant> result) {
+									protected void doOnSuccess(ArrayList<EventParticipant> result) {
 										registration.setParticipants(result);
 										populateParticipants();
 									}

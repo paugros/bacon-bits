@@ -9,7 +9,7 @@ public final class EventRegistration extends EntityDto<EventRegistration> {
 	private Date addedDate;
 	private int eventId;
 	private int addedById;
-	private ArrayList<EventRegistrationParticipant> participants = new ArrayList<EventRegistrationParticipant>();
+	private ArrayList<EventParticipant> participants = new ArrayList<EventParticipant>();
 	private ArrayList<EventVolunteerPosition> volunteerPositions = new ArrayList<EventVolunteerPosition>();
 
 	// aux
@@ -35,7 +35,7 @@ public final class EventRegistration extends EntityDto<EventRegistration> {
 		return eventId;
 	}
 
-	public ArrayList<EventRegistrationParticipant> getParticipants() {
+	public ArrayList<EventParticipant> getParticipants() {
 		return participants;
 	}
 
@@ -59,7 +59,7 @@ public final class EventRegistration extends EntityDto<EventRegistration> {
 		this.eventId = eventId;
 	}
 
-	public void setParticipants(ArrayList<EventRegistrationParticipant> participants) {
+	public void setParticipants(ArrayList<EventParticipant> participants) {
 		this.participants = participants;
 	}
 

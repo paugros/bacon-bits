@@ -30,8 +30,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -101,7 +101,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public void deleteEventParticipant(EventRegistrationParticipant participant) {
+	public void deleteEventParticipant(EventParticipant participant) {
 		String sql = "delete from eventRegistrationParticipants where id = ?";
 		update(sql, participant.getId());
 	}
@@ -136,7 +136,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int ageGroupId = args.getInt(EventArg.AGE_GROUP_ID);
 		int eventId = args.getInt(EventArg.EVENT_ID);
-		final int participantId = args.getInt(EventArg.REGISTRATION_PARTICIPANT_ID);
+		final int participantId = args.getInt(EventArg.PARTICIPANT_ID);
 
 		String sql = "select ef.*, et.type ";
 		if (participantId > 0) {
@@ -228,7 +228,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 					if (!Common.isNullOrEmpty(r.getParticipants())) {
 						int canceledCount = 0;
-						for (EventRegistrationParticipant p : r.getParticipants()) {
+						for (EventParticipant p : r.getParticipants()) {
 							if (p.isCanceled()) {
 								canceledCount++;
 							}
@@ -262,14 +262,15 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public ArrayList<EventRegistrationParticipant> getParticipants(ArgMap<EventArg> args) {
+	public ArrayList<EventParticipant> getParticipants(ArgMap<EventArg> args) {
 		int registrationId = args.getInt(EventArg.REGISTRATION_ID);
-		int participantId = args.getInt(EventArg.REGISTRATION_PARTICIPANT_ID);
+		int participantId = args.getInt(EventArg.PARTICIPANT_ID);
 		int eventId = args.getInt(EventArg.EVENT_ID);
+		int parentId = args.getInt(EventArg.PARENT_ID);
 		final boolean includeFields = args.getBoolean(EventArg.INCLUDE_FIELDS);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
-		String sql = "select p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
+		String sql = "select r.eventId, e.title, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
 		sql += "up.firstName as parentFirstName, up.lastName as parentLastName, \n";
 		if (includeFields) {
 			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n\n";
@@ -286,24 +287,32 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 		sql += "join events e on e.id = r.eventId \n";
 		sql += "where 1 = 1 \n";
+
 		if (registrationId > 0) {
 			sql += "and p.eventRegistrationId = ? \n";
 			sqlArgs.add(registrationId);
 		}
+
 		if (participantId > 0) {
 			sql += "and p.id = ? \n";
 			sqlArgs.add(participantId);
 		}
+
+		if (parentId > 0) {
+			sql += "and u.parentId = ? \n";
+			sqlArgs.add(parentId);
+		}
+
 		if (eventId > 0) {
 			sql += "and r.eventId = ? \n";
 			sqlArgs.add(eventId);
 		}
 		sql += "order by u.lastName, u.firstName \n";
 
-		return query(sql, new RowMapper<EventRegistrationParticipant>() {
+		return query(sql, new RowMapper<EventParticipant>() {
 			@Override
-			public EventRegistrationParticipant mapRow(ResultSet rs, int row) throws SQLException {
-				EventRegistrationParticipant p = new EventRegistrationParticipant();
+			public EventParticipant mapRow(ResultSet rs, int row) throws SQLException {
+				EventParticipant p = new EventParticipant();
 				p.setId(rs.getInt("id"));
 				p.setAgeGroupId(rs.getInt("ageGroupId"));
 				p.setEventRegistrationId(rs.getInt("eventRegistrationId"));
@@ -318,6 +327,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setParentId(rs.getInt("parentId"));
 				p.setUserId(rs.getInt("userId"));
 				p.setAddedDate(rs.getTimestamp("addedDate"));
+				p.setEventId(rs.getInt("eventId"));
+				p.setEventTitle(rs.getString("title"));
 				if (includeFields) {
 					p.setFieldValues(rs.getString("fieldValues"));
 				}
@@ -438,7 +449,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public synchronized ArrayList<EventRegistrationParticipant> saveParticipant(EventRegistrationParticipant participant) {
+	public synchronized ArrayList<EventParticipant> saveParticipant(EventParticipant participant) {
 
 		if (participant.getStatusId() == 0) {
 			participant.setStatusId(1);
@@ -504,8 +515,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			}
 
 			ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTRATION_ID, registration.getId());
-			ArrayList<EventRegistrationParticipant> participants = getParticipants(args);
-			for (EventRegistrationParticipant p : participants) {
+			ArrayList<EventParticipant> participants = getParticipants(args);
+			for (EventParticipant p : participants) {
 				p.setStatusId(registration.getCanceled() ? 5 : 1);
 				saveParticipant(p);
 			}

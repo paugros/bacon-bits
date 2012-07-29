@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public final class EventRegistrationParticipant extends EntityDto<EventRegistrationParticipant> {
+public final class EventParticipant extends EntityDto<EventParticipant> {
 	private static final long serialVersionUID = 1L;
 	private String firstName, lastName;
 	private int eventRegistrationId;
@@ -15,6 +15,8 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 
 	// aux
 	private String status;
+	private int eventId;
+	private String eventTitle;
 	private String fieldValues;
 	private User user;
 	private Date birthDate;
@@ -23,7 +25,7 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 	private String parentFirstName, parentLastName;
 	private int parentId;
 
-	public EventRegistrationParticipant() {
+	public EventParticipant() {
 
 	}
 
@@ -46,8 +48,16 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		return eventFields;
 	}
 
+	public int getEventId() {
+		return eventId;
+	}
+
 	public int getEventRegistrationId() {
 		return eventRegistrationId;
+	}
+
+	public String getEventTitle() {
+		return eventTitle;
 	}
 
 	public String getFieldValues() {
@@ -122,8 +132,16 @@ public final class EventRegistrationParticipant extends EntityDto<EventRegistrat
 		this.eventFields = eventFields;
 	}
 
+	public void setEventId(int eventId) {
+		this.eventId = eventId;
+	}
+
 	public void setEventRegistrationId(int eventRegistrationId) {
 		this.eventRegistrationId = eventRegistrationId;
+	}
+
+	public void setEventTitle(String eventTitle) {
+		this.eventTitle = eventTitle;
 	}
 
 	public void setFieldValues(String fieldValues) {

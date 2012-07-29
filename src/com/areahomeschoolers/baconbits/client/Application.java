@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.client.content.article.ArticleGroupPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
 import com.areahomeschoolers.baconbits.client.content.event.EventListPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventPage;
+import com.areahomeschoolers.baconbits.client.content.event.EventParticipantListPage;
 import com.areahomeschoolers.baconbits.client.content.home.HomePage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
@@ -74,16 +75,16 @@ public final class Application implements ValueChangeHandler<String> {
 		return isAuthenticated() && applicationData.getCurrentUser().hasRole(level);
 	}
 
-	public static boolean isSystemAdministrator() {
-		return isAuthenticated() && applicationData.getCurrentUser().getSystemAdministrator();
-	}
-
 	public static boolean isAuthenticated() {
 		return applicationData.getCurrentUser() != null;
 	}
 
 	public static boolean isLive() {
 		return applicationData.isLive();
+	}
+
+	public static boolean isSystemAdministrator() {
+		return isAuthenticated() && applicationData.getCurrentUser().getSystemAdministrator();
 	}
 
 	public static boolean memberOf(Integer groupId) {
@@ -122,6 +123,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new UserGroupListPage(vp);
 		} else if ("ArticleGroup".equals(page)) {
 			new ArticleGroupPage(vp);
+		} else if ("EventParticipantList".equals(page)) {
+			new EventParticipantListPage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

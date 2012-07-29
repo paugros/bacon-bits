@@ -139,6 +139,9 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getEventsMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Events", PageUrl.eventList());
+		if (Application.isAuthenticated()) {
+			addLinkToMenu(menu, "My Participants", PageUrl.eventParticipantList());
+		}
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
 		}

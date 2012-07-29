@@ -10,7 +10,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistrationParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -21,7 +21,7 @@ public interface EventServiceAsync {
 
 	void deleteEventField(int fieldId, AsyncCallback<Void> callback);
 
-	void deleteEventParticipant(EventRegistrationParticipant participant, AsyncCallback<Void> callback);
+	void deleteEventParticipant(EventParticipant participant, AsyncCallback<Void> callback);
 
 	void deleteVolunteerPosition(EventVolunteerPosition position, AsyncCallback<Void> callback);
 
@@ -35,7 +35,7 @@ public interface EventServiceAsync {
 
 	void getPageData(int id, AsyncCallback<EventPageData> callback);
 
-	void getParticipants(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventRegistrationParticipant>> callback);
+	void getParticipants(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventParticipant>> callback);
 
 	void getVolunteers(int eventId, AsyncCallback<ArrayList<Data>> callback);
 
@@ -47,7 +47,7 @@ public interface EventServiceAsync {
 
 	void saveEventField(EventField field, AsyncCallback<EventField> callback);
 
-	void saveParticipant(EventRegistrationParticipant participant, AsyncCallback<ArrayList<EventRegistrationParticipant>> callback);
+	void saveParticipant(EventParticipant participant, AsyncCallback<ArrayList<EventParticipant>> callback);
 
 	void saveRegistration(EventRegistration registration, AsyncCallback<EventRegistration> callback);
 
