@@ -169,7 +169,7 @@ public class UserFieldTable extends FieldTable {
 			addField(passwordField);
 		}
 
-		if (!Application.isAuthenticated()) {
+		if (!Application.isAuthenticated() && !user.isSaved()) {
 			PasswordInputs inputs = new PasswordInputs(new Command() {
 				@Override
 				public void execute() {
