@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
+import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
@@ -41,6 +42,8 @@ import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
+import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
+import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
@@ -571,7 +574,22 @@ public class EventPage implements Page {
 			tabPanel.add("Event", false, new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					tabBody.add(WidgetFactory.newSection(title, fieldTable));
+					TitleBar tb = new TitleBar(title, TitleBarStyle.SECTION);
+					if (Application.isSystemAdministrator()) {
+						tb.addLink(new ClickLabel("Clone", new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								ConfirmDialog.confirm("Clone this event?", new ConfirmHandler() {
+									@Override
+									public void onConfirm() {
+										calendarEvent.setId(0);
+										save(form.getFirstFormField());
+									}
+								});
+							}
+						}));
+					}
+					tabBody.add(WidgetFactory.newSection(tb, fieldTable));
 
 					// we need to do this again in case we started on another tab
 					form.initialize();
@@ -645,6 +663,10 @@ public class EventPage implements Page {
 						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
 						args.put(EventArg.INCLUDE_FIELDS);
 						EventParticipantCellTable table = new EventParticipantCellTable(args);
+						if (Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
+							table.setDisplayColumns(ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE,
+									ParticipantColumn.AGE, ParticipantColumn.PRICE, ParticipantColumn.STATUS);
+						}
 						table.populate();
 						table.setTitle("Participants");
 						tabBody.add(WidgetFactory.newSection(table));
@@ -789,10 +811,12 @@ public class EventPage implements Page {
 	}
 
 	private void save(final FormField field) {
+		final boolean isSaved = calendarEvent.isSaved();
+
 		eventService.save(calendarEvent, new Callback<Event>() {
 			@Override
 			protected void doOnSuccess(Event e) {
-				if (!Url.isParamValidId("eventId")) {
+				if (!isSaved) {
 					HistoryToken.set(PageUrl.event(e.getId()));
 				} else {
 					calendarEvent = e;

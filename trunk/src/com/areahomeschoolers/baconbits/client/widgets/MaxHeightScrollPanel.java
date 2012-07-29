@@ -57,14 +57,17 @@ public class MaxHeightScrollPanel extends ScrollPanel {
 			setHeight("0px");
 			return;
 		}
+
+		getScrollableElement().getStyle().setOverflowX(Overflow.HIDDEN);
+
 		if (scrolling && w.getOffsetHeight() > maxHeight) {
 			setHeight(maxHeight + "px");
 		} else {
-			if (getMaximumHorizontalScrollPosition() <= 22) {
-				getScrollableElement().getStyle().setOverflowX(Overflow.HIDDEN);
-			} else {
-				getScrollableElement().getStyle().setOverflowX(Overflow.AUTO);
-			}
+			// if (getMaximumHorizontalScrollPosition() <= 22) {
+			// getScrollableElement().getStyle().setOverflowX(Overflow.HIDDEN);
+			// } else {
+			// getScrollableElement().getStyle().setOverflowX(Overflow.AUTO);
+			// }
 			setHeight((w.getOffsetHeight()) + "px");
 		}
 	}

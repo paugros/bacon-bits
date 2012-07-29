@@ -32,6 +32,8 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private int accessLevelId;
 
 	// auxilliary
+	private int currentUserParticipantCount;
+	private String agePrices;
 	private int documentCount;
 	private String category;
 	private String groupName;
@@ -78,6 +80,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		return adultRequired;
 	}
 
+	public String getAgePrices() {
+		return agePrices;
+	}
+
 	public String getCategory() {
 		return category;
 	}
@@ -88,6 +94,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public double getCost() {
 		return cost;
+	}
+
+	public int getCurrentUserParticipantCount() {
+		return currentUserParticipantCount;
 	}
 
 	public String getDescription() {
@@ -216,6 +226,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		this.adultRequired = adultRequired;
 	}
 
+	public void setAgePrices(String agePrices) {
+		this.agePrices = agePrices;
+	}
+
 	public void setCategory(String category) {
 		this.category = category;
 	}
@@ -226,6 +240,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public void setCost(double cost) {
 		this.cost = cost;
+	}
+
+	public void setCurrentUserParticipantCount(int currentUserParticipantCount) {
+		this.currentUserParticipantCount = currentUserParticipantCount;
 	}
 
 	public void setDescription(String description) {

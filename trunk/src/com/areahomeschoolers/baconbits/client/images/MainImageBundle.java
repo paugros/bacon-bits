@@ -13,6 +13,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource cancel();
 
+	ImageResource checkMark();
+
 	ImageResource collapse();
 
 	ImageResource edit();
