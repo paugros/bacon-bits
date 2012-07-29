@@ -53,7 +53,7 @@ public interface EventService extends RemoteService {
 
 	public EventField saveEventField(EventField field);
 
-	public EventRegistrationParticipant saveParticipant(EventRegistrationParticipant participant);
+	public ArrayList<EventRegistrationParticipant> saveParticipant(EventRegistrationParticipant participant);
 
 	public ServerResponseData<EventRegistration> saveRegistration(EventRegistration registration);
 

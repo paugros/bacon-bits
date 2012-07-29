@@ -109,7 +109,7 @@ public class EventServiceImpl extends GwtController implements EventService {
 	}
 
 	@Override
-	public EventRegistrationParticipant saveParticipant(EventRegistrationParticipant participant) {
+	public ArrayList<EventRegistrationParticipant> saveParticipant(EventRegistrationParticipant participant) {
 		return dao.saveParticipant(participant);
 	}
 

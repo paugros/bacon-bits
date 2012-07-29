@@ -48,7 +48,7 @@ public interface EventServiceAsync {
 
 	void saveEventField(EventField field, AsyncCallback<EventField> callback);
 
-	void saveParticipant(EventRegistrationParticipant participant, AsyncCallback<EventRegistrationParticipant> callback);
+	void saveParticipant(EventRegistrationParticipant participant, AsyncCallback<ArrayList<EventRegistrationParticipant>> callback);
 
 	void saveRegistration(EventRegistration registration, AsyncCallback<ServerResponseData<EventRegistration>> callback);
 

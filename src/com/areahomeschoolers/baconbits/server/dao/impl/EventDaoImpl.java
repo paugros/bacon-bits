@@ -437,12 +437,28 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public EventRegistrationParticipant saveParticipant(EventRegistrationParticipant participant) {
-		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);
+	public synchronized ArrayList<EventRegistrationParticipant> saveParticipant(EventRegistrationParticipant participant) {
 
+		if (participant.getStatusId() == 0) {
+			participant.setStatusId(1);
+		}
+
+		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTRATION_ID, participant.getEventRegistrationId());
+		args.put(EventArg.AGE_GROUP_ID, participant.getAgeGroupId());
+		Data waitData = getWaitData(args);
+		boolean eventIsFull = eventIsFull(waitData);
+		if (participant.getStatusId() == 1 && eventIsFull) {
+			participant.setStatusId(3);
+		}
+
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);
 		if (participant.isSaved()) {
 			String sql = "update eventRegistrationParticipants set statusId = :statusId where id = :id ";
 			update(sql, namedParams);
+
+			if (participant.getStatusId() == 5 && eventIsFull) {
+				registerNextWaitingParticipant(waitData);
+			}
 		} else {
 			// create or update the associated user
 			User u = participant.getUser();
@@ -457,11 +473,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			UserDao userDao = ServerContext.getDaoImpl("user");
 			u = userDao.save(u).getData();
 			participant.setUserId(u.getId());
-
-			// TODO do wait list check here
-			if (participant.getStatusId() == 0) {
-				participant.setStatusId(1);
-			}
 
 			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, userId, statusId, ageGroupId, addedDate) ";
 			sql += "values(:eventRegistrationId, :userId, :statusId, :ageGroupId, now())";
@@ -479,7 +490,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			}
 		}
 
-		return getParticipants(new ArgMap<EventArg>(EventArg.REGISTRATION_PARTICIPANT_ID, participant.getId())).get(0);
+		return getParticipants(new ArgMap<EventArg>(EventArg.REGISTRATION_ID, participant.getEventRegistrationId()));
 	}
 
 	@Override
@@ -578,6 +589,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		return sql;
 	}
 
+	private boolean eventIsFull(Data info) {
+		if (info == null) {
+			return false;
+		}
+		return info.getInt("maxParticipants") > 0 && (info.getInt("participants") >= info.getInt("maxParticipants"));
+	}
+
 	private ArrayList<EventVolunteerPosition> getVolunteerPositions(int eventId, final int registrationId) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		sqlArgs.add(eventId);
@@ -614,6 +632,83 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				return e;
 			}
 		}, sqlArgs.toArray());
+	}
+
+	private Data getWaitData(ArgMap<EventArg> args) {
+		List<Object> sqlArgs = new ArrayList<Object>();
+		int eventId = args.getInt(EventArg.EVENT_ID);
+		int ageGroupId = args.getInt(EventArg.AGE_GROUP_ID);
+		int registrationId = args.getInt(EventArg.REGISTRATION_ID);
+
+		String sql = "select r.eventId, p.ageGroupId, \n";
+		sql += "case p.ageGroupId when 0 then e.maximumParticipants else g.maximumParticipants end as maxParticipants, \n";
+		sql += "sum(case when  p.statusId in(1, 2) then 1 else 0 end) as participants \n";
+		sql += "from eventRegistrationParticipants p \n";
+		sql += "left join eventAgeGroups g on g.id = p.ageGroupId \n";
+		sql += "join eventRegistrations r on p.eventRegistrationId = r.id \n";
+		sql += "join events e on e.id = r.eventId \n";
+		sql += "where 1 = 1 ";
+		if (eventId > 0) {
+			sql += "and e.id = ? \n";
+			sqlArgs.add(eventId);
+		}
+		if (registrationId > 0) {
+			sql += "and r.id = ? \n";
+			sqlArgs.add(registrationId);
+		}
+		if (ageGroupId > 0) {
+			sql += "and p.ageGroupId = ? \n";
+			sqlArgs.add(ageGroupId);
+		}
+		sql += "group by r.eventId, p.ageGroupId limit 1";
+
+		return queryForObject(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
+	}
+
+	private void registerNextWaitingParticipant(Data info) {
+		List<Object> sqlArgs = new ArrayList<Object>();
+		int eventId = info.getInt("eventId");
+		int ageGroupId = info.getInt("ageGroupId");
+
+		if (eventId == 0 && ageGroupId == 0) {
+			return;
+		}
+
+		String sql = "select p.id, r.eventId, e.title, concat(up.firstName, ' ', up.lastName) as participantName, \n";
+		sql += "concat(ur.firstName, ' ', ur.lastName) as registrantName, ur.email ";
+		sql += "from eventRegistrationParticipants p \n";
+		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
+		sql += "join users ur on ur.id = r.addedById \n";
+		sql += "join users up on up.id = p.userId \n";
+		sql += "join events e on e.id = r.eventId \n";
+		sql += "where p.statusId = 3 \n";
+		if (ageGroupId > 0) {
+			sql += "and p.ageGroupId = ? \n";
+			sqlArgs.add(ageGroupId);
+		}
+		if (eventId > 0) {
+			sql += "and e.id = ? \n";
+			sqlArgs.add(eventId);
+		}
+		sql += "order by p.addedDate limit 1";
+
+		ArrayList<Data> notify = query(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
+
+		if (notify.isEmpty()) {
+			return;
+		}
+
+		List<Integer> ids = new ArrayList<Integer>();
+		for (Data n : notify) {
+			// TODO send email here
+			// System.out.println(n.get("registrantName") + ", " + n.get("participantName") + ", " + n.get("email"));
+			ids.add(n.getId());
+		}
+
+		String idString = Common.join(ids, ", ");
+		sql = "update eventRegistrationParticipants set statusId = 1 where id in(" + idString + ")";
+
+		update(sql);
 	}
 
 	private void saveFieldValue(EventField field) {

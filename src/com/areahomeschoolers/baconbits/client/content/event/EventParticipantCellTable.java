@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
@@ -60,11 +61,18 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 		addCheckboxColumn("Attended", new ValueGetter<Boolean, EventRegistrationParticipant>() {
 			@Override
 			public Boolean get(EventRegistrationParticipant item) {
+				if (item.getStatusId() != 2) {
+					// TODO disable checkbox
+				}
 				return item.getStatusId() == 4;
 			}
 		}, new FieldUpdater<EventRegistrationParticipant, Boolean>() {
 			@Override
 			public void update(int index, EventRegistrationParticipant item, Boolean value) {
+				if (item.getStatusId() != 2 && item.getStatusId() != 4) {
+					return;
+				}
+
 				if (item.hasAttended()) {
 					item.setStatusId(2);
 					item.setStatus("Confirmed");
@@ -72,9 +80,9 @@ public final class EventParticipantCellTable extends EntityCellTable<EventRegist
 					item.setStatusId(4);
 					item.setStatus("Attended");
 				}
-				eventService.saveParticipant(item, new Callback<EventRegistrationParticipant>(false) {
+				eventService.saveParticipant(item, new Callback<ArrayList<EventRegistrationParticipant>>(false) {
 					@Override
-					protected void doOnSuccess(EventRegistrationParticipant result) {
+					protected void doOnSuccess(ArrayList<EventRegistrationParticipant> result) {
 						refresh();
 					}
 				});

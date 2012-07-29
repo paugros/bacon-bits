@@ -52,7 +52,7 @@ public interface EventDao {
 
 	public EventField saveField(EventField field);
 
-	public EventRegistrationParticipant saveParticipant(EventRegistrationParticipant participant);
+	public ArrayList<EventRegistrationParticipant> saveParticipant(EventRegistrationParticipant participant);
 
 	public ServerResponseData<EventRegistration> saveRegistration(EventRegistration registration);
 

@@ -116,7 +116,7 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 							return new Label("");
 						}
 
-						return new Hyperlink("Register", PageUrl.event(item.getId()) + "&tab=2");
+						return new Hyperlink("Register", PageUrl.event(item.getId()) + "&tab=1");
 					}
 				});
 				break;
