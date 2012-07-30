@@ -16,8 +16,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 @Controller
@@ -53,8 +53,8 @@ public class EventServiceImpl extends GwtController implements EventService {
 	}
 
 	@Override
-	public void deleteVolunteerPositionMapping(EventVolunteerPosition position) {
-		dao.deleteVolunteerPositionMapping(position);
+	public void deleteVolunteerPositionMapping(int id) {
+		dao.deleteVolunteerPositionMapping(id);
 	}
 
 	@Override

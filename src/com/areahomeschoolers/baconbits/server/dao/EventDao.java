@@ -11,8 +11,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 public interface EventDao {
@@ -28,7 +28,7 @@ public interface EventDao {
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void deleteVolunteerPosition(EventVolunteerPosition position);
 
-	public void deleteVolunteerPositionMapping(EventVolunteerPosition position);
+	public void deleteVolunteerPositionMapping(int id);
 
 	public Event getById(int id);
 

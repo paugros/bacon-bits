@@ -25,8 +25,8 @@ import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -328,7 +328,7 @@ public class EventRegistrationSection extends Composite {
 						ConfirmDialog.confirm("Don't want to volunteer for this role?", new ConfirmHandler() {
 							@Override
 							public void onConfirm() {
-								eventService.deleteVolunteerPositionMapping(p, new Callback<Void>() {
+								eventService.deleteVolunteerPositionMapping(p.getMappingId(), new Callback<Void>() {
 									@Override
 									protected void doOnSuccess(Void result) {
 										registration.getVolunteerPositions().remove(p);

@@ -9,8 +9,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -25,7 +25,7 @@ public interface EventServiceAsync {
 
 	void deleteVolunteerPosition(EventVolunteerPosition position, AsyncCallback<Void> callback);
 
-	void deleteVolunteerPositionMapping(EventVolunteerPosition position, AsyncCallback<Void> callback);
+	void deleteVolunteerPositionMapping(int id, AsyncCallback<Void> callback);
 
 	void getById(int id, AsyncCallback<Event> callback);
 
