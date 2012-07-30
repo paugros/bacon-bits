@@ -122,4 +122,9 @@ public class EventServiceImpl extends GwtController implements EventService {
 		return dao.saveVolunteerPosition(position);
 	}
 
+	@Override
+	public void setVolunteerFulFilled(int id, boolean fulfilled) {
+		dao.setVolunteerFulFilled(id, fulfilled);
+	}
+
 }

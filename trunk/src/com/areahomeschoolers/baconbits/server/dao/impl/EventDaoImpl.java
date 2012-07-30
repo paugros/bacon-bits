@@ -347,7 +347,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	@Override
 	public ArrayList<Data> getVolunteers(int eventId) {
-		String sql = "select m.id, u.firstName, u.lastName, p.jobTitle ";
+		String sql = "select m.id, m.fulfilled, u.firstName, u.lastName, p.jobTitle ";
 		sql += "from eventVolunteerMapping m ";
 		sql += "join eventVolunteerPositions p on p.id = m.eventVolunteerPositionId ";
 		sql += "join eventRegistrations r on r.id = m.eventRegistrationId ";
@@ -586,6 +586,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		return position;
+	}
+
+	@Override
+	public void setVolunteerFulFilled(int id, boolean fulfilled) {
+		String sql = "update eventVolunteerMapping set fulfilled = ? where id = ?";
+		update(sql, fulfilled, id);
 	}
 
 	private EventField createBaseEventField(ResultSet rs) throws SQLException {

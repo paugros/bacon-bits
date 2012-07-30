@@ -57,4 +57,6 @@ public interface EventDao {
 
 	public EventVolunteerPosition saveVolunteerPosition(EventVolunteerPosition position);
 
+	public void setVolunteerFulFilled(int id, boolean fulfilled);
+
 }
