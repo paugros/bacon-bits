@@ -59,6 +59,15 @@ public class ServerContext implements ApplicationContextAware {
 		return (User) session.getAttribute("user");
 	}
 
+	public static int getCurrentUserId() {
+		User u = getCurrentUser();
+		if (u == null) {
+			return 0;
+		}
+
+		return u.getId();
+	}
+
 	public static <T> T getDaoImpl(String dao) {
 		return (T) getApplicationContext().getBean(dao + "DaoImpl");
 	}

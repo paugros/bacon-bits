@@ -32,6 +32,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private int accessLevelId;
 
 	// auxilliary
+	private int cloneFromId;
 	private int currentUserParticipantCount;
 	private String agePrices;
 	private int documentCount;
@@ -90,6 +91,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public int getCategoryId() {
 		return categoryId;
+	}
+
+	public int getCloneFromId() {
+		return cloneFromId;
 	}
 
 	public double getCost() {
@@ -236,6 +241,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public void setCategoryId(int categoryId) {
 		this.categoryId = categoryId;
+	}
+
+	public void setCloneFromId(int cloneFromId) {
+		this.cloneFromId = cloneFromId;
 	}
 
 	public void setCost(double cost) {

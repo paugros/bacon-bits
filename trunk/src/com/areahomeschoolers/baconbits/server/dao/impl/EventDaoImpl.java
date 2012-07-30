@@ -410,6 +410,20 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			update(sql, namedParams, keys);
 
 			event.setId(ServerUtils.getIdFromKeys(keys));
+
+			if (event.getCloneFromId() > 0) {
+				// clone age groups
+				sql = "insert into eventAgeGroups (eventId, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price) ";
+				sql += "select ?, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price ";
+				sql += "from eventAgeGroups where eventId = ?";
+				update(sql, event.getId(), event.getCloneFromId());
+
+				// clone volunteer positions
+				sql = "insert into eventVolunteerPositions (eventId, jobTitle, description, discount, positionCount) ";
+				sql += "select ?, jobTitle, description, discount, positionCount ";
+				sql += "from eventVolunteerPositions where eventId = ?";
+				update(sql, event.getId(), event.getCloneFromId());
+			}
 		}
 
 		return getById(event.getId());
@@ -588,7 +602,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	private String createSqlBase() {
-		int userId = ServerContext.isAuthenticated() ? ServerContext.getCurrentUser().getId() : 0;
+		int userId = ServerContext.getCurrentUserId();
 		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.accessLevel, \n";
 		sql += "(select group_concat(price) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		if (ServerContext.isAuthenticated()) {

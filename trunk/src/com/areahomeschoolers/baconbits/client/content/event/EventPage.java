@@ -582,6 +582,7 @@ public class EventPage implements Page {
 								ConfirmDialog.confirm("Clone this event?", new ConfirmHandler() {
 									@Override
 									public void onConfirm() {
+										calendarEvent.setCloneFromId(calendarEvent.getId());
 										calendarEvent.setId(0);
 										save(form.getFirstFormField());
 									}
