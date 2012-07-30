@@ -198,8 +198,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		}
 
 		if (parentId > 0) {
-			sql += "and u.parentId = ? ";
+			sql += "and (u.parentId = ?";
 			sqlArgs.add(parentId);
+			if (registrationId > 0) {
+				sql += " or u.id = ?";
+				sqlArgs.add(parentId);
+			}
+			sql += ") ";
 		}
 
 		sql += "order by u.lastName, u.firstName";

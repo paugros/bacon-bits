@@ -59,7 +59,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		sql += "left join groups g on g.id = a.groupId \n";
 		sql += "join userAccessLevels l on l.id = a.accessLevelId \n";
 
-		int userId = ServerContext.isAuthenticated() ? ServerContext.getCurrentUser().getId() : 0;
+		int userId = ServerContext.getCurrentUserId();
 		sql += "left join userGroupMembers ugm on ugm.groupId = a.groupId and ugm.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
 
@@ -97,9 +97,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			}
 
 			sql += "and a.id in(" + Common.join(scrubbedIds, ", ") + ") ";
-		}
-
-		if (top > 0) {
+			sql += "order by field(a.id, " + Common.join(scrubbedIds, ", ") + ")";
+		} else if (top > 0) {
 			sql += "order by a.id desc limit ?";
 			sqlArgs.add(top);
 		}

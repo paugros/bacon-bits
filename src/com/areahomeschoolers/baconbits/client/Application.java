@@ -55,6 +55,15 @@ public final class Application implements ValueChangeHandler<String> {
 		return applicationData.getCurrentUser();
 	}
 
+	public static int getCurrentUserId() {
+		User u = getCurrentUser();
+		if (u == null) {
+			return 0;
+		}
+
+		return u.getId();
+	}
+
 	public static Layout getLayout() {
 		return layout;
 	}
