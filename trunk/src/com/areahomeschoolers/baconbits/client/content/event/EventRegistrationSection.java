@@ -77,39 +77,41 @@ public class EventRegistrationSection extends Composite {
 		TitleBar tb = new TitleBar("Registered Participants", TitleBarStyle.SUBSECTION);
 
 		if (pageData.getEvent().allowRegistrations()) {
-			final ClickLabel cancel = new ClickLabel(getCancelRegistrationLabelText());
-			cancel.addMouseDownHandler(new MouseDownHandler() {
-				@Override
-				public void onMouseDown(MouseDownEvent event) {
-					String text = "";
-					if (registration.getCanceled()) {
-						text = "Restore registration?";
-					} else {
-						text = "Really cancel your registration for this event?";
-					}
-					ConfirmDialog.confirm(text, new ConfirmHandler() {
-						@Override
-						public void onConfirm() {
-							registration.setCanceled(!registration.getCanceled());
-
-							eventService.saveRegistration(registration, new Callback<EventRegistration>() {
-								@Override
-								protected void doOnSuccess(EventRegistration result) {
-									registration = result;
-									pageData.setRegistration(result);
-									if (registration.getCanceled()) {
-										registration.getVolunteerPositions().clear();
-										loadSection();
-									} else {
-										Application.reloadPage();
-									}
-								}
-							});
+			if (registration.isSaved()) {
+				final ClickLabel cancel = new ClickLabel(getCancelRegistrationLabelText());
+				cancel.addMouseDownHandler(new MouseDownHandler() {
+					@Override
+					public void onMouseDown(MouseDownEvent event) {
+						String text = "";
+						if (registration.getCanceled()) {
+							text = "Restore registration?";
+						} else {
+							text = "Really cancel your registration for this event?";
 						}
-					});
-				}
-			});
-			tb.addLink(cancel);
+						ConfirmDialog.confirm(text, new ConfirmHandler() {
+							@Override
+							public void onConfirm() {
+								registration.setCanceled(!registration.getCanceled());
+
+								eventService.saveRegistration(registration, new Callback<EventRegistration>() {
+									@Override
+									protected void doOnSuccess(EventRegistration result) {
+										registration = result;
+										pageData.setRegistration(result);
+										if (registration.getCanceled()) {
+											registration.getVolunteerPositions().clear();
+											loadSection();
+										} else {
+											Application.reloadPage();
+										}
+									}
+								});
+							}
+						});
+					}
+				});
+				tb.addLink(cancel);
+			}
 
 			tb.addLink(new ClickLabel("Add", new MouseDownHandler() {
 				@Override
@@ -145,7 +147,7 @@ public class EventRegistrationSection extends Composite {
 			HorizontalPanel pp = new PaddedPanel();
 			final DefaultListBox lb = new DefaultListBox();
 			lb.addStyleName("RequiredListBox");
-			lb.addItem("", 0);
+			lb.addItem("Select position", 0);
 			final Map<Integer, EventVolunteerPosition> vMap = new HashMap<Integer, EventVolunteerPosition>();
 			for (EventVolunteerPosition p : pageData.getVolunteerPositions()) {
 				if (p.getOpenPositionCount() == 0) {
@@ -303,7 +305,10 @@ public class EventRegistrationSection extends Composite {
 		}
 
 		if (registration.getParticipants().isEmpty()) {
-			participantTable.setWidget(0, 0, new Label("You haven't registered anyone yet."));
+			String text = "You haven't registered anyone yet. To register for this event, select the Add link above.";
+			Label empty = new Label(text);
+			empty.setWordWrap(false);
+			participantTable.setWidget(0, 0, empty);
 		} else {
 			int row = participantTable.getRowCount();
 			participantTable.setText(row, 1, Formatter.formatCurrency(totalPrice));
@@ -343,6 +348,13 @@ public class EventRegistrationSection extends Composite {
 				positionTable.setWidget(i, 1, cl);
 				positionTable.getCellFormatter().setHorizontalAlignment(i, 1, HasHorizontalAlignment.ALIGN_RIGHT);
 			}
+		}
+
+		if (positionTable.getRowCount() == 0) {
+			String text = "To volunteer, select the volunteer position from the dropdown and click the Volunteer! button.";
+			Label empty = new Label(text);
+			empty.setWordWrap(false);
+			positionTable.setWidget(0, 0, empty);
 		}
 	}
 

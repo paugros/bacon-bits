@@ -8,6 +8,7 @@
   <context:annotation-config />
   
   <bean id="dataSourceFactory" class="com.areahomeschoolers.baconbits.server.spring.DataSourceFactory" />
+  <bean id="payPalCredentials" class="com.areahomeschoolers.baconbits.server.paypal.PayPalCredentials" />
   
   <bean id="dataSource" factory-bean="dataSourceFactory" factory-method="createDataSource" destroy-method="close">
   </bean>

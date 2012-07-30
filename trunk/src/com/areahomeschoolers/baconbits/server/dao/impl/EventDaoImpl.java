@@ -478,7 +478,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTRATION_ID, participant.getEventRegistrationId());
-		args.put(EventArg.AGE_GROUP_ID, participant.getAgeGroupId());
+		int ageGroupId = participant.getAgeGroupId() == null ? 0 : participant.getAgeGroupId();
+		args.put(EventArg.AGE_GROUP_ID, ageGroupId);
 		Data waitData = getWaitData(args);
 		boolean eventIsFull = eventIsFull(waitData);
 		if (participant.getStatusId() == 1 && eventIsFull) {
