@@ -16,7 +16,6 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
-import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -34,12 +33,13 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
-import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -166,7 +166,7 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 			fieldsPanel.clear();
 		} else {
 			final EventFieldTable eventFieldsTable = new EventFieldTable(fields);
-			if (entity.isSaved()) {
+			if (entity.isSaved() && entity.getStatusId() != 1) {
 				eventFieldsTable.getForm().setEnabled(false);
 			}
 			form.addPartner(eventFieldsTable.getForm());
@@ -198,15 +198,17 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 			});
 		}
 
+		final boolean canEditUser = !entity.isSaved();
 		final Label firstNameDisplay = new Label();
 		final RequiredTextBox firstNameInput = new RequiredTextBox();
 		firstNameInput.setMaxLength(50);
-		FormField firstNameField = form.createFormField("First name:", firstNameInput, firstNameDisplay);
+		final FormField firstNameField = form.createFormField("First name:", firstNameInput, firstNameDisplay);
 		firstNameField.setInitializer(new Command() {
 			@Override
 			public void execute() {
 				firstNameDisplay.setText(entity.getFirstName());
 				firstNameInput.setText(entity.getFirstName());
+				firstNameField.setEnabled(canEditUser);
 			}
 		});
 		firstNameField.setDtoUpdater(new Command() {
@@ -220,12 +222,13 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		final Label lastNameDisplay = new Label();
 		final RequiredTextBox lastNameInput = new RequiredTextBox();
 		lastNameInput.setMaxLength(50);
-		FormField lastNameField = form.createFormField("Last name:", lastNameInput, lastNameDisplay);
+		final FormField lastNameField = form.createFormField("Last name:", lastNameInput, lastNameDisplay);
 		lastNameField.setInitializer(new Command() {
 			@Override
 			public void execute() {
 				lastNameDisplay.setText(entity.getLastName());
 				lastNameInput.setText(entity.getLastName());
+				lastNameField.setEnabled(canEditUser);
 			}
 		});
 		lastNameField.setDtoUpdater(new Command() {
@@ -294,13 +297,14 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		}
 
 		final Label birthDateDisplay = new Label();
-		FormField birthDateField = form.createFormField("Birth month / year:", birthDateInput, birthDateDisplay);
+		final FormField birthDateField = form.createFormField("Birth month / year:", birthDateInput, birthDateDisplay);
 		birthDateField.setRequired(true);
 		birthDateField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				birthDateDisplay.setText(Formatter.formatDate(entity.getBirthDate()));
+				birthDateDisplay.setText(DateTimeFormat.getFormat("M/yyyy").format(entity.getBirthDate()));
 				birthDateInput.setValue(entity.getBirthDate());
+				birthDateField.setEnabled(canEditUser);
 			}
 		});
 		birthDateField.setDtoUpdater(new Command() {
@@ -314,12 +318,11 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		vp.add(fieldTable);
 		vp.add(fieldsPanel);
 
-		if (entity.isSaved()) {
+		if (entity.isSaved() && entity.getStatusId() != 1) {
 			form.setEnabled(false);
 			form.getSubmitButton().removeFromParent();
 		}
 
 		return vp;
 	}
-
 }

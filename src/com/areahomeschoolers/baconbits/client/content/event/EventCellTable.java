@@ -10,7 +10,6 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -28,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class EventCellTable extends EntityCellTable<Event, EventArg, EventColumn> {
 	public enum EventColumn implements EntityCellTableColumn<EventColumn> {
-		REGISTERED(""), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Start"), END_DATE("End"), PRICE("Price"), CATEGORY("Category"), REGISTER(
+		REGISTERED(""), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), PRICE("Price"), CATEGORY("Category"), REGISTER(
 				"Register");
 
 		private String title;
@@ -52,8 +51,8 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 
 	private EventCellTable() {
 		setDefaultSortColumn(EventColumn.START_DATE, SortDirection.SORT_ASC);
-		setDisplayColumns(EventColumn.REGISTERED, EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.END_DATE, EventColumn.PRICE,
-				EventColumn.CATEGORY, EventColumn.REGISTER);
+		setDisplayColumns(EventColumn.REGISTERED, EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.PRICE, EventColumn.CATEGORY,
+				EventColumn.REGISTER);
 	}
 
 	@Override
@@ -74,11 +73,7 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 								return new Label();
 							}
 
-							PaddedPanel pp = new PaddedPanel();
-							Image check = new Image(MainImageBundle.INSTANCE.checkMark());
-							pp.add(check);
-							pp.add(new Label(Integer.toString(item.getCurrentUserParticipantCount())));
-							return pp;
+							return new Image(MainImageBundle.INSTANCE.checkMark());
 						}
 					});
 				}

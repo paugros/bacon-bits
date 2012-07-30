@@ -105,6 +105,7 @@ public class LoginDialog extends DialogBox {
 		VerticalPanel password = new VerticalPanel();
 		password.add(passwordInput);
 
+		PaddedPanel createPanel = new PaddedPanel();
 		ClickLabel create = new ClickLabel("Create new account", new MouseDownHandler() {
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
@@ -113,8 +114,12 @@ public class LoginDialog extends DialogBox {
 			}
 		});
 		create.addStyleName("bold mediumPadding");
+		createPanel.add(new Label("New to the site?"));
+		createPanel.add(create);
 
-		ClickLabel forgot = new ClickLabel("Forgot password?", new MouseDownHandler() {
+		PaddedPanel pp = new PaddedPanel();
+		pp.add(new Label("Did you forget your password?"));
+		ClickLabel forgot = new ClickLabel("Click here", new MouseDownHandler() {
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
 				hide();
@@ -127,12 +132,15 @@ public class LoginDialog extends DialogBox {
 				dialog.center();
 			}
 		});
-		forgot.addStyleName("smallText");
-		password.add(forgot);
+		pp.add(forgot);
+		pp.add(new Label("to reset it."));
+		pp.addStyleName("smallText");
+
+		password.add(pp);
 
 		FlexTable table = new FlexTable();
 		table.setCellPadding(5);
-		table.setWidget(0, 1, create);
+		table.setWidget(0, 1, createPanel);
 		table.setWidget(1, 0, new Label("Email:"));
 		table.setWidget(1, 1, usernameInput);
 		Label pl = new Label("Password:");
