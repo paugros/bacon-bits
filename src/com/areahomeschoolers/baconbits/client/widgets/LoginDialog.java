@@ -139,6 +139,7 @@ public class LoginDialog extends DialogBox {
 		pl.getElement().getStyle().setPaddingTop(3, Unit.PX);
 		table.setWidget(2, 0, pl);
 		table.getCellFormatter().setVerticalAlignment(1, 0, HasVerticalAlignment.ALIGN_TOP);
+		table.getCellFormatter().setVerticalAlignment(2, 0, HasVerticalAlignment.ALIGN_TOP);
 		if (sessionExpired) {
 			table.setWidget(2, 1, passwordInput);
 		} else {
