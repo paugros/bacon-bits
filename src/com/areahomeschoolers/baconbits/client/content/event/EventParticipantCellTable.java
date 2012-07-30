@@ -161,18 +161,28 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 				});
 				break;
 			case AGE:
-				addNumberColumn(col, new ValueGetter<Number, EventParticipant>() {
+				addTextColumn(col, new ValueGetter<String, EventParticipant>() {
 					@Override
-					public Number get(EventParticipant item) {
+					public String get(EventParticipant item) {
 						if (item.getBirthDate() == null) {
-							return 0;
+							return "0";
 						}
 
-						return (int) (ClientDateUtils.daysBetween(item.getBirthDate(), new Date()) / 365);
+						int age = (int) (ClientDateUtils.daysBetween(item.getBirthDate(), new Date()) / 365);
+
+						if (age >= 18) {
+							return "Adult";
+						}
+
+						return Integer.toString(age);
+					}
+				}, new ValueGetter<Date, EventParticipant>() {
+					@Override
+					public Date get(EventParticipant item) {
+						return item.getBirthDate();
 					}
 				});
 				break;
-
 			case EDIT_STATUS:
 				if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 					return;

@@ -302,7 +302,9 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		birthDateField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				birthDateDisplay.setText(DateTimeFormat.getFormat("M/yyyy").format(entity.getBirthDate()));
+				if (entity.getBirthDate() != null) {
+					birthDateDisplay.setText(DateTimeFormat.getFormat("M/yyyy").format(entity.getBirthDate()));
+				}
 				birthDateInput.setValue(entity.getBirthDate());
 				birthDateField.setEnabled(canEditUser);
 			}
