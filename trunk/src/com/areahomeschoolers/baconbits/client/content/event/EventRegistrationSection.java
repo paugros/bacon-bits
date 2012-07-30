@@ -149,8 +149,10 @@ public class EventRegistrationSection extends Composite {
 			lb.addStyleName("RequiredListBox");
 			lb.addItem("Select position", 0);
 			final Map<Integer, EventVolunteerPosition> vMap = new HashMap<Integer, EventVolunteerPosition>();
+			int fullCount = 0;
 			for (EventVolunteerPosition p : pageData.getVolunteerPositions()) {
 				if (p.getOpenPositionCount() == 0) {
+					fullCount++;
 					continue;
 				}
 				if (!registration.getVolunteerPositions().contains(p)) {
@@ -158,65 +160,70 @@ public class EventRegistrationSection extends Composite {
 					vMap.put(p.getId(), p);
 				}
 			}
-			pp.add(lb);
 
-			final Label description = new Label();
-			description.addStyleName("mediumPadding");
+			if (fullCount < pageData.getVolunteerPositions().size()) {
+				pp.add(lb);
 
-			volunteerAddButton = new Button("Volunteer!");
-			volunteerAddButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					if (!Application.isAuthenticated()) {
-						showLogin();
-						return;
-					}
+				final Label description = new Label();
+				description.addStyleName("mediumPadding");
 
-					int positionId = lb.getIntValue();
-
-					if (positionId > 0) {
-						volunteerAddButton.setEnabled(false);
-						final EventVolunteerPosition position = vMap.get(positionId);
-						position.setRegisterPositionCount(1);
-
-						if (!registration.isSaved()) {
-							registration.setEventId(pageData.getEvent().getId());
-
-							eventService.saveRegistration(registration, new Callback<EventRegistration>() {
-								@Override
-								protected void doOnSuccess(EventRegistration result) {
-									registration = result;
-									pageData.setRegistration(result);
-									saveVolunteerPosition(position);
-								}
-							});
-						} else {
-							saveVolunteerPosition(position);
+				volunteerAddButton = new Button("Volunteer!");
+				volunteerAddButton.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						if (!Application.isAuthenticated()) {
+							showLogin();
+							return;
 						}
 
-						lb.removeItem(lb.getSelectedIndex());
-						lb.setSelectedIndex(0);
-						description.setText("");
+						int positionId = lb.getIntValue();
+
+						if (positionId > 0) {
+							volunteerAddButton.setEnabled(false);
+							final EventVolunteerPosition position = vMap.get(positionId);
+							position.setRegisterPositionCount(1);
+
+							if (!registration.isSaved()) {
+								registration.setEventId(pageData.getEvent().getId());
+
+								eventService.saveRegistration(registration, new Callback<EventRegistration>() {
+									@Override
+									protected void doOnSuccess(EventRegistration result) {
+										registration = result;
+										pageData.setRegistration(result);
+										saveVolunteerPosition(position);
+									}
+								});
+							} else {
+								saveVolunteerPosition(position);
+							}
+
+							lb.removeItem(lb.getSelectedIndex());
+							lb.setSelectedIndex(0);
+							description.setText("");
+						}
 					}
-				}
-			});
-			pp.add(volunteerAddButton);
+				});
+				pp.add(volunteerAddButton);
 
-			lb.addChangeHandler(new ChangeHandler() {
-				@Override
-				public void onChange(ChangeEvent event) {
-					int positionId = lb.getIntValue();
+				lb.addChangeHandler(new ChangeHandler() {
+					@Override
+					public void onChange(ChangeEvent event) {
+						int positionId = lb.getIntValue();
 
-					if (positionId > 0) {
-						description.setText(vMap.get(positionId).getDescription());
-					} else {
-						description.setText("");
+						if (positionId > 0) {
+							description.setText(vMap.get(positionId).getDescription());
+						} else {
+							description.setText("");
+						}
 					}
-				}
-			});
+				});
+				vp.add(pp);
+				vp.add(description);
+			} else {
+				vp.add(new Label("All volunteer positions have been filled."));
+			}
 
-			vp.add(pp);
-			vp.add(description);
 		}
 
 		positionTable = new FlexTable();
