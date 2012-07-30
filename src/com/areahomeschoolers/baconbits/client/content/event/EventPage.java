@@ -662,7 +662,7 @@ public class EventPage implements Page {
 										Label title = new Label(item.get("jobTitle"));
 										title.getElement().getStyle().setMarginRight(20, Unit.PX);
 										ft.setWidget(row, 2, title);
-										if (Application.isSystemAdministrator()) {
+										if (Application.administratorOf(calendarEvent.getGroupId())) {
 											ClickLabel cl = new ClickLabel("X", new MouseDownHandler() {
 												@Override
 												public void onMouseDown(MouseDownEvent event) {
@@ -705,7 +705,7 @@ public class EventPage implements Page {
 						EventParticipantCellTable table = new EventParticipantCellTable(args);
 						if (Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
 							table.setDisplayColumns(ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE,
-									ParticipantColumn.AGE, ParticipantColumn.PRICE, ParticipantColumn.STATUS);
+									ParticipantColumn.AGE, ParticipantColumn.PRICE, ParticipantColumn.STATUS, ParticipantColumn.EDIT_STATUS);
 						}
 						table.populate();
 						table.setTitle("Participants");

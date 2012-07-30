@@ -3,14 +3,18 @@ package com.areahomeschoolers.baconbits.client.content.event;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -18,8 +22,11 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,7 +34,7 @@ import com.google.gwt.user.client.ui.Widget;
 public final class EventParticipantCellTable extends EntityCellTable<EventParticipant, EventArg, ParticipantColumn> {
 	public enum ParticipantColumn implements EntityCellTableColumn<ParticipantColumn> {
 		ATTENDED("Attended"), EVENT("Event"), REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE("Age"), PRICE("Price"), FIELDS(
-				"Fields"), STATUS("Status");
+				"Fields"), STATUS("Status"), EDIT_STATUS("");
 
 		private String title;
 
@@ -51,7 +58,7 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 	private EventParticipantCellTable() {
 		setDefaultSortColumn(ParticipantColumn.PARTICIPANT_NAME, SortDirection.SORT_ASC);
 		setDisplayColumns(ParticipantColumn.ATTENDED, ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE,
-				ParticipantColumn.AGE, ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
+				ParticipantColumn.AGE, ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS, ParticipantColumn.EDIT_STATUS);
 	}
 
 	@Override
@@ -162,6 +169,52 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 						}
 
 						return (int) (ClientDateUtils.daysBetween(item.getBirthDate(), new Date()) / 365);
+					}
+				});
+				break;
+
+			case EDIT_STATUS:
+				if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+					return;
+				}
+				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
+					@Override
+					protected Widget createWidget(final EventParticipant item) {
+						String editText = "";
+						if (item.isCanceled()) {
+							editText = "Restore";
+						} else {
+							editText = "X";
+						}
+
+						ClickLabel cl = new ClickLabel(editText, new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								String confirmText = "";
+								if (item.isCanceled()) {
+									confirmText = "Restore registration for " + item.getFirstName() + "?";
+								} else {
+									confirmText = "Really remove " + item.getFirstName() + " from the attendee list?";
+								}
+								ConfirmDialog.confirm(confirmText, new ConfirmHandler() {
+									@Override
+									public void onConfirm() {
+										item.setStatusId(item.isCanceled() ? 1 : 5);
+
+										eventService.saveParticipant(item, new Callback<ArrayList<EventParticipant>>() {
+											@Override
+											protected void doOnSuccess(ArrayList<EventParticipant> result) {
+												removeItems(result);
+												addItems(result);
+												refresh();
+											}
+										});
+									}
+								});
+							}
+						});
+
+						return cl;
 					}
 				});
 				break;
