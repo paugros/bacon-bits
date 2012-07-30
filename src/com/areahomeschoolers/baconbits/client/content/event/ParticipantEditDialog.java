@@ -257,7 +257,8 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		}
 
 		birthDateInput = new MonthYearPicker();
-		birthDateInput.setEarliestMonth(1930, 1);
+		birthDateInput.setEarliestMonth(1995, 1);
+		birthDateInput.getYearPicker().getListBox().insertItem("Adult", "1994", 1);
 
 		if (!Common.isNullOrEmpty(pageData.getAgeGroups())) {
 			birthDateInput.addValueChangeCommand(new Command() {

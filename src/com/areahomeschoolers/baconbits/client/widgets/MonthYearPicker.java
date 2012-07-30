@@ -113,6 +113,10 @@ public class MonthYearPicker extends Composite implements CustomFocusWidget, Has
 		return yearPicker.getYear();
 	}
 
+	public YearPicker getYearPicker() {
+		return yearPicker;
+	}
+
 	@Override
 	public boolean isRequired() {
 		return required;
