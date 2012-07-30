@@ -637,15 +637,40 @@ public class EventPage implements Page {
 									Label label = new Label("Volunteers");
 									label.addStyleName("largeText");
 
-									FlexTable ft = new FlexTable();
+									final FlexTable ft = new FlexTable();
 
-									for (Data item : result) {
-										int row = ft.getRowCount();
+									for (final Data item : result) {
+										final int row = ft.getRowCount();
 
 										Label name = new Label(item.get("firstName") + " " + item.get("lastName"));
 										name.getElement().getStyle().setMarginRight(30, Unit.PX);
 										ft.setWidget(row, 0, name);
-										ft.setText(row, 1, item.get("jobTitle"));
+										Label title = new Label(item.get("jobTitle"));
+										title.getElement().getStyle().setMarginRight(20, Unit.PX);
+										ft.setWidget(row, 1, title);
+										if (Application.isSystemAdministrator()) {
+											ClickLabel cl = new ClickLabel("X", new MouseDownHandler() {
+												@Override
+												public void onMouseDown(MouseDownEvent event) {
+													ConfirmDialog.confirm("Remove this volunteer?", new ConfirmHandler() {
+														@Override
+														public void onConfirm() {
+															eventService.deleteVolunteerPositionMapping(item.getId(), new Callback<Void>() {
+																@Override
+																protected void doOnSuccess(Void result) {
+																	ft.removeRow(row);
+																	if (ft.getRowCount() == 0) {
+																		ft.setText(0, 0, "None");
+																	}
+																}
+															});
+														}
+													});
+												}
+											});
+
+											ft.setWidget(row, 2, cl);
+										}
 									}
 
 									vp.add(label);

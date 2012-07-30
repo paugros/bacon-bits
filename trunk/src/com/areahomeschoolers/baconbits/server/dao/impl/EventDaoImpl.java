@@ -115,9 +115,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public void deleteVolunteerPositionMapping(EventVolunteerPosition position) {
+	public void deleteVolunteerPositionMapping(int id) {
 		String sql = "delete from eventVolunteerMapping where id = ?";
-		update(sql, position.getMappingId());
+		update(sql, id);
 	}
 
 	@Override
@@ -347,7 +347,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	@Override
 	public ArrayList<Data> getVolunteers(int eventId) {
-		String sql = "select u.firstName, u.lastName, p.jobTitle ";
+		String sql = "select m.id, u.firstName, u.lastName, p.jobTitle ";
 		sql += "from eventVolunteerMapping m ";
 		sql += "join eventVolunteerPositions p on p.id = m.eventVolunteerPositionId ";
 		sql += "join eventRegistrations r on r.id = m.eventRegistrationId ";
