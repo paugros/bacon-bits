@@ -58,4 +58,6 @@ public interface EventService extends RemoteService {
 
 	public EventVolunteerPosition saveVolunteerPosition(EventVolunteerPosition position);
 
+	public void setVolunteerFulFilled(int id, boolean fulfilled);
+
 }

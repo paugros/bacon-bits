@@ -53,4 +53,6 @@ public interface EventServiceAsync {
 
 	void saveVolunteerPosition(EventVolunteerPosition position, AsyncCallback<EventVolunteerPosition> callback);
 
+	void setVolunteerFulFilled(int id, boolean fulfilled, AsyncCallback<Void> callback);
+
 }

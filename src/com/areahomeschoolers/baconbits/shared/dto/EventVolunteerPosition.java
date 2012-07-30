@@ -9,9 +9,11 @@ public final class EventVolunteerPosition extends EntityDto<EventVolunteerPositi
 
 	private int positionCount;
 	private int openPositionCount;
+
 	// used when registering
 	private int registerPositionCount;
 	private int mappingId;
+	private boolean fulfilled;
 	private int eventRegistrationId;
 
 	private String description;
@@ -37,6 +39,10 @@ public final class EventVolunteerPosition extends EntityDto<EventVolunteerPositi
 
 	public int getEventRegistrationId() {
 		return eventRegistrationId;
+	}
+
+	public boolean getFulfilled() {
+		return fulfilled;
 	}
 
 	public String getJobTitle() {
@@ -73,6 +79,10 @@ public final class EventVolunteerPosition extends EntityDto<EventVolunteerPositi
 
 	public void setEventRegistrationId(int eventRegistrationId) {
 		this.eventRegistrationId = eventRegistrationId;
+	}
+
+	public void setFulfilled(boolean fulfilled) {
+		this.fulfilled = fulfilled;
 	}
 
 	public void setJobTitle(String jobTitle) {

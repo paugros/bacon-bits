@@ -60,6 +60,7 @@ import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -642,12 +643,25 @@ public class EventPage implements Page {
 									for (final Data item : result) {
 										final int row = ft.getRowCount();
 
+										CheckBox cb = new CheckBox();
+										cb.setValue(item.getBoolean("fulfilled"));
+										cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+											@Override
+											public void onValueChange(ValueChangeEvent<Boolean> event) {
+												eventService.setVolunteerFulFilled(item.getId(), event.getValue(), new Callback<Void>(false) {
+													@Override
+													protected void doOnSuccess(Void result) {
+													}
+												});
+											}
+										});
+										ft.setWidget(row, 0, cb);
 										Label name = new Label(item.get("firstName") + " " + item.get("lastName"));
 										name.getElement().getStyle().setMarginRight(30, Unit.PX);
-										ft.setWidget(row, 0, name);
+										ft.setWidget(row, 1, name);
 										Label title = new Label(item.get("jobTitle"));
 										title.getElement().getStyle().setMarginRight(20, Unit.PX);
-										ft.setWidget(row, 1, title);
+										ft.setWidget(row, 2, title);
 										if (Application.isSystemAdministrator()) {
 											ClickLabel cl = new ClickLabel("X", new MouseDownHandler() {
 												@Override
@@ -669,7 +683,7 @@ public class EventPage implements Page {
 												}
 											});
 
-											ft.setWidget(row, 2, cl);
+											ft.setWidget(row, 3, cl);
 										}
 									}
 
