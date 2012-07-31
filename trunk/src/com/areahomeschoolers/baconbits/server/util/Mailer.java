@@ -71,7 +71,7 @@ public class Mailer {
 	}
 
 	public String getFrom() {
-		return "paul.augros@gmail.com";
+		return "info@wearehomeeducators.com";
 		// String from = this.from;
 		//
 		// if (from == null) {
