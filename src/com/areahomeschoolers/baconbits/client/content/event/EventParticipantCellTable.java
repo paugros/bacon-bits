@@ -33,8 +33,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class EventParticipantCellTable extends EntityCellTable<EventParticipant, EventArg, ParticipantColumn> {
 	public enum ParticipantColumn implements EntityCellTableColumn<ParticipantColumn> {
-		ATTENDED("Attended"), EVENT("Event"), REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE("Age"), PRICE("Price"), FIELDS(
-				"Fields"), STATUS("Status"), EDIT_STATUS("");
+		ATTENDED("Attended"), EVENT("Event"), EVENT_DATE("Event date"), REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE(
+				"Age"), PRICE("Price"), FIELDS("Fields"), STATUS("Status"), EDIT_STATUS("");
 
 		private String title;
 
@@ -51,11 +51,17 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 
 	public EventParticipantCellTable(ArgMap<EventArg> args) {
-		this();
+		init();
 		setArgMap(args);
 	}
 
-	private EventParticipantCellTable() {
+	public EventParticipantCellTable(ArgMap<EventArg> args, Resources r) {
+		super(r);
+		init();
+		setArgMap(args);
+	}
+
+	private void init() {
 		setDefaultSortColumn(ParticipantColumn.PARTICIPANT_NAME, SortDirection.SORT_ASC);
 		setDisplayColumns(ParticipantColumn.ATTENDED, ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE,
 				ParticipantColumn.AGE, ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS, ParticipantColumn.EDIT_STATUS);
@@ -70,6 +76,14 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 	protected void setColumns() {
 		for (ParticipantColumn col : getDisplayColumns()) {
 			switch (col) {
+			case EVENT_DATE:
+				addDateTimeColumn(col, new ValueGetter<Date, EventParticipant>() {
+					@Override
+					public Date get(EventParticipant item) {
+						return item.getEventDate();
+					}
+				});
+				break;
 			case EVENT:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override

@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -40,6 +41,8 @@ public interface EventServiceAsync {
 	void getVolunteers(int eventId, AsyncCallback<ArrayList<Data>> callback);
 
 	void list(ArgMap<EventArg> args, AsyncCallback<ArrayList<Event>> callback);
+
+	void payForEvents(ArrayList<EventParticipant> participants, AsyncCallback<PaypalData> callback);
 
 	void save(Event event, AsyncCallback<Event> callback);
 

@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -45,6 +46,8 @@ public interface EventService extends RemoteService {
 	public ArrayList<Data> getVolunteers(int eventId);
 
 	public ArrayList<Event> list(ArgMap<EventArg> args);
+
+	public PaypalData payForEvents(ArrayList<EventParticipant> participants);
 
 	public Event save(Event event);
 

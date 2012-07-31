@@ -22,8 +22,8 @@ public final class EventParticipantListPage implements Page {
 		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID, Application.getCurrentUser().getId());
 		final String title = "My Event Registrations";
 		EventParticipantCellTable table = new EventParticipantCellTable(args);
-		table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE, ParticipantColumn.AGE,
-				ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
+		table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE,
+				ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
 		table.setTitle(title);
 
 		table.getTitleBar().addSearchControl();

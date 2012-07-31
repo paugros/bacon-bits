@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 public interface EventDao {
 
@@ -43,6 +44,8 @@ public interface EventDao {
 	public ArrayList<Data> getVolunteers(int eventId);
 
 	public ArrayList<Event> list(ArgMap<EventArg> args);
+
+	public PaypalData payForEvents(ArrayList<EventParticipant> participants);
 
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public Event save(Event event);

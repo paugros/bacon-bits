@@ -12,10 +12,12 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 	private int userId;
 	private Date addedDate;
 	private int statusId;
+	private Integer paymentId;
 
 	// aux
 	private String status;
 	private int eventId;
+	private Date eventDate;
 	private String eventTitle;
 	private String fieldValues;
 	private User user;
@@ -42,6 +44,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public Date getBirthDate() {
 		return birthDate;
+	}
+
+	public Date getEventDate() {
+		return eventDate;
 	}
 
 	public List<EventField> getEventFields() {
@@ -82,6 +88,13 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public String getParentLastName() {
 		return parentLastName;
+	}
+
+	public Integer getPaymentId() {
+		if (paymentId == null || paymentId == 0) {
+			return null;
+		}
+		return paymentId;
 	}
 
 	public double getPrice() {
@@ -128,6 +141,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 		this.birthDate = birthDate;
 	}
 
+	public void setEventDate(Date eventDate) {
+		this.eventDate = eventDate;
+	}
+
 	public void setEventFields(List<EventField> eventFields) {
 		this.eventFields = eventFields;
 	}
@@ -166,6 +183,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setParentLastName(String parentLastName) {
 		this.parentLastName = parentLastName;
+	}
+
+	public void setPaymentId(Integer paymentId) {
+		this.paymentId = paymentId;
 	}
 
 	public void setPrice(double price) {
