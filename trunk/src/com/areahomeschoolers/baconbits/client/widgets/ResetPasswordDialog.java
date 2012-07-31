@@ -109,5 +109,8 @@ public class ResetPasswordDialog extends DefaultDialog {
 				user.setResetPassword(false);
 			}
 		});
+
+		user.setResetPassword(false);
+
 	}
 }
