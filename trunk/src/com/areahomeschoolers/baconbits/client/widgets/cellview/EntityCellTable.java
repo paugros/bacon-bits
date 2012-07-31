@@ -73,6 +73,7 @@ import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.RangeChangeEvent;
 import com.google.gwt.view.client.RowCountChangeEvent;
 import com.google.gwt.view.client.RowCountChangeEvent.Handler;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
 
@@ -189,7 +190,11 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	private HandlerRegistration noSortRegistration;
 
 	public EntityCellTable() {
-		super(DEFAULT_PAGE_SIZE, EntityCellTableResources.INSTANCE);
+		this(EntityCellTableResources.INSTANCE);
+	}
+
+	public EntityCellTable(Resources r) {
+		super(DEFAULT_PAGE_SIZE, r);
 		setSelectionPolicy(selectionPolicy);
 		setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
 		setLoadingIndicator(new Label("Loading..."));
@@ -1190,7 +1195,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 				@Override
 				public void onCellPreview(CellPreviewEvent<T> event) {
 					if (event.getColumn() == 0 && "click".equals(event.getNativeEvent().getType())) {
-						int totalItems = visibleItems.size();
 						boolean select = !isItemSelected(event.getValue());
 						if (lastSelectedItem != null && event.getNativeEvent().getShiftKey()) {
 							int start = indexOf(lastSelectedItem);
@@ -1207,12 +1211,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 						}
 						lastSelectedItem = event.getValue();
 						setItemSelected(lastSelectedItem, select);
-						int currentlySelected = getSelectedItems().size();
-						if (currentlySelected == totalItems) {
-							cbHeader.setValue(true);
-						} else if (currentlySelected < totalItems) {
-							cbHeader.setValue(false);
-						}
 					}
 				}
 			});
@@ -1272,6 +1270,13 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 				}
 			}
 		}
+
+		getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+			@Override
+			public void onSelectionChange(SelectionChangeEvent event) {
+				updateHeaderCheckbox();
+			}
+		});
 	}
 
 	public void setSortingEnabled(final boolean enabled) {
@@ -1775,6 +1780,20 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		}
 		if (getColumnCount() > defaultSortIndex) {
 			getColumnSortList().push(new ColumnSortInfo(getColumn(defaultSortIndex), SortDirection.SORT_ASC.equals(defaultSortDirection)));
+		}
+	}
+
+	private void updateHeaderCheckbox() {
+		if (cbHeader == null) {
+			return;
+		}
+
+		int totalItems = getFullList().size();
+		int currentlySelected = getSelectedItems().size();
+		if (currentlySelected == totalItems) {
+			cbHeader.setValue(true);
+		} else if (currentlySelected < totalItems) {
+			cbHeader.setValue(false);
 		}
 	}
 

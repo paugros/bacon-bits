@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.server.dao.impl;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Repository;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.server.dao.EventDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
+import com.areahomeschoolers.baconbits.server.paypal.PayPalCredentials;
 import com.areahomeschoolers.baconbits.server.util.Mailer;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
@@ -35,7 +38,26 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.paypal.adaptive.api.requests.fnapi.SimplePay;
+import com.paypal.adaptive.api.responses.PayResponse;
+import com.paypal.adaptive.core.AckCode;
+import com.paypal.adaptive.core.CurrencyCodes;
+import com.paypal.adaptive.core.PayError;
+import com.paypal.adaptive.core.PaymentType;
+import com.paypal.adaptive.core.Receiver;
+import com.paypal.adaptive.core.ServiceEnvironment;
+import com.paypal.adaptive.exceptions.AuthorizationRequiredException;
+import com.paypal.adaptive.exceptions.InvalidAPICredentialsException;
+import com.paypal.adaptive.exceptions.InvalidResponseDataException;
+import com.paypal.adaptive.exceptions.MissingAPICredentialsException;
+import com.paypal.adaptive.exceptions.MissingParameterException;
+import com.paypal.adaptive.exceptions.PayPalErrorException;
+import com.paypal.adaptive.exceptions.PaymentExecException;
+import com.paypal.adaptive.exceptions.PaymentInCompleteException;
+import com.paypal.adaptive.exceptions.RequestAlreadyMadeException;
+import com.paypal.adaptive.exceptions.RequestFailureException;
 
 @Repository
 public class EventDaoImpl extends SpringWrapper implements EventDao {
@@ -81,10 +103,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 	}
 
-	@Autowired
-	public EventDaoImpl(DataSource dataSource) {
-		super(dataSource);
+	private PayPalCredentials paypal;
 
+	@Autowired
+	public EventDaoImpl(DataSource dataSource, PayPalCredentials pp) {
+		super(dataSource);
+		this.paypal = pp;
 	}
 
 	@Override
@@ -270,10 +294,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int eventId = args.getInt(EventArg.EVENT_ID);
 		int parentId = args.getInt(EventArg.PARENT_ID);
 		int userId = args.getInt(EventArg.USER_ID);
+		int statusId = args.getInt(EventArg.STATUS_ID);
 		final boolean includeFields = args.getBoolean(EventArg.INCLUDE_FIELDS);
+		boolean onlyFuture = args.getBoolean(EventArg.ONLY_FUTURE);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
-		String sql = "select r.eventId, e.title, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
+		String sql = "select r.eventId, e.title, e.startDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
 		sql += "up.firstName as parentFirstName, up.lastName as parentLastName, \n";
 		if (includeFields) {
 			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n\n";
@@ -291,9 +317,18 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "join events e on e.id = r.eventId \n";
 		sql += "where 1 = 1 \n";
 
+		if (onlyFuture) {
+			sql += "and e.startDate >= now() ";
+		}
+
 		if (registrationId > 0) {
 			sql += "and p.eventRegistrationId = ? \n";
 			sqlArgs.add(registrationId);
+		}
+
+		if (statusId > 0) {
+			sql += "and p.statusId = ? \n";
+			sqlArgs.add(statusId);
 		}
 
 		if (participantId > 0) {
@@ -307,7 +342,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		if (parentId > 0) {
-			sql += "and u.parentId = ? \n";
+			sql += "and (u.parentId = ? or u.id = ?) \n";
+			sqlArgs.add(parentId);
 			sqlArgs.add(parentId);
 		}
 
@@ -337,6 +373,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setAddedDate(rs.getTimestamp("addedDate"));
 				p.setEventId(rs.getInt("eventId"));
 				p.setEventTitle(rs.getString("title"));
+				p.setPaymentId(rs.getInt("paymentId"));
+				p.setEventDate(rs.getTimestamp("startDate"));
 				if (includeFields) {
 					p.setFieldValues(rs.getString("fieldValues"));
 				}
@@ -382,6 +420,116 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		ArrayList<Event> data = query(sql, new EventMapper(), sqlArgs.toArray());
 
 		return data;
+	}
+
+	public void makePayment() {
+		try {
+			StringBuilder url = new StringBuilder();
+			// TODO
+			url.append("http://127.0.0.1:8888/?gwt.codesvr=127.0.0.1:9997#page=Payment");
+			String returnURL = url.toString() + "&return=1&action=pay&payKey=${payKey}";
+			String cancelURL = url.toString() + "&action=pay&cancel=1";
+			String ipnURL = url.toString() + "&action=ipn";
+
+			SimplePay payment = new SimplePay();
+			payment.setCancelUrl(cancelURL);
+			payment.setReturnUrl(returnURL);
+			payment.setCredentialObj(paypal);
+			// TODO
+			payment.setUserIp("127.0.0.1");
+			payment.setApplicationName("WeAre Home Educators");
+			payment.setCurrencyCode(CurrencyCodes.USD);
+			// TODO
+			payment.setEnv(ServiceEnvironment.SANDBOX);
+			payment.setIpnURL(ipnURL);
+			payment.setLanguage("en_US");
+			// TODO
+			payment.setMemo("A test payment");
+			Receiver receiver = new Receiver();
+			// TODO
+			receiver.setAmount(22.14);
+			// TODO
+			receiver.setEmail("paul.a_1343673136_biz@gmail.com");
+			receiver.setPaymentType(PaymentType.SERVICE);
+			payment.setReceiver(receiver);
+			// TODO
+			payment.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343740218
+
+			PayResponse payResponse = payment.makeRequest();
+			System.out.println("PaymentExecStatus:" + payResponse.getPaymentExecStatus().toString());
+		} catch (IOException e) {
+			System.out.println("Payment Failed w/ IOException");
+		} catch (MissingAPICredentialsException e) {
+			// No API Credential Object provided - log error
+			// e.printStackTrace();
+			System.out.println("No APICredential object provided");
+		} catch (InvalidAPICredentialsException e) {
+			// invalid API Credentials provided - application error - log error
+			// e.printStackTrace();
+			System.out.println("Invalid API Credentials " + e.getMissingCredentials());
+		} catch (MissingParameterException e) {
+			// missing parameter - log error
+			// e.printStackTrace();
+			System.out.println("Missing Parameter error: " + e.getParameterName());
+		} catch (RequestFailureException e) {
+			// HTTP Error - some connection issues ?
+			// e.printStackTrace();
+			System.out.println("Request HTTP Error: " + e.getHTTP_RESPONSE_CODE());
+		} catch (InvalidResponseDataException e) {
+			// PayPal service error
+			// log error
+			// e.printStackTrace();
+			System.out.println("Invalid Response Data from PayPal: \"" + e.getResponseData() + "\"");
+		} catch (PayPalErrorException e) {
+			// Request failed due to a Service/Application error
+			// e.printStackTrace();
+			if (e.getResponseEnvelope().getAck() == AckCode.Failure) {
+				// log the error
+				System.out.println("Received Failure from PayPal (ack)");
+				System.out.println("ErrorData provided:");
+				System.out.println(e.getPayErrorList().toString());
+				for (PayError error : e.getPayErrorList()) {
+					System.out.println(error.getError().getMessage());
+				}
+				if (e.getPaymentExecStatus() != null) {
+					System.out.println("PaymentExecStatus: " + e.getPaymentExecStatus());
+				}
+			} else if (e.getResponseEnvelope().getAck() == AckCode.FailureWithWarning) {
+				// there is a warning - log it!
+				System.out.println("Received Failure with Warning from PayPal (ack)");
+				System.out.println("ErrorData provided:");
+				System.out.println(e.getPayErrorList().toString());
+			}
+		} catch (RequestAlreadyMadeException e) {
+			// shouldn't occur - log the error
+			// e.printStackTrace();
+			System.out.println("Request to send a request that has already been sent!");
+		} catch (PaymentExecException e) {
+			System.out.println("Failed Payment Request w/ PaymentExecStatus: " + e.getPaymentExecStatus().toString());
+			System.out.println("ErrorData provided:");
+
+			System.out.println(e.getPayErrorList().toString());
+		} catch (PaymentInCompleteException e) {
+			System.out.println("Incomplete Payment w/ PaymentExecStatus: " + e.getPaymentExecStatus().toString());
+			System.out.println("ErrorData provided:");
+
+			System.out.println(e.getPayErrorList().toString());
+		} catch (AuthorizationRequiredException e) {
+			// redirect the user to PayPal for Authorization
+			// resp.sendRedirect(e.getAuthorizationUrl(ServiceEnvironment.SANDBOX));
+
+			try {
+				System.out.println(e.getAuthorizationUrl(ServiceEnvironment.SANDBOX));
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public PaypalData payForEvents(ArrayList<EventParticipant> participants) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

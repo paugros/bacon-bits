@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 @Controller
 @RequestMapping("/event")
@@ -90,6 +91,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	@Override
 	public ArrayList<Event> list(ArgMap<EventArg> args) {
 		return dao.list(args);
+	}
+
+	@Override
+	public PaypalData payForEvents(ArrayList<EventParticipant> participants) {
+		return dao.payForEvents(participants);
 	}
 
 	@Override

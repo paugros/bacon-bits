@@ -24,6 +24,10 @@ public class PageUrl {
 		return "page=EventParticipantList";
 	}
 
+	public static String eventPayment() {
+		return "page=EventPayment";
+	}
+
 	public static String home() {
 		return "page=Home";
 	}
