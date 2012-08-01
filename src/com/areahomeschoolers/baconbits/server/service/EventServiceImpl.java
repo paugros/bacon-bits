@@ -94,8 +94,8 @@ public class EventServiceImpl extends GwtController implements EventService {
 	}
 
 	@Override
-	public PaypalData payForEvents(ArrayList<EventParticipant> participants) {
-		return dao.payForEvents(participants);
+	public PaypalData payForEvents(ArrayList<Integer> participantIds) {
+		return dao.payForEvents(participantIds);
 	}
 
 	@Override

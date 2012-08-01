@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -296,13 +297,14 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int userId = args.getInt(EventArg.USER_ID);
 		int statusId = args.getInt(EventArg.STATUS_ID);
 		final boolean includeFields = args.getBoolean(EventArg.INCLUDE_FIELDS);
-		boolean onlyFuture = args.getBoolean(EventArg.ONLY_FUTURE);
+		boolean onlyPayable = args.getBoolean(EventArg.ONLY_PAYABLE_PARTICIPANTS);
+		List<Integer> ids = args.getIntList(EventArg.PARTICIPANT_IDS);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select r.eventId, e.title, e.startDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
 		sql += "up.firstName as parentFirstName, up.lastName as parentLastName, \n";
 		if (includeFields) {
-			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n\n";
+			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n";
 			sql += "from eventFieldValues v \n";
 			sql += "join eventFields f on f.id = v.eventFieldId \n";
 			sql += "where v.participantId = p.id) as fieldValues, \n";
@@ -312,13 +314,18 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "join users u on u.id = p.userId \n";
 		sql += "join users up on up.id = u.parentId \n";
 		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
+		sql += "left join payments py on py.id = p.paymentId \n";
 		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 		sql += "join events e on e.id = r.eventId \n";
 		sql += "where 1 = 1 \n";
 
-		if (onlyFuture) {
-			sql += "and e.startDate >= now() ";
+		if (onlyPayable) {
+			sql += "and (py.id is null or py.statusId in(5, 6, 7, 9, 10, 12)) and p.statusId = 1 ";
+		}
+
+		if (!Common.isNullOrEmpty(ids)) {
+			sql += "and p.id in(" + Common.join(ids, ", ") + ")";
 		}
 
 		if (registrationId > 0) {
@@ -422,41 +429,53 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		return data;
 	}
 
-	public void makePayment() {
+	public PaypalData makePayment(int paymentId, double amount) {
+		PaypalData data = new PaypalData();
+
+		ServiceEnvironment environment = ServerContext.isLive() ? ServiceEnvironment.PRODUCTION : ServiceEnvironment.SANDBOX;
+
 		try {
 			StringBuilder url = new StringBuilder();
 			// TODO
-			url.append("http://127.0.0.1:8888/?gwt.codesvr=127.0.0.1:9997#page=Payment");
+			url.append("http://127.0.0.1:8888/?gwt.codesvr=127.0.0.1:9997#page=EventPayment");
 			String returnURL = url.toString() + "&return=1&action=pay&payKey=${payKey}";
 			String cancelURL = url.toString() + "&action=pay&cancel=1";
 			String ipnURL = url.toString() + "&action=ipn";
 
 			SimplePay payment = new SimplePay();
-			payment.setCancelUrl(cancelURL);
-			payment.setReturnUrl(returnURL);
+			// always the same
 			payment.setCredentialObj(paypal);
-			// TODO
-			payment.setUserIp("127.0.0.1");
+			payment.setUserIp(ServerContext.getRequest().getRemoteAddr());
 			payment.setApplicationName("WeAre Home Educators");
 			payment.setCurrencyCode(CurrencyCodes.USD);
-			// TODO
-			payment.setEnv(ServiceEnvironment.SANDBOX);
-			payment.setIpnURL(ipnURL);
 			payment.setLanguage("en_US");
-			// TODO
+			payment.setEnv(environment);
+			if (ServerContext.isLive()) {
+				payment.setSenderEmail(ServerContext.getCurrentUser().getEmail());
+			} else {
+				payment.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343740218
+			}
+
+			payment.setCancelUrl(cancelURL);
+			payment.setReturnUrl(returnURL);
+			payment.setIpnURL(ipnURL);
 			payment.setMemo("A test payment");
+
 			Receiver receiver = new Receiver();
-			// TODO
-			receiver.setAmount(22.14);
-			// TODO
-			receiver.setEmail("paul.a_1343673136_biz@gmail.com");
+			receiver.setAmount(amount);
+			if (ServerContext.isLive()) {
+				receiver.setEmail("weare.home.educators@gmail.com");
+			} else {
+				receiver.setEmail("paul.a_1343673136_biz@gmail.com");
+			}
 			receiver.setPaymentType(PaymentType.SERVICE);
 			payment.setReceiver(receiver);
-			// TODO
-			payment.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343740218
 
 			PayResponse payResponse = payment.makeRequest();
-			System.out.println("PaymentExecStatus:" + payResponse.getPaymentExecStatus().toString());
+			data.setPayKey(payResponse.getPayKey());
+			data.setPaymentExecStatus(payResponse.getPaymentExecStatus().toString());
+			return data;
+			// System.out.println("PaymentExecStatus:" + payResponse.getPaymentExecStatus().toString());
 		} catch (IOException e) {
 			System.out.println("Payment Failed w/ IOException");
 		} catch (MissingAPICredentialsException e) {
@@ -519,17 +538,44 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			// resp.sendRedirect(e.getAuthorizationUrl(ServiceEnvironment.SANDBOX));
 
 			try {
-				System.out.println(e.getAuthorizationUrl(ServiceEnvironment.SANDBOX));
-			} catch (UnsupportedEncodingException e1) {
-				e1.printStackTrace();
+				data.setAuthorizationUrl(e.getAuthorizationUrl(environment));
+				return data;
+			} catch (UnsupportedEncodingException ex) {
+				ex.printStackTrace();
 			}
 		}
+
+		return data;
 	}
 
 	@Override
-	public PaypalData payForEvents(ArrayList<EventParticipant> participants) {
-		// TODO Auto-generated method stub
-		return null;
+	public PaypalData payForEvents(ArrayList<Integer> participantIds) {
+		if (Common.isNullOrEmpty(participantIds)) {
+			return null;
+		}
+		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARTICIPANT_IDS, participantIds);
+		// scrub the participants because client prices can't be trusted
+		List<EventParticipant> participants = getParticipants(args);
+		double total = 0.00;
+		for (EventParticipant p : participants) {
+			total += p.getPrice();
+		}
+
+		// add a payment record
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("userId", ServerContext.getCurrentUserId());
+		params.addValue("total", total);
+		String sql = "insert into payments (userId, paymentDate, amount, statusId) ";
+		sql += "values(:userId, now(), :total, 1)";
+		KeyHolder keys = new GeneratedKeyHolder();
+		update(sql, params, keys);
+
+		int paymentId = ServerUtils.getIdFromKeys(keys);
+
+		sql = "update eventRegistrationParticipants set paymentId = ? where id in(" + Common.join(participantIds, ", ") + ")";
+		update(sql, paymentId);
+
+		return makePayment(paymentId, total);
 	}
 
 	@Override
@@ -630,8 +676,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		args.put(EventArg.AGE_GROUP_ID, ageGroupId);
 		Data waitData = getWaitData(args);
 		boolean eventIsFull = eventIsFull(waitData);
-		if (participant.getStatusId() == 1 && eventIsFull) {
-			participant.setStatusId(3);
+		if (participant.getStatusId() == 1) {
+			if (eventIsFull) {
+				participant.setStatusId(3);
+			} else if (participant.getPrice() == 0) {
+				// go immediately to Confirmed/Paid for free events, as long as it's not full
+				participant.setStatusId(2);
+			}
 		}
 
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);

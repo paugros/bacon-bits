@@ -42,7 +42,7 @@ public interface EventServiceAsync {
 
 	void list(ArgMap<EventArg> args, AsyncCallback<ArrayList<Event>> callback);
 
-	void payForEvents(ArrayList<EventParticipant> participants, AsyncCallback<PaypalData> callback);
+	void payForEvents(ArrayList<Integer> participantIds, AsyncCallback<PaypalData> callback);
 
 	void save(Event event, AsyncCallback<Event> callback);
 

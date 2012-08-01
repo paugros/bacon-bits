@@ -47,7 +47,7 @@ public interface EventService extends RemoteService {
 
 	public ArrayList<Event> list(ArgMap<EventArg> args);
 
-	public PaypalData payForEvents(ArrayList<EventParticipant> participants);
+	public PaypalData payForEvents(ArrayList<Integer> participantIds);
 
 	public Event save(Event event);
 

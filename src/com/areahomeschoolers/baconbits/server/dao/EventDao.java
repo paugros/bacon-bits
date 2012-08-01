@@ -45,7 +45,7 @@ public interface EventDao {
 
 	public ArrayList<Event> list(ArgMap<EventArg> args);
 
-	public PaypalData payForEvents(ArrayList<EventParticipant> participants);
+	public PaypalData payForEvents(ArrayList<Integer> participantIds);
 
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public Event save(Event event);
