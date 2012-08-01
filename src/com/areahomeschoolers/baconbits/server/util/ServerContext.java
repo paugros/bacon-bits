@@ -45,7 +45,17 @@ public class ServerContext implements ApplicationContextAware {
 		if (port != 80 && port != 443) {
 			url += ":" + port;
 		}
-		url += "/" + getGwtCodeServerAsQueryString();
+		url += "/";
+
+		return url;
+	}
+
+	public static String getBaseUrlWithCodeServer() {
+		String url = getBaseUrl();
+
+		if (!isLive) {
+			url += "?gwt.codesvr=127.0.0.1:9997";
+		}
 
 		return url;
 	}
@@ -70,21 +80,6 @@ public class ServerContext implements ApplicationContextAware {
 
 	public static <T> T getDaoImpl(String dao) {
 		return (T) getApplicationContext().getBean(dao + "DaoImpl");
-	}
-
-	/**
-	 * Returns a URL query string containing the value of the "gwt.codesvr" parameter.
-	 * 
-	 * @return A string of form "?gwt.codesvr=[host:port]" or the empty string if the parameter is not set
-	 */
-	public static String getGwtCodeServerAsQueryString() {
-		// Note: this is empty for non-page requests (ie, an RPC to lock a quote)
-		String ret = "";
-		String svr = tl.get().request.getParameter("gwt.codesvr");
-		if (svr != null) {
-			ret = "?gwt.codesvr=" + svr;
-		}
-		return ret;
 	}
 
 	public static HttpServletRequest getRequest() {

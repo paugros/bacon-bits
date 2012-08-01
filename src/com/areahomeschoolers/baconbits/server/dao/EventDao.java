@@ -24,42 +24,53 @@ public interface EventDao {
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void deleteEventField(int fieldId);
 
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public void deleteEventParticipant(EventParticipant participant);
 
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void deleteVolunteerPosition(EventVolunteerPosition position);
 
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public void deleteVolunteerPositionMapping(int id);
 
 	public Event getById(int id);
 
 	public ArrayList<Data> getEventFieldTypes();
 
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public ArrayList<EventField> getFields(ArgMap<EventArg> args);
 
 	public EventPageData getPageData(int id);
 
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public ArrayList<EventParticipant> getParticipants(ArgMap<EventArg> args);
 
 	public ArrayList<Data> getVolunteers(int eventId);
 
 	public ArrayList<Event> list(ArgMap<EventArg> args);
 
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public PaypalData payForEvents(ArrayList<Integer> participantIds);
 
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public Event save(Event event);
 
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup);
 
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public EventField saveField(EventField field);
 
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public ArrayList<EventParticipant> saveParticipant(EventParticipant participant);
 
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public EventRegistration saveRegistration(EventRegistration registration);
 
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public EventVolunteerPosition saveVolunteerPosition(EventVolunteerPosition position);
 
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void setVolunteerFulFilled(int id, boolean fulfilled);
 
 }

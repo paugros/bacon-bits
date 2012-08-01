@@ -436,11 +436,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		try {
 			StringBuilder url = new StringBuilder();
-			// TODO
-			url.append("http://127.0.0.1:8888/?gwt.codesvr=127.0.0.1:9997#page=EventPayment");
-			String returnURL = url.toString() + "&return=1&action=pay&payKey=${payKey}";
-			String cancelURL = url.toString() + "&action=pay&cancel=1";
-			String ipnURL = url.toString() + "&action=ipn";
+			url.append(ServerContext.getBaseUrl() + "#page=EventParticipantList");
+			String returnURL = url.toString() + "&ps=return&payKey=${payKey}";
+			String cancelURL = url.toString() + "&ps=cancel";
+			String ipnURL = ServerContext.getBaseUrl() + "baconbits/service/ipn";
 
 			SimplePay payment = new SimplePay();
 			// always the same
@@ -453,13 +452,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			if (ServerContext.isLive()) {
 				payment.setSenderEmail(ServerContext.getCurrentUser().getEmail());
 			} else {
-				payment.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343740218
+				payment.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343833982
 			}
 
 			payment.setCancelUrl(cancelURL);
 			payment.setReturnUrl(returnURL);
 			payment.setIpnURL(ipnURL);
-			payment.setMemo("A test payment");
+			payment.setMemo("Payment for events");
 
 			Receiver receiver = new Receiver();
 			receiver.setAmount(amount);
@@ -572,10 +571,16 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		int paymentId = ServerUtils.getIdFromKeys(keys);
 
-		sql = "update eventRegistrationParticipants set paymentId = ? where id in(" + Common.join(participantIds, ", ") + ")";
+		sql = "update eventRegistrationParticipants set paymentId = ?, statusId = 2 where id in(" + Common.join(participantIds, ", ") + ")";
 		update(sql, paymentId);
 
-		return makePayment(paymentId, total);
+		PaypalData pd = makePayment(paymentId, total);
+		if (pd.getPayKey() != null) {
+			sql = "update payments set payKey = ? where id = ?";
+			update(sql, pd.getPayKey(), paymentId);
+		}
+
+		return pd;
 	}
 
 	@Override

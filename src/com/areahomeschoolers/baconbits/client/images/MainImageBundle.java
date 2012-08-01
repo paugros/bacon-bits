@@ -55,6 +55,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource mapShadow();
 
+	ImageResource paypalButton();
+
 	ImageResource pixel();
 
 	ImageResource refresh();
