@@ -445,7 +445,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			// always the same
 			payment.setCredentialObj(paypal);
 			payment.setUserIp(ServerContext.getRequest().getRemoteAddr());
-			payment.setApplicationName("WeAre Home Educators");
+			payment.setApplicationName("wearehomeeducators");
 			payment.setCurrencyCode(CurrencyCodes.USD);
 			payment.setLanguage("en_US");
 			payment.setEnv(environment);
