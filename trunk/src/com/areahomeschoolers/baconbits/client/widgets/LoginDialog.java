@@ -117,7 +117,7 @@ public class LoginDialog extends DialogBox {
 		createPanel.add(new Label("New to the site?"));
 		createPanel.add(create);
 
-		PaddedPanel pp = new PaddedPanel();
+		VerticalPanel pp = new VerticalPanel();
 		pp.add(new Label("Did you forget your password?"));
 		ClickLabel forgot = new ClickLabel("Click here", new MouseDownHandler() {
 			@Override
