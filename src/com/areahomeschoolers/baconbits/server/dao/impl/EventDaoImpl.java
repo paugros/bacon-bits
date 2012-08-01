@@ -480,7 +480,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		} catch (MissingAPICredentialsException e) {
 			// No API Credential Object provided - log error
 			// e.printStackTrace();
-			System.out.println("No APICredential object provided");
+			throw new RuntimeException("No APICredential object provided");
 		} catch (InvalidAPICredentialsException e) {
 			// invalid API Credentials provided - application error - log error
 			// e.printStackTrace();
@@ -488,50 +488,55 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		} catch (MissingParameterException e) {
 			// missing parameter - log error
 			// e.printStackTrace();
-			System.out.println("Missing Parameter error: " + e.getParameterName());
+			throw new RuntimeException("Missing Parameter error: " + e.getParameterName());
 		} catch (RequestFailureException e) {
 			// HTTP Error - some connection issues ?
 			// e.printStackTrace();
-			System.out.println("Request HTTP Error: " + e.getHTTP_RESPONSE_CODE());
+			throw new RuntimeException("Request HTTP Error: " + e.getHTTP_RESPONSE_CODE());
 		} catch (InvalidResponseDataException e) {
 			// PayPal service error
 			// log error
 			// e.printStackTrace();
-			System.out.println("Invalid Response Data from PayPal: \"" + e.getResponseData() + "\"");
+			throw new RuntimeException("Invalid Response Data from PayPal: \"" + e.getResponseData() + "\"");
 		} catch (PayPalErrorException e) {
 			// Request failed due to a Service/Application error
 			// e.printStackTrace();
 			if (e.getResponseEnvelope().getAck() == AckCode.Failure) {
 				// log the error
-				System.out.println("Received Failure from PayPal (ack)");
-				System.out.println("ErrorData provided:");
-				System.out.println(e.getPayErrorList().toString());
+				String text = "Received Failure from PayPal (ack)\n";
+				text += "ErrorData provided:";
+				text += e.getPayErrorList().toString();
 				for (PayError error : e.getPayErrorList()) {
-					System.out.println(error.getError().getMessage());
+					text += error.getError().getMessage();
 				}
 				if (e.getPaymentExecStatus() != null) {
-					System.out.println("PaymentExecStatus: " + e.getPaymentExecStatus());
+					text += "PaymentExecStatus: " + e.getPaymentExecStatus();
 				}
+				throw new RuntimeException(text);
 			} else if (e.getResponseEnvelope().getAck() == AckCode.FailureWithWarning) {
 				// there is a warning - log it!
-				System.out.println("Received Failure with Warning from PayPal (ack)");
-				System.out.println("ErrorData provided:");
-				System.out.println(e.getPayErrorList().toString());
+				String text = "Received Failure with Warning from PayPal (ack)";
+				text += "ErrorData provided:";
+				text += e.getPayErrorList().toString();
+				throw new RuntimeException(text);
 			}
 		} catch (RequestAlreadyMadeException e) {
 			// shouldn't occur - log the error
 			// e.printStackTrace();
-			System.out.println("Request to send a request that has already been sent!");
+			throw new RuntimeException("Request to send a request that has already been sent!");
 		} catch (PaymentExecException e) {
-			System.out.println("Failed Payment Request w/ PaymentExecStatus: " + e.getPaymentExecStatus().toString());
-			System.out.println("ErrorData provided:");
+			String text = "Failed Payment Request w/ PaymentExecStatus: " + e.getPaymentExecStatus().toString();
+			text += "ErrorData provided:";
 
-			System.out.println(e.getPayErrorList().toString());
+			text += e.getPayErrorList().toString();
+
+			throw new RuntimeException(text);
 		} catch (PaymentInCompleteException e) {
-			System.out.println("Incomplete Payment w/ PaymentExecStatus: " + e.getPaymentExecStatus().toString());
-			System.out.println("ErrorData provided:");
+			String text = "Incomplete Payment w/ PaymentExecStatus: " + e.getPaymentExecStatus().toString();
+			text += "ErrorData provided:";
 
-			System.out.println(e.getPayErrorList().toString());
+			text += e.getPayErrorList().toString();
+			throw new RuntimeException(text);
 		} catch (AuthorizationRequiredException e) {
 			// redirect the user to PayPal for Authorization
 			// resp.sendRedirect(e.getAuthorizationUrl(ServiceEnvironment.SANDBOX));
