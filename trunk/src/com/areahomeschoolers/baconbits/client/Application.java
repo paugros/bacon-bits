@@ -41,7 +41,7 @@ public final class Application implements ValueChangeHandler<String> {
 	private static final String DEFAULT_TOKEN = "page=Home";
 	private static ApplicationData applicationData;
 	private static Command rpcFailureCommand;
-	public static final String APPLICATION_NAME = "AHS";
+	public static final String APPLICATION_NAME = "WHE";
 	private static boolean confirmNavigation = false;
 
 	public static boolean administratorOf(Integer groupId) {

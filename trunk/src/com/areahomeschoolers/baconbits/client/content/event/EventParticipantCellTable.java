@@ -110,14 +110,14 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 
 						if (item.hasAttended()) {
 							item.setStatusId(2);
-							item.setStatus("Confirmed");
 						} else {
 							item.setStatusId(4);
-							item.setStatus("Attended");
 						}
 						eventService.saveParticipant(item, new Callback<ArrayList<EventParticipant>>(false) {
 							@Override
 							protected void doOnSuccess(ArrayList<EventParticipant> result) {
+								removeItems(result);
+								addItems(result);
 								refresh();
 							}
 						});

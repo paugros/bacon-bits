@@ -23,6 +23,7 @@ import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -45,7 +46,7 @@ public final class EventPaymentPage implements Page {
 
 		final String title = "Event Payment / Checkout";
 		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID, Application.getCurrentUser().getId());
-		args.put(EventArg.ONLY_FUTURE);
+		args.put(EventArg.ONLY_PAYABLE_PARTICIPANTS);
 		args.put(EventArg.STATUS_ID, 1);
 
 		table = new EventParticipantCellTable(args, SimpleCellTableResources.INSTANCE);
@@ -88,11 +89,18 @@ public final class EventPaymentPage implements Page {
 
 				paying = true;
 
-				eventService.payForEvents(Common.asArrayList(table.getSelectedItems()), new Callback<PaypalData>() {
+				eventService.payForEvents(Common.asArrayList(table.getSelectedItemIds()), new Callback<PaypalData>() {
+					@Override
+					protected void doOnFailure(Throwable caught) {
+						super.doOnFailure(caught);
+						paying = false;
+					}
+
 					@Override
 					protected void doOnSuccess(PaypalData result) {
-
+						Window.Location.replace(result.getAuthorizationUrl());
 					}
+
 				});
 			}
 		});
