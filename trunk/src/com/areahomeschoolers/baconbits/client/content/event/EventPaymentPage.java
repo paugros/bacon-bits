@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
@@ -56,7 +57,7 @@ public final class EventPaymentPage implements Page {
 		table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
 		table.setWidth("750px");
 
-		VerticalPanel vp = new VerticalPanel();
+		final VerticalPanel vp = new VerticalPanel();
 		vp.setSpacing(15);
 
 		Label header = new Label(title);
@@ -70,44 +71,6 @@ public final class EventPaymentPage implements Page {
 		vp.add(headerPanel);
 		vp.add(table);
 
-		PaddedPanel payPanel = new PaddedPanel(15);
-		Label l = new Label("Total:");
-		l.addStyleName("hugeText");
-		payPanel.add(l);
-		total = new Label();
-		total.addStyleName("hugeText");
-		payPanel.add(total);
-		vp.add(payPanel);
-		Image logo = new Image("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif");
-		logo.getElement().getStyle().setCursor(Cursor.POINTER);
-		logo.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (paying) {
-					return;
-				}
-
-				paying = true;
-
-				eventService.payForEvents(Common.asArrayList(table.getSelectedItemIds()), new Callback<PaypalData>() {
-					@Override
-					protected void doOnFailure(Throwable caught) {
-						super.doOnFailure(caught);
-						paying = false;
-					}
-
-					@Override
-					protected void doOnSuccess(PaypalData result) {
-						Window.Location.replace(result.getAuthorizationUrl());
-					}
-
-				});
-			}
-		});
-		vp.add(logo);
-
-		vp.setCellHorizontalAlignment(payPanel, HasHorizontalAlignment.ALIGN_RIGHT);
-		vp.setCellHorizontalAlignment(logo, HasHorizontalAlignment.ALIGN_RIGHT);
 		page.add(vp);
 
 		table.addDataReturnHandler(new DataReturnHandler() {
@@ -121,6 +84,48 @@ public final class EventPaymentPage implements Page {
 						updateTotal();
 					}
 				});
+
+				if (!Common.isNullOrEmpty(table.getFullList())) {
+					PaddedPanel payPanel = new PaddedPanel(15);
+					Label l = new Label("Total:");
+					l.addStyleName("hugeText");
+					payPanel.add(l);
+					total = new Label();
+					total.addStyleName("hugeText");
+					payPanel.add(total);
+					vp.add(payPanel);
+					Image logo = new Image(MainImageBundle.INSTANCE.paypalButton());
+					logo.getElement().getStyle().setCursor(Cursor.POINTER);
+					logo.addClickHandler(new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							if (paying) {
+								return;
+							}
+
+							paying = true;
+
+							eventService.payForEvents(Common.asArrayList(table.getSelectedItemIds()), new Callback<PaypalData>() {
+								@Override
+								protected void doOnFailure(Throwable caught) {
+									super.doOnFailure(caught);
+									paying = false;
+								}
+
+								@Override
+								protected void doOnSuccess(PaypalData result) {
+									Window.Location.replace(result.getAuthorizationUrl());
+								}
+
+							});
+						}
+					});
+					vp.add(logo);
+
+					vp.setCellHorizontalAlignment(payPanel, HasHorizontalAlignment.ALIGN_RIGHT);
+					vp.setCellHorizontalAlignment(logo, HasHorizontalAlignment.ALIGN_RIGHT);
+				}
+
 				Application.getLayout().setPage(title, page);
 			}
 		});
@@ -129,6 +134,10 @@ public final class EventPaymentPage implements Page {
 	}
 
 	private void updateTotal() {
+		if (total == null) {
+			return;
+		}
+
 		double totalAmount = 0.00;
 		for (EventParticipant p : table.getSelectedItems()) {
 			totalAmount += p.getPrice();
