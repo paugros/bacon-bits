@@ -132,8 +132,10 @@ public class LoginDialog extends DialogBox {
 				dialog.center();
 			}
 		});
-		pp.add(forgot);
-		pp.add(new Label("to reset it."));
+		PaddedPanel p = new PaddedPanel();
+		p.add(forgot);
+		p.add(new Label("to reset it."));
+		pp.add(p);
 		pp.addStyleName("smallText");
 
 		password.add(pp);
