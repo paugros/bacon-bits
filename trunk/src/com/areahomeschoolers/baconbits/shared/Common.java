@@ -316,6 +316,10 @@ public abstract class Common {
 	 * @return Whether the string provided can be formatted as a Double
 	 */
 	public static boolean isDouble(String number) {
+		if (number == null) {
+			return false;
+		}
+
 		try {
 			Double.parseDouble(number);
 		} catch (NumberFormatException e) {
@@ -350,6 +354,10 @@ public abstract class Common {
 	 * @return Whether the string provided can be formatted as an Integer
 	 */
 	public static boolean isInteger(String number) {
+		if (number == null) {
+			return false;
+		}
+
 		try {
 			Integer.parseInt(number);
 		} catch (NumberFormatException e) {
