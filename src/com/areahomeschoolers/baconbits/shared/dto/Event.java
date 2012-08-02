@@ -35,6 +35,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private int cloneFromId;
 	private int currentUserParticipantCount;
 	private String agePrices;
+	private String ageRanges;
 	private int documentCount;
 	private String category;
 	private String groupName;
@@ -83,6 +84,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public String getAgePrices() {
 		return agePrices;
+	}
+
+	public String getAgeRanges() {
+		return ageRanges;
 	}
 
 	public String getCategory() {
@@ -233,6 +238,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public void setAgePrices(String agePrices) {
 		this.agePrices = agePrices;
+	}
+
+	public void setAgeRanges(String ageRanges) {
+		this.ageRanges = ageRanges;
 	}
 
 	public void setCategory(String category) {
