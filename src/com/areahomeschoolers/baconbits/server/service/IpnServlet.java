@@ -64,7 +64,7 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 			}
 
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost("https://www.paypal.com/cgi-bin/webscr");
+			HttpPost post = new HttpPost("http://www.paypal.com/cgi-bin/webscr");
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			params.add(new BasicNameValuePair("cmd", "_notify-validate")); // You need to add this parameter to tell PayPal to verify
 			for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
