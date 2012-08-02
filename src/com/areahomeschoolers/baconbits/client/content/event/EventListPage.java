@@ -25,7 +25,7 @@ public final class EventListPage implements Page {
 
 		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
-		page.add(WidgetFactory.newSection(table));
+		page.add(WidgetFactory.newSection(table, "1150px"));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
@@ -33,7 +33,6 @@ public final class EventListPage implements Page {
 				Application.getLayout().setPage(title, page);
 			}
 		});
-		table.setWidth("1000px");
 
 		table.populate();
 	}

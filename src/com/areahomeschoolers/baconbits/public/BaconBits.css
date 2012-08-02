@@ -705,6 +705,13 @@ img {
 	border: 1px solid #BCC4CD;
 }
 
+.TitleBar-cellTable {
+	padding: 4px;
+	background-color: #ACD3FF;
+	border: 1px solid #8CB3DF;
+	border-bottom: none;
+}
+
 .TitleBar .control {
 	cursor: pointer;
 }

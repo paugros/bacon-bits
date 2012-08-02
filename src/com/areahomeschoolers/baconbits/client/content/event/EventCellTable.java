@@ -139,20 +139,20 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 				});
 				break;
 			case END_DATE:
-				addDateTimeColumn(col, new ValueGetter<Date, Event>() {
+				setColumnWidth(addDateTimeColumn(col, new ValueGetter<Date, Event>() {
 					@Override
 					public Date get(Event item) {
 						return item.getEndDate();
 					}
-				});
+				}), "120px");
 				break;
 			case START_DATE:
-				addDateTimeColumn(col, new ValueGetter<Date, Event>() {
+				setColumnWidth(addDateTimeColumn(col, new ValueGetter<Date, Event>() {
 					@Override
 					public Date get(Event item) {
 						return item.getStartDate();
 					}
-				});
+				}), "120px");
 				break;
 			case REGISTER:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Event>() {

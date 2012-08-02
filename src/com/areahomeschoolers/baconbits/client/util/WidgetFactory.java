@@ -107,6 +107,12 @@ public abstract class WidgetFactory {
 		return newSection(cellTable.getTitleBar(), cellTable);
 	}
 
+	public static VerticalPanel newSection(EntityCellTable<?, ?, ?> cellTable, String width) {
+		VerticalPanel vp = newSection(cellTable);
+		vp.setWidth(width);
+		return vp;
+	}
+
 	public static VerticalPanel newSection(String title, Widget w) {
 		return WidgetFactory.newSection(new TitleBar(title, TitleBarStyle.SECTION), w);
 	}

@@ -24,7 +24,7 @@ public final class UserListPage implements Page {
 
 		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
-		page.add(WidgetFactory.newSection(table));
+		page.add(WidgetFactory.newSection(table, "750px"));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override

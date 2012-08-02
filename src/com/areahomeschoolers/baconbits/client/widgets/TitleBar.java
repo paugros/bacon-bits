@@ -34,7 +34,7 @@ public class TitleBar extends Composite {
 	 * Different types of title bars have different styling and behavior.
 	 */
 	public enum TitleBarStyle {
-		MAIN, SECTION, SUBSECTION, INACTIVE, OVERDUE, SIDEBAR
+		MAIN, SECTION, SUBSECTION, INACTIVE, OVERDUE, SIDEBAR, CELLTABLE
 	}
 
 	public enum TitleControl {
@@ -347,6 +347,9 @@ public class TitleBar extends Composite {
 			break;
 		case SUBSECTION:
 			titleGrid.addStyleDependentName("subSection");
+			break;
+		case CELLTABLE:
+			titleGrid.addStyleDependentName("cellTable");
 			break;
 		}
 	}
