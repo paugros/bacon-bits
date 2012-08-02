@@ -33,6 +33,7 @@ public final class EventListPage implements Page {
 				Application.getLayout().setPage(title, page);
 			}
 		});
+		table.setWidth("1000px");
 
 		table.populate();
 	}

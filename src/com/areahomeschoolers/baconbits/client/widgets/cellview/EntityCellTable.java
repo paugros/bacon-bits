@@ -190,7 +190,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	private HandlerRegistration noSortRegistration;
 
 	public EntityCellTable() {
-		this(EntityCellTableResources.INSTANCE);
+		this(SimpleCellTableResources.INSTANCE);
 	}
 
 	public EntityCellTable(Resources r) {
@@ -217,7 +217,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		});
 		setSortingEnabled(true);
 		setDefaultSortColumn(0, SortDirection.SORT_ASC);
-		setWidth("100%");
+		// setWidth("100%");
 	}
 
 	public Column<T, ?> addAveragedNumberColumn(String header, ValueGetter<Number, T> numberGetter, String format) {

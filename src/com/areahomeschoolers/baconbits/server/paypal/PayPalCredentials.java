@@ -11,7 +11,7 @@ public class PayPalCredentials extends APICredential {
 			setAPIPassword("BZFADA4CXJSCHYW8");
 			setSignature("AFcWxV21C7fd0v3bYYYRCpSSRl31AIiJDk-qOGV.J6VfFcbztTiAOVoS");
 			setAccountEmail("weare.home.educators@gmail.com");
-			setAppId("APP-c5b65d85d40716b42b8cbc6055fdca0b");
+			setAppId("c5b65d85d40716b42b8cbc6055fdca0b");
 		} else {
 			setAPIUsername("paul.a_1343673136_biz_api1.gmail.com");
 			setAPIPassword("1343673159");

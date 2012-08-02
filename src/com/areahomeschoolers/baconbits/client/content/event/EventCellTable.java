@@ -159,7 +159,11 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 					@Override
 					protected Widget createWidget(Event item) {
 						if (!item.allowRegistrations() || !item.getRequiresRegistration()) {
-							return new Label("");
+							String text = "";
+							if (item.getRegistrationStartDate().after(new Date())) {
+								text = Formatter.formatDate(item.getRegistrationStartDate());
+							}
+							return new Label(text);
 						}
 
 						return new Hyperlink("Register", PageUrl.event(item.getId()) + "&tab=1");
