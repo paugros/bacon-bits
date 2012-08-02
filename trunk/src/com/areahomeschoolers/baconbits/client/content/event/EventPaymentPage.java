@@ -14,7 +14,6 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
-import com.areahomeschoolers.baconbits.client.widgets.cellview.SimpleCellTableResources;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -50,7 +49,7 @@ public final class EventPaymentPage implements Page {
 		args.put(EventArg.ONLY_PAYABLE_PARTICIPANTS);
 		args.put(EventArg.STATUS_ID, 1);
 
-		table = new EventParticipantCellTable(args, SimpleCellTableResources.INSTANCE);
+		table = new EventParticipantCellTable(args);
 		table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.PRICE,
 				ParticipantColumn.EDIT_STATUS);
 		table.disablePaging();

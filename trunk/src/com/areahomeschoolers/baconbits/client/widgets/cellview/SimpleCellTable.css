@@ -1,8 +1,13 @@
 .cellTableWidget {
-	border: none;
+	border-collapse: collapse;
+	border: 1px solid #ACACAC;
 }
 
 .cellTableHeader {
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 5px;
+	padding-bottom: 3px;
 }
 
 .cellTableSortableHeader {
@@ -11,10 +16,11 @@
 }
 
 .cellTableCell {
-	padding-left: 2px;
-	padding-right: 2px;
-	padding-top: 3px;
-	padding-bottom: 1px;
+	border-top: 1px solid #ACACAC;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 8px;
+	padding-bottom: 6px;
 	overflow: hidden;
 }
 

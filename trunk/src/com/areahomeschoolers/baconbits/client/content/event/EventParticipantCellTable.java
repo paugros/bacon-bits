@@ -50,14 +50,12 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 
-	public EventParticipantCellTable(ArgMap<EventArg> args) {
+	public EventParticipantCellTable() {
 		init();
-		setArgMap(args);
 	}
 
-	public EventParticipantCellTable(ArgMap<EventArg> args, Resources r) {
-		super(r);
-		init();
+	public EventParticipantCellTable(ArgMap<EventArg> args) {
+		this();
 		setArgMap(args);
 	}
 

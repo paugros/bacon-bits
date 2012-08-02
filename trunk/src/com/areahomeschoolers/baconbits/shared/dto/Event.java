@@ -22,7 +22,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private String address;
 	private boolean adultRequired = false;
 	private boolean active = true;
-	private boolean finished, registrationFinished;
+	private boolean finished, registrationOpen;
 	private boolean sendSurvey;
 	private boolean requiresRegistration = true;
 	private int minimumParticipants, maximumParticipants;
@@ -46,7 +46,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	}
 
 	public boolean allowRegistrations() {
-		return active && !finished && !registrationFinished;
+		return active && !finished && registrationOpen;
 	}
 
 	public String getAccessLevel() {
@@ -166,8 +166,8 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		return registrationEndDate;
 	}
 
-	public boolean getRegistrationFinished() {
-		return registrationFinished;
+	public boolean getRegistrationOpen() {
+		return registrationOpen;
 	}
 
 	public Date getRegistrationStartDate() {
@@ -307,8 +307,8 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		this.registrationEndDate = registrationEndDate;
 	}
 
-	public void setRegistrationFinished(boolean registrationFinished) {
-		this.registrationFinished = registrationFinished;
+	public void setRegistrationOpen(boolean registrationFinished) {
+		this.registrationOpen = registrationFinished;
 	}
 
 	public void setRegistrationStartDate(Date registrationStartDate) {
