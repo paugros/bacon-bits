@@ -118,10 +118,14 @@ public abstract class WidgetFactory {
 	}
 
 	public static VerticalPanel newSection(TitleBar tb, Widget w) {
+		return newSection(tb, w, "100%");
+	}
+
+	public static VerticalPanel newSection(TitleBar tb, Widget w, String width) {
 		VerticalPanel vp = new VerticalPanel();
 		vp.add(tb);
 		vp.add(w);
-		vp.setWidth("100%");
+		vp.setWidth(width);
 		return vp;
 	}
 

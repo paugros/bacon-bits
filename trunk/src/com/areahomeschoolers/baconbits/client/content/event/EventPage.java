@@ -606,6 +606,7 @@ public class EventPage implements Page {
 					// we need to do this again in case we started on another tab
 					form.initialize();
 					form.emancipate();
+
 					tabPanel.selectTabNow(tabBody);
 				}
 			});
