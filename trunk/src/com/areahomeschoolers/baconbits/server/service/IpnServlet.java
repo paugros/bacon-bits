@@ -52,11 +52,6 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 		ServerContext.loadContext(request, response, servletContext);
 
 		try {
-			if (!ServerContext.isLive()) {
-				processPayment(request);
-				return null;
-			}
-
 			StringBuffer params = new StringBuffer();
 			String encoding = "UTF-8";
 			params.append("cmd=_notify-validate");
@@ -64,6 +59,11 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 				String name = e.nextElement();
 				String value = request.getParameter(name);
 				params.append("&" + name + "=" + URLEncoder.encode(value, encoding));
+			}
+
+			if (!ServerContext.isLive()) {
+				processPayment(request, params.toString());
+				return null;
 			}
 
 			String rc = getResponse("https://www.paypal.com/cgi-bin/webscr", params.toString()).trim();
