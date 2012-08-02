@@ -100,6 +100,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setAccessLevelId(rs.getInt("accessLevelId"));
 			event.setCurrentUserParticipantCount(rs.getInt("currentUserParticipantCount"));
 			event.setAgePrices(rs.getString("agePrices"));
+			event.setAgeRanges(rs.getString("ageRanges"));
 			return event;
 		}
 	}
@@ -829,6 +830,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int userId = ServerContext.getCurrentUserId();
 		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.accessLevel, \n";
 		sql += "(select group_concat(price) from eventAgeGroups where eventId = e.id) as agePrices, \n";
+		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {
 			sql += "(select count(p.id) from eventRegistrationParticipants p join eventRegistrations r on r.id = p.eventRegistrationId and r.addedById = "
 					+ userId + " where r.eventId = e.id) as currentUserParticipantCount, \n";
