@@ -129,7 +129,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	}
 
 	private static final String TABLE_SORT_PREF = "tableSort.";
-	public static final int DEFAULT_PAGE_SIZE = 50;
+	public static final int DEFAULT_PAGE_SIZE = 25;
 	private String defaultSizePrefName = "default";
 
 	// Layout Data
@@ -181,7 +181,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 
 	// UI Components
 	private MaxHeightScrollPanel scrollPanel;
-	private CellTitleBar<T> titleBar = new CellTitleBar<T>("", TitleBarStyle.SECTION);
+	private CellTitleBar<T> titleBar = new CellTitleBar<T>("", TitleBarStyle.CELLTABLE);
 	private Set<WidgetCellCreator<?>> cellWidgetCreators = new HashSet<WidgetCellCreator<?>>();
 	private RowStyles<T> rowStyles;
 
@@ -217,7 +217,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		});
 		setSortingEnabled(true);
 		setDefaultSortColumn(0, SortDirection.SORT_ASC);
-		// setWidth("100%");
+		setWidth("100%");
 	}
 
 	public Column<T, ?> addAveragedNumberColumn(String header, ValueGetter<Number, T> numberGetter, String format) {
