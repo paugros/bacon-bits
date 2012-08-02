@@ -49,7 +49,6 @@ public final class MainMenu extends MenuBar {
 	private final User user = Application.getCurrentUser();
 
 	public MainMenu() {
-		setAutoOpen(true);
 		addStyleName("MainMenu");
 		addCloseHandler(new CloseHandler<PopupPanel>() {
 			@Override
