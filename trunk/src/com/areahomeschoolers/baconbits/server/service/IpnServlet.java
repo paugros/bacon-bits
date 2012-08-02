@@ -122,20 +122,34 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 
 		if (key != null) {
 			String statusText = "statusId";
+			int paymentStatusId = 0;
 			try {
-				int statusId = template.queryForInt("select id from paymentStatus where status = ?", status);
-				statusText = Integer.toString(statusId);
+				paymentStatusId = template.queryForInt("select id from paymentStatus where status = ?", status);
+				statusText = Integer.toString(paymentStatusId);
 			} catch (Exception e) {
 			}
 			double paymentFee = 0;
 			if (Common.isDouble(fee)) {
 				paymentFee = Double.parseDouble(fee);
 			}
+
 			String sql = "update payments set paymentFee = ?, transactionId = ?, ipnDate = now(), statusId = " + statusText + " where payKey = ?";
 			template.update(sql, paymentFee, txnId, key);
 
-			sql = "update eventRegistrationParticipants set statusId = 2 where paymentId = (select id from payments where payKey = ? limit 1)";
-			template.update(sql, key);
+			int participantStatusId = 0;
+
+			if (paymentStatusId > 0) {
+				if (paymentStatusId == 2 || paymentStatusId == 11) {
+					participantStatusId = 2;
+				} else if (paymentStatusId == 9) {
+					participantStatusId = 5;
+				}
+
+				if (participantStatusId > 0) {
+					sql = "update eventRegistrationParticipants set statusId = 2 where paymentId = (select id from payments where payKey = ? limit 1)";
+					template.update(sql, key);
+				}
+			}
 		}
 	}
 
