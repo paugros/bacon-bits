@@ -2,11 +2,13 @@ package com.areahomeschoolers.baconbits.server.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Enumeration;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
@@ -14,13 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -35,7 +30,6 @@ import com.areahomeschoolers.baconbits.shared.Common;
 @Component
 @RequestMapping("/ipn")
 public class IpnServlet extends HttpServlet implements ServletContextAware, Controller {
-
 	private static final long serialVersionUID = 1L;
 	protected ServletContext servletContext;
 	private final JdbcTemplate template;
@@ -63,22 +57,22 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 				return null;
 			}
 
-			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost("http://www.paypal.com/cgi-bin/webscr");
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("cmd", "_notify-validate")); // You need to add this parameter to tell PayPal to verify
+			StringBuffer params = new StringBuffer();
+			String encoding = "UTF-8";
+			params.append("cmd=_notify-validate");
 			for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
 				String name = e.nextElement();
 				String value = request.getParameter(name);
-				params.add(new BasicNameValuePair(name, value));
+				params.append("&" + name + "=" + URLEncoder.encode(value, encoding));
 			}
-			post.setEntity(new UrlEncodedFormEntity(params));
 
-			String rc = getReturnCode(client.execute(post)).trim();
+			String rc = getResponse("https://www.paypal.com/cgi-bin/webscr", params.toString()).trim();
 			if ("VERIFIED".equals(rc)) {
 				processPayment(request);
 			} else if ("INVALID".equals(rc)) {
-				throw new RuntimeException("Invalid IPN transaction! Pay key: " + request.getParameter("pay_key"));
+				throw new RuntimeException("Ukulele no good - Invalid IPN transaction! Pay key: " + request.getParameter("pay_key"));
+			} else {
+				throw new RuntimeException("Ukulele no good - IPN transaction totally failed - Pay key: " + request.getParameter("pay_key"));
 			}
 		} finally {
 			ServerContext.unloadContext();
@@ -92,15 +86,32 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 		this.servletContext = servletContext;
 	}
 
-	private String getReturnCode(HttpResponse response) throws IOException, IllegalStateException {
-		InputStream is = response.getEntity().getContent();
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		String result = "";
-		String line = null;
-		while ((line = br.readLine()) != null) {
-			result += line;
+	private String getResponse(String urlString, String params) throws MalformedURLException {
+		URL url = new URL(urlString);
+		URLConnection connection;
+		StringBuffer response = new StringBuffer();
+
+		try {
+			connection = url.openConnection();
+			connection.setDoOutput(true);
+
+			OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+			writer.write(params);
+			writer.flush();
+			writer.close();
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				response.append(line);
+			}
+			reader.close();
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
 		}
-		return result;
+
+		return response.toString();
 	}
 
 	private void processPayment(HttpServletRequest request) {
