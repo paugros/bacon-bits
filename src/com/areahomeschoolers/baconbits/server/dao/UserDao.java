@@ -23,6 +23,8 @@ public interface UserDao {
 
 	public ArrayList<UserGroup> listGroups(ArgMap<UserArg> args);
 
+	public void recordLogin(String username);
+
 	public ServerResponseData<User> save(User user);
 
 	@PreAuthorize("hasRole('SYSTEM_ADMINISTRATORS')")

@@ -139,7 +139,7 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "Events", PageUrl.eventList());
 		if (Application.isAuthenticated()) {
 			addLinkToMenu(menu, "My Event Registrations", PageUrl.eventParticipantList());
-			addLinkToMenu(menu, "Event Payment / Checkout", PageUrl.eventPayment());
+			addLinkToMenu(menu, "My Outstanding Event Balance", PageUrl.eventPayment());
 		}
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));

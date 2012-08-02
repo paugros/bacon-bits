@@ -97,8 +97,9 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 			success = false;
 		}
 
-		// SystemDao systemDao = (SystemDao) ctx.getBean("systemDaoImpl");
-		// systemDao.recordLoginAttempt(username, remoteIp, success);
+		if (success) {
+			userDao.recordLogin(username);
+		}
 
 		return success;
 	}

@@ -81,7 +81,7 @@ public abstract class EntityCellSelector<T extends EntityDto<T>, U extends Arg, 
 			});
 		}
 
-		buttonPanel.addLeftButton(submitButton);
+		buttonPanel.addRightButton(submitButton);
 		buttonPanel.getCloseButton().setText("Cancel");
 		buttonPanel.getCloseButton().addKeyDownHandler(new KeyDownHandler() {
 			@Override

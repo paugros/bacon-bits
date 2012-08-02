@@ -12,6 +12,7 @@ public final class UserGroupSelector extends EntityCellSelector<UserGroup, UserA
 	public UserGroupSelector(ArgMap<UserArg> args) {
 		this();
 		userGroupTable = new UserGroupCellTable(args);
+		userGroupTable.setTitle("User Groups");
 		setEntityCellTable(userGroupTable);
 		userGroupTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION);
 	}

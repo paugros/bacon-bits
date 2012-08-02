@@ -37,8 +37,8 @@ import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -129,8 +129,8 @@ public final class Layout {
 
 		ClickLabel logInOrOut = new ClickLabel();
 		if (Application.isAuthenticated()) {
-			Label name = new Label("Hello, " + Application.getCurrentUser().getFirstName());
-			name.setWordWrap(false);
+			Hyperlink name = new Hyperlink("Hello, " + Application.getCurrentUser().getFirstName(), PageUrl.user(Application.getCurrentUserId()));
+			name.addStyleName("nowrap");
 			sessionPanel.add(name);
 
 			logInOrOut.setText("Log out");
