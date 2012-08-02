@@ -133,8 +133,9 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 				paymentFee = Double.parseDouble(fee);
 			}
 
-			String sql = "update payments set paymentFee = ?, transactionId = ?, ipnDate = now(), statusId = " + statusText + " where payKey = ?";
-			template.update(sql, paymentFee, txnId, key);
+			String sql = "update payments set paymentFee = ?, transactionId = ?, ipnDate = now(), ";
+			sql += "rawData = ?, statusId = " + statusText + " where payKey = ?";
+			template.update(sql, paymentFee, txnId, request.getQueryString(), key);
 
 			int participantStatusId = 0;
 
