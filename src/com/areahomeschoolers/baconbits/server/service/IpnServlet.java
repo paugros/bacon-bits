@@ -68,7 +68,7 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 
 			String rc = getResponse("https://www.paypal.com/cgi-bin/webscr", params.toString()).trim();
 			if ("VERIFIED".equals(rc)) {
-				processPayment(request);
+				processPayment(request, params.toString());
 			} else if ("INVALID".equals(rc)) {
 				throw new RuntimeException("Ukulele no good - Invalid IPN transaction! Pay key: " + request.getParameter("pay_key"));
 			} else {
@@ -114,7 +114,7 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 		return response.toString();
 	}
 
-	private void processPayment(HttpServletRequest request) {
+	private void processPayment(HttpServletRequest request, String rawData) {
 		String status = request.getParameter("payment_status");
 		String key = request.getParameter("pay_key");
 		String fee = request.getParameter("payment_fee");
@@ -135,7 +135,7 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 
 			String sql = "update payments set paymentFee = ?, transactionId = ?, ipnDate = now(), ";
 			sql += "rawData = ?, statusId = " + statusText + " where payKey = ?";
-			template.update(sql, paymentFee, txnId, request.getQueryString(), key);
+			template.update(sql, paymentFee, txnId, rawData, key);
 
 			int participantStatusId = 0;
 
