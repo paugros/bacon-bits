@@ -576,7 +576,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		int paymentId = ServerUtils.getIdFromKeys(keys);
 
-		sql = "update eventRegistrationParticipants set paymentId = ?, statusId = 2 where id in(" + Common.join(participantIds, ", ") + ")";
+		sql = "update eventRegistrationParticipants set paymentId = ? where id in(" + Common.join(participantIds, ", ") + ")";
 		update(sql, paymentId);
 
 		PaypalData pd = makePayment(paymentId, total);
