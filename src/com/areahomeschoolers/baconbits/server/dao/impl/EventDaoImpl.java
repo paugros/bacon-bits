@@ -675,24 +675,19 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public synchronized ArrayList<EventParticipant> saveParticipant(EventParticipant participant) {
+	public synchronized ArrayList<EventParticipant> saveParticipant(final EventParticipant participant) {
 
 		if (participant.getStatusId() == 0) {
 			participant.setStatusId(1);
 		}
 
-		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTRATION_ID, participant.getEventRegistrationId());
+		ArgMap<EventArg> args = new ArgMap<EventArg>();
 		int ageGroupId = participant.getAgeGroupId() == null ? 0 : participant.getAgeGroupId();
 		args.put(EventArg.AGE_GROUP_ID, ageGroupId);
 		Data waitData = getWaitData(args);
 		boolean eventIsFull = eventIsFull(waitData);
-		if (participant.getStatusId() == 1) {
-			if (eventIsFull) {
-				participant.setStatusId(3);
-			} else if (participant.getPrice() == 0) {
-				// go immediately to Confirmed/Paid for free events, as long as it's not full
-				participant.setStatusId(2);
-			}
+		if (participant.getStatusId() == 1 && eventIsFull) {
+			participant.setStatusId(3);
 		}
 
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);
@@ -734,7 +729,20 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			}
 		}
 
-		return getParticipants(new ArgMap<EventArg>(EventArg.REGISTRATION_ID, participant.getEventRegistrationId()));
+		ArrayList<EventParticipant> list = getParticipants(new ArgMap<EventArg>(EventArg.REGISTRATION_ID, participant.getEventRegistrationId()));
+
+		if (participant.getStatusId() == 1) {
+			for (EventParticipant p : list) {
+				if (p.getId() == participant.getId() && p.getPrice() == 0) {
+					String sql = "update eventRegistrationParticipants set statusId = 2 where id = ?";
+					update(sql, p.getId());
+					p.setStatusId(2);
+					p.setStatus("Confirmed/Paid");
+				}
+			}
+		}
+
+		return list;
 	}
 
 	@Override

@@ -685,7 +685,7 @@ img {
 .TitleBar {
 	font-weight: bold;
 	width: 100%;
-	padding: 0px;
+	padding: 4px;
 	padding-left: 1px;
 	padding-right: 1px;
 }
@@ -706,7 +706,6 @@ img {
 }
 
 .TitleBar-cellTable {
-	padding: 4px;
 	background-color: #ACD3FF;
 	border: 1px solid #8CB3DF;
 	border-bottom: none;
