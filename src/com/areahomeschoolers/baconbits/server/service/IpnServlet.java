@@ -122,6 +122,9 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 			}
 			String sql = "update payments set paymentFee = ?, transactionId = ?, ipnDate = now(), statusId = " + statusText + " where payKey = ?";
 			template.update(sql, paymentFee, txnId, key);
+
+			sql = "update eventRegistrationParticipants set statusId = 2 where paymentId = (select id from payments where payKey = ? limit 1)";
+			template.update(sql, key);
 		}
 	}
 
