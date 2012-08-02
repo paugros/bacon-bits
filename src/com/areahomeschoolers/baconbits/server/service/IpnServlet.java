@@ -141,9 +141,6 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 			if (paymentStatusId > 0) {
 				if (paymentStatusId == 2 || paymentStatusId == 11) {
 					participantStatusId = 2;
-				} else if (paymentStatusId == 9) {
-					// TODO register the next waiting here
-					participantStatusId = 5;
 				}
 
 				if (participantStatusId > 0) {
