@@ -45,7 +45,7 @@ public final class EventPaymentPage implements Page {
 		}
 
 		final String title = "Event Payment / Checkout";
-		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID, Application.getCurrentUser().getId());
+		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID_PLUS_SELF, Application.getCurrentUser().getId());
 		args.put(EventArg.ONLY_PAYABLE_PARTICIPANTS);
 		args.put(EventArg.STATUS_ID, 1);
 

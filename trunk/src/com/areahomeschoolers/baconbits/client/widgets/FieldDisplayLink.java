@@ -1,18 +1,22 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import com.areahomeschoolers.baconbits.shared.Common;
+
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
-
-import com.areahomeschoolers.baconbits.shared.Common;
+import com.google.gwt.user.client.ui.Widget;
 
 public class FieldDisplayLink extends Composite {
 	private FocusPanel panel = new FocusPanel();
 	private Hyperlink link = new Hyperlink();
+	private Anchor anchor = new Anchor();
 	private Label label = new Label();
 	private boolean enabled = true;
 	private String defaultText = Common.getDefaultIfNull(null);
+	private Widget linkWidget = link;
 
 	public FieldDisplayLink() {
 		initWidget(panel);
@@ -39,12 +43,26 @@ public class FieldDisplayLink extends Composite {
 		if (!enabled) {
 			panel.setWidget(label);
 		} else {
-			panel.setWidget(link);
+			panel.setWidget(linkWidget);
 		}
 	}
 
+	public void setHref(String href) {
+		linkWidget = anchor;
+		anchor.setHref(href);
+		panel.setWidget(anchor);
+	}
+
+	public void setTarget(String target) {
+		linkWidget = anchor;
+		anchor.setTarget(target);
+		panel.setWidget(anchor);
+	}
+
 	public void setTargetHistoryToken(String token) {
+		linkWidget = link;
 		link.setTargetHistoryToken(token);
+		panel.setWidget(link);
 	}
 
 	public void setText(String text) {
@@ -57,7 +75,8 @@ public class FieldDisplayLink extends Composite {
 			panel.setWidget(label);
 		} else {
 			link.setText(text);
-			panel.setWidget(link);
+			anchor.setText(text);
+			panel.setWidget(linkWidget);
 		}
 	}
 

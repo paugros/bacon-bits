@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
@@ -14,9 +15,11 @@ import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.FieldDisplayLink;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
@@ -30,6 +33,7 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 
@@ -264,6 +268,32 @@ public class UserFieldTable extends FieldTable {
 			}
 		});
 		addField(mobilePhoneField);
+
+		final FieldDisplayLink addressDisplay = new FieldDisplayLink();
+		addressDisplay.setTarget("_blank");
+		final MaxLengthTextArea addressInput = new MaxLengthTextArea(200);
+		addressInput.setVisibleLines(2);
+		addressInput.setCharacterWidth(50);
+		FormField addressField = form.createFormField("Address:", addressInput, addressDisplay);
+		addressField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				addressDisplay.setText(user.getAddress());
+				addressDisplay.setHref("http://maps.google.com/maps?q=" + user.getAddress());
+				addressInput.setText(user.getAddress());
+			}
+		});
+		addressField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				user.setAddress(addressInput.getText());
+			}
+		});
+		addField(addressField);
+
+		if (user.isSaved() && user.getParentId() != null && user.getParentId() > 0) {
+			addField("Parent:", new Hyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId())));
+		}
 
 		if (Application.isAuthenticated()) {
 			final Label startDateDisplay = new Label();

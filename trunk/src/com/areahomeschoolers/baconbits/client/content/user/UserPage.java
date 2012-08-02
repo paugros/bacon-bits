@@ -21,9 +21,12 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.TabPage;
+import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -45,6 +48,7 @@ public class UserPage implements Page {
 	private User user = new User();
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private UserFieldTable fieldTable;
+	private TabPage tabPanel;
 
 	public UserPage(VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
@@ -80,76 +84,133 @@ public class UserPage implements Page {
 	}
 
 	private void initializePage() {
-		String title = user.isSaved() ? user.getFullName() : "New User";
+		final String title = user.isSaved() ? user.getFullName() : "New User";
 		createFieldTable();
 		form.initialize();
 
-		page.add(WidgetFactory.newSection(title, fieldTable));
-
-		if (user.isSaved()) {
-			ArgMap<EventArg> eventArgs = new ArgMap<EventArg>(EventArg.USER_ID, user.getId());
-			EventParticipantCellTable eventsTable = new EventParticipantCellTable(eventArgs);
-			eventsTable.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.ADDED_DATE, ParticipantColumn.AGE, ParticipantColumn.PRICE,
-					ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
-			eventsTable.setTitle("Events");
-
-			eventsTable.getTitleBar().addSearchControl();
-			eventsTable.getTitleBar().addExcelControl();
-			page.add(WidgetFactory.newSection(eventsTable));
-			eventsTable.populate();
-
-			ArgMap<UserArg> userArgs = new ArgMap<UserArg>();
-			userArgs.put(UserArg.USER_ID, user.getId());
-			final UserGroupCellTable groupsTable = new UserGroupCellTable(userArgs);
-			groupsTable.setUser(user);
-			groupsTable.setTitle("Group Membership");
-			groupsTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
-			groupsTable.getTitleBar().addExcelControl();
-			groupsTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
-				@Override
-				public void onMouseDown(MouseDownEvent event) {
-					final UserGroupSelector selector = new UserGroupSelector(new ArgMap<UserArg>());
-					selector.addSubmitCommand(new Command() {
-						@Override
-						public void execute() {
-							final ArrayList<UserGroup> groups = new ArrayList<UserGroup>(selector.getSelectedItems());
-							groups.removeAll(groupsTable.getFullList());
-							if (groups.isEmpty()) {
-								return;
-							}
-
-							for (UserGroup g : groups) {
-								if (!groupsTable.getFullList().contains(g)) {
-									groupsTable.addItem(g);
-								}
-							}
-							userService.updateUserGroupRelation(user, groups, true, new Callback<Void>() {
-								@Override
-								protected void doOnSuccess(Void item) {
-									groups.removeAll(groupsTable.getFullList());
-								}
-							});
-							selector.clearSelection();
-						}
-					});
-
-					selector.setMultiSelect(true);
-					selector.setSelectedItems(groupsTable.getFullList());
-					selector.center();
-				}
-			}));
-			groupsTable.populate();
-			page.add(WidgetFactory.newSection(groupsTable));
-		}
-
 		if (!user.isSaved()) {
 			form.configureForAdd(fieldTable);
+			page.add(WidgetFactory.newSection(title, fieldTable));
 		} else {
+			tabPanel = new TabPage();
 			form.emancipate();
+
+			tabPanel.add("Main", new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					tabBody.add(WidgetFactory.newSection(title, fieldTable));
+
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
+
+			tabPanel.add("Events", new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					ArgMap<EventArg> eventArgs = new ArgMap<EventArg>(EventArg.USER_ID, user.getId());
+					EventParticipantCellTable eventsTable = new EventParticipantCellTable(eventArgs);
+					eventsTable.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.ADDED_DATE, ParticipantColumn.AGE, ParticipantColumn.PRICE,
+							ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
+					eventsTable.setTitle("Events");
+
+					eventsTable.getTitleBar().addSearchControl();
+					eventsTable.getTitleBar().addExcelControl();
+					eventsTable.populate();
+
+					tabBody.add(WidgetFactory.newSection(eventsTable, "1150px"));
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
+
+			tabPanel.add("Groups", new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					ArgMap<UserArg> userArgs = new ArgMap<UserArg>();
+					userArgs.put(UserArg.USER_ID, user.getId());
+					final UserGroupCellTable groupsTable = new UserGroupCellTable(userArgs);
+					groupsTable.setUser(user);
+					groupsTable.setTitle("Group Membership");
+					groupsTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
+					groupsTable.getTitleBar().addExcelControl();
+					groupsTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
+						@Override
+						public void onMouseDown(MouseDownEvent event) {
+							final UserGroupSelector selector = new UserGroupSelector(new ArgMap<UserArg>());
+							selector.addSubmitCommand(new Command() {
+								@Override
+								public void execute() {
+									final ArrayList<UserGroup> groups = new ArrayList<UserGroup>(selector.getSelectedItems());
+									groups.removeAll(groupsTable.getFullList());
+									if (groups.isEmpty()) {
+										return;
+									}
+
+									for (UserGroup g : groups) {
+										if (!groupsTable.getFullList().contains(g)) {
+											groupsTable.addItem(g);
+										}
+									}
+									userService.updateUserGroupRelation(user, groups, true, new Callback<Void>() {
+										@Override
+										protected void doOnSuccess(Void item) {
+											groups.removeAll(groupsTable.getFullList());
+										}
+									});
+									selector.clearSelection();
+								}
+							});
+
+							selector.setMultiSelect(true);
+							selector.setSelectedItems(groupsTable.getFullList());
+							selector.center();
+						}
+					}));
+
+					groupsTable.populate();
+
+					tabBody.add(WidgetFactory.newSection(groupsTable, "750px"));
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
+
+			tabPanel.add("Children", new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
+					args.put(UserArg.PARENT_ID, Application.getCurrentUserId());
+
+					UserCellTable table = new UserCellTable(args);
+					table.setTitle("Children");
+					table.populate();
+
+					tabBody.add(WidgetFactory.newSection(table, "750px"));
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
+
+			tabPanel.add("Registrations", new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID_PLUS_SELF, user.getId());
+					EventParticipantCellTable table = new EventParticipantCellTable(args);
+					table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE,
+							ParticipantColumn.STATUS);
+					table.setTitle("Event Registrations");
+
+					table.getTitleBar().addSearchControl();
+					table.getTitleBar().addExcelControl();
+					table.populate();
+
+					tabBody.add(WidgetFactory.newSection(table, "1000px"));
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
 
 			if (!Application.isAuthenticated()) {
 				form.setEnabled(false);
 			}
+
+			page.add(tabPanel);
 		}
 
 		Application.getLayout().setPage(title, page);

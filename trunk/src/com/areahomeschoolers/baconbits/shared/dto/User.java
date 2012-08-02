@@ -18,6 +18,7 @@ public final class User extends EntityDto<User> {
 	private String lastName;
 	private String passwordDigest;
 	private String homePhone;
+	private String address;
 	// only for setting
 	private String password;
 
@@ -25,6 +26,8 @@ public final class User extends EntityDto<User> {
 	private boolean active;
 	private boolean systemAdministrator;
 	private boolean resetPassword;
+	private String parentFirstName;
+	private String parentLastName;
 	private HashMap<Integer, Boolean> groups;
 	private Date startDate, endDate, addedDate, lastLoginDate, birthDate;
 	private Integer parentId;
@@ -51,6 +54,10 @@ public final class User extends EntityDto<User> {
 
 	public Date getAddedDate() {
 		return addedDate;
+	}
+
+	public String getAddress() {
+		return address;
 	}
 
 	public Date getBirthDate() {
@@ -97,11 +104,19 @@ public final class User extends EntityDto<User> {
 		return mobilePhone;
 	}
 
+	public String getParentFirstName() {
+		return parentFirstName;
+	}
+
 	public Integer getParentId() {
 		if (parentId == null || parentId == 0) {
 			return null;
 		}
 		return parentId;
+	}
+
+	public String getParentLastName() {
+		return parentLastName;
 	}
 
 	public String getPassword() {
@@ -137,6 +152,9 @@ public final class User extends EntityDto<User> {
 	}
 
 	public boolean memberOf(int groupId) {
+		if (systemAdministrator || groupId == 0) {
+			return true;
+		}
 		return groups.keySet().contains(groupId);
 	}
 
@@ -150,6 +168,10 @@ public final class User extends EntityDto<User> {
 
 	public void setAddedDate(Date addedDate) {
 		this.addedDate = addedDate;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public void setBirthDate(Date birthDate) {
@@ -195,8 +217,16 @@ public final class User extends EntityDto<User> {
 		this.mobilePhone = mobilePhone;
 	}
 
+	public void setParentFirstName(String parentFirstName) {
+		this.parentFirstName = parentFirstName;
+	}
+
 	public void setParentId(Integer parentId) {
 		this.parentId = parentId;
+	}
+
+	public void setParentLastName(String parentLastName) {
+		this.parentLastName = parentLastName;
 	}
 
 	public void setPassword(String password) {

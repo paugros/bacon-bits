@@ -90,6 +90,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 			user.setSystemAdministrator(rs.getBoolean("isSystemAdministrator"));
 			user.setBirthDate(rs.getTimestamp("birthDate"));
 			user.setParentId(rs.getInt("parentId"));
+			user.setAddress(rs.getString("address"));
+			user.setParentFirstName(rs.getString("parentFirstName"));
+			user.setParentLastName(rs.getString("parentLastName"));
 			return user;
 		}
 	}
@@ -121,7 +124,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 	@Autowired
 	public UserDaoImpl(DataSource dataSource) {
 		super(dataSource);
-		SELECT = "select isActive(startDate, endDate) as isEnabled, u.* from users u ";
+		SELECT = "select isActive(u.startDate, u.endDate) as isEnabled, u.*, uu.firstName as parentFirstName, uu.lastName as parentLastName from users u \n";
+		SELECT += "left join users uu on uu.id = u.parentId \n";
 	}
 
 	@Override
@@ -179,6 +183,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 	public ArrayList<User> list(ArgMap<UserArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 
+		int parentIdPlusSelf = args.getInt(UserArg.PARENT_ID_PLUS_SELF);
 		int parentId = args.getInt(UserArg.PARENT_ID);
 		int registrationId = args.getInt(UserArg.NOT_ON_REGISTRATION_ID);
 
@@ -197,14 +202,15 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 			sql += "and p.id is null ";
 		}
 
+		if (parentIdPlusSelf > 0) {
+			sql += "and (u.parentId = ? or u.id = ?) ";
+			sqlArgs.add(parentIdPlusSelf);
+			sqlArgs.add(parentIdPlusSelf);
+		}
+
 		if (parentId > 0) {
-			sql += "and (u.parentId = ?";
+			sql += "and u.parentId = ? ";
 			sqlArgs.add(parentId);
-			if (registrationId > 0) {
-				sql += " or u.id = ?";
-				sqlArgs.add(parentId);
-			}
-			sql += ") ";
 		}
 
 		sql += "order by u.lastName, u.firstName";
@@ -237,6 +243,12 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		}
 
 		return query(sql, new GroupMapper(), sqlArgs.toArray());
+	}
+
+	@Override
+	public void recordLogin(String username) {
+		String sql = "update users set lastLoginDate = now() where email = ?";
+		update(sql, username);
 	}
 
 	@Override
@@ -273,16 +285,16 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		if (user.isSaved()) {
 			String sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, isSystemAdministrator = :systemAdministrator, ";
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, lastLoginDate = :lastLoginDate, ";
-			sql += "birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest where id = :id";
+			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (user.getStartDate() == null) {
 				user.setStartDate(new Date());
 			}
 			String sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
-			sql += "isSystemAdministrator, resetPassword, birthDate, parentId) values ";
+			sql += "address, isSystemAdministrator, resetPassword, birthDate, parentId) values ";
 			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
-			sql += ":systemAdministrator, :resetPassword, :birthDate, :parentId)";
+			sql += ":address, :systemAdministrator, :resetPassword, :birthDate, :parentId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

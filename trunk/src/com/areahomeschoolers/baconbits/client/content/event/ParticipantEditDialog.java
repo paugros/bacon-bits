@@ -185,7 +185,7 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		if (!entity.isSaved()) {
 			UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 			ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
-			args.put(UserArg.PARENT_ID, Application.getCurrentUser().getId());
+			args.put(UserArg.PARENT_ID_PLUS_SELF, Application.getCurrentUser().getId());
 			args.put(UserArg.NOT_ON_REGISTRATION_ID, registration.getId());
 			userService.list(args, new Callback<ArrayList<User>>() {
 				@Override

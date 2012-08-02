@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -41,6 +42,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -76,7 +78,7 @@ public class EventRegistrationSection extends Composite {
 	private void addParticipantSection() {
 		TitleBar tb = new TitleBar("Registered Participants", TitleBarStyle.SUBSECTION);
 
-		if (pageData.getEvent().allowRegistrations()) {
+		if (pageData.getEvent().allowRegistrations() && Application.memberOf(pageData.getEvent().getGroupId())) {
 			if (registration.isSaved()) {
 				final ClickLabel cancel = new ClickLabel(getCancelRegistrationLabelText());
 				cancel.addMouseDownHandler(new MouseDownHandler() {
@@ -111,6 +113,15 @@ public class EventRegistrationSection extends Composite {
 					}
 				});
 				tb.addLink(cancel);
+			}
+
+			if (pageData.getRegistration() != null) {
+				for (EventParticipant p : pageData.getRegistration().getParticipants()) {
+					if (p.getPrice() > 0 && p.getStatusId() == 1) {
+						tb.addLink(new Hyperlink("Pay", PageUrl.eventPayment()));
+						break;
+					}
+				}
 			}
 
 			tb.addLink(new ClickLabel("Add", new MouseDownHandler() {

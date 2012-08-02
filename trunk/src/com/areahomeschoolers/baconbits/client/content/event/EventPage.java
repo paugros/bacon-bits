@@ -52,6 +52,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
+import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
 import com.google.gwt.dom.client.Style.Unit;
@@ -175,7 +176,7 @@ public class EventPage implements Page {
 
 		final Hyperlink addressDisplay = new Hyperlink();
 		final MaxLengthTextArea addressInput = new MaxLengthTextArea(200);
-		addressInput.setVisibleLines(3);
+		addressInput.setVisibleLines(2);
 		addressInput.setCharacterWidth(50);
 		FormField addressField = form.createFormField("Address:", addressInput, addressDisplay);
 		addressField.setRequired(true);
@@ -590,6 +591,15 @@ public class EventPage implements Page {
 								});
 							}
 						}));
+
+						if (pageData.getRegistration() != null) {
+							for (EventParticipant p : pageData.getRegistration().getParticipants()) {
+								if (p.getPrice() > 0 && p.getStatusId() == 1) {
+									tb.addLink(new Hyperlink("Pay", PageUrl.eventPayment()));
+									break;
+								}
+							}
+						}
 					}
 					tabBody.add(WidgetFactory.newSection(tb, fieldTable));
 
