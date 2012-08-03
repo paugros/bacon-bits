@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -106,46 +107,40 @@ public abstract class WidgetFactory {
 		return label;
 	}
 
-	public static VerticalPanel newSection(EntityCellTable<?, ?, ?> cellTable) {
+	public static Widget newSection(EntityCellTable<?, ?, ?> cellTable) {
 		return newSection(cellTable.getTitleBar(), cellTable);
 	}
 
-	public static VerticalPanel newSection(EntityCellTable<?, ?, ?> cellTable, ContentWidth width) {
-		VerticalPanel vp = newSection(cellTable);
-		if (width != null) {
-			vp.addStyleName(width.toString());
-		}
-		return vp;
+	public static Widget newSection(EntityCellTable<?, ?, ?> cellTable, ContentWidth width) {
+		SimplePanel sp = new SimplePanel(newSection(cellTable));
+		sp.addStyleName(width.toString());
+		return sp;
 	}
 
-	public static VerticalPanel newSection(String title, Widget w) {
-		VerticalPanel vp = newSection(title, w, null);
+	public static Widget newSection(String title, Widget w) {
+		Widget vp = newSection(new TitleBar(title, TitleBarStyle.SECTION), w);
 		vp.setWidth("100%");
 		return vp;
 	}
 
-	public static VerticalPanel newSection(String title, Widget w, ContentWidth width) {
-		VerticalPanel vp = newSection(new TitleBar(title, TitleBarStyle.SECTION), w);
-		if (width != null) {
-			vp.addStyleName(width.toString());
-		}
-		return vp;
+	public static Widget newSection(String title, Widget w, ContentWidth width) {
+		SimplePanel sp = new SimplePanel(newSection(title, w));
+		sp.addStyleName(width.toString());
+		return sp;
 	}
 
-	public static VerticalPanel newSection(TitleBar tb, Widget w) {
-		VerticalPanel vp = newSection(tb, w, null);
-		vp.setWidth("100%");
-		return vp;
-	}
-
-	public static VerticalPanel newSection(TitleBar tb, Widget w, ContentWidth width) {
+	public static Widget newSection(TitleBar tb, Widget w) {
 		VerticalPanel vp = new VerticalPanel();
 		vp.add(tb);
 		vp.add(w);
-		if (width != null) {
-			vp.addStyleName(width.toString());
-		}
+		vp.setWidth("100%");
 		return vp;
+	}
+
+	public static Widget newSection(TitleBar tb, Widget w, ContentWidth width) {
+		SimplePanel sp = new SimplePanel(newSection(tb, w));
+		sp.addStyleName(width.toString());
+		return sp;
 	}
 
 	/**
@@ -158,6 +153,12 @@ public abstract class WidgetFactory {
 			return new HTML("<a href=\"#" + link.getTargetHistoryToken() + "\" target=\"_blank\">" + link.getText() + "</a>");
 		}
 		return link;
+	}
+
+	public static SimplePanel wrapForWidth(Widget w, ContentWidth width) {
+		SimplePanel sp = new SimplePanel(w);
+		sp.addStyleName(width.toString());
+		return sp;
 	}
 
 	private WidgetFactory() {

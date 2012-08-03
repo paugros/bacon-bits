@@ -3,6 +3,8 @@ package com.areahomeschoolers.baconbits.client.content.article;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.user.client.ui.Composite;
@@ -14,7 +16,6 @@ public class ArticleWidget extends Composite {
 
 	public ArticleWidget(Article article) {
 		VerticalPanel vp = new VerticalPanel();
-		vp.addStyleName("ArticleWidget");
 		vp.setSpacing(10);
 		Hyperlink title = new Hyperlink(article.getTitle(), PageUrl.article(article.getId()));
 		title.addStyleName("hugeText bold");
@@ -27,7 +28,7 @@ public class ArticleWidget extends Composite {
 			vp.add(ds);
 		}
 
-		initWidget(vp);
+		initWidget(WidgetFactory.wrapForWidth(vp, ContentWidth.maxWidth1100px));
 	}
 
 }

@@ -46,6 +46,7 @@ public class FieldTable extends Composite {
 		flexTable.setCellPadding(0);
 		flexTable.setCellSpacing(0);
 		initWidget(flexTable);
+		setWidth("100%");
 	}
 
 	public void addAll(Form form) {

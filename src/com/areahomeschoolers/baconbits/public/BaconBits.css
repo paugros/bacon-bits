@@ -162,11 +162,6 @@ img {
 	cursor: default;
 }
 
-.ArticleWidget {
-	display: block;
-	max-width: 1100px;
-}
-
 .DataTable {
 	border-collapse: collapse;
 	background: #F8F8F8;
@@ -308,22 +303,22 @@ img {
 }
 
 .maxWidth750px {
-	display: block;
+	width: 100%;
 	max-width: 750px;
 }
 
 .maxWidth1000px {
-	display: block;
+	width: 100%;
 	max-width: 1000px;
 }
 
 .maxWidth1100px {
-	display: block;
+	width: 100%;
 	max-width: 1100px;
 }
 
 .maxWidth1150px {
-	display: block;
+	width: 100%;
 	max-width: 1150px;
 }
 
