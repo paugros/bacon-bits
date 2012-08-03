@@ -91,7 +91,7 @@ public class UserPage implements Page {
 
 		if (!user.isSaved()) {
 			form.configureForAdd(fieldTable);
-			page.add(WidgetFactory.newSection(title, fieldTable));
+			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.maxWidth1100px));
 		} else {
 			tabPanel = new TabPage();
 			form.emancipate();
