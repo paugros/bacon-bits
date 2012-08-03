@@ -125,7 +125,7 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getEducationMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Arts/Crafts", PageUrl.articleGroup("26,23"));
-		addLinkToMenu(menu, "Language Arts", PageUrl.articleGroup("26,23"));
+		// addLinkToMenu(menu, "Language Arts", PageUrl.articleGroup("26,23"));
 		addLinkToMenu(menu, "Math", PageUrl.articleGroup("25"));
 		addLinkToMenu(menu, "Preschool", PageUrl.articleGroup("5,23"));
 		addLinkToMenu(menu, "Science", PageUrl.articleGroup("30"));
@@ -159,7 +159,7 @@ public final class MainMenu extends MenuBar {
 
 	private MenuBar getResourcesMenu() {
 		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Helpful Links", PageUrl.articleGroup("39"));
+		// addLinkToMenu(menu, "Helpful Links", PageUrl.articleGroup("39"));
 		addLinkToMenu(menu, "Homeschooling Books", PageUrl.articleGroup("43"));
 		addLinkToMenu(menu, "Local Sports League Info", PageUrl.articleGroup("34"));
 
