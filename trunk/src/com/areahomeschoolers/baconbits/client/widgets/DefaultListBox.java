@@ -8,6 +8,7 @@ public class DefaultListBox extends ListBox {
 
 	public DefaultListBox() {
 		super();
+		getElement().getStyle().setBorderColor("#cccccc");
 	}
 
 	public DefaultListBox(boolean isMultipleSelect) {
