@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
@@ -22,6 +23,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -90,8 +92,13 @@ public class HomePage implements Page {
 				Hyperlink link = new Hyperlink("See more events...", PageUrl.eventList());
 				vp.add(link);
 
-				HTML fb = new HTML();
-				fb.setHTML("<p><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" mce_href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" target=\"_TOP\" style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; font-variant: normal; font-style: normal; font-weight: normal; color: #3B5998; text-decoration: none;\" mce_style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; font-variant: normal; font-style: normal; font-weight: normal; color: #3B5998; text-decoration: none;\" title=\"WeAre Home Educators\">WeAre Home Educators</a><br><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" mce_href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" target=\"_TOP\" title=\"WeAre Home Educators\"><img src=\"http://badge.facebook.com/badge/111756708899702.553.1216136535.png\" mce_src=\"http://badge.facebook.com/badge/111756708899702.553.1216136535.png\" width=\"120\" height=\"179\" style=\"border: 0px;\" mce_style=\"border: 0px;\"></a><br><a href=\"http://www.facebook.com/business/dashboard/\" mce_href=\"http://www.facebook.com/business/dashboard/\" target=\"_TOP\" style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; font-variant: normal; font-style: normal; font-weight: normal; color: #3B5998; text-decoration: none;\" mce_style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; font-variant: normal; font-style: normal; font-weight: normal; color: #3B5998; text-decoration: none;\" title=\"Make your own badge!\"></a></p>");
+				Image image = new Image(MainImageBundle.INSTANCE.faceBook());
+				String text = "<p><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" target=\"_TOP\" ";
+				text += "style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; color: #3B5998; text-decoration: none;\" ";
+				text += "title=\"WeAre Home Educators\">WeAre Home Educators</a><br><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" title=\"WeAre Home Educators\">";
+				text += image.toString() + "</a></p>";
+
+				HTML fb = new HTML(text);
 				vp.add(fb);
 
 				eventPanel.setWidget(vp);

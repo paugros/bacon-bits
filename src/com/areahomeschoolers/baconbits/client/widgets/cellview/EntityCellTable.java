@@ -129,7 +129,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	}
 
 	private static final String TABLE_SORT_PREF = "tableSort.";
-	public static final int DEFAULT_PAGE_SIZE = 25;
+	public static final int DEFAULT_PAGE_SIZE = 50;
 	private String defaultSizePrefName = "default";
 
 	// Layout Data
