@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 
@@ -24,7 +25,7 @@ public final class UserListPage implements Page {
 
 		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
-		page.add(WidgetFactory.newSection(table, "750px"));
+		page.add(WidgetFactory.newSection(table, ContentWidth.maxWidth750px));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override

@@ -3,78 +3,81 @@ package com.areahomeschoolers.baconbits.client.content.event;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.MonthPicker;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class EventListPage implements Page {
+	private MonthPicker monthBox;
+	private DefaultListBox ageBox;
+	private EventCellTable table;
+
 	public EventListPage(final VerticalPanel page) {
 		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 		final String title = "Events";
-		final EventCellTable table = new EventCellTable(args);
+		table = new EventCellTable(args);
 
 		PaddedPanel pp = new PaddedPanel();
 		pp.addStyleName("mediumPadding");
-		final DefaultListBox lb = new DefaultListBox();
-		lb.addItem("All", 0);
+		ageBox = new DefaultListBox();
+		ageBox.addItem("all ages", 0);
 		for (int age = 1; age < 19; age++) {
-			lb.addItem(Integer.toString(age), age);
+			ageBox.addItem(Integer.toString(age) + " year-olds", age);
 		}
 
-		lb.addChangeHandler(new ChangeHandler() {
+		ageBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				int age = lb.getIntValue();
-				if (age == 0) {
-					table.showAllItems();
-					return;
-				}
-
-				for (Event e : table.getFullList()) {
-					String rangeText = e.getAgeRanges();
-
-					if (rangeText == null) {
-						table.showItem(e, false, false, false);
-						continue;
-					}
-
-					String[] ranges = rangeText.split(",");
-
-					for (int i = 0; i < ranges.length; i++) {
-						String[] limits = ranges[i].split("-");
-
-						int min = Integer.parseInt(limits[0]);
-						int max = Integer.parseInt(limits[1]);
-
-						if ((min == 0 || (min <= age)) && (max == 0 || (max >= age))) {
-							table.showItem(e, false, false, false);
-						} else {
-							table.hideItem(e, false, false);
-						}
-					}
-				}
-
-				table.refresh(false);
-				table.sort();
+				applyTableFilter();
 			}
 		});
 
-		Label l = new Label("Show events for age:");
-		l.addStyleName("largeText");
-		lb.addStyleName("mediumText");
-		pp.add(l);
-		pp.add(lb);
+		monthBox = new MonthPicker();
+		monthBox.getListBox().setItemText(0, "any month");
+		monthBox.getListBox().setSelectedIndex(0);
+		monthBox.addValueChangeCommand(new Command() {
+			@Override
+			public void execute() {
+				applyTableFilter();
+			}
+		});
+
+		Label show = new Label("Show events for ");
+		pp.add(show);
+		pp.add(ageBox);
+
+		Label in = new Label("in");
+		pp.add(in);
+		pp.add(monthBox);
+		pp.getElement().getStyle().setBackgroundColor("#c5eabf");
+
+		HTML message = new HTML();
+		message.getElement().getStyle().setMarginLeft(20, Unit.PX);
+		String text = "<b><font class=errorText>New this year:</font></b> all events must be paid for using PayPal or credit card.<br>You can register for all your events then pay all at once.";
+		message.setHTML(text);
+		pp.add(message);
+
+		for (int i = 0; i < pp.getWidgetCount(); i++) {
+			pp.setCellVerticalAlignment(pp.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+		}
 		page.add(pp);
 
 		table.setTitle(title);
@@ -85,7 +88,7 @@ public final class EventListPage implements Page {
 
 		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
-		page.add(WidgetFactory.newSection(table, "1150px"));
+		page.add(WidgetFactory.newSection(table, ContentWidth.maxWidth1150px));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
@@ -95,5 +98,51 @@ public final class EventListPage implements Page {
 		});
 
 		table.populate();
+	}
+
+	private void applyTableFilter() {
+		// first
+		int month = monthBox.getMonth();
+		int age = ageBox.getIntValue();
+
+		if (month == 0 && age == 0) {
+			table.showAllItems();
+			return;
+		}
+
+		for (Event e : table.getFullList()) {
+			boolean monthMatch = false;
+			boolean ageMatch = false;
+
+			// month
+			monthMatch = month == 0 || (ClientDateUtils.getMonth(e.getStartDate()) == month);
+
+			// age
+			String rangeText = e.getAgeRanges();
+
+			if (age == 0 || rangeText == null) {
+				ageMatch = true;
+			} else {
+				String[] ranges = rangeText.split(",");
+
+				for (int i = 0; i < ranges.length; i++) {
+					String[] limits = ranges[i].split("-");
+
+					int min = Integer.parseInt(limits[0]);
+					int max = Integer.parseInt(limits[1]);
+
+					ageMatch = ((min == 0 || (min <= age)) && (max == 0 || (max >= age)));
+				}
+			}
+
+			if (monthMatch && ageMatch) {
+				table.showItem(e, false, false, false);
+			} else {
+				table.hideItem(e, false, false);
+			}
+		}
+
+		table.refresh(false);
+		table.sort();
 	}
 }

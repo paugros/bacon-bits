@@ -18,6 +18,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
@@ -98,7 +99,7 @@ public class UserPage implements Page {
 			tabPanel.add("Main", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					tabBody.add(WidgetFactory.newSection(title, fieldTable, "1100px"));
+					tabBody.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.maxWidth1100px));
 
 					tabPanel.selectTabNow(tabBody);
 				}
@@ -117,7 +118,7 @@ public class UserPage implements Page {
 					eventsTable.getTitleBar().addExcelControl();
 					eventsTable.populate();
 
-					tabBody.add(WidgetFactory.newSection(eventsTable, "1150px"));
+					tabBody.add(WidgetFactory.newSection(eventsTable, ContentWidth.maxWidth1150px));
 					tabPanel.selectTabNow(tabBody);
 				}
 			});
@@ -168,7 +169,7 @@ public class UserPage implements Page {
 
 					groupsTable.populate();
 
-					tabBody.add(WidgetFactory.newSection(groupsTable, "750px"));
+					tabBody.add(WidgetFactory.newSection(groupsTable, ContentWidth.maxWidth750px));
 					tabPanel.selectTabNow(tabBody);
 				}
 			});
@@ -183,7 +184,7 @@ public class UserPage implements Page {
 					table.setTitle("Children");
 					table.populate();
 
-					tabBody.add(WidgetFactory.newSection(table, "750px"));
+					tabBody.add(WidgetFactory.newSection(table, ContentWidth.maxWidth750px));
 					tabPanel.selectTabNow(tabBody);
 				}
 			});
@@ -201,7 +202,7 @@ public class UserPage implements Page {
 					table.getTitleBar().addExcelControl();
 					table.populate();
 
-					tabBody.add(WidgetFactory.newSection(table, "1000px"));
+					tabBody.add(WidgetFactory.newSection(table, ContentWidth.maxWidth1000px));
 					tabPanel.selectTabNow(tabBody);
 				}
 			});

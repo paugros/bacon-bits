@@ -9,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
@@ -61,7 +62,7 @@ public final class EventParticipantListPage implements Page {
 
 		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
-		page.add(WidgetFactory.newSection(table, "1000px"));
+		page.add(WidgetFactory.newSection(table, ContentWidth.maxWidth1000px));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
