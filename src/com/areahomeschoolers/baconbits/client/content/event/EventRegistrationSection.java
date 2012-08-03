@@ -45,6 +45,7 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class EventRegistrationSection extends Composite {
@@ -63,6 +64,7 @@ public class EventRegistrationSection extends Composite {
 		}
 	};
 	private Button volunteerAddButton;
+	private SimplePanel payMessage = new SimplePanel();
 
 	public EventRegistrationSection(EventPageData pd) {
 		initWidget(vp);
@@ -248,22 +250,7 @@ public class EventRegistrationSection extends Composite {
 
 		addVolunteerSection();
 
-		if (pageData.getRegistration() != null) {
-			for (EventParticipant p : pageData.getRegistration().getParticipants()) {
-				if (p.getPrice() > 0 && p.getStatusId() == 1) {
-					String text = "All done here? ";
-					Hyperlink payLink = new Hyperlink("Pay now", PageUrl.eventPayment());
-					text += payLink.toString() + " or ";
-					Hyperlink eventLink = new Hyperlink("continue registering", PageUrl.eventList());
-					text += eventLink.toString() + ".";
-
-					HTML blob = new HTML(text);
-					blob.addStyleName("largeText heavyPadding");
-					vp.add(blob);
-					break;
-				}
-			}
-		}
+		vp.add(payMessage);
 	}
 
 	private void populateParticipants() {
@@ -345,6 +332,24 @@ public class EventRegistrationSection extends Composite {
 		participantTable.getColumnFormatter().setWidth(0, "180px");
 		participantTable.getColumnFormatter().setWidth(1, "80px");
 		participantTable.getColumnFormatter().setWidth(2, "80px");
+
+		payMessage.clear();
+		if (pageData.getRegistration() != null) {
+			for (EventParticipant p : pageData.getRegistration().getParticipants()) {
+				if (p.getPrice() > 0 && p.getStatusId() == 1) {
+					String text = "All done here? ";
+					Hyperlink payLink = new Hyperlink("Pay now", PageUrl.eventPayment());
+					text += payLink.toString() + " or ";
+					Hyperlink eventLink = new Hyperlink("continue registering", PageUrl.eventList());
+					text += eventLink.toString() + ".";
+
+					HTML blob = new HTML(text);
+					blob.addStyleName("largeText heavyPadding");
+					payMessage.setWidget(blob);
+					break;
+				}
+			}
+		}
 	}
 
 	private void populateVolunteerPositions() {
