@@ -299,7 +299,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int userId = args.getInt(EventArg.USER_ID);
 		int statusId = args.getInt(EventArg.STATUS_ID);
 		final boolean includeFields = args.getBoolean(EventArg.INCLUDE_FIELDS);
-		boolean onlyPayable = args.getBoolean(EventArg.ONLY_PAYABLE_PARTICIPANTS);
 		List<Integer> ids = args.getIntList(EventArg.PARTICIPANT_IDS);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
@@ -321,10 +320,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 		sql += "join events e on e.id = r.eventId \n";
 		sql += "where 1 = 1 \n";
-
-		if (onlyPayable) {
-			sql += "and (py.id is null or py.statusId != 1) and p.statusId = 1 ";
-		}
 
 		if (!Common.isNullOrEmpty(ids)) {
 			sql += "and p.id in(" + Common.join(ids, ", ") + ")";
