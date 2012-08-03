@@ -100,7 +100,7 @@ public class UserFieldTable extends FieldTable {
 		emailField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				emailDisplay.setText(user.getEmail());
+				emailDisplay.setText(Common.getDefaultIfNull(user.getEmail()));
 				emailInput.setText(user.getEmail());
 			}
 		});
@@ -239,7 +239,7 @@ public class UserFieldTable extends FieldTable {
 		homePhoneField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				homePhoneDisplay.setText(user.getHomePhone());
+				homePhoneDisplay.setText(Common.getDefaultIfNull(user.getHomePhone()));
 				homePhoneInput.setText(user.getHomePhone());
 			}
 		});
@@ -257,7 +257,7 @@ public class UserFieldTable extends FieldTable {
 		mobilePhoneField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				mobilePhoneDisplay.setText(user.getMobilePhone());
+				mobilePhoneDisplay.setText(Common.getDefaultIfNull(user.getMobilePhone()));
 				mobilePhoneInput.setText(user.getMobilePhone());
 			}
 		});
@@ -278,7 +278,7 @@ public class UserFieldTable extends FieldTable {
 		addressField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				addressDisplay.setText(user.getAddress());
+				addressDisplay.setText(Common.getDefaultIfNull(user.getAddress()));
 				addressDisplay.setHref("http://maps.google.com/maps?q=" + user.getAddress());
 				addressInput.setText(user.getAddress());
 			}

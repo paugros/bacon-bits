@@ -98,7 +98,7 @@ public class UserPage implements Page {
 			tabPanel.add("Main", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					tabBody.add(WidgetFactory.newSection(title, fieldTable));
+					tabBody.add(WidgetFactory.newSection(title, fieldTable, "1100px"));
 
 					tabPanel.selectTabNow(tabBody);
 				}

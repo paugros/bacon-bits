@@ -591,17 +591,18 @@ public class EventPage implements Page {
 								});
 							}
 						}));
+					}
 
-						if (pageData.getRegistration() != null) {
-							for (EventParticipant p : pageData.getRegistration().getParticipants()) {
-								if (p.getPrice() > 0 && p.getStatusId() == 1) {
-									tb.addLink(new Hyperlink("Pay", PageUrl.eventPayment()));
-									break;
-								}
+					if (pageData.getRegistration() != null) {
+						for (EventParticipant p : pageData.getRegistration().getParticipants()) {
+							if (p.getPrice() > 0 && p.getStatusId() == 1) {
+								tb.addLink(new Hyperlink("Pay", PageUrl.eventPayment()));
+								break;
 							}
 						}
 					}
-					tabBody.add(WidgetFactory.newSection(tb, fieldTable));
+
+					tabBody.add(WidgetFactory.newSection(tb, fieldTable, "1100px"));
 
 					// we need to do this again in case we started on another tab
 					form.initialize();
