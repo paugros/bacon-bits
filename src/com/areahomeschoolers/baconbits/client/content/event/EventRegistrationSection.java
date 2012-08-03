@@ -142,7 +142,7 @@ public class EventRegistrationSection extends Composite {
 	}
 
 	private void addVolunteerSection() {
-		if (registration.getCanceled() || Common.isNullOrEmpty(pageData.getVolunteerPositions())
+		if (registration.getCanceled() || Common.isNullOrEmpty(pageData.getVolunteerPositions()) || !Application.memberOf(pageData.getEvent().getGroupId())
 				|| (!pageData.getEvent().allowRegistrations() && Common.isNullOrEmpty(registration.getVolunteerPositions()))) {
 			return;
 		}
