@@ -323,7 +323,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "where 1 = 1 \n";
 
 		if (onlyPayable) {
-			sql += "and (py.id is null or py.statusId in(5, 6, 7, 9, 10, 12)) and p.statusId = 1 ";
+			sql += "and (py.id is null or py.statusId != 1) and p.statusId = 1 ";
 		}
 
 		if (!Common.isNullOrEmpty(ids)) {
@@ -456,9 +456,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			payment.setCurrencyCode(CurrencyCodes.USD);
 			payment.setLanguage("en_US");
 			payment.setEnv(environment);
-			if (ServerContext.isLive()) {
-				payment.setSenderEmail(ServerContext.getCurrentUser().getEmail());
-			} else {
+			if (!ServerContext.isLive()) {
 				payment.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343833982
 			}
 
