@@ -7,7 +7,6 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
-import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
@@ -735,13 +734,9 @@ public class EventPage implements Page {
 						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
 						args.put(EventArg.INCLUDE_FIELDS);
 						EventParticipantCellTable table = new EventParticipantCellTable(args);
-						if (Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
-							table.setDisplayColumns(ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE,
-									ParticipantColumn.AGE, ParticipantColumn.PRICE, ParticipantColumn.STATUS, ParticipantColumn.EDIT_STATUS);
-						}
 						table.populate();
 						table.setTitle("Participants");
-						tabBody.add(WidgetFactory.newSection(table));
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.maxWidth1150px));
 						tabPanel.selectTabNow(tabBody);
 					}
 				});

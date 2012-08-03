@@ -9,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -82,7 +83,7 @@ public class EventFieldsTab extends Composite {
 				dialog.center(e);
 			}
 		}));
-		vp.add(WidgetFactory.newSection(tb, fieldTable));
+		vp.add(WidgetFactory.newSection(tb, fieldTable, ContentWidth.maxWidth750px));
 
 		ageGroupListBox.addChangeHandler(new ChangeHandler() {
 			@Override
