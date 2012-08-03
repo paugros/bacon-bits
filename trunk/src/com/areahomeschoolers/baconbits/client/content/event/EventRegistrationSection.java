@@ -81,7 +81,7 @@ public class EventRegistrationSection extends Composite {
 	private void addParticipantSection() {
 		TitleBar tb = new TitleBar("Registered Participants", TitleBarStyle.SUBSECTION);
 
-		if (pageData.getEvent().allowRegistrations() && Application.memberOf(pageData.getEvent().getGroupId())) {
+		if (pageData.getEvent().allowRegistrations() && (pageData.getEvent().getGroupId() == null || Application.memberOf(pageData.getEvent().getGroupId()))) {
 			tb.addLink(new ClickLabel("Add participant", new MouseDownHandler() {
 				@Override
 				public void onMouseDown(MouseDownEvent event) {

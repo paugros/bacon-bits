@@ -10,7 +10,6 @@ import com.google.gwt.user.client.ui.ListBox;
 public class YearPicker extends Composite implements CustomFocusWidget {
 
 	private static final int DEFAULT_START_YEAR = 2008;
-	private int startYear = DEFAULT_START_YEAR;
 	private final DefaultListBox listBox = new DefaultListBox();
 	private final int currentYear = ClientDateUtils.getYear(new Date());
 
@@ -42,8 +41,6 @@ public class YearPicker extends Composite implements CustomFocusWidget {
 	}
 
 	public void setStartYear(int startYear) {
-		this.startYear = startYear;
-
 		if (startYear > currentYear) {
 			startYear = DEFAULT_START_YEAR;
 		}
@@ -65,10 +62,6 @@ public class YearPicker extends Composite implements CustomFocusWidget {
 	}
 
 	public void setYear(int year) {
-		if (year < startYear || year > currentYear + 1) {
-			return;
-		}
-
-		listBox.setSelectedIndex(currentYear + 1 - year);
+		listBox.setValue(year);
 	}
 }

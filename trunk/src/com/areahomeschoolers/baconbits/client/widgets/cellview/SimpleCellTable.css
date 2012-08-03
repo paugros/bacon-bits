@@ -8,6 +8,8 @@
 	padding-right: 8px;
 	padding-top: 5px;
 	padding-bottom: 3px;
+	white-space: nowrap;
+	text-align: left;
 }
 
 .cellTableSortableHeader {

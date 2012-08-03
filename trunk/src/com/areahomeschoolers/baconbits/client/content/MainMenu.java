@@ -65,7 +65,7 @@ public final class MainMenu extends MenuBar {
 		addItem("About", getHomeMenu());
 		addItem("Event Registration", getEventsMenu());
 		addItem("WHE Classes/Activities", getClassesMenu());
-		addItem("Educational Resources", getEducationMenu());
+		// addItem("Educational Resources", getEducationMenu());
 		addItem("Support", getSupportMenu());
 		addItem("Resources", getResourcesMenu());
 		if (Application.isSystemAdministrator()) {
@@ -173,8 +173,8 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "Homeschool Stories", PageUrl.articleGroup("15,16,14,13,12,11,10,9,8"));
 		addLinkToMenu(menu, "Homeschooling Methods", PageUrl.articleGroup("40"));
 		addLinkToMenu(menu, "Curriculum Providers", PageUrl.articleGroup("41"));
-		addLinkToMenu(menu, "Managing Schedules", PageUrl.articleGroup("28,27"));
-		addLinkToMenu(menu, "Reluctant Learners", PageUrl.articleGroup("24"));
+		// addLinkToMenu(menu, "Managing Schedules", PageUrl.articleGroup("28,27"));
+		// addLinkToMenu(menu, "Reluctant Learners", PageUrl.articleGroup("24"));
 
 		return menu;
 	}
