@@ -20,9 +20,11 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg, UserGroupColumn> {
@@ -111,6 +113,9 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
 						@Override
 						protected Widget createWidget(final UserGroup item) {
+							if (!Application.administratorOf(item.getId())) {
+								return new Label(Common.yesNo(item.getAdministrator()));
+							}
 							return new ClickLabel(Common.yesNo(item.getAdministrator()), new MouseDownHandler() {
 								@Override
 								public void onMouseDown(MouseDownEvent event) {
@@ -168,10 +173,14 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 			}
 		}
 
-		if (user != null) {
+		if (user != null && Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			addCompositeWidgetColumn("Delete", new WidgetCellCreator<UserGroup>() {
 				@Override
 				protected Widget createWidget(final UserGroup group) {
+					if (!Application.administratorOf(group.getId())) {
+						return new Label("");
+					}
+
 					return new ClickLabel("X", new MouseDownHandler() {
 						@Override
 						public void onMouseDown(MouseDownEvent event) {

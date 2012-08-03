@@ -106,15 +106,19 @@ public class LoginDialog extends DialogBox {
 		password.add(passwordInput);
 
 		PaddedPanel createPanel = new PaddedPanel();
-		ClickLabel create = new ClickLabel("Create new account", new MouseDownHandler() {
+		ClickLabel create = new ClickLabel("Create a new one", new MouseDownHandler() {
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
 				createDialog.center(new User());
 				hide();
 			}
 		});
-		create.addStyleName("bold mediumPadding");
-		createPanel.add(new Label("New to the site?"));
+		create.setWordWrap(false);
+		create.addStyleName("bold");
+
+		Label msg = new Label("Don't have an account?");
+		msg.setWordWrap(false);
+		createPanel.add(msg);
 		createPanel.add(create);
 
 		VerticalPanel pp = new VerticalPanel();

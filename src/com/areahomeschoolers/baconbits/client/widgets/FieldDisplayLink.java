@@ -50,22 +50,32 @@ public class FieldDisplayLink extends Composite {
 	public void setHref(String href) {
 		linkWidget = anchor;
 		anchor.setHref(href);
-		panel.setWidget(anchor);
+		if (enabled) {
+			panel.setWidget(anchor);
+		}
 	}
 
 	public void setTarget(String target) {
 		linkWidget = anchor;
 		anchor.setTarget(target);
-		panel.setWidget(anchor);
+		if (enabled) {
+			panel.setWidget(anchor);
+		}
 	}
 
 	public void setTargetHistoryToken(String token) {
 		linkWidget = link;
 		link.setTargetHistoryToken(token);
-		panel.setWidget(link);
+		if (enabled) {
+			panel.setWidget(link);
+		}
 	}
 
 	public void setText(String text) {
+		if (text == defaultText) {
+			setEnabled(false);
+		}
+
 		if (!enabled || isEmpty(text)) {
 			if (enabled || isEmpty(text)) {
 				label.setText(defaultText);

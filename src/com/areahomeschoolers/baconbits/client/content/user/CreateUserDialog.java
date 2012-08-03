@@ -52,6 +52,7 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 	@Override
 	protected Widget createContent() {
 		VerticalPanel vp = new VerticalPanel();
+		vp.setWidth("530px");
 		vp.setSpacing(6);
 
 		FieldTable ft = new UserFieldTable(form, entity);

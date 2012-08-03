@@ -29,6 +29,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private String notificationEmail;
 	private String website;
 	private String phone;
+	private String registrationInstructions;
 	private int accessLevelId;
 
 	// auxilliary
@@ -169,6 +170,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public Date getRegistrationEndDate() {
 		return registrationEndDate;
+	}
+
+	public String getRegistrationInstructions() {
+		return registrationInstructions;
 	}
 
 	public boolean getRegistrationOpen() {
@@ -314,6 +319,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public void setRegistrationEndDate(Date registrationEndDate) {
 		this.registrationEndDate = registrationEndDate;
+	}
+
+	public void setRegistrationInstructions(String registrationInstructions) {
+		this.registrationInstructions = registrationInstructions;
 	}
 
 	public void setRegistrationOpen(boolean registrationFinished) {

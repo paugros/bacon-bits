@@ -306,6 +306,25 @@ public class EventPage implements Page {
 				}
 			});
 			fieldTable.addField(categoryField);
+
+			final Label instructionsDisplay = new Label();
+			final MaxLengthTextArea instructionsInput = new MaxLengthTextArea(300);
+			instructionsInput.setVisibleLines(2);
+			FormField instructionsField = form.createFormField("Registration instructions:", instructionsInput, instructionsDisplay);
+			instructionsField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					instructionsDisplay.setText(Common.getDefaultIfNull(calendarEvent.getRegistrationInstructions()));
+					instructionsInput.setText(calendarEvent.getRegistrationInstructions());
+				}
+			});
+			instructionsField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setRegistrationInstructions(instructionsInput.getText());
+				}
+			});
+			fieldTable.addField(instructionsField);
 		}
 
 		if (Application.administratorOf(calendarEvent.getGroupId())) {
