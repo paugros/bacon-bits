@@ -92,7 +92,7 @@ public class UserFieldTable extends FieldTable {
 		});
 		addField(lastNameField);
 
-		final Label emailDisplay = new Label();
+		final FieldDisplayLink emailDisplay = new FieldDisplayLink();
 		final EmailTextBox emailInput = new EmailTextBox();
 		emailInput.setRequired(true);
 		emailInput.setMaxLength(100);
@@ -101,6 +101,7 @@ public class UserFieldTable extends FieldTable {
 			@Override
 			public void execute() {
 				emailDisplay.setText(Common.getDefaultIfNull(user.getEmail()));
+				emailDisplay.setHref("mailto:" + user.getEmail());
 				emailInput.setText(user.getEmail());
 			}
 		});

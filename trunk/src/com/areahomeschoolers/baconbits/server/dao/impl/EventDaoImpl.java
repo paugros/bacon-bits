@@ -101,6 +101,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setCurrentUserParticipantCount(rs.getInt("currentUserParticipantCount"));
 			event.setAgePrices(rs.getString("agePrices"));
 			event.setAgeRanges(rs.getString("ageRanges"));
+			event.setRegistrationInstructions(rs.getString("registrationInstructions"));
 			return event;
 		}
 	}
@@ -597,6 +598,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, requiresRegistration = :requiresRegistration, ";
+			sql += "registrationInstructions = :registrationInstructions, ";
 			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price, phone = :phone, website = :website ";
 			sql += "where id = :id";
 			update(sql, namedParams);
@@ -605,10 +607,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, ";
-			sql += "publishDate, active, price, requiresRegistration, phone, website, accessLevelId) values ";
+			sql += "publishDate, active, price, requiresRegistration, phone, website, accessLevelId, registrationInstructions) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, ";
-			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :accessLevelId)";
+			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :accessLevelId, :registrationInstructions)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -707,7 +709,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			u.setFirstName(participant.getFirstName());
 			u.setLastName(participant.getLastName());
 			u.setBirthDate(participant.getBirthDate());
-			u.setParentId(ServerContext.getCurrentUser().getId());
+			if (u.getId() != ServerContext.getCurrentUserId()) {
+				u.setParentId(ServerContext.getCurrentUserId());
+			}
 
 			UserDao userDao = ServerContext.getDaoImpl("user");
 			u = userDao.save(u).getData();

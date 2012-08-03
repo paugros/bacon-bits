@@ -30,6 +30,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -246,11 +247,26 @@ public class EventRegistrationSection extends Composite {
 	private void loadSection() {
 		vp.clear();
 
+		VerticalPanel summary = new VerticalPanel();
+		summary.addStyleName("mediumPadding");
+		Label title = new Label(pageData.getEvent().getTitle() + " - " + Formatter.formatDateTime(pageData.getEvent().getStartDate()));
+		title.addStyleName("largeText");
+
+		summary.add(title);
+		if (!Common.isNullOrBlank(pageData.getEvent().getRegistrationInstructions())) {
+			HTML instructions = new HTML("<b>NOTE: </b>" + pageData.getEvent().getRegistrationInstructions());
+			instructions.addStyleName("italic");
+			instructions.getElement().getStyle().setMarginLeft(8, Unit.PX);
+			summary.add(instructions);
+		}
+
+		vp.add(summary);
+
 		addParticipantSection();
+		vp.add(payMessage);
 
 		addVolunteerSection();
 
-		vp.add(payMessage);
 	}
 
 	private void populateParticipants() {
@@ -319,7 +335,15 @@ public class EventRegistrationSection extends Composite {
 		}
 
 		if (registration.getParticipants().isEmpty()) {
-			String text = "You haven't registered anyone yet. To register for this event, select the Add link above.";
+			String text = "";
+			if (pageData.getEvent().allowRegistrations()
+					&& (pageData.getEvent().getGroupId() == null || Application.memberOf(pageData.getEvent().getGroupId()))) {
+				text = "You haven't registered anyone yet. To register for this event, select the Add link above.";
+			} else if (!pageData.getEvent().allowRegistrations()) {
+				text = "We are not currently taking registrations for this event.";
+			} else if (pageData.getEvent().getGroupId() != null && !Application.memberOf(pageData.getEvent().getGroupId())) {
+				text = "You do not have access to register for this event. Contact the group administrator for more information.";
+			}
 			Label empty = new Label(text);
 			empty.setWordWrap(false);
 			participantTable.setWidget(0, 0, empty);
@@ -335,19 +359,29 @@ public class EventRegistrationSection extends Composite {
 
 		payMessage.clear();
 		if (pageData.getRegistration() != null) {
+			boolean hasPay = false;
 			for (EventParticipant p : pageData.getRegistration().getParticipants()) {
 				if (p.getPrice() > 0 && p.getStatusId() == 1) {
-					String text = "All done here? ";
+					hasPay = true;
+					break;
+				}
+			}
+
+			if (!pageData.getRegistration().getParticipants().isEmpty()) {
+				String text = "All done here? ";
+				if (hasPay) {
 					Hyperlink payLink = new Hyperlink("Pay now", PageUrl.eventPayment());
 					text += payLink.toString() + " or ";
 					Hyperlink eventLink = new Hyperlink("continue registering", PageUrl.eventList());
 					text += eventLink.toString() + ".";
-
-					HTML blob = new HTML(text);
-					blob.addStyleName("largeText heavyPadding");
-					payMessage.setWidget(blob);
-					break;
+				} else {
+					Hyperlink eventLink = new Hyperlink("Continue registering", PageUrl.eventList());
+					text += eventLink.toString() + ".";
 				}
+
+				HTML blob = new HTML(text);
+				blob.addStyleName("largeText heavyPadding");
+				payMessage.setWidget(blob);
 			}
 		}
 	}
