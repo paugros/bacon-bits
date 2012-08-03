@@ -254,7 +254,7 @@ public class EventRegistrationSection extends Composite {
 
 		summary.add(title);
 		if (!Common.isNullOrBlank(pageData.getEvent().getRegistrationInstructions())) {
-			HTML instructions = new HTML("<b>NOTE: </b>" + pageData.getEvent().getRegistrationInstructions());
+			HTML instructions = new HTML("<span class=errorText><b>NOTE: </b>" + pageData.getEvent().getRegistrationInstructions() + "</span>");
 			instructions.addStyleName("italic");
 			instructions.getElement().getStyle().setMarginLeft(8, Unit.PX);
 			summary.add(instructions);
