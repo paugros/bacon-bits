@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
@@ -199,7 +200,7 @@ public class ArticlePage implements Page {
 			form.emancipate();
 		}
 
-		page.add(WidgetFactory.newSection(title, fieldTable, "1100px"));
+		page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.maxWidth1100px));
 
 		Application.getLayout().setPage(title, page);
 	}

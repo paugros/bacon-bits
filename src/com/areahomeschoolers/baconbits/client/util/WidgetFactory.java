@@ -21,6 +21,9 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public abstract class WidgetFactory {
+	public enum ContentWidth {
+		maxWidth750px, maxWidth1000px, maxWidth1100px, maxWidth1150px;
+	}
 
 	private static final String DEFAULT_PERCENTAGE_BAR_STYLE = "percentageBar-green";
 	public static final int PAGE_SPACING = 10;
@@ -107,31 +110,41 @@ public abstract class WidgetFactory {
 		return newSection(cellTable.getTitleBar(), cellTable);
 	}
 
-	public static VerticalPanel newSection(EntityCellTable<?, ?, ?> cellTable, String width) {
+	public static VerticalPanel newSection(EntityCellTable<?, ?, ?> cellTable, ContentWidth width) {
 		VerticalPanel vp = newSection(cellTable);
-		vp.setWidth(width);
+		if (width != null) {
+			vp.addStyleName(width.toString());
+		}
 		return vp;
 	}
 
 	public static VerticalPanel newSection(String title, Widget w) {
-		return newSection(title, w, "100%");
+		VerticalPanel vp = newSection(title, w, null);
+		vp.setWidth("100%");
+		return vp;
 	}
 
-	public static VerticalPanel newSection(String title, Widget w, String width) {
+	public static VerticalPanel newSection(String title, Widget w, ContentWidth width) {
 		VerticalPanel vp = newSection(new TitleBar(title, TitleBarStyle.SECTION), w);
-		vp.setWidth(width);
+		if (width != null) {
+			vp.addStyleName(width.toString());
+		}
 		return vp;
 	}
 
 	public static VerticalPanel newSection(TitleBar tb, Widget w) {
-		return newSection(tb, w, "100%");
+		VerticalPanel vp = newSection(tb, w, null);
+		vp.setWidth("100%");
+		return vp;
 	}
 
-	public static VerticalPanel newSection(TitleBar tb, Widget w, String width) {
+	public static VerticalPanel newSection(TitleBar tb, Widget w, ContentWidth width) {
 		VerticalPanel vp = new VerticalPanel();
 		vp.add(tb);
 		vp.add(w);
-		vp.setWidth(width);
+		if (width != null) {
+			vp.addStyleName(width.toString());
+		}
 		return vp;
 	}
 

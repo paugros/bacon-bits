@@ -162,6 +162,10 @@ img {
 	cursor: default;
 }
 
+.ArticleWidget {
+	max-width: 1100px;
+}
+
 .DataTable {
 	border-collapse: collapse;
 	background: #F8F8F8;
@@ -300,6 +304,22 @@ img {
 	border-bottom: none;
 	border-left: none;
 	border-right: none;
+}
+
+.maxWidth750px {
+	max-width: 750px;
+}
+
+.maxWidth1000px {
+	max-width: 1000px;
+}
+
+.maxWidth1100px {
+	max-width: 1100px;
+}
+
+.maxWidth1150px {
+	max-width: 1150px;
 }
 
 .DndVerticalPanel {

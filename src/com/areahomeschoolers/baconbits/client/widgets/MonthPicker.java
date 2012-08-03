@@ -34,6 +34,10 @@ public class MonthPicker extends Composite implements CustomFocusWidget {
 		changeCommands.add(command);
 	}
 
+	public DefaultListBox getListBox() {
+		return listBox;
+	}
+
 	public int getMonth() {
 		return listBox.getIntValue();
 	}

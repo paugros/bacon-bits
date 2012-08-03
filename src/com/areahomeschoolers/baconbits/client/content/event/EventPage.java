@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
@@ -602,7 +603,7 @@ public class EventPage implements Page {
 						}
 					}
 
-					tabBody.add(WidgetFactory.newSection(tb, fieldTable, "1100px"));
+					tabBody.add(WidgetFactory.newSection(tb, fieldTable, ContentWidth.maxWidth1100px));
 
 					// we need to do this again in case we started on another tab
 					form.initialize();
