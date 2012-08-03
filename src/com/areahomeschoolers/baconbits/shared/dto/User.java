@@ -151,8 +151,8 @@ public final class User extends EntityDto<User> {
 		return active;
 	}
 
-	public boolean memberOf(int groupId) {
-		if (systemAdministrator || groupId == 0) {
+	public boolean memberOf(Integer groupId) {
+		if (systemAdministrator || groupId == null || groupId == 0) {
 			return true;
 		}
 		return groups.keySet().contains(groupId);

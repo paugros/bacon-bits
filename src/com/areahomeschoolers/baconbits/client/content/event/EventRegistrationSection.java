@@ -40,6 +40,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -79,6 +80,20 @@ public class EventRegistrationSection extends Composite {
 		TitleBar tb = new TitleBar("Registered Participants", TitleBarStyle.SUBSECTION);
 
 		if (pageData.getEvent().allowRegistrations() && Application.memberOf(pageData.getEvent().getGroupId())) {
+			tb.addLink(new ClickLabel("Add participant", new MouseDownHandler() {
+				@Override
+				public void onMouseDown(MouseDownEvent event) {
+					if (!Application.isAuthenticated()) {
+						showLogin();
+						return;
+					}
+
+					EventParticipant rp = new EventParticipant();
+					rp.setEventRegistrationId(registration.getId());
+					new ParticipantEditDialog(pageData, refreshParticipants).center(rp);
+				}
+			}));
+
 			if (registration.isSaved()) {
 				final ClickLabel cancel = new ClickLabel(getCancelRegistrationLabelText());
 				cancel.addMouseDownHandler(new MouseDownHandler() {
@@ -114,29 +129,6 @@ public class EventRegistrationSection extends Composite {
 				});
 				tb.addLink(cancel);
 			}
-
-			if (pageData.getRegistration() != null) {
-				for (EventParticipant p : pageData.getRegistration().getParticipants()) {
-					if (p.getPrice() > 0 && p.getStatusId() == 1) {
-						tb.addLink(new Hyperlink("Pay", PageUrl.eventPayment()));
-						break;
-					}
-				}
-			}
-
-			tb.addLink(new ClickLabel("Add", new MouseDownHandler() {
-				@Override
-				public void onMouseDown(MouseDownEvent event) {
-					if (!Application.isAuthenticated()) {
-						showLogin();
-						return;
-					}
-
-					EventParticipant rp = new EventParticipant();
-					rp.setEventRegistrationId(registration.getId());
-					new ParticipantEditDialog(pageData, refreshParticipants).center(rp);
-				}
-			}));
 		}
 
 		vp.add(tb);
@@ -246,7 +238,7 @@ public class EventRegistrationSection extends Composite {
 	}
 
 	private String getCancelRegistrationLabelText() {
-		return registration.getCanceled() ? "Restore" : "Cancel";
+		return registration.getCanceled() ? "Restore" : "Cancel registration";
 	}
 
 	private void loadSection() {
@@ -255,6 +247,23 @@ public class EventRegistrationSection extends Composite {
 		addParticipantSection();
 
 		addVolunteerSection();
+
+		if (pageData.getRegistration() != null) {
+			for (EventParticipant p : pageData.getRegistration().getParticipants()) {
+				if (p.getPrice() > 0 && p.getStatusId() == 1) {
+					String text = "All done here? ";
+					Hyperlink payLink = new Hyperlink("Pay now", PageUrl.eventPayment());
+					text += payLink.toString() + " or ";
+					Hyperlink eventLink = new Hyperlink("continue registering", PageUrl.eventList());
+					text += eventLink.toString() + ".";
+
+					HTML blob = new HTML(text);
+					blob.addStyleName("largeText heavyPadding");
+					vp.add(blob);
+					break;
+				}
+			}
+		}
 	}
 
 	private void populateParticipants() {

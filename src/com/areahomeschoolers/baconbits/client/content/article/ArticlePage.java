@@ -199,7 +199,7 @@ public class ArticlePage implements Page {
 			form.emancipate();
 		}
 
-		page.add(WidgetFactory.newSection(title, fieldTable));
+		page.add(WidgetFactory.newSection(title, fieldTable, "1100px"));
 
 		Application.getLayout().setPage(title, page);
 	}
