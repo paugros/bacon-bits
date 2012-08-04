@@ -314,13 +314,22 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "case isnull(a.price) when true then e.price else a.price end as price \n";
 		sql += "from eventRegistrationParticipants p \n";
 		sql += "join users u on u.id = p.userId \n";
-		sql += "join users up on up.id = u.parentId \n";
 		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
-		sql += "left join payments py on py.id = p.paymentId \n";
-		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 		sql += "join events e on e.id = r.eventId \n";
+		sql += "join users up on up.id = r.addedById \n";
+		sql += "left join payments py on py.id = p.paymentId \n";
+		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
 		sql += "where 1 = 1 \n";
+
+		if (args.getStatus() != Status.ALL) {
+			if (args.getStatus() == Status.ACTIVE) {
+				sql += "and e.endDate > now() and active = 1 \n";
+			} else {
+				sql += "(and e.endDate < now() or active = 0) \n";
+			}
+
+		}
 
 		if (!Common.isNullOrEmpty(ids)) {
 			sql += "and p.id in(" + Common.join(ids, ", ") + ")";
