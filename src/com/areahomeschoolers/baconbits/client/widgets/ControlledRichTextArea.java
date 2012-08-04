@@ -3,6 +3,8 @@ package com.areahomeschoolers.baconbits.client.widgets;
 import com.areahomeschoolers.baconbits.client.images.richtext.RichTextImages;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.TextDecoration;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -101,6 +103,9 @@ public class ControlledRichTextArea extends Composite {
 					formatter.insertUnorderedList();
 				} else if (sender == removeFormat) {
 					formatter.removeFormat();
+				} else if (sender == insertLink) {
+					HtmlInsertDialog dialog = new HtmlInsertDialog();
+					dialog.center();
 				} else if (sender == htmlLink) {
 					HtmlEditDialog dialog = new HtmlEditDialog();
 					dialog.center();
@@ -143,7 +148,7 @@ public class ControlledRichTextArea extends Composite {
 						richText.setHTML(textArea.getText());
 					}
 				});
-				bp.addLeftButton(submit);
+				bp.addRightButton(submit);
 				Button submitAndClose = new Button("Update and Close");
 				submitAndClose.addMouseDownHandler(new MouseDownHandler() {
 					@Override
@@ -152,7 +157,7 @@ public class ControlledRichTextArea extends Composite {
 						hide();
 					}
 				});
-				bp.addLeftButton(submitAndClose);
+				bp.addRightButton(submitAndClose);
 				bp.getCloseButton().setText("Close");
 				setWidget(vp);
 			}
@@ -163,6 +168,45 @@ public class ControlledRichTextArea extends Composite {
 				textArea.setText(richText.getHTML());
 
 				super.show();
+			}
+		}
+
+		protected class HtmlInsertDialog extends DefaultDialog {
+			private TextArea textArea = new TextArea();
+			private ButtonPanel bp = new ButtonPanel(this);
+			private VerticalPanel vp = new VerticalPanel();
+
+			public HtmlInsertDialog() {
+				setModal(true);
+				setText("Insert HTML");
+				textArea.setCharacterWidth(50);
+				textArea.setVisibleLines(5);
+
+				vp.add(textArea);
+				vp.add(bp);
+
+				Button submit = new Button("Insert");
+				submit.addMouseDownHandler(new MouseDownHandler() {
+					@Override
+					public void onMouseDown(MouseDownEvent event) {
+						richText.getFormatter().insertHTML(textArea.getText());
+						hide();
+					}
+				});
+				bp.addRightButton(submit);
+				bp.getCloseButton().setText("Close");
+				setWidget(vp);
+			}
+
+			@Override
+			public void show() {
+				super.show();
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+					@Override
+					public void execute() {
+						textArea.setFocus(true);
+					}
+				});
 			}
 		}
 
@@ -197,7 +241,7 @@ public class ControlledRichTextArea extends Composite {
 		private PushButton createLink;
 		private PushButton removeLink;
 		private PushButton removeFormat;
-		private ClickLabel htmlLink;
+		private ClickLabel htmlLink, insertLink;
 
 		private DefaultListBox backColors;
 		private DefaultListBox foreColors;
@@ -246,10 +290,14 @@ public class ControlledRichTextArea extends Composite {
 				htmlLink.addClickHandler(handler);
 				htmlLink.getElement().getStyle().setTextDecoration(TextDecoration.UNDERLINE);
 				topPanel.add(htmlLink);
+				insertLink = new ClickLabel("Insert HTML");
+				insertLink.getElement().getStyle().setTextDecoration(TextDecoration.UNDERLINE);
+				insertLink.addClickHandler(handler);
 				bottomPanel.add(backColors = createColorList("Background"));
 				bottomPanel.add(foreColors = createColorList("Foreground"));
 				bottomPanel.add(fonts = createFontList());
 				bottomPanel.add(fontSizes = createFontSizes());
+				bottomPanel.add(insertLink);
 
 				// We only use these handlers for updating status, so don't hook them up
 				// unless at least basic editing is supported.
