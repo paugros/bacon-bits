@@ -184,7 +184,7 @@ public class EventPage implements Page {
 			@Override
 			public void execute() {
 				addressDisplay.setText(calendarEvent.getAddress());
-				addressDisplay.setTargetHistoryToken(PageUrl.event(calendarEvent.getId()) + "&tab=3");
+				addressDisplay.setTargetHistoryToken(PageUrl.event(calendarEvent.getId()) + "&tab=4");
 				addressInput.setText(calendarEvent.getAddress());
 			}
 		});
