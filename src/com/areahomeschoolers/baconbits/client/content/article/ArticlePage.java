@@ -76,6 +76,13 @@ public class ArticlePage implements Page {
 		}
 	}
 
+	private boolean allowEdit() {
+		if (article.getGroupId() == null) {
+			return Application.isSystemAdministrator();
+		}
+		return Application.administratorOf(article.getGroupId());
+	}
+
 	private void createFieldTable() {
 		fieldTable.setWidth("100%");
 
@@ -201,6 +208,8 @@ public class ArticlePage implements Page {
 		}
 
 		page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.maxWidth1100px));
+
+		form.setEnabled(allowEdit());
 
 		Application.getLayout().setPage(title, page);
 	}

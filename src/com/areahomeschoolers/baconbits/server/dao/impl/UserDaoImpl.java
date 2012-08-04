@@ -283,8 +283,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		}
 
 		if (user.isSaved()) {
-			String sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, isSystemAdministrator = :systemAdministrator, ";
-			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, lastLoginDate = :lastLoginDate, ";
+			String sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, ";
+			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
 			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest where id = :id";
 			update(sql, namedParams);
 		} else {

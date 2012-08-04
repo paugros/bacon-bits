@@ -93,7 +93,6 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 				e.printStackTrace();
 			}
 
-			e.printStackTrace();
 			success = false;
 		}
 

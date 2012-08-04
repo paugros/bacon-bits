@@ -100,6 +100,12 @@ public class ResetPasswordDialog extends DefaultDialog {
 		userService.save(user, new Callback<ServerResponseData<User>>() {
 			@Override
 			protected void doOnSuccess(ServerResponseData<User> result) {
+				if (result.hasErrors()) {
+					passwordInputs.showErrors(result.getErrors());
+					submit.setEnabled(true);
+					return;
+				}
+
 				hide();
 				User u = result.getData();
 				user.setPassword(null);
@@ -109,8 +115,6 @@ public class ResetPasswordDialog extends DefaultDialog {
 				user.setResetPassword(false);
 			}
 		});
-
-		user.setResetPassword(false);
 
 	}
 }
