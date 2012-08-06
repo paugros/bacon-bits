@@ -82,13 +82,13 @@ public class UserFieldTable extends FieldTable {
 			@Override
 			public void execute() {
 				lastNameDisplay.setText(user.getLastName());
-				lastNameInput.setText(Common.ucWords(user.getLastName().trim()));
+				lastNameInput.setText(user.getLastName());
 			}
 		});
 		lastNameField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				user.setLastName(lastNameInput.getText());
+				user.setLastName(Common.ucWords(lastNameInput.getText().trim()));
 			}
 		});
 		addField(lastNameField);
@@ -109,7 +109,7 @@ public class UserFieldTable extends FieldTable {
 		emailField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				user.setEmail(emailInput.getText().toLowerCase());
+				user.setEmail(emailInput.getText().toLowerCase().trim());
 			}
 		});
 		addField(emailField);
@@ -278,8 +278,10 @@ public class UserFieldTable extends FieldTable {
 			@Override
 			public void execute() {
 				String text = Formatter.formatDate(user.getBirthDate());
-				if (ClientDateUtils.getYear(user.getBirthDate()) < 1995) {
-					text = "Adult";
+				if (user.getBirthDate() != null) {
+					if (ClientDateUtils.getYear(user.getBirthDate()) < 1995) {
+						text = "Adult";
+					}
 				}
 				birthDisplay.setText(text);
 				birthInput.setValue(user.getBirthDate());
