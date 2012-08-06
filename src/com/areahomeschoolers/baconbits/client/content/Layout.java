@@ -153,16 +153,7 @@ public final class Layout {
 				public void onMouseDown(MouseDownEvent event) {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
 
-					if (GWT.isProdMode()) {
-						final LoginDialog ld = new LoginDialog(loginService);
-						ld.setLoginHandler(new LoginHandler() {
-							@Override
-							public void onLogin(ApplicationData ap) {
-								Window.Location.reload();
-							}
-						});
-						ld.center();
-					} else {
+					if (!GWT.isProdMode()) {
 						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "Borrow99dolls?", new AsyncCallback<ApplicationData>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -173,7 +164,17 @@ public final class Layout {
 								Window.Location.reload();
 							}
 						});
+						return;
 					}
+
+					final LoginDialog ld = new LoginDialog(loginService);
+					ld.setLoginHandler(new LoginHandler() {
+						@Override
+						public void onLogin(ApplicationData ap) {
+							Window.Location.reload();
+						}
+					});
+					ld.center();
 				}
 			});
 		}
