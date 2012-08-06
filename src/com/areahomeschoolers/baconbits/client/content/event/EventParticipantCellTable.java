@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.cell.client.FieldUpdater;
@@ -111,11 +112,11 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 						} else {
 							item.setStatusId(4);
 						}
-						eventService.saveParticipant(item, new Callback<ArrayList<EventParticipant>>(false) {
+						eventService.saveParticipant(item, new Callback<ServerResponseData<ArrayList<EventParticipant>>>(false) {
 							@Override
-							protected void doOnSuccess(ArrayList<EventParticipant> result) {
-								removeItems(result);
-								addItems(result);
+							protected void doOnSuccess(ServerResponseData<ArrayList<EventParticipant>> d) {
+								removeItems(d.getData());
+								addItems(d.getData());
 								refresh();
 							}
 						});
@@ -223,11 +224,11 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 									public void onConfirm() {
 										item.setStatusId(item.isCanceled() ? 1 : 5);
 
-										eventService.saveParticipant(item, new Callback<ArrayList<EventParticipant>>() {
+										eventService.saveParticipant(item, new Callback<ServerResponseData<ArrayList<EventParticipant>>>() {
 											@Override
-											protected void doOnSuccess(ArrayList<EventParticipant> result) {
-												removeItems(result);
-												addItems(result);
+											protected void doOnSuccess(ServerResponseData<ArrayList<EventParticipant>> result) {
+												removeItems(result.getData());
+												addItems(result.getData());
 												refresh();
 											}
 										});

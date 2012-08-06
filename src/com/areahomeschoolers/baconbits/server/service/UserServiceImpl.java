@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.dao.impl.UserDaoImpl;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.Mailer;
+import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -77,7 +78,7 @@ public class UserServiceImpl extends GwtController implements UserService {
 				msg += "The password for your WHE account has been reset. ";
 			}
 			msg += "Login information appears below. You will be required to establish a new password upon logging in.\n\n";
-			msg += "Site: http://www.wearehomeeducators.com\n";
+			msg += "Site: " + ServerContext.getBaseUrl() + "\n";
 			msg += "User name: " + user.getUserName() + "\n";
 			msg += "Password: " + password + "\n\n";
 			msg += "Thank you.\n\n";

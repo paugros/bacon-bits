@@ -29,6 +29,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -317,10 +318,10 @@ public class EventRegistrationSection extends Composite {
 							public void onConfirm() {
 								p.setStatusId(p.isCanceled() ? 1 : 5);
 
-								eventService.saveParticipant(p, new Callback<ArrayList<EventParticipant>>() {
+								eventService.saveParticipant(p, new Callback<ServerResponseData<ArrayList<EventParticipant>>>() {
 									@Override
-									protected void doOnSuccess(ArrayList<EventParticipant> result) {
-										registration.setParticipants(result);
+									protected void doOnSuccess(ServerResponseData<ArrayList<EventParticipant>> result) {
+										registration.setParticipants(result.getData());
 										populateParticipants();
 									}
 								});

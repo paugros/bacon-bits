@@ -13,6 +13,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -52,7 +53,7 @@ public interface EventServiceAsync {
 
 	void saveEventField(EventField field, AsyncCallback<EventField> callback);
 
-	void saveParticipant(EventParticipant participant, AsyncCallback<ArrayList<EventParticipant>> callback);
+	void saveParticipant(EventParticipant participant, AsyncCallback<ServerResponseData<ArrayList<EventParticipant>>> callback);
 
 	void saveRegistration(EventRegistration registration, AsyncCallback<EventRegistration> callback);
 

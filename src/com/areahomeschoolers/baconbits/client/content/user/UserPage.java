@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
@@ -127,6 +128,7 @@ public class UserPage implements Page {
 				@Override
 				public void execute(VerticalPanel tabBody) {
 					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID_PLUS_SELF, user.getId());
+					args.put(EventArg.NOT_STATUS_ID, 5);
 					EventParticipantCellTable table = new EventParticipantCellTable(args);
 					table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
 							ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE, ParticipantColumn.STATUS);
@@ -223,6 +225,14 @@ public class UserPage implements Page {
 		userService.save(user, new Callback<ServerResponseData<User>>() {
 			@Override
 			protected void doOnSuccess(ServerResponseData<User> r) {
+				if (r.hasErrors()) {
+					new ServerResponseDialog(r).center();
+					if (user.isSaved()) {
+						field.getSubmitButton().setEnabled(true);
+					}
+					return;
+				}
+
 				if (!Url.isParamValidId("userId")) {
 					HistoryToken.set(PageUrl.user(r.getData().getId()));
 				} else {
