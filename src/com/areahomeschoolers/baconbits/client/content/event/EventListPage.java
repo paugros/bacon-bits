@@ -36,7 +36,6 @@ public final class EventListPage implements Page {
 		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 		final String title = "Events";
 		table = new EventCellTable(args);
-		page.addStyleName(ContentWidth.MAXWIDTH1300PX.toString());
 
 		VerticalPanel vp = new VerticalPanel();
 		vp.setWidth("100%");
@@ -91,12 +90,11 @@ public final class EventListPage implements Page {
 		hp.add(vp);
 
 		EventBalanceBox eb = new EventBalanceBox();
-		page.add(eb);
 		eb.populate();
 		hp.add(eb);
 		hp.setCellHorizontalAlignment(eb, HasHorizontalAlignment.ALIGN_RIGHT);
 
-		page.add(hp);
+		page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH1300PX));
 
 		table.setTitle(title);
 		if (Application.isAuthenticated()) {
@@ -106,7 +104,7 @@ public final class EventListPage implements Page {
 
 		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
-		page.add(WidgetFactory.newSection(table));
+		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1300PX));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override

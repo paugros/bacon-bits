@@ -29,11 +29,9 @@ public final class EventParticipantListPage implements Page {
 			return;
 		}
 
-		page.addStyleName(ContentWidth.MAXWIDTH1500PX.toString());
-
 		if (!showAll) {
 			EventBalanceBox eb = new EventBalanceBox();
-			page.add(eb);
+			page.add(WidgetFactory.wrapForWidth(eb, ContentWidth.MAXWIDTH1500PX));
 			eb.populate();
 			page.setCellHorizontalAlignment(eb, HasHorizontalAlignment.ALIGN_RIGHT);
 		}
@@ -75,12 +73,12 @@ public final class EventParticipantListPage implements Page {
 					ParticipantColumn.STATUS, ParticipantColumn.EDIT_STATUS);
 			table.setDefaultSortColumn(ParticipantColumn.ADDED_DATE, SortDirection.SORT_DESC);
 			title = "Recent Event Registrations";
-			page.add(WidgetFactory.newSection(table));
+			page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1500PX));
 		} else {
 			table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE,
 					ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
 			title = "My Event Registrations";
-			page.add(WidgetFactory.newSection(table));
+			page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1500PX));
 		}
 		table.setTitle(title);
 
