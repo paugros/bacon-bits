@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
@@ -68,7 +69,7 @@ public class UserFieldTable extends FieldTable {
 		firstNameField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				user.setFirstName(firstNameInput.getText());
+				user.setFirstName(Common.ucWords(firstNameInput.getText().trim()));
 			}
 		});
 		addField(firstNameField);
@@ -81,7 +82,7 @@ public class UserFieldTable extends FieldTable {
 			@Override
 			public void execute() {
 				lastNameDisplay.setText(user.getLastName());
-				lastNameInput.setText(user.getLastName());
+				lastNameInput.setText(Common.ucWords(user.getLastName().trim()));
 			}
 		});
 		lastNameField.setDtoUpdater(new Command() {
@@ -108,7 +109,7 @@ public class UserFieldTable extends FieldTable {
 		emailField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				user.setEmail(emailInput.getText());
+				user.setEmail(emailInput.getText().toLowerCase());
 			}
 		});
 		addField(emailField);
@@ -269,6 +270,28 @@ public class UserFieldTable extends FieldTable {
 			}
 		});
 		addField(mobilePhoneField);
+
+		final Label birthDisplay = new Label();
+		final ValidatorDateBox birthInput = new ValidatorDateBox();
+		FormField birthField = form.createFormField("Birth date:", birthInput, birthDisplay);
+		birthField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				String text = Formatter.formatDate(user.getBirthDate());
+				if (ClientDateUtils.getYear(user.getBirthDate()) < 1995) {
+					text = "Adult";
+				}
+				birthDisplay.setText(text);
+				birthInput.setValue(user.getBirthDate());
+			}
+		});
+		birthField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				user.setBirthDate(birthInput.getValue());
+			}
+		});
+		addField(birthField);
 
 		final FieldDisplayLink addressDisplay = new FieldDisplayLink();
 		addressDisplay.setTarget("_blank");

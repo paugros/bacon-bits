@@ -256,6 +256,16 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		ServerResponseData<User> retData = new ServerResponseData<User>();
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(user);
 
+		// verify no duplicate email/login
+		String sql = "select count(id) from users where email = ? and id != ?";
+		int conflict = queryForInt(sql, user.getEmail(), user.getId());
+
+		if (conflict > 0) {
+			retData.addError("Email address is already registered to another account.");
+			retData.setData(user);
+			return retData;
+		}
+
 		if (user.getPassword() != null) {
 			String digest = getSha1Hash(user.getPassword(), user.getEmail());
 			if (user.getPasswordDigest() != null && user.getPasswordDigest().equals(digest)) {
@@ -283,7 +293,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		}
 
 		if (user.isSaved()) {
-			String sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, ";
+			sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, ";
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
 			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest where id = :id";
 			update(sql, namedParams);
@@ -291,7 +301,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 			if (user.getStartDate() == null) {
 				user.setStartDate(new Date());
 			}
-			String sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
+			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
 			sql += "address, isSystemAdministrator, resetPassword, birthDate, parentId) values ";
 			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
 			sql += ":address, :systemAdministrator, :resetPassword, :birthDate, :parentId)";
@@ -363,7 +373,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 
 	@Override
 	public User setPasswordFromDigest(int userId, String digest) {
-		String sql = "select ID from dbo.Users where ID = ? and PasswordDigest = ?";
+		String sql = "select id from users where id = ? and passwordDigest = ?";
 		try {
 			int id = queryForInt(sql, userId, digest);
 			User u = getById(id);

@@ -28,7 +28,7 @@ public class ArticleWidget extends Composite {
 			vp.add(ds);
 		}
 
-		initWidget(WidgetFactory.wrapForWidth(vp, ContentWidth.maxWidth1100px));
+		initWidget(WidgetFactory.wrapForWidth(vp, ContentWidth.MAXWIDTH1100PX));
 	}
 
 }

@@ -84,6 +84,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	}
 
 	@Override
+	public Data getUnpaidBalance(int userId) {
+		return dao.getUnpaidBalance(userId);
+	}
+
+	@Override
 	public ArrayList<Data> getVolunteers(int eventId) {
 		return dao.getVolunteers(eventId);
 	}

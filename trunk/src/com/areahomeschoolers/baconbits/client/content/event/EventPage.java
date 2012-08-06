@@ -587,7 +587,7 @@ public class EventPage implements Page {
 
 		if (!calendarEvent.isSaved()) {
 			form.configureForAdd(fieldTable);
-			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.maxWidth1100px));
+			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
 		} else {
 			tabPanel = new TabPage();
 			form.emancipate();
@@ -621,7 +621,7 @@ public class EventPage implements Page {
 						}
 					}
 
-					tabBody.add(WidgetFactory.newSection(tb, fieldTable, ContentWidth.maxWidth1100px));
+					tabBody.add(WidgetFactory.newSection(tb, fieldTable, ContentWidth.MAXWIDTH1100PX));
 
 					// we need to do this again in case we started on another tab
 					form.initialize();
@@ -736,7 +736,7 @@ public class EventPage implements Page {
 						EventParticipantCellTable table = new EventParticipantCellTable(args);
 						table.populate();
 						table.setTitle("Participants");
-						tabBody.add(WidgetFactory.newSection(table, ContentWidth.maxWidth1150px));
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1200PX));
 						tabPanel.selectTabNow(tabBody);
 					}
 				});

@@ -45,6 +45,8 @@ public interface EventDao {
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public ArrayList<EventParticipant> getParticipants(ArgMap<EventArg> args);
 
+	public Data getUnpaidBalance(int userId);
+
 	public ArrayList<Data> getVolunteers(int eventId);
 
 	public ArrayList<Event> list(ArgMap<EventArg> args);

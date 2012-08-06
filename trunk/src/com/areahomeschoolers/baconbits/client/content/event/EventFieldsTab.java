@@ -83,7 +83,7 @@ public class EventFieldsTab extends Composite {
 				dialog.center(e);
 			}
 		}));
-		vp.add(WidgetFactory.newSection(tb, fieldTable, ContentWidth.maxWidth750px));
+		vp.add(WidgetFactory.newSection(tb, fieldTable, ContentWidth.MAXWIDTH750PX));
 
 		ageGroupListBox.addChangeHandler(new ChangeHandler() {
 			@Override

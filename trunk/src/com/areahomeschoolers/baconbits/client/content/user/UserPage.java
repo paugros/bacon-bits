@@ -91,7 +91,7 @@ public class UserPage implements Page {
 
 		if (!user.isSaved()) {
 			form.configureForAdd(fieldTable);
-			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.maxWidth1100px));
+			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
 		} else {
 			tabPanel = new TabPage();
 			form.emancipate();
@@ -99,7 +99,7 @@ public class UserPage implements Page {
 			tabPanel.add("Main", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					tabBody.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.maxWidth1100px));
+					tabBody.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
 
 					tabPanel.selectTabNow(tabBody);
 				}
@@ -110,15 +110,33 @@ public class UserPage implements Page {
 				public void execute(VerticalPanel tabBody) {
 					ArgMap<EventArg> eventArgs = new ArgMap<EventArg>(EventArg.USER_ID, user.getId());
 					EventParticipantCellTable eventsTable = new EventParticipantCellTable(eventArgs);
-					eventsTable.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.ADDED_DATE, ParticipantColumn.AGE, ParticipantColumn.PRICE,
-							ParticipantColumn.FIELDS, ParticipantColumn.STATUS);
+					eventsTable.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PRICE, ParticipantColumn.FIELDS,
+							ParticipantColumn.STATUS);
 					eventsTable.setTitle("Events");
 
 					eventsTable.getTitleBar().addSearchControl();
 					eventsTable.getTitleBar().addExcelControl();
 					eventsTable.populate();
 
-					tabBody.add(WidgetFactory.newSection(eventsTable, ContentWidth.maxWidth1150px));
+					tabBody.add(WidgetFactory.newSection(eventsTable, ContentWidth.MAXWIDTH1200PX));
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
+
+			tabPanel.add("Registrations", new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID_PLUS_SELF, user.getId());
+					EventParticipantCellTable table = new EventParticipantCellTable(args);
+					table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
+							ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE, ParticipantColumn.STATUS);
+					table.setTitle("Event Registrations");
+
+					table.getTitleBar().addSearchControl();
+					table.getTitleBar().addExcelControl();
+					table.populate();
+
+					tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
 					tabPanel.selectTabNow(tabBody);
 				}
 			});
@@ -171,7 +189,7 @@ public class UserPage implements Page {
 
 					groupsTable.populate();
 
-					tabBody.add(WidgetFactory.newSection(groupsTable, ContentWidth.maxWidth750px));
+					tabBody.add(WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH750PX));
 					tabPanel.selectTabNow(tabBody);
 				}
 			});
@@ -180,31 +198,13 @@ public class UserPage implements Page {
 				@Override
 				public void execute(VerticalPanel tabBody) {
 					ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
-					args.put(UserArg.PARENT_ID, Application.getCurrentUserId());
+					args.put(UserArg.PARENT_ID, user.getId());
 
 					UserCellTable table = new UserCellTable(args);
 					table.setTitle("Children");
 					table.populate();
 
-					tabBody.add(WidgetFactory.newSection(table, ContentWidth.maxWidth750px));
-					tabPanel.selectTabNow(tabBody);
-				}
-			});
-
-			tabPanel.add("Registrations", new TabPageCommand() {
-				@Override
-				public void execute(VerticalPanel tabBody) {
-					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID_PLUS_SELF, user.getId());
-					EventParticipantCellTable table = new EventParticipantCellTable(args);
-					table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE,
-							ParticipantColumn.STATUS);
-					table.setTitle("Event Registrations");
-
-					table.getTitleBar().addSearchControl();
-					table.getTitleBar().addExcelControl();
-					table.populate();
-
-					tabBody.add(WidgetFactory.newSection(table, ContentWidth.maxWidth1000px));
+					tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));
 					tabPanel.selectTabNow(tabBody);
 				}
 			});

@@ -147,6 +147,10 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 			}
 		}
 
+		if (entity.getUserId() > 0 && entity.getUserId() == Application.getCurrentUserId()) {
+			Application.getCurrentUser().setBirthDate(entity.getBirthDate());
+		}
+
 		entity.setEventRegistrationId(registration.getId());
 		entity.setEventFields(eventFields);
 
