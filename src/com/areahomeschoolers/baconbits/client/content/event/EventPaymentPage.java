@@ -83,7 +83,7 @@ public final class EventPaymentPage implements Page {
 					}
 				});
 
-				if (!Common.isNullOrEmpty(table.getFullList())) {
+				if (!Common.isNullOrEmpty(table.getFullList()) && total == null) {
 					PaddedPanel payPanel = new PaddedPanel(15);
 					Label l = new Label("Total:");
 					l.addStyleName("hugeText");

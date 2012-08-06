@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public abstract class WidgetFactory {
 	public enum ContentWidth {
-		maxWidth750px, maxWidth1000px, maxWidth1100px, maxWidth1150px;
+		MAXWIDTH750PX, MAXWIDTH1000PX, MAXWIDTH1100PX, MAXWIDTH1200PX, MAXWIDTH1300PX, MAXWIDTH1400PX, MAXWIDTH1500PX;
 	}
 
 	private static final String DEFAULT_PERCENTAGE_BAR_STYLE = "percentageBar-green";

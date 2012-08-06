@@ -105,17 +105,16 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 
 	@Override
 	public ApplicationData loginAndGetApplicationData(String username, String password) {
-		if (login(username, password)) {
-			return getApplicationData();
-		}
-		return null;
+		login(username, password);
+		return getApplicationData();
 	}
 
 	@Override
 	public ApplicationData loginForPasswordReset(int id, String digest) {
 		User u = userDao.setPasswordFromDigest(id, digest);
+
 		if (u == null) {
-			return null;
+			return getApplicationData();
 		}
 
 		return loginAndGetApplicationData(u.getUserName(), digest);

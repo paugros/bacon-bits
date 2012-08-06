@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -278,7 +279,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		} else {
 			Event e = new Event();
-			e.setRegistrationStartDate(new Date());
+			Date d = new Date();
+			e.setRegistrationStartDate(DateUtils.setHours(d, 7));
 			e.setPublishDate(new Date());
 			e.setNotificationEmail(ServerContext.getCurrentUser().getEmail());
 			pd.setEvent(e);
@@ -400,6 +402,19 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				return p;
 			}
 		}, sqlArgs.toArray());
+	}
+
+	@Override
+	public Data getUnpaidBalance(int userId) {
+		String sql = "select count(p.id) as itemCount, sum(case isnull(a.price) when true then e.price else a.price end) as balance \n";
+		sql += "from eventRegistrationParticipants p \n";
+		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
+		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
+		sql += "join events e on e.id = r.eventId \n";
+		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
+		sql += "where r.addedById = ? and p.statusId = 1";
+
+		return queryForObject(sql, ServerUtils.getGenericRowMapper(), userId);
 	}
 
 	@Override
@@ -725,6 +740,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			UserDao userDao = ServerContext.getDaoImpl("user");
 			u = userDao.save(u).getData();
 			participant.setUserId(u.getId());
+
+			if (participant.getUserId() > 0 && participant.getUserId() == ServerContext.getCurrentUserId()) {
+				ServerContext.getCurrentUser().setBirthDate(participant.getBirthDate());
+			}
 
 			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, userId, statusId, ageGroupId, addedDate) ";
 			sql += "values(:eventRegistrationId, :userId, :statusId, :ageGroupId, now())";

@@ -20,7 +20,9 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -34,8 +36,21 @@ public final class EventListPage implements Page {
 		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 		final String title = "Events";
 		table = new EventCellTable(args);
+		page.addStyleName(ContentWidth.MAXWIDTH1300PX.toString());
+
+		VerticalPanel vp = new VerticalPanel();
+		vp.setWidth("100%");
+		HorizontalPanel hp = new HorizontalPanel();
+		hp.setWidth("100%");
+
+		HTML message = new HTML();
+		message.getElement().getStyle().setMarginBottom(10, Unit.PX);
+		String text = "<b><font class=errorText>New this year:</font></b> all events must be paid for using PayPal or credit card (MC, Visa, Discover).<br>You can register for all your events then pay all at once.";
+		message.setHTML(text);
+		vp.add(message);
 
 		PaddedPanel pp = new PaddedPanel();
+		vp.add(pp);
 		pp.addStyleName("mediumPadding");
 		ageBox = new DefaultListBox();
 		ageBox.addItem("all ages", 0);
@@ -69,16 +84,19 @@ public final class EventListPage implements Page {
 		pp.add(monthBox);
 		pp.getElement().getStyle().setBackgroundColor("#c5eabf");
 
-		HTML message = new HTML();
-		message.getElement().getStyle().setMarginLeft(20, Unit.PX);
-		String text = "<b><font class=errorText>New this year:</font></b> all events must be paid for using PayPal or credit card.<br>You can register for all your events then pay all at once.";
-		message.setHTML(text);
-		pp.add(message);
-
 		for (int i = 0; i < pp.getWidgetCount(); i++) {
 			pp.setCellVerticalAlignment(pp.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
 		}
-		page.add(pp);
+
+		hp.add(vp);
+
+		EventBalanceBox eb = new EventBalanceBox();
+		page.add(eb);
+		eb.populate();
+		hp.add(eb);
+		hp.setCellHorizontalAlignment(eb, HasHorizontalAlignment.ALIGN_RIGHT);
+
+		page.add(hp);
 
 		table.setTitle(title);
 		if (Application.isAuthenticated()) {
@@ -88,7 +106,7 @@ public final class EventListPage implements Page {
 
 		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
-		page.add(WidgetFactory.newSection(table, ContentWidth.maxWidth1150px));
+		page.add(WidgetFactory.newSection(table));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override

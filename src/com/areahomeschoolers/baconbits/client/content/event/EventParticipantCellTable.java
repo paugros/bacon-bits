@@ -60,7 +60,7 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 	}
 
 	private void init() {
-		setDefaultSortColumn(ParticipantColumn.PARTICIPANT_NAME, SortDirection.SORT_ASC);
+		setDefaultSortColumn(ParticipantColumn.EVENT_DATE, SortDirection.SORT_ASC);
 		setDisplayColumns(ParticipantColumn.ATTENDED, ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE,
 				ParticipantColumn.AGE, ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS, ParticipantColumn.EDIT_STATUS);
 	}
@@ -75,12 +75,12 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 		for (ParticipantColumn col : getDisplayColumns()) {
 			switch (col) {
 			case EVENT_DATE:
-				addDateTimeColumn(col, new ValueGetter<Date, EventParticipant>() {
+				setColumnWidth(addDateTimeColumn(col, new ValueGetter<Date, EventParticipant>() {
 					@Override
 					public Date get(EventParticipant item) {
 						return item.getEventDate();
 					}
-				});
+				}), "140px");
 				break;
 			case EVENT:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
@@ -131,12 +131,12 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 				});
 				break;
 			case ADDED_DATE:
-				addDateTimeColumn(col, new ValueGetter<Date, EventParticipant>() {
+				setColumnWidth(addDateTimeColumn(col, new ValueGetter<Date, EventParticipant>() {
 					@Override
 					public Date get(EventParticipant item) {
 						return item.getAddedDate();
 					}
-				});
+				}), "140px");
 				break;
 			case FIELDS:
 				addWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {

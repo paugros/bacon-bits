@@ -302,24 +302,39 @@ img {
 	border-right: none;
 }
 
-.maxWidth750px {
+.MAXWIDTH750PX {
 	width: 100%;
 	max-width: 750px;
 }
 
-.maxWidth1000px {
+.MAXWIDTH1000PX {
 	width: 100%;
 	max-width: 1000px;
 }
 
-.maxWidth1100px {
+.MAXWIDTH1100PX {
 	width: 100%;
 	max-width: 1100px;
 }
 
-.maxWidth1150px {
+.MAXWIDTH1200PX {
 	width: 100%;
-	max-width: 1150px;
+	max-width: 1200px;
+}
+
+.MAXWIDTH1300PX {
+	width: 100%;
+	max-width: 1300px;
+}
+
+.MAXWIDTH1400PX {
+	width: 100%;
+	max-width: 1400px;
+}
+
+.MAXWIDTH1500PX {
+	width: 100%;
+	max-width: 1500px;
 }
 
 .DndVerticalPanel {

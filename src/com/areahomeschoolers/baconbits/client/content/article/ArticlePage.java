@@ -207,7 +207,7 @@ public class ArticlePage implements Page {
 			form.emancipate();
 		}
 
-		page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.maxWidth1100px));
+		page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
 
 		form.setEnabled(allowEdit());
 
