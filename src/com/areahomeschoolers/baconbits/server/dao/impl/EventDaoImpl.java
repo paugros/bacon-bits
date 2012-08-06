@@ -754,11 +754,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 			sql += "join events e on e.id = r.eventId \n";
 			sql += "where p.statusId != 5 \n";
-			sql += "and (? between e.startDate and e.endDate \n";
-			sql += "or ? between e.startDate and e.endDate) \n";
+			// sql += "and (? between e.startDate and e.endDate \n";
+			// sql += "or ? between e.startDate and e.endDate) \n";
+			sql += "and ((? >= e.startDate and ? < e.endDate) \n";
+			sql += "or (? > e.startDate and ? <= e.endDate)) \n";
 			sql += "and userId = ? limit 1";
-			Data existing = queryForObject(sql, ServerUtils.getGenericRowMapper(), event.getDate("startDate"), event.getDate("endDate"),
-					participant.getUserId());
+			Data existing = queryForObject(sql, ServerUtils.getGenericRowMapper(), event.getDate("startDate"), event.getDate("startDate"),
+					event.getDate("endDate"), event.getDate("endDate"), participant.getUserId());
 
 			if (existing != null) {
 				String m = "This participant is already registered for an event that conflicts with this one: ";
