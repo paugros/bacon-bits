@@ -25,6 +25,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.MonthYearPicker;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
@@ -35,6 +36,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -154,10 +156,14 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		entity.setEventRegistrationId(registration.getId());
 		entity.setEventFields(eventFields);
 
-		eventService.saveParticipant(entity, new Callback<ArrayList<EventParticipant>>() {
+		eventService.saveParticipant(entity, new Callback<ServerResponseData<ArrayList<EventParticipant>>>() {
 			@Override
-			protected void doOnSuccess(ArrayList<EventParticipant> result) {
-				registration.setParticipants(result);
+			protected void doOnSuccess(ServerResponseData<ArrayList<EventParticipant>> result) {
+				if (result.hasErrors()) {
+					new ServerResponseDialog(result).center();
+					return;
+				}
+				registration.setParticipants(result.getData());
 				refreshCommand.execute(registration);
 			}
 		});

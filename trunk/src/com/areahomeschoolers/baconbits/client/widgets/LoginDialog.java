@@ -217,8 +217,7 @@ public class LoginDialog extends DialogBox {
 
 				@Override
 				public void onSuccess(ApplicationData ap) {
-
-					if (ap != null) {
+					if (ap.getCurrentUser() != null) {
 						hide();
 
 						if (loginHandler != null) {

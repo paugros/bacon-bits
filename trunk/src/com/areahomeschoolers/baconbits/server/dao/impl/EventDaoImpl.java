@@ -41,6 +41,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.paypal.adaptive.api.requests.fnapi.SimplePay;
 import com.paypal.adaptive.api.responses.PayResponse;
@@ -301,6 +302,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int parentId = args.getInt(EventArg.PARENT_ID);
 		int userId = args.getInt(EventArg.USER_ID);
 		int statusId = args.getInt(EventArg.STATUS_ID);
+		int notStatusId = args.getInt(EventArg.NOT_STATUS_ID);
 		final boolean includeFields = args.getBoolean(EventArg.INCLUDE_FIELDS);
 		List<Integer> ids = args.getIntList(EventArg.PARTICIPANT_IDS);
 
@@ -330,7 +332,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			} else {
 				sql += "(and e.endDate < now() or active = 0) \n";
 			}
+		}
 
+		if (notStatusId > 0) {
+			sql += "and p.statusId != ? \n";
+			sqlArgs.add(notStatusId);
 		}
 
 		if (!Common.isNullOrEmpty(ids)) {
@@ -701,7 +707,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public synchronized ArrayList<EventParticipant> saveParticipant(final EventParticipant participant) {
+	public synchronized ServerResponseData<ArrayList<EventParticipant>> saveParticipant(final EventParticipant participant) {
+		ServerResponseData<ArrayList<EventParticipant>> data = new ServerResponseData<ArrayList<EventParticipant>>();
 
 		if (participant.getStatusId() == 0) {
 			participant.setStatusId(1);
@@ -725,6 +732,41 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				registerNextWaitingParticipant(waitData);
 			}
 		} else {
+			// validate for time overlaps
+			// get the event date being registered first
+			String sql = "select e.startDate, e.endDate \n";
+			sql += "from eventRegistrations r \n";
+			sql += "join events e on e.id = r.eventId \n";
+			sql += "where r.id = ? limit 1";
+			Data event = queryForObject(sql, new RowMapper<Data>() {
+				@Override
+				public Data mapRow(ResultSet rs, int row) throws SQLException {
+					Data d = new Data();
+					d.put("startDate", rs.getTimestamp("startDate"));
+					d.put("endDate", rs.getTimestamp("endDate"));
+					return d;
+				}
+			}, participant.getEventRegistrationId());
+
+			// now see if it overlaps
+			sql = "select e.id, e.title \n";
+			sql += "from eventRegistrationParticipants p \n";
+			sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
+			sql += "join events e on e.id = r.eventId \n";
+			sql += "where p.statusId != 5 \n";
+			sql += "and (? between e.startDate and e.endDate \n";
+			sql += "or ? between e.startDate and e.endDate) \n";
+			sql += "and userId = ? limit 1";
+			Data existing = queryForObject(sql, ServerUtils.getGenericRowMapper(), event.getDate("startDate"), event.getDate("endDate"),
+					participant.getUserId());
+
+			if (existing != null) {
+				String m = "This participant is already registered for an event that conflicts with this one: ";
+				m += "<a href=\"" + ServerContext.getBaseUrl() + "#" + PageUrl.event(existing.getInt("id")) + "\">" + existing.get("title") + "</a>";
+				data.addError(m);
+				return data;
+			}
+
 			// create or update the associated user
 			User u = participant.getUser();
 			if (u == null) {
@@ -745,7 +787,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				ServerContext.getCurrentUser().setBirthDate(participant.getBirthDate());
 			}
 
-			String sql = "insert into eventRegistrationParticipants(eventRegistrationId, userId, statusId, ageGroupId, addedDate) ";
+			sql = "insert into eventRegistrationParticipants(eventRegistrationId, userId, statusId, ageGroupId, addedDate) ";
 			sql += "values(:eventRegistrationId, :userId, :statusId, :ageGroupId, now())";
 
 			KeyHolder keys = new GeneratedKeyHolder();
@@ -774,7 +816,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			}
 		}
 
-		return list;
+		data.setData(list);
+
+		return data;
 	}
 
 	@Override
@@ -1007,7 +1051,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		body += "Due to a cancellation, " + notify.get("participantName") + " has been moved off the waiting list for the following event.\n\n";
 		body += "Event: " + notify.get("title") + "\n";
 		body += "Date: " + notify.get("startDate") + " to " + notify.get("endDate") + "\n";
-		body += "Link: http://www.areahomeschoolers.com/#" + PageUrl.event(notify.getInt("eventId")) + "\n\n";
+		body += "Link: " + ServerContext.getBaseUrl() + "#" + PageUrl.event(notify.getInt("eventId")) + "\n\n";
 		body += "Click the link above to view more event details and your registration status.\n\n";
 		body += "Thank you.";
 		mailer.setSubject(subject);

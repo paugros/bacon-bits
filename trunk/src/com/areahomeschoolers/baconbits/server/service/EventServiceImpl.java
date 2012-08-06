@@ -20,6 +20,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 @Controller
 @RequestMapping("/event")
@@ -119,7 +120,7 @@ public class EventServiceImpl extends GwtController implements EventService {
 	}
 
 	@Override
-	public ArrayList<EventParticipant> saveParticipant(EventParticipant participant) {
+	public ServerResponseData<ArrayList<EventParticipant>> saveParticipant(EventParticipant participant) {
 		return dao.saveParticipant(participant);
 	}
 

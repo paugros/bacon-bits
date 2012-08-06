@@ -62,6 +62,7 @@ public final class EventParticipantListPage implements Page {
 		}
 
 		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.INCLUDE_FIELDS);
+		args.put(EventArg.NOT_STATUS_ID, 5);
 		if (showAll) {
 			args.setStatus(Status.ACTIVE);
 		} else {

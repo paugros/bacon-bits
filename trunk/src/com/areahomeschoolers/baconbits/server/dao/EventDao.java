@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
+import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 public interface EventDao {
 
@@ -64,7 +65,7 @@ public interface EventDao {
 	public EventField saveField(EventField field);
 
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
-	public ArrayList<EventParticipant> saveParticipant(EventParticipant participant);
+	public ServerResponseData<ArrayList<EventParticipant>> saveParticipant(EventParticipant participant);
 
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public EventRegistration saveRegistration(EventRegistration registration);
