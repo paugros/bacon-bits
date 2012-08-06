@@ -153,7 +153,7 @@ public final class Layout {
 				public void onMouseDown(MouseDownEvent event) {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
 
-					if (!GWT.isProdMode()) {
+					if (GWT.isProdMode()) {
 						final LoginDialog ld = new LoginDialog(loginService);
 						ld.setLoginHandler(new LoginHandler() {
 							@Override
