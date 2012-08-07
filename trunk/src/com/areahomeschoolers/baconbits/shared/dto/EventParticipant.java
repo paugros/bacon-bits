@@ -24,11 +24,24 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 	private Date birthDate;
 	private double price;
 	private List<EventField> eventFields = new ArrayList<EventField>();
-	private String parentFirstName, parentLastName;
+	private String addedByFirstName, addedByLastName;
+	private int addedById;
 	private int parentId;
 
 	public EventParticipant() {
 
+	}
+
+	public String getAddedByFirstName() {
+		return addedByFirstName;
+	}
+
+	public int getAddedById() {
+		return addedById;
+	}
+
+	public String getAddedByLastName() {
+		return addedByLastName;
 	}
 
 	public Date getAddedDate() {
@@ -78,16 +91,8 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 		return lastName;
 	}
 
-	public String getParentFirstName() {
-		return parentFirstName;
-	}
-
 	public int getParentId() {
 		return parentId;
-	}
-
-	public String getParentLastName() {
-		return parentLastName;
 	}
 
 	public Integer getPaymentId() {
@@ -127,6 +132,18 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public boolean isWaiting() {
 		return statusId == 3;
+	}
+
+	public void setAddedByFirstName(String addedByFirstName) {
+		this.addedByFirstName = addedByFirstName;
+	}
+
+	public void setAddedById(int addedById) {
+		this.addedById = addedById;
+	}
+
+	public void setAddedByLastName(String addedByLastName) {
+		this.addedByLastName = addedByLastName;
 	}
 
 	public void setAddedDate(Date addedDate) {
@@ -173,16 +190,8 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 		this.lastName = lastName;
 	}
 
-	public void setParentFirstName(String parentFirstName) {
-		this.parentFirstName = parentFirstName;
-	}
-
 	public void setParentId(int parentId) {
 		this.parentId = parentId;
-	}
-
-	public void setParentLastName(String parentLastName) {
-		this.parentLastName = parentLastName;
 	}
 
 	public void setPaymentId(Integer paymentId) {

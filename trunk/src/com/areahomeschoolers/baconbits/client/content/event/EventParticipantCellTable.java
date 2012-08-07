@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
@@ -30,6 +31,7 @@ import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class EventParticipantCellTable extends EntityCellTable<EventParticipant, EventArg, ParticipantColumn> {
@@ -51,6 +53,8 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 
+	private ParameterHandler<EventParticipant> cancelHandler;
+
 	public EventParticipantCellTable() {
 		init();
 	}
@@ -58,6 +62,10 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 	public EventParticipantCellTable(ArgMap<EventArg> args) {
 		this();
 		setArgMap(args);
+	}
+
+	public void setCancelHandler(ParameterHandler<EventParticipant> cancelHandler) {
+		this.cancelHandler = cancelHandler;
 	}
 
 	private void init() {
@@ -160,7 +168,7 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
 					protected Widget createWidget(EventParticipant item) {
-						Hyperlink link = new Hyperlink(item.getParentFirstName() + " " + item.getParentLastName(), PageUrl.user(item.getParentId()));
+						Hyperlink link = new Hyperlink(item.getAddedByFirstName() + " " + item.getAddedByLastName(), PageUrl.user(item.getAddedById()));
 						return link;
 					}
 				});
@@ -197,12 +205,19 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 				});
 				break;
 			case EDIT_STATUS:
-				if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
-					return;
-				}
 				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
 					protected Widget createWidget(final EventParticipant item) {
+						int uid = Application.getCurrentUserId();
+						if (uid == 0) {
+							return new Label("");
+						}
+						if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+							if (uid != item.getUserId() && uid != item.getAddedById() && uid != item.getParentId()) {
+								return new Label("");
+							}
+						}
+
 						String editText = "";
 						if (item.isCanceled()) {
 							editText = "Restore";
@@ -230,6 +245,10 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 												removeItems(result.getData());
 												addItems(result.getData());
 												refresh();
+
+												if (item.isCanceled() && cancelHandler != null) {
+													cancelHandler.execute(item);
+												}
 											}
 										});
 									}

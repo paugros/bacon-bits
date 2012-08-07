@@ -6,12 +6,15 @@ import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCell
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -27,6 +30,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -35,6 +39,7 @@ public final class EventPaymentPage implements Page {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private EventParticipantCellTable table;
 	private Label total;
+	private SimplePanel payContainer = new SimplePanel();
 	// used to prevent double pay
 	private boolean paying;
 
@@ -70,10 +75,13 @@ public final class EventPaymentPage implements Page {
 		vp.add(table);
 
 		page.add(vp);
+		page.add(WidgetFactory.wrapForWidth(payContainer, ContentWidth.MAXWIDTH750PX));
+		page.setCellHorizontalAlignment(payContainer, HasHorizontalAlignment.ALIGN_RIGHT);
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
 			public void onDataReturn() {
+				payContainer.clear();
 				table.setSelectedItems(table.getFullList());
 				updateTotal();
 				table.getSelectionModel().addSelectionChangeHandler(new Handler() {
@@ -83,7 +91,7 @@ public final class EventPaymentPage implements Page {
 					}
 				});
 
-				if (!Common.isNullOrEmpty(table.getFullList()) && total == null) {
+				if (!Common.isNullOrEmpty(table.getFullList())) {
 					PaddedPanel payPanel = new PaddedPanel(15);
 					Label l = new Label("Total:");
 					l.addStyleName("hugeText");
@@ -91,7 +99,9 @@ public final class EventPaymentPage implements Page {
 					total = new Label();
 					total.addStyleName("hugeText");
 					payPanel.add(total);
-					vp.add(payPanel);
+					VerticalPanel pvp = new VerticalPanel();
+					pvp.setWidth("100%");
+					pvp.add(payPanel);
 					Image logo = new Image(MainImageBundle.INSTANCE.paypalButton());
 					logo.getElement().getStyle().setCursor(Cursor.POINTER);
 					logo.addClickHandler(new ClickHandler() {
@@ -118,13 +128,23 @@ public final class EventPaymentPage implements Page {
 							});
 						}
 					});
-					vp.add(logo);
+					pvp.add(logo);
 
-					vp.setCellHorizontalAlignment(payPanel, HasHorizontalAlignment.ALIGN_RIGHT);
-					vp.setCellHorizontalAlignment(logo, HasHorizontalAlignment.ALIGN_RIGHT);
+					pvp.setCellHorizontalAlignment(payPanel, HasHorizontalAlignment.ALIGN_RIGHT);
+					pvp.setCellHorizontalAlignment(logo, HasHorizontalAlignment.ALIGN_RIGHT);
+					payContainer.setWidget(pvp);
 				}
 
 				Application.getLayout().setPage(title, page);
+			}
+		});
+
+		table.setCancelHandler(new ParameterHandler<EventParticipant>() {
+			@Override
+			public void execute(EventParticipant item) {
+				table.removeItem(item);
+				table.refresh();
+				updateTotal();
 			}
 		});
 

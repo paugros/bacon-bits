@@ -159,10 +159,13 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		eventService.saveParticipant(entity, new Callback<ServerResponseData<ArrayList<EventParticipant>>>() {
 			@Override
 			protected void doOnSuccess(ServerResponseData<ArrayList<EventParticipant>> result) {
-				if (result.hasErrors()) {
+				if (result.hasErrorsOrWarnings()) {
 					new ServerResponseDialog(result).center();
-					return;
+					if (result.hasErrors()) {
+						return;
+					}
 				}
+
 				registration.setParticipants(result.getData());
 				refreshCommand.execute(registration);
 			}
