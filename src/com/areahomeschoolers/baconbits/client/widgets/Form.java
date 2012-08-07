@@ -639,7 +639,7 @@ public class Form {
 	}
 
 	/**
-	 * This is used here instead of {@link ValidatorManager#validateAll()} because so as to be field label aware (turn label red upon error).
+	 * This is used here instead of {@link ValidatorManager#validateAll()} so as to be field label aware (turn label red upon error).
 	 * 
 	 * @return Returns whether the form validated correctly.
 	 */
