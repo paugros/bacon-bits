@@ -20,8 +20,10 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -29,20 +31,71 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class HomePage implements Page {
+	private class EventModulePanel extends Composite {
+		public EventModulePanel(String title, ArrayList<Event> events) {
+			VerticalPanel vp = new VerticalPanel();
+			vp.setWidth("100%");
+			vp.setSpacing(8);
+
+			Label label = new Label(title);
+			label.addStyleName("hugeText");
+			vp.add(label);
+
+			for (Event e : events) {
+				VerticalPanel ep = new VerticalPanel();
+				Hyperlink link = new Hyperlink(e.getTitle(), PageUrl.event(e.getId()));
+				link.addStyleName("mediumText");
+
+				ep.add(link);
+
+				String subText = Formatter.formatDateTime(e.getStartDate());
+				if (e.getCategoryId() == 6) {
+					subText += " - " + Formatter.formatCurrency(e.getPrice());
+				}
+				Label date = new Label(subText);
+				date.addStyleName("italic");
+				ep.add(date);
+
+				HTML h = new HTML();
+				h.setHTML(e.getDescription().replaceAll("<br>", " "));
+				String text = h.getText();
+				if (text.length() > 100) {
+					text = text.substring(0, 101) + "...";
+				}
+				ep.add(new Label(text));
+
+				vp.add(ep);
+			}
+
+			if (events.isEmpty()) {
+				vp.add(new Label("None right now."));
+			}
+
+			initWidget(vp);
+		}
+	}
+
 	private final ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private VerticalPanel page = new VerticalPanel();
-	private HorizontalPanel hp = new HorizontalPanel();
+	private Grid grid = new Grid(1, 3);
 	private SimplePanel articlePanel = new SimplePanel();
 	private SimplePanel eventPanel = new SimplePanel();
 
+	private SimplePanel communityPanel = new SimplePanel();
+
 	public HomePage(VerticalPanel p) {
 		page = p;
-		hp.add(articlePanel);
-		hp.add(eventPanel);
-		eventPanel.getElement().getStyle().setBackgroundColor("#dddddd");
-		hp.setCellWidth(eventPanel, "250px");
-		page.add(hp);
+		grid.setWidget(0, 0, communityPanel);
+		grid.setWidget(0, 1, articlePanel);
+		grid.setWidget(0, 2, eventPanel);
+		grid.getCellFormatter().setWidth(0, 0, "250px");
+		grid.getCellFormatter().setWidth(0, 2, "250px");
+		grid.getCellFormatter().getElement(0, 0).getStyle().setBackgroundColor("#d8e6f7");
+		grid.getCellFormatter().getElement(0, 2).getStyle().setBackgroundColor("#ddf3da");
+		grid.getCellFormatter().setVerticalAlignment(0, 0, HasVerticalAlignment.ALIGN_TOP);
+		grid.getCellFormatter().setVerticalAlignment(0, 2, HasVerticalAlignment.ALIGN_TOP);
+		page.add(grid);
 
 		articleService.getById(6, new Callback<Article>() {
 			@Override
@@ -60,37 +113,12 @@ public class HomePage implements Page {
 			@Override
 			protected void doOnSuccess(ArrayList<Event> result) {
 				VerticalPanel vp = new VerticalPanel();
-				vp.setWidth("100%");
-				vp.setSpacing(8);
+				vp.add(new EventModulePanel("Upcoming Events", result));
 
-				Label title = new Label("Upcoming Events");
-				title.addStyleName("hugeText");
-				vp.add(title);
-
-				for (Event e : result) {
-					VerticalPanel ep = new VerticalPanel();
-					Hyperlink link = new Hyperlink(e.getTitle(), PageUrl.event(e.getId()));
-					link.addStyleName("mediumText");
-
-					ep.add(link);
-
-					Label date = new Label(Formatter.formatDateTime(e.getStartDate()));
-					date.addStyleName("italic");
-					ep.add(date);
-
-					HTML h = new HTML();
-					h.setHTML(e.getDescription().replaceAll("<br>", " "));
-					String text = h.getText();
-					if (text.length() > 100) {
-						text = text.substring(0, 101) + "...";
-					}
-					ep.add(new Label(text));
-
-					vp.add(ep);
-				}
-
+				VerticalPanel vvp = new VerticalPanel();
+				vvp.setSpacing(8);
 				Hyperlink link = new Hyperlink("See more events...", PageUrl.eventList());
-				vp.add(link);
+				vvp.add(link);
 
 				Image image = new Image(MainImageBundle.INSTANCE.faceBook());
 				String text = "<p><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" target=\"_TOP\" ";
@@ -99,9 +127,22 @@ public class HomePage implements Page {
 				text += image.toString() + "</a></p>";
 
 				HTML fb = new HTML(text);
-				vp.add(fb);
+				vvp.add(fb);
+				vp.add(vvp);
 
 				eventPanel.setWidget(vp);
+			}
+		});
+
+		args.put(EventArg.SHOW_COMMUNITY);
+
+		eventService.list(args, new Callback<ArrayList<Event>>() {
+			@Override
+			protected void doOnSuccess(ArrayList<Event> result) {
+				VerticalPanel vp = new VerticalPanel();
+				vp.add(new EventModulePanel("Community Events", result));
+
+				communityPanel.setWidget(vp);
 			}
 		});
 

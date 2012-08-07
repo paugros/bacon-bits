@@ -79,7 +79,7 @@ public class VariableSizePager extends AbstractPager {
 	private int index = 0;
 	private DefaultListBox pageSizeListBox;
 	private boolean pageResizingEnabled = true;
-	private int defaultPageSize = 50;
+	private int defaultPageSize = 75;
 	private int pagingThreshold;
 	private static final String PAGE_SIZE_PREF = "tablePageSize.";
 	private List<ParameterHandler<Integer>> pageSizeChangeHandlers = new ArrayList<ParameterHandler<Integer>>();
@@ -248,7 +248,7 @@ public class VariableSizePager extends AbstractPager {
 			@Override
 			public void execute() {
 				if (getDisplay() != null && pageResizingEnabled) {
-					pageSizeListBox.setSelectedIndex(2);
+					pageSizeListBox.setSelectedIndex(3);
 					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 						@Override
 						public void execute() {

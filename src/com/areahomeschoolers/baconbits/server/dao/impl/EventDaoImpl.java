@@ -308,7 +308,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select r.eventId, e.title, e.startDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
-		sql += "up.firstName as parentFirstName, up.lastName as parentLastName, \n";
+		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, r.addedById, \n";
 		if (includeFields) {
 			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n";
 			sql += "from eventFieldValues v \n";
@@ -328,11 +328,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		if (args.getStatus() != Status.ALL) {
 			if (args.getStatus() == Status.ACTIVE) {
-				sql += "and e.endDate > now() and active = 1 \n";
+				sql += "and e.endDate > now() \n";
 			} else {
-				sql += "(and e.endDate < now() or active = 0) \n";
+				sql += "and e.endDate < now() \n";
 			}
 		}
+
+		sql += "and e.active = 1 ";
 
 		if (notStatusId > 0) {
 			sql += "and p.statusId != ? \n";
@@ -393,9 +395,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setStatus(rs.getString("status"));
 				p.setPrice(rs.getDouble("price"));
 				p.setBirthDate(rs.getDate("birthDate"));
-				p.setParentFirstName(rs.getString("parentFirstName"));
-				p.setParentLastName(rs.getString("parentLastName"));
-				p.setParentId(rs.getInt("parentId"));
+				p.setAddedByFirstName(rs.getString("addedByFirstName"));
+				p.setAddedByLastName(rs.getString("addedByLastName"));
+				p.setAddedById(rs.getInt("addedById"));
 				p.setUserId(rs.getInt("userId"));
 				p.setAddedDate(rs.getTimestamp("addedDate"));
 				p.setEventId(rs.getInt("eventId"));
@@ -440,6 +442,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	public ArrayList<Event> list(ArgMap<EventArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int upcoming = args.getInt(EventArg.UPCOMING_NUMBER);
+		boolean showCommunity = args.getBoolean(EventArg.SHOW_COMMUNITY);
 
 		String sql = createSqlBase();
 
@@ -450,6 +453,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				sql += "(and e.endDate < now() or active = 0) \n";
 			}
 
+		}
+
+		if (showCommunity) {
+			sql += "and e.categoryId = 6 ";
+		} else {
+			sql += "and e.categoryId != 6 ";
 		}
 
 		if (upcoming > 0) {
@@ -796,6 +805,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			update(sql, namedParams, keys);
 
 			participant.setId(ServerUtils.getIdFromKeys(keys));
+
+			if (participant.isWaiting()) {
+				data.addWarning("This participant has been added to the waiting list because the event or age group is full.");
+			}
 		}
 
 		if (!Common.isNullOrEmpty(participant.getEventFields())) {

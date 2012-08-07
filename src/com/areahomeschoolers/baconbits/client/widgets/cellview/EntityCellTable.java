@@ -129,7 +129,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	}
 
 	private static final String TABLE_SORT_PREF = "tableSort.";
-	public static final int DEFAULT_PAGE_SIZE = 50;
+	public static final int DEFAULT_PAGE_SIZE = 75;
 	private String defaultSizePrefName = "default";
 
 	// Layout Data
@@ -1506,6 +1506,17 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		return header;
 	}
 
+	private void executeDataReturnHandlers() {
+		for (final DataReturnHandler handler : dataReturnHandlers) {
+			Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+				@Override
+				public void execute() {
+					handler.onDataReturn();
+				}
+			});
+		}
+	}
+
 	private <W extends Widget> ValueGetter<?, T> getDefaultValueGetter(final WidgetCellCreator<T> widgetCreator) {
 		return new ValueGetter<String, T>() {
 			private Map<T, String> sortCache = new HashMap<T, String>();
@@ -1565,14 +1576,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 
 		setAggregateFooterLabels(results);
 
-		for (final DataReturnHandler handler : dataReturnHandlers) {
-			Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-				@Override
-				public void execute() {
-					handler.onDataReturn();
-				}
-			});
-		}
+		executeDataReturnHandlers();
 	}
 
 	private void setAggregateFooterLabels(List<T> results) {
