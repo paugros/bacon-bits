@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -410,6 +412,49 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				return p;
 			}
 		}, sqlArgs.toArray());
+	}
+
+	@Override
+	public ArrayList<Data> getRegistrationSummary() {
+		String sql = "select e.id, e.title, e.startDate, a.minimumAge, a.maximumAge, '' as ageText, '' as minMaxText, '' as countText, \n";
+		sql += "case when a.minimumParticipants is null then e.minimumParticipants else a.minimumParticipants end as minimumParticipants, \n";
+		sql += "case when a.maximumParticipants is null then e.maximumParticipants else a.maximumParticipants end as maximumParticipants, \n";
+		sql += "count(p.id) as participants \n";
+		sql += "from events e \n";
+		sql += "left join eventRegistrations r on r.eventId = e.id \n";
+		sql += "left join eventAgeGroups a on a.eventId = e.id \n";
+		sql += "left join eventRegistrationParticipants p on p.eventRegistrationId = r.id and (p.ageGroupId = a.id or p.ageGroupId is null) \n";
+		sql += "where e.endDate > now() and e.active = 1 \n";
+		sql += "group by e.id, e.title, e.startDate, a.minimumAge, a.maximumAge, a.minimumParticipants, a.maximumParticipants \n";
+		sql += "order by e.id, a.minimumAge";
+
+		List<Data> data = query(sql, ServerUtils.getGenericRowMapper());
+		Map<Integer, Data> map = new HashMap<Integer, Data>();
+
+		for (Data d : data) {
+			Data event = map.get(d.getId());
+			if (event == null) {
+				map.put(d.getId(), d);
+				event = d;
+			}
+
+			String ageText = d.get("minimumAge");
+			if (d.getInt("maximumAge") == 0) {
+				ageText += "+";
+			} else {
+				ageText += "-" + d.get("maximumAge");
+			}
+
+			if (d.get("minimumAge") == null) {
+				ageText = "N/A";
+			}
+			event.put("ageText", event.get("ageText") + ageText + "\n");
+
+			event.put("minMaxText", event.get("minMaxText") + d.get("minimumParticipants") + "/" + d.get("maximumParticipants") + "\n");
+			event.put("countText", event.get("countText") + d.get("participants") + "\n");
+		}
+
+		return new ArrayList<Data>(map.values());
 	}
 
 	@Override

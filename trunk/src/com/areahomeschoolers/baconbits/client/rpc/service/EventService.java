@@ -44,6 +44,8 @@ public interface EventService extends RemoteService {
 
 	public ArrayList<EventParticipant> getParticipants(ArgMap<EventArg> args);
 
+	public ArrayList<Data> getRegistrationSummary();
+
 	public Data getUnpaidBalance(int userId);
 
 	public ArrayList<Data> getVolunteers(int eventId);

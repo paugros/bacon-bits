@@ -32,6 +32,10 @@ public class PageUrl {
 		return "page=Home";
 	}
 
+	public static String registrationManagement() {
+		return "page=RegistrationManagement";
+	}
+
 	public static String user(int id) {
 		String url = "page=User";
 		return (id == 0) ? url : url + "&userId=" + id;

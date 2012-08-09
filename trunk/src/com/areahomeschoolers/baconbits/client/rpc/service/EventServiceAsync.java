@@ -39,6 +39,8 @@ public interface EventServiceAsync {
 
 	void getParticipants(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventParticipant>> callback);
 
+	void getRegistrationSummary(AsyncCallback<ArrayList<Data>> callback);
+
 	void getUnpaidBalance(int userId, AsyncCallback<Data> callback);
 
 	void getVolunteers(int eventId, AsyncCallback<ArrayList<Data>> callback);

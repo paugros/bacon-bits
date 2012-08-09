@@ -144,7 +144,7 @@ public final class MainMenu extends MenuBar {
 
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
-			addLinkToMenu(menu, "All Active Registrations", PageUrl.eventParticipantList() + "&all=true");
+			addLinkToMenu(menu, "Registration Management", PageUrl.registrationManagement());
 		}
 
 		return menu;
