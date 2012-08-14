@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
@@ -27,6 +28,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.ui.HTML;
@@ -62,6 +65,45 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 	public EventParticipantCellTable(ArgMap<EventArg> args) {
 		this();
 		setArgMap(args);
+	}
+
+	public void addStatusFilterBox() {
+		final com.areahomeschoolers.baconbits.client.widgets.DefaultListBox filterBox = getTitleBar().addFilterListControl();
+		filterBox.addItem("Active");
+		filterBox.addItem("Canceled");
+		filterBox.addItem("All");
+		filterBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				switch (filterBox.getSelectedIndex()) {
+				case 0:
+					for (EventParticipant participant : getFullList()) {
+						setItemVisible(participant, !participant.isCanceled(), false, false, false);
+					}
+					break;
+				case 1:
+					for (EventParticipant participant : getFullList()) {
+						setItemVisible(participant, participant.isCanceled(), false, false, false);
+					}
+					break;
+				case 2:
+					showAllItems();
+					break;
+				}
+
+				refreshForCurrentState();
+			}
+		});
+
+		filterBox.setSelectedIndex(0);
+
+		addDataReturnHandler(new DataReturnHandler() {
+			@Override
+			public void onDataReturn() {
+				filterBox.fireEvent(new ChangeEvent() {
+				});
+			}
+		});
 	}
 
 	public void setCancelHandler(ParameterHandler<EventParticipant> cancelHandler) {

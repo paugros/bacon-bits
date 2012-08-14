@@ -96,6 +96,12 @@ public class RegistrationManagementPage implements Page {
 							}
 						});
 
+						addWidgetColumn("Waiting", new WidgetCellCreator<Data>() {
+							@Override
+							protected Widget createWidget(Data item) {
+								return new HTML(Formatter.formatNoteText(item.get("waitText")));
+							}
+						});
 					}
 				};
 
@@ -103,7 +109,7 @@ public class RegistrationManagementPage implements Page {
 				table.setTitle("Registration Summary");
 				table.populate();
 
-				tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));
+				tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
 
 				tabPanel.selectTabNow(tabBody);
 			}
@@ -113,7 +119,6 @@ public class RegistrationManagementPage implements Page {
 			@Override
 			public void execute(final VerticalPanel tabBody) {
 				ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.INCLUDE_FIELDS);
-				args.put(EventArg.NOT_STATUS_ID, 5);
 				args.setStatus(Status.ACTIVE);
 				final EventParticipantCellTable table = new EventParticipantCellTable(args);
 				table.setDisplayColumns(ParticipantColumn.ATTENDED, ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.REGISTRANT_NAME,
@@ -123,6 +128,7 @@ public class RegistrationManagementPage implements Page {
 				tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1500PX));
 				table.setTitle("Recent Event Registrations");
 
+				table.addStatusFilterBox();
 				table.getTitleBar().addSearchControl();
 				table.getTitleBar().addExcelControl();
 

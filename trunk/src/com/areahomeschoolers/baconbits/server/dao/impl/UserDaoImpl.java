@@ -93,6 +93,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 			user.setAddress(rs.getString("address"));
 			user.setParentFirstName(rs.getString("parentFirstName"));
 			user.setParentLastName(rs.getString("parentLastName"));
+			user.setGroupsText(rs.getString("groupsText"));
 			return user;
 		}
 	}
@@ -124,7 +125,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 	@Autowired
 	public UserDaoImpl(DataSource dataSource) {
 		super(dataSource);
-		SELECT = "select isActive(u.startDate, u.endDate) as isEnabled, u.*, uu.firstName as parentFirstName, uu.lastName as parentLastName from users u \n";
+		SELECT = "select isActive(u.startDate, u.endDate) as isEnabled, u.*, uu.firstName as parentFirstName, uu.lastName as parentLastName, ";
+		SELECT += "(select group_concat(g.groupName separator '\n') from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id) as groupsText ";
+		SELECT += "from users u \n";
 		SELECT += "left join users uu on uu.id = u.parentId \n";
 	}
 
