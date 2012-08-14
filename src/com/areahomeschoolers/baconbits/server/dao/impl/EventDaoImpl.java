@@ -419,12 +419,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		String sql = "select e.id, e.title, e.startDate, a.minimumAge, a.maximumAge, '' as ageText, '' as minMaxText, '' as countText, \n";
 		sql += "case when a.minimumParticipants is null then e.minimumParticipants else a.minimumParticipants end as minimumParticipants, \n";
 		sql += "case when a.maximumParticipants is null then e.maximumParticipants else a.maximumParticipants end as maximumParticipants, \n";
-		sql += "count(p.id) as participants \n";
+		sql += "sum(case when p.statusId in(1, 2) then 1 else 0 end) as participants, \n";
+		sql += "sum(case when p.statusId = 3 then 1 else 0 end) as waiting \n";
 		sql += "from events e \n";
 		sql += "left join eventRegistrations r on r.eventId = e.id \n";
 		sql += "left join eventAgeGroups a on a.eventId = e.id \n";
 		sql += "left join eventRegistrationParticipants p on p.eventRegistrationId = r.id and (p.ageGroupId = a.id or p.ageGroupId is null) \n";
-		sql += "where e.endDate > now() and e.active = 1 \n";
+		sql += "where e.endDate > now() and e.active = 1 and e.requiresRegistration = 1 and p.statusId in(1, 2, 3) \n";
 		sql += "group by e.id, e.title, e.startDate, a.minimumAge, a.maximumAge, a.minimumParticipants, a.maximumParticipants \n";
 		sql += "order by e.id, a.minimumAge";
 
@@ -451,7 +452,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.put("ageText", event.get("ageText") + ageText + "\n");
 
 			event.put("minMaxText", event.get("minMaxText") + d.get("minimumParticipants") + "/" + d.get("maximumParticipants") + "\n");
-			event.put("countText", event.get("countText") + d.get("participants") + "\n");
+			event.put("countText", Common.getDefaultIfNull(event.get("countText"), "") + d.get("participants") + "\n");
+			event.put("waitText", Common.getDefaultIfNull(event.get("waitText"), "") + d.get("waiting") + "\n");
 		}
 
 		return new ArrayList<Data>(map.values());

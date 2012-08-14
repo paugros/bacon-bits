@@ -1085,6 +1085,14 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		}
 	}
 
+	public void setItemVisible(T item, boolean visible, boolean sort, boolean updateTotal, boolean fireUpdate) {
+		if (visible) {
+			showItem(item, sort, updateTotal, fireUpdate);
+		} else {
+			hideItem(item, updateTotal, fireUpdate);
+		}
+	}
+
 	public void setLinksOpenNewTab(boolean linksOpenNewTab) {
 		this.linksOpenNewTab = linksOpenNewTab;
 	}
@@ -1959,6 +1967,11 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	 */
 	protected List<T> preprocessResults(List<T> results) {
 		return results;
+	}
+
+	protected void refreshForCurrentState() {
+		updateTitleTotal();
+		onRowDataUpdate(true, null);
 	}
 
 	@Override

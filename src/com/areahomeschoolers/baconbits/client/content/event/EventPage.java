@@ -733,8 +733,8 @@ public class EventPage implements Page {
 
 						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
 						args.put(EventArg.INCLUDE_FIELDS);
-						args.put(EventArg.NOT_STATUS_ID, 5);
 						EventParticipantCellTable table = new EventParticipantCellTable(args);
+						table.addStatusFilterBox();
 						table.getTitleBar().addExcelControl();
 						table.getTitleBar().addSearchControl();
 						table.populate();

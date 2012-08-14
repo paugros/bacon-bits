@@ -33,6 +33,7 @@ public final class User extends EntityDto<User> {
 	private Integer parentId;
 
 	// aux
+	private String groupsText;
 	private boolean generatePassword;
 	private HashSet<AccessLevel> accessLevels;
 
@@ -86,6 +87,10 @@ public final class User extends EntityDto<User> {
 
 	public HashMap<Integer, Boolean> getGroups() {
 		return groups;
+	}
+
+	public String getGroupsText() {
+		return groupsText;
 	}
 
 	public String getHomePhone() {
@@ -199,6 +204,10 @@ public final class User extends EntityDto<User> {
 
 	public void setGroups(HashMap<Integer, Boolean> groups) {
 		this.groups = groups;
+	}
+
+	public void setGroupsText(String groupsText) {
+		this.groupsText = groupsText;
 	}
 
 	public void setHomePhone(String homePhone) {

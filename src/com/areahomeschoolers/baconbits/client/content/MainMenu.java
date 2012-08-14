@@ -115,6 +115,7 @@ public final class MainMenu extends MenuBar {
 
 	private MenuBar getClassesMenu() {
 		MenuBar menu = new MenuBar(true);
+		addLinkToMenu(menu, "Apologia Chemistry", PageUrl.articleGroup("55"));
 		addLinkToMenu(menu, "Mixed Class Day", PageUrl.articleGroup("37,38"));
 		addLinkToMenu(menu, "Parents' Support Meeting", PageUrl.articleGroup("33"));
 		addLinkToMenu(menu, "PE Activities", PageUrl.articleGroup("36"));
@@ -146,6 +147,8 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
 			addLinkToMenu(menu, "Registration Management", PageUrl.registrationManagement());
 		}
+
+		addLinkToMenu(menu, "Policies", PageUrl.articleGroup("57,56,58"));
 
 		return menu;
 	}
