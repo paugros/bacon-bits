@@ -1043,7 +1043,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int registrationId = args.getInt(EventArg.REGISTRATION_ID);
 
 		String sql = "select r.eventId, p.ageGroupId, \n";
-		sql += "case p.ageGroupId when 0 then e.maximumParticipants else g.maximumParticipants end as maxParticipants, \n";
+		sql += "case when p.ageGroupId is null then e.maximumParticipants else g.maximumParticipants end as maxParticipants, \n";
 		sql += "sum(case when  p.statusId in(1, 2) then 1 else 0 end) as participants \n";
 		sql += "from eventRegistrationParticipants p \n";
 		sql += "left join eventAgeGroups g on g.id = p.ageGroupId \n";
