@@ -33,8 +33,8 @@ public final class UserGroupListPage implements Page {
 			}));
 		}
 
-		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
+		table.getTitleBar().addSearchControl();
 		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));
 
 		table.addDataReturnHandler(new DataReturnHandler() {

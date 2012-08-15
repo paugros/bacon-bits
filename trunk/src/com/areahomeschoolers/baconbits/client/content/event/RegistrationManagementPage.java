@@ -129,8 +129,8 @@ public class RegistrationManagementPage implements Page {
 				table.setTitle("Recent Event Registrations");
 
 				table.addStatusFilterBox();
-				table.getTitleBar().addSearchControl();
 				table.getTitleBar().addExcelControl();
+				table.getTitleBar().addSearchControl();
 
 				table.addDataReturnHandler(new DataReturnHandler() {
 					@Override

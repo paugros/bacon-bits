@@ -773,6 +773,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		ArgMap<EventArg> args = new ArgMap<EventArg>();
 		int ageGroupId = participant.getAgeGroupId() == null ? 0 : participant.getAgeGroupId();
 		args.put(EventArg.AGE_GROUP_ID, ageGroupId);
+		args.put(EventArg.REGISTRATION_ID, participant.getEventRegistrationId());
 		Data waitData = getWaitData(args);
 		boolean eventIsFull = eventIsFull(waitData);
 		if (participant.getStatusId() == 1 && eventIsFull) {
@@ -1080,7 +1081,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		String sql = "select p.id, r.eventId, e.title, concat(up.firstName, ' ', up.lastName) as participantName, \n";
 		sql += "ur.firstName, ur.email, date_format(e.startDate, '%W, %c/%e %l:%i %p') as startDate, \n";
-		sql += "date_format(e.endDate, '%W, %c/%e %l:%i %p') as endDate ";
+		sql += "date_format(e.endDate, '%W, %c/%e %l:%i %p') as endDate, e.notificationEmail ";
 		sql += "from eventRegistrationParticipants p \n";
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 		sql += "join users ur on ur.id = r.addedById \n";
@@ -1107,14 +1108,14 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		update(sql, notify.getId());
 
 		Mailer mailer = new Mailer();
-		mailer.addTo(notify.get("email"));
-		String subject = "A spot has opened up for " + notify.get("participantName");
-		String body = "Hello " + notify.get("firstName") + ",\n\n";
+		mailer.addTo(notify.get("notificationEmail"));
+		String subject = "Event wait list notification: " + notify.get("title");
+		String body = "Hello,\n\n";
 		body += "Due to a cancellation, " + notify.get("participantName") + " has been moved off the waiting list for the following event.\n\n";
 		body += "Event: " + notify.get("title") + "\n";
 		body += "Date: " + notify.get("startDate") + " to " + notify.get("endDate") + "\n";
 		body += "Link: " + ServerContext.getBaseUrl() + "#" + PageUrl.event(notify.getInt("eventId")) + "\n\n";
-		body += "Click the link above to view more event details and your registration status.\n\n";
+		body += "Click the link above to view more event details and registration status.\n\n";
 		body += "Thank you.";
 		mailer.setSubject(subject);
 		mailer.setBody(body);

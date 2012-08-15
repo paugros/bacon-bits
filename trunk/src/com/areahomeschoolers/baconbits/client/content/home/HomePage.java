@@ -40,6 +40,7 @@ public class HomePage implements Page {
 			Label label = new Label(title);
 			label.addStyleName("hugeText");
 			vp.add(label);
+			boolean community = false;
 
 			for (Event e : events) {
 				VerticalPanel ep = new VerticalPanel();
@@ -50,6 +51,7 @@ public class HomePage implements Page {
 
 				String subText = Formatter.formatDateTime(e.getStartDate());
 				if (e.getCategoryId() == 6) {
+					community = true;
 					subText += " - " + Formatter.formatCurrency(e.getPrice());
 				}
 				Label date = new Label(subText);
@@ -69,6 +71,12 @@ public class HomePage implements Page {
 
 			if (events.isEmpty()) {
 				vp.add(new Label("None right now."));
+			} else {
+				String url = PageUrl.eventList();
+				if (community) {
+					url += "&showCommunity=true";
+				}
+				vp.add(new Hyperlink("See more events...", url));
 			}
 
 			initWidget(vp);
@@ -117,8 +125,8 @@ public class HomePage implements Page {
 
 				VerticalPanel vvp = new VerticalPanel();
 				vvp.setSpacing(8);
-				Hyperlink link = new Hyperlink("See more events...", PageUrl.eventList());
-				vvp.add(link);
+				// Hyperlink link = new Hyperlink("See more events...", PageUrl.eventList());
+				// vvp.add(link);
 
 				Image image = new Image(MainImageBundle.INSTANCE.faceBook());
 				String text = "<p><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" target=\"_TOP\" ";

@@ -9,17 +9,23 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.EntityDto;
 
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.VerticalAlign;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -28,9 +34,9 @@ import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -38,12 +44,11 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 
 	protected EntityCellTable<T, ?, ?> cellTable;
 	private VariableSizePager pagingControl;
-	private HorizontalPanel searchControl;
-	private Image tableSearchControl;
 	private Image refreshControl;
+	private HorizontalPanel searchControl;
 	private Image excelControl;
 	private List<Command> refreshCommands = new ArrayList<Command>();
-	private TextBox searchControlInput = new TextBox();
+	private TextBox searchTextBox;
 	private DefaultListBox filterListControl;
 	private Timer searchTimer;
 
@@ -163,7 +168,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public void addSearchControl() {
-		if (tableSearchControl != null || cellTable == null) {
+		if (searchTextBox != null || cellTable == null) {
 			return;
 		}
 
@@ -174,29 +179,55 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 			}
 		};
 
-		searchControlInput.setHeight("16px");
 		if (searchControl == null) {
+			searchControl = new PaddedPanel();
+			searchTextBox = new TextBox();
+			searchTextBox.setHeight("16px");
+			final String defaultColor = "rgb(153, 153, 153)";
+			final String defaultText = "Search...";
 			if (clearFilter != null) {
 				clearFilter.setEnabled(false);
 			}
-			searchControl = new HorizontalPanel();
-			searchControlInput.addKeyDownHandler(new KeyDownHandler() {
+			searchTextBox.addFocusHandler(new FocusHandler() {
+				@Override
+				public void onFocus(FocusEvent event) {
+					if (searchTextBox.getElement().getStyle().getColor().equals(defaultColor)) {
+						searchTextBox.setText("");
+						searchTextBox.getElement().getStyle().setColor("#000000");
+					}
+				}
+			});
+
+			searchTextBox.addBlurHandler(new BlurHandler() {
+				@Override
+				public void onBlur(BlurEvent event) {
+					if (Common.isNullOrBlank(searchTextBox.getText())) {
+						searchTextBox.getElement().getStyle().setColor(defaultColor);
+						searchTextBox.setText(defaultText);
+					}
+				}
+			});
+
+			searchTextBox.getElement().getStyle().setColor(defaultColor);
+			searchTextBox.setText(defaultText);
+
+			searchTextBox.addKeyDownHandler(new KeyDownHandler() {
 				@Override
 				public void onKeyDown(KeyDownEvent event) {
 					int keyCode = event.getNativeKeyCode();
+					boolean reschedule = true;
 					switch (keyCode) {
 					case KeyCodes.KEY_ESCAPE:
-						if (searchControl.getWidgetIndex(searchControlInput) != -1) {
-							tableSearchControl.fireEvent(new MouseDownEvent() {
-							});
-						}
+						clearFilter();
+						searchTimer.cancel();
+						reschedule = false;
 						break;
 					case KeyCodes.KEY_ENTER:
 						clearFilter.setEnabled(true);
 						break;
 					case KeyCodes.KEY_BACKSPACE:
 						if (clearFilter != null) {
-							clearFilter.setEnabled(!((searchControlInput.getText().length() - 1) <= 0));
+							clearFilter.setEnabled(!((searchTextBox.getText().length() - 1) <= 0));
 						}
 						break;
 					default:
@@ -205,35 +236,30 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 						}
 						break;
 					}
+
 					searchTimer.cancel();
-					searchTimer.schedule(150);
+
+					if (reschedule) {
+						searchTimer.schedule(150);
+					}
 				}
 			});
 		}
-		tableSearchControl = new Image(MainImageBundle.INSTANCE.search());
-		tableSearchControl.setTitle("Search in table");
-		tableSearchControl.addMouseDownHandler(new MouseDownHandler() {
+
+		Image cancel = new Image(MainImageBundle.INSTANCE.cancel());
+		searchControl.add(searchTextBox);
+		searchControl.add(cancel);
+		searchControl.setCellVerticalAlignment(cancel, HasVerticalAlignment.ALIGN_MIDDLE);
+		cancel.getElement().getStyle().setCursor(Cursor.POINTER);
+		cancel.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
-				if (searchControl.getWidgetIndex(searchControlInput) == -1) {
-					searchControl.insert(searchControlInput, 0);
-					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-						@Override
-						public void execute() {
-							searchControlInput.setFocus(true);
-						}
-					});
-					tableSearchControl.setResource(MainImageBundle.INSTANCE.cancel());
-				} else if (searchControl.getWidgetIndex(searchControlInput) != -1) {
-					clearFilter();
-					searchControl.remove(searchControlInput);
-					tableSearchControl.setResource(MainImageBundle.INSTANCE.search());
-				}
+			public void onClick(ClickEvent event) {
+				clearFilter();
 			}
 		});
-		searchControl.add(tableSearchControl);
-		searchControl.add(new Label(" "));
-		tableSearchControl.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
+
+		searchTextBox.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
+
 		addControl(searchControl);
 	}
 
@@ -248,15 +274,19 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public void clearFilter() {
-		if (searchControlInput != null) {
-			searchControlInput.setText("");
+		if (searchTextBox != null) {
+			searchTextBox.setText("");
 		}
 		if (clearFilter != null) {
 			clearFilter.setEnabled(false);
 		}
-		if (tableSearchControl != null) {
+		if (searchTextBox != null) {
 			searchTable();
 		}
+
+		searchTextBox.setFocus(false);
+		searchTextBox.fireEvent(new BlurEvent() {
+		});
 	}
 
 	/**
@@ -271,7 +301,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public boolean hasFilter() {
-		return !searchControlInput.getText().isEmpty();
+		return !searchTextBox.getText().isEmpty();
 	}
 
 	public boolean isPaging() {
@@ -308,7 +338,12 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	private void searchTable() {
-		String searchText = searchControlInput.getText().toLowerCase();
+		String searchText = searchTextBox.getText().toLowerCase();
+		if (searchText.isEmpty()) {
+			cellTable.showAllItems();
+			return;
+		}
+
 		List<T> searchList = new ArrayList<T>();
 		if (filterListControl != null) {
 			filterListControl.fireEvent(new ChangeEvent() {
@@ -319,14 +354,12 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		} else {
 			searchList = cellTable.getFullList();
 		}
-		if (searchText.isEmpty()) {
-			cellTable.setItemsVisible(searchList, true, true);
-			return;
-		}
+
 		for (T entity : searchList) {
-			cellTable.setItemVisible(entity, cellTable.itemContainsString(searchText, entity), false);
+			cellTable.setItemVisible(entity, cellTable.itemContainsString(searchText, entity), false, false, false);
 		}
-		cellTable.updateTitleTotal();
+
+		cellTable.refreshForCurrentState();
 	}
 
 	@Override

@@ -63,8 +63,8 @@ public final class EventParticipantListPage implements Page {
 		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1500PX));
 		table.setTitle(title);
 
-		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
+		table.getTitleBar().addSearchControl();
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
