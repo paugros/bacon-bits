@@ -1,10 +1,12 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.content.event.EventCellTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -14,6 +16,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -31,79 +34,90 @@ public final class EventListPage implements Page {
 	private MonthPicker monthBox;
 	private DefaultListBox ageBox;
 	private EventCellTable table;
+	private boolean showCommunity = Url.getBooleanParameter("showCommunity");
 
 	public EventListPage(final VerticalPanel page) {
 		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
-		final String title = "Events";
+		if (showCommunity) {
+			args.put(EventArg.SHOW_COMMUNITY);
+		}
+		final String title = showCommunity ? "Community Events" : "Events";
 		table = new EventCellTable(args);
 
-		VerticalPanel vp = new VerticalPanel();
-		vp.setWidth("100%");
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setWidth("100%");
+		if (!showCommunity) {
+			VerticalPanel vp = new VerticalPanel();
+			vp.setWidth("100%");
+			HorizontalPanel hp = new HorizontalPanel();
+			hp.setWidth("100%");
 
-		HTML message = new HTML();
-		message.getElement().getStyle().setMarginBottom(10, Unit.PX);
-		String text = "<b><font class=errorText>New this year:</font></b> all events must be paid for using PayPal or credit card (MC, Visa, Discover).<br>You can register for all your events then pay all at once.";
-		message.setHTML(text);
-		vp.add(message);
+			HTML message = new HTML();
+			message.getElement().getStyle().setMarginBottom(10, Unit.PX);
+			String text = "<b><font class=errorText>New this year:</font></b> all events must be paid for using PayPal or credit card (MC, Visa, Discover).<br>You can register for all your events then pay all at once.";
+			message.setHTML(text);
+			vp.add(message);
 
-		PaddedPanel pp = new PaddedPanel();
-		vp.add(pp);
-		pp.addStyleName("mediumPadding");
-		ageBox = new DefaultListBox();
-		ageBox.addItem("all ages", 0);
-		for (int age = 1; age < 19; age++) {
-			ageBox.addItem(Integer.toString(age) + " year-olds", age);
+			PaddedPanel pp = new PaddedPanel();
+			vp.add(pp);
+			pp.addStyleName("mediumPadding");
+			ageBox = new DefaultListBox();
+			ageBox.addItem("all ages", 0);
+			for (int age = 1; age < 19; age++) {
+				ageBox.addItem(Integer.toString(age) + " year-olds", age);
+			}
+
+			ageBox.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					applyTableFilter();
+				}
+			});
+
+			monthBox = new MonthPicker();
+			monthBox.getListBox().setItemText(0, "any month");
+			monthBox.getListBox().setSelectedIndex(0);
+			monthBox.addValueChangeCommand(new Command() {
+				@Override
+				public void execute() {
+					applyTableFilter();
+				}
+			});
+
+			Label show = new Label("Show events for ");
+			pp.add(show);
+			pp.add(ageBox);
+
+			Label in = new Label("in");
+			pp.add(in);
+			pp.add(monthBox);
+			pp.getElement().getStyle().setBackgroundColor("#c5eabf");
+
+			for (int i = 0; i < pp.getWidgetCount(); i++) {
+				pp.setCellVerticalAlignment(pp.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+			}
+
+			hp.add(vp);
+
+			EventBalanceBox eb = new EventBalanceBox();
+			eb.populate();
+			hp.add(eb);
+			hp.setCellHorizontalAlignment(eb, HasHorizontalAlignment.ALIGN_RIGHT);
+
+			page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH1300PX));
 		}
 
-		ageBox.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				applyTableFilter();
-			}
-		});
-
-		monthBox = new MonthPicker();
-		monthBox.getListBox().setItemText(0, "any month");
-		monthBox.getListBox().setSelectedIndex(0);
-		monthBox.addValueChangeCommand(new Command() {
-			@Override
-			public void execute() {
-				applyTableFilter();
-			}
-		});
-
-		Label show = new Label("Show events for ");
-		pp.add(show);
-		pp.add(ageBox);
-
-		Label in = new Label("in");
-		pp.add(in);
-		pp.add(monthBox);
-		pp.getElement().getStyle().setBackgroundColor("#c5eabf");
-
-		for (int i = 0; i < pp.getWidgetCount(); i++) {
-			pp.setCellVerticalAlignment(pp.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+		if (showCommunity) {
+			table.removeColumn(EventColumn.CATEGORY);
+			table.removeColumn(EventColumn.REGISTER);
+			table.removeColumn(EventColumn.REGISTERED);
 		}
-
-		hp.add(vp);
-
-		EventBalanceBox eb = new EventBalanceBox();
-		eb.populate();
-		hp.add(eb);
-		hp.setCellHorizontalAlignment(eb, HasHorizontalAlignment.ALIGN_RIGHT);
-
-		page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH1300PX));
-
 		table.setTitle(title);
-		if (Application.isAuthenticated()) {
+		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			Hyperlink addLink = new Hyperlink("Add", PageUrl.event(0));
 			table.getTitleBar().addLink(addLink);
 		}
 
-		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
+		table.getTitleBar().addSearchControl();
 		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1300PX));
 
 		table.addDataReturnHandler(new DataReturnHandler() {

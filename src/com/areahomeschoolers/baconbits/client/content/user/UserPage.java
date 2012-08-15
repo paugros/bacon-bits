@@ -115,8 +115,8 @@ public class UserPage implements Page {
 							ParticipantColumn.STATUS);
 					eventsTable.setTitle("Events");
 
-					eventsTable.getTitleBar().addSearchControl();
 					eventsTable.getTitleBar().addExcelControl();
+					eventsTable.getTitleBar().addSearchControl();
 					eventsTable.populate();
 
 					tabBody.add(WidgetFactory.newSection(eventsTable, ContentWidth.MAXWIDTH1200PX));
@@ -134,8 +134,8 @@ public class UserPage implements Page {
 							ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE, ParticipantColumn.STATUS);
 					table.setTitle("Event Registrations");
 
-					table.getTitleBar().addSearchControl();
 					table.getTitleBar().addExcelControl();
+					table.getTitleBar().addSearchControl();
 					table.populate();
 
 					tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
