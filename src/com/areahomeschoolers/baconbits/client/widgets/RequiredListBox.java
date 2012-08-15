@@ -22,7 +22,7 @@ public class RequiredListBox extends DefaultListBox implements HasValidator {
 	});
 
 	public RequiredListBox() {
-		this("");
+		this("- Select -");
 	}
 
 	public RequiredListBox(String defaultItemText) {
