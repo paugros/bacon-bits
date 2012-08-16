@@ -9,21 +9,17 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.EntityDto;
 
-import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -34,9 +30,8 @@ import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -45,10 +40,9 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	protected EntityCellTable<T, ?, ?> cellTable;
 	private VariableSizePager pagingControl;
 	private Image refreshControl;
-	private HorizontalPanel searchControl;
 	private Image excelControl;
 	private List<Command> refreshCommands = new ArrayList<Command>();
-	private TextBox searchTextBox;
+	private TextBox searchControl;
 	private DefaultListBox filterListControl;
 	private Timer searchTimer;
 
@@ -168,7 +162,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public void addSearchControl() {
-		if (searchTextBox != null || cellTable == null) {
+		if (searchControl != null || cellTable == null) {
 			return;
 		}
 
@@ -180,38 +174,37 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		};
 
 		if (searchControl == null) {
-			searchControl = new PaddedPanel();
-			searchTextBox = new TextBox();
-			searchTextBox.setHeight("16px");
+			searchControl = new TextBox();
+			searchControl.setHeight("16px");
 			final String defaultColor = "rgb(153, 153, 153)";
 			final String defaultText = "Search...";
 			if (clearFilter != null) {
 				clearFilter.setEnabled(false);
 			}
-			searchTextBox.addFocusHandler(new FocusHandler() {
+			searchControl.addFocusHandler(new FocusHandler() {
 				@Override
 				public void onFocus(FocusEvent event) {
-					if (searchTextBox.getElement().getStyle().getColor().equals(defaultColor)) {
-						searchTextBox.setText("");
-						searchTextBox.getElement().getStyle().setColor("#000000");
+					if (searchControl.getElement().getStyle().getColor().equals(defaultColor)) {
+						searchControl.setText("");
+						searchControl.getElement().getStyle().setColor("#000000");
 					}
 				}
 			});
 
-			searchTextBox.addBlurHandler(new BlurHandler() {
+			searchControl.addBlurHandler(new BlurHandler() {
 				@Override
 				public void onBlur(BlurEvent event) {
-					if (Common.isNullOrBlank(searchTextBox.getText())) {
-						searchTextBox.getElement().getStyle().setColor(defaultColor);
-						searchTextBox.setText(defaultText);
+					if (Common.isNullOrBlank(searchControl.getText())) {
+						searchControl.getElement().getStyle().setColor(defaultColor);
+						searchControl.setText(defaultText);
 					}
 				}
 			});
 
-			searchTextBox.getElement().getStyle().setColor(defaultColor);
-			searchTextBox.setText(defaultText);
+			searchControl.getElement().getStyle().setColor(defaultColor);
+			searchControl.setText(defaultText);
 
-			searchTextBox.addKeyDownHandler(new KeyDownHandler() {
+			searchControl.addKeyDownHandler(new KeyDownHandler() {
 				@Override
 				public void onKeyDown(KeyDownEvent event) {
 					int keyCode = event.getNativeKeyCode();
@@ -227,7 +220,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 						break;
 					case KeyCodes.KEY_BACKSPACE:
 						if (clearFilter != null) {
-							clearFilter.setEnabled(!((searchTextBox.getText().length() - 1) <= 0));
+							clearFilter.setEnabled(!((searchControl.getText().length() - 1) <= 0));
 						}
 						break;
 					default:
@@ -246,21 +239,9 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 			});
 		}
 
-		Image cancel = new Image(MainImageBundle.INSTANCE.cancel());
-		searchControl.add(searchTextBox);
-		searchControl.add(cancel);
-		searchControl.setCellVerticalAlignment(cancel, HasVerticalAlignment.ALIGN_MIDDLE);
-		cancel.getElement().getStyle().setCursor(Cursor.POINTER);
-		cancel.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				clearFilter();
-			}
-		});
+		searchControl.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
 
-		searchTextBox.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
-
-		addControl(searchControl);
+		addControl(new SimplePanel(searchControl));
 	}
 
 	public void addVisibilityControl() {
@@ -274,18 +255,18 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public void clearFilter() {
-		if (searchTextBox != null) {
-			searchTextBox.setText("");
+		if (searchControl != null) {
+			searchControl.setText("");
 		}
 		if (clearFilter != null) {
 			clearFilter.setEnabled(false);
 		}
-		if (searchTextBox != null) {
+		if (searchControl != null) {
 			searchTable();
 		}
 
-		searchTextBox.setFocus(false);
-		searchTextBox.fireEvent(new BlurEvent() {
+		searchControl.setFocus(false);
+		searchControl.fireEvent(new BlurEvent() {
 		});
 	}
 
@@ -301,7 +282,10 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public boolean hasFilter() {
-		return !searchTextBox.getText().isEmpty();
+		if (searchControl == null) {
+			return false;
+		}
+		return !searchControl.getText().isEmpty();
 	}
 
 	public boolean isPaging() {
@@ -338,7 +322,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	private void searchTable() {
-		String searchText = searchTextBox.getText().toLowerCase();
+		String searchText = searchControl.getText().toLowerCase();
 		if (searchText.isEmpty()) {
 			cellTable.showAllItems();
 			return;
