@@ -325,7 +325,6 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		String searchText = searchControl.getText().toLowerCase();
 		if (searchText.isEmpty()) {
 			cellTable.showAllItems();
-			return;
 		}
 
 		List<T> searchList = new ArrayList<T>();
@@ -337,6 +336,10 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 			}
 		} else {
 			searchList = cellTable.getFullList();
+		}
+
+		if (searchText.isEmpty()) {
+			return;
 		}
 
 		for (T entity : searchList) {
