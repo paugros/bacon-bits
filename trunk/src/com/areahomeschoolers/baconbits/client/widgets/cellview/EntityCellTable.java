@@ -875,6 +875,11 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		setRowCount(visibleItems.size());
 	}
 
+	public void refreshForCurrentState() {
+		updateTitleTotal();
+		onRowDataUpdate(true, null);
+	}
+
 	/**
 	 * Registers a {@link MaxHeightScrollPanel} to which the table must be placed inside by the caller. MaxHeightScrollPanel.adjustHeight() will automatically
 	 * be called once it's registered.
@@ -1967,11 +1972,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	 */
 	protected List<T> preprocessResults(List<T> results) {
 		return results;
-	}
-
-	protected void refreshForCurrentState() {
-		updateTitleTotal();
-		onRowDataUpdate(true, null);
 	}
 
 	@Override
