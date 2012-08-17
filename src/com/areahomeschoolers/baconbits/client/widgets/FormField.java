@@ -867,6 +867,10 @@ public class FormField extends Composite {
 			createInputWidget();
 		}
 
+		if (!isVisible()) {
+			return true;
+		}
+
 		if (validator != null) {
 			validator.validate();
 			validator.skipNextValidation();
