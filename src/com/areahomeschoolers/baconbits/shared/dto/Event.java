@@ -1,8 +1,11 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.content.document.HasDocuments;
+
+import com.google.gwt.event.shared.HandlerRegistration;
 
 public final class Event extends EntityDto<Event> implements HasDocuments {
 	private static final long serialVersionUID = 1L;
@@ -31,6 +34,8 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private String phone;
 	private String registrationInstructions;
 	private int accessLevelId;
+	private Integer seriesId;
+	private boolean requiredInSeries;
 
 	// auxilliary
 	private int cloneFromId;
@@ -43,8 +48,27 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private String accessLevel;
 	private String addedByFullName;
 
+	// used to create a series
+	private ArrayList<Pair<Date, Date>> createSeriesDates;
+
 	public Event() {
 
+	}
+
+	public HandlerRegistration addSeriesDate(Date startDate, Date endDate) {
+		if (createSeriesDates == null) {
+			createSeriesDates = new ArrayList<Pair<Date, Date>>();
+		}
+
+		final Pair<Date, Date> p = new Pair<Date, Date>(startDate, endDate);
+		createSeriesDates.add(p);
+
+		return new HandlerRegistration() {
+			@Override
+			public void removeHandler() {
+				createSeriesDates.remove(p);
+			}
+		};
 	}
 
 	public boolean allowRegistrations() {
@@ -184,12 +208,27 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		return registrationStartDate;
 	}
 
+	public boolean getRequiredInSeries() {
+		return requiredInSeries;
+	}
+
 	public boolean getRequiresRegistration() {
 		return requiresRegistration;
 	}
 
 	public boolean getSendSurvey() {
 		return sendSurvey;
+	}
+
+	public ArrayList<Pair<Date, Date>> getSeriesDates() {
+		return createSeriesDates;
+	}
+
+	public Integer getSeriesId() {
+		if (seriesId == null || seriesId == 0) {
+			return null;
+		}
+		return seriesId;
 	}
 
 	public Date getStartDate() {
@@ -333,12 +372,20 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		this.registrationStartDate = registrationStartDate;
 	}
 
+	public void setRequiredInSeries(boolean requiredInSeries) {
+		this.requiredInSeries = requiredInSeries;
+	}
+
 	public void setRequiresRegistration(boolean requiresRegistration) {
 		this.requiresRegistration = requiresRegistration;
 	}
 
 	public void setSendSurvey(boolean sendSurvey) {
 		this.sendSurvey = sendSurvey;
+	}
+
+	public void setSeriesId(Integer seriesId) {
+		this.seriesId = seriesId;
 	}
 
 	public void setStartDate(Date startDate) {

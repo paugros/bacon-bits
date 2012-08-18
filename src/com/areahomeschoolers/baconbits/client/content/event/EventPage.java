@@ -7,10 +7,12 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
+import com.areahomeschoolers.baconbits.client.content.event.EventCellTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -184,7 +186,7 @@ public class EventPage implements Page {
 			@Override
 			public void execute() {
 				addressDisplay.setText(calendarEvent.getAddress());
-				addressDisplay.setTargetHistoryToken(PageUrl.event(calendarEvent.getId()) + "&tab=4");
+				addressDisplay.setTargetHistoryToken(PageUrl.event(calendarEvent.getId()) + "&tab=5");
 				addressInput.setText(calendarEvent.getAddress());
 			}
 		});
@@ -596,7 +598,7 @@ public class EventPage implements Page {
 				@Override
 				public void execute(VerticalPanel tabBody) {
 					TitleBar tb = new TitleBar(title, TitleBarStyle.SECTION);
-					if (Application.isSystemAdministrator()) {
+					if (Application.administratorOf(calendarEvent.getGroupId())) {
 						tb.addLink(new ClickLabel("Clone", new MouseDownHandler() {
 							@Override
 							public void onMouseDown(MouseDownEvent event) {
@@ -610,6 +612,15 @@ public class EventPage implements Page {
 								});
 							}
 						}));
+
+						if (calendarEvent.getSeriesId() == null) {
+							tb.addLink(new ClickLabel("Create series", new MouseDownHandler() {
+								@Override
+								public void onMouseDown(MouseDownEvent event) {
+									new EventSeriesDialog(calendarEvent).center();
+								}
+							}));
+						}
 					}
 
 					if (pageData.getRegistration() != null) {
@@ -638,6 +649,31 @@ public class EventPage implements Page {
 						tabBody.add(new EventRegistrationSection(pageData));
 
 						tabPanel.selectTabNow(tabBody);
+					}
+				});
+			} else {
+				tabPanel.addSkipIndex();
+			}
+
+			if (calendarEvent.getSeriesId() != null) {
+				tabPanel.add("Series", false, new TabPageCommand() {
+					@Override
+					public void execute(final VerticalPanel tabBody) {
+						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.SERIES_ID, calendarEvent.getSeriesId());
+						EventCellTable table = new EventCellTable(args);
+						table.removeColumn(EventColumn.REGISTER);
+
+						table.setTitle("Event Series");
+
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1100PX));
+						table.populate();
+
+						table.addDataReturnHandler(new DataReturnHandler() {
+							@Override
+							public void onDataReturn() {
+								tabPanel.selectTabNow(tabBody);
+							}
+						});
 					}
 				});
 			} else {

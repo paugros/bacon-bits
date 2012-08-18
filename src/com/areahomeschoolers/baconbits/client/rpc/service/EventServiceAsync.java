@@ -19,6 +19,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface EventServiceAsync {
 
+	void createSeries(Event event, AsyncCallback<Void> callback);
+
 	void deleteAgeGroup(EventAgeGroup ageGroup, AsyncCallback<Void> callback);
 
 	void deleteEventField(int fieldId, AsyncCallback<Void> callback);

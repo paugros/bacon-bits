@@ -24,6 +24,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("service/event")
 public interface EventService extends RemoteService {
 
+	public void createSeries(Event event);
+
 	public void deleteAgeGroup(EventAgeGroup ageGroup);
 
 	public void deleteEventField(int fieldId);

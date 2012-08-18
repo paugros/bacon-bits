@@ -65,6 +65,11 @@ public class DateRangeBox extends Composite implements HasValidator, CustomFocus
 		});
 	}
 
+	public void clear() {
+		startDateBox.setValue(null);
+		endDateBox.setValue(null);
+	}
+
 	public Date getEndDate() {
 		Date date = endDateBox.getValue();
 
