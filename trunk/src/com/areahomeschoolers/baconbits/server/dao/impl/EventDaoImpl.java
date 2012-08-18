@@ -42,6 +42,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.Pair;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -106,6 +107,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setAgePrices(rs.getString("agePrices"));
 			event.setAgeRanges(rs.getString("ageRanges"));
 			event.setRegistrationInstructions(rs.getString("registrationInstructions"));
+			event.setSeriesId(rs.getInt("seriesId"));
+			event.setRequiredInSeries(rs.getBoolean("requiredInSeries"));
 			return event;
 		}
 	}
@@ -116,6 +119,38 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	public EventDaoImpl(DataSource dataSource, PayPalCredentials pp) {
 		super(dataSource);
 		this.paypal = pp;
+	}
+
+	@Override
+	public void createSeries(Event event) {
+		int cloneFromId = event.getId();
+
+		update("update events set seriesId = id, requiredInSeries = ? where id = ?", event.getRequiredInSeries(), event.getId());
+
+		Date firstDate = event.getSeriesDates().get(0).getLeft();
+		for (Pair<Date, Date> dates : event.getSeriesDates()) {
+			if (dates.getLeft().before(firstDate)) {
+				firstDate = dates.getLeft();
+			}
+		}
+
+		for (Pair<Date, Date> dates : event.getSeriesDates()) {
+			event.setId(0);
+			event.setCloneFromId(cloneFromId);
+			event.setSeriesId(cloneFromId);
+			event.setStartDate(dates.getLeft());
+			event.setEndDate(dates.getRight());
+
+			event.setRegistrationStartDate(new Date());
+
+			if (event.getRequiredInSeries()) {
+				event.setRegistrationEndDate(DateUtils.addDays(firstDate, 14));
+			} else {
+				event.setRegistrationEndDate(DateUtils.addDays(event.getStartDate(), 14));
+			}
+
+			save(event);
+		}
 	}
 
 	@Override
@@ -207,12 +242,18 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	@Override
 	public EventPageData getPageData(int eventId) {
-		EventPageData pd = new EventPageData();
+		final EventPageData pd = new EventPageData();
 		if (eventId > 0) {
 			pd.setEvent(getById(eventId));
 
 			if (pd.getEvent() == null) {
 				return null;
+			}
+
+			// other events in same series
+			if (pd.getEvent().getSeriesId() != null) {
+				ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.SERIES_ID, pd.getEvent().getSeriesId());
+				pd.setEventsInSeries(list(args));
 			}
 
 			// age groups
@@ -490,6 +531,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int upcoming = args.getInt(EventArg.UPCOMING_NUMBER);
 		boolean showCommunity = args.getBoolean(EventArg.SHOW_COMMUNITY);
+		int seriesId = args.getInt(EventArg.SERIES_ID);
 
 		String sql = createSqlBase();
 
@@ -508,8 +550,14 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "and e.categoryId != 6 ";
 		}
 
+		if (seriesId > 0) {
+			sql += "and e.seriesId = ? ";
+			sqlArgs.add(seriesId);
+		}
+
+		sql += "order by e.startDate ";
 		if (upcoming > 0) {
-			sql += "order by e.startDate limit ? ";
+			sql += "limit ? ";
 			sqlArgs.add(upcoming);
 		}
 
@@ -684,7 +732,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, requiresRegistration = :requiresRegistration, ";
-			sql += "registrationInstructions = :registrationInstructions, ";
+			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, ";
 			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price, phone = :phone, website = :website ";
 			sql += "where id = :id";
 			update(sql, namedParams);
@@ -693,10 +741,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, ";
-			sql += "publishDate, active, price, requiresRegistration, phone, website, accessLevelId, registrationInstructions) values ";
+			sql += "publishDate, active, price, requiresRegistration, phone, website, accessLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, ";
-			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :accessLevelId, :registrationInstructions)";
+			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :accessLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -764,124 +812,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	@Override
 	public synchronized ServerResponseData<ArrayList<EventParticipant>> saveParticipant(final EventParticipant participant) {
-		ServerResponseData<ArrayList<EventParticipant>> data = new ServerResponseData<ArrayList<EventParticipant>>();
-
-		if (participant.getStatusId() == 0) {
-			participant.setStatusId(1);
-		}
-
-		ArgMap<EventArg> args = new ArgMap<EventArg>();
-		int ageGroupId = participant.getAgeGroupId() == null ? 0 : participant.getAgeGroupId();
-		args.put(EventArg.AGE_GROUP_ID, ageGroupId);
-		args.put(EventArg.REGISTRATION_ID, participant.getEventRegistrationId());
-		Data waitData = getWaitData(args);
-		boolean eventIsFull = eventIsFull(waitData);
-		if (participant.getStatusId() == 1 && eventIsFull) {
-			participant.setStatusId(3);
-		}
-
-		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);
-		if (participant.isSaved()) {
-			String sql = "update eventRegistrationParticipants set statusId = :statusId where id = :id ";
-			update(sql, namedParams);
-
-			if (participant.getStatusId() == 5 && eventIsFull) {
-				registerNextWaitingParticipant(waitData);
-			}
-		} else {
-			// validate for time overlaps
-			// get the event date being registered first
-			String sql = "select e.startDate, e.endDate \n";
-			sql += "from eventRegistrations r \n";
-			sql += "join events e on e.id = r.eventId \n";
-			sql += "where r.id = ? limit 1";
-			Data event = queryForObject(sql, new RowMapper<Data>() {
-				@Override
-				public Data mapRow(ResultSet rs, int row) throws SQLException {
-					Data d = new Data();
-					d.put("startDate", rs.getTimestamp("startDate"));
-					d.put("endDate", rs.getTimestamp("endDate"));
-					return d;
-				}
-			}, participant.getEventRegistrationId());
-
-			// now see if it overlaps
-			sql = "select e.id, e.title \n";
-			sql += "from eventRegistrationParticipants p \n";
-			sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
-			sql += "join events e on e.id = r.eventId \n";
-			sql += "where p.statusId != 5 \n";
-			// sql += "and (? between e.startDate and e.endDate \n";
-			// sql += "or ? between e.startDate and e.endDate) \n";
-			sql += "and ((? >= e.startDate and ? < e.endDate) \n";
-			sql += "or (? > e.startDate and ? <= e.endDate)) \n";
-			sql += "and userId = ? limit 1";
-			Data existing = queryForObject(sql, ServerUtils.getGenericRowMapper(), event.getDate("startDate"), event.getDate("startDate"),
-					event.getDate("endDate"), event.getDate("endDate"), participant.getUserId());
-
-			if (existing != null) {
-				String m = "This participant is already registered for an event that conflicts with this one: ";
-				m += "<a href=\"" + ServerContext.getBaseUrl() + "#" + PageUrl.event(existing.getInt("id")) + "\">" + existing.get("title") + "</a>";
-				data.addError(m);
-				return data;
-			}
-
-			// create or update the associated user
-			User u = participant.getUser();
-			if (u == null) {
-				u = new User();
-			}
-			u.setFirstName(participant.getFirstName());
-			u.setLastName(participant.getLastName());
-			u.setBirthDate(participant.getBirthDate());
-			if (u.getId() != ServerContext.getCurrentUserId()) {
-				u.setParentId(ServerContext.getCurrentUserId());
-			}
-
-			UserDao userDao = ServerContext.getDaoImpl("user");
-			u = userDao.save(u).getData();
-			participant.setUserId(u.getId());
-
-			if (participant.getUserId() > 0 && participant.getUserId() == ServerContext.getCurrentUserId()) {
-				ServerContext.getCurrentUser().setBirthDate(participant.getBirthDate());
-			}
-
-			sql = "insert into eventRegistrationParticipants(eventRegistrationId, userId, statusId, ageGroupId, addedDate) ";
-			sql += "values(:eventRegistrationId, :userId, :statusId, :ageGroupId, now())";
-
-			KeyHolder keys = new GeneratedKeyHolder();
-			update(sql, namedParams, keys);
-
-			participant.setId(ServerUtils.getIdFromKeys(keys));
-
-			if (participant.isWaiting()) {
-				data.addWarning("This participant has been added to the waiting list because the event or age group is full.");
-			}
-		}
-
-		if (!Common.isNullOrEmpty(participant.getEventFields())) {
-			for (EventField f : participant.getEventFields()) {
-				f.setParticipantId(participant.getId());
-				saveFieldValue(f);
-			}
-		}
-
-		ArrayList<EventParticipant> list = getParticipants(new ArgMap<EventArg>(EventArg.REGISTRATION_ID, participant.getEventRegistrationId()));
-
-		if (participant.getStatusId() == 1) {
-			for (EventParticipant p : list) {
-				if (p.getId() == participant.getId() && p.getPrice() == 0) {
-					String sql = "update eventRegistrationParticipants set statusId = 2 where id = ?";
-					update(sql, p.getId());
-					p.setStatusId(2);
-					p.setStatus("Confirmed/Paid");
-				}
-			}
-		}
-
-		data.setData(list);
-
-		return data;
+		return saveParticipant(participant, true);
 	}
 
 	@Override
@@ -1137,6 +1068,168 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			field.setId(ServerUtils.getIdFromKeys(keys));
 		}
+	}
+
+	private synchronized ServerResponseData<ArrayList<EventParticipant>> saveParticipant(final EventParticipant participant, boolean validateOverlaps) {
+		ServerResponseData<ArrayList<EventParticipant>> data = new ServerResponseData<ArrayList<EventParticipant>>();
+
+		String sql = "";
+		if (participant.getStatusId() == 0) {
+			participant.setStatusId(1);
+		}
+
+		ArgMap<EventArg> args = new ArgMap<EventArg>();
+		int ageGroupId = participant.getAgeGroupId() == null ? 0 : participant.getAgeGroupId();
+		args.put(EventArg.AGE_GROUP_ID, ageGroupId);
+		args.put(EventArg.REGISTRATION_ID, participant.getEventRegistrationId());
+		Data waitData = getWaitData(args);
+		boolean eventIsFull = eventIsFull(waitData);
+		if (participant.getStatusId() == 1 && eventIsFull) {
+			participant.setStatusId(3);
+		}
+
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);
+		if (participant.isSaved()) {
+			sql = "update eventRegistrationParticipants set statusId = :statusId where id = :id ";
+			update(sql, namedParams);
+
+			if (participant.getStatusId() == 5 && eventIsFull) {
+				registerNextWaitingParticipant(waitData);
+			}
+		} else {
+			if (validateOverlaps) {
+				// validate for time overlaps
+				// get the event date being registered first
+				sql = "select e.startDate, e.endDate \n";
+				sql += "from eventRegistrations r \n";
+				sql += "join events e on e.id = r.eventId \n";
+				sql += "where r.id = ? limit 1";
+				Data event = queryForObject(sql, new RowMapper<Data>() {
+					@Override
+					public Data mapRow(ResultSet rs, int row) throws SQLException {
+						Data d = new Data();
+						d.put("startDate", rs.getTimestamp("startDate"));
+						d.put("endDate", rs.getTimestamp("endDate"));
+						return d;
+					}
+				}, participant.getEventRegistrationId());
+
+				// now see if it overlaps
+				sql = "select e.id, e.title \n";
+				sql += "from eventRegistrationParticipants p \n";
+				sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
+				sql += "join events e on e.id = r.eventId \n";
+				sql += "where p.statusId != 5 \n";
+				// sql += "and (? between e.startDate and e.endDate \n";
+				// sql += "or ? between e.startDate and e.endDate) \n";
+				sql += "and ((? >= e.startDate and ? < e.endDate) \n";
+				sql += "or (? > e.startDate and ? <= e.endDate)) \n";
+				sql += "and userId = ? limit 1";
+				Data existing = queryForObject(sql, ServerUtils.getGenericRowMapper(), event.getDate("startDate"), event.getDate("startDate"),
+						event.getDate("endDate"), event.getDate("endDate"), participant.getUserId());
+
+				if (existing != null) {
+					String m = "This participant is already registered for an event that conflicts with this one: ";
+					m += "<a href=\"" + ServerContext.getBaseUrl() + "#" + PageUrl.event(existing.getInt("id")) + "\">" + existing.get("title") + "</a>";
+					data.addError(m);
+					return data;
+				}
+			}
+
+			// create or update the associated user
+			User u = participant.getUser();
+			if (u == null) {
+				u = new User();
+			}
+			u.setFirstName(participant.getFirstName());
+			u.setLastName(participant.getLastName());
+			u.setBirthDate(participant.getBirthDate());
+			if (u.getId() != ServerContext.getCurrentUserId()) {
+				u.setParentId(ServerContext.getCurrentUserId());
+			}
+
+			UserDao userDao = ServerContext.getDaoImpl("user");
+			u = userDao.save(u).getData();
+			participant.setUserId(u.getId());
+			participant.setUser(u);
+
+			if (participant.getUserId() > 0 && participant.getUserId() == ServerContext.getCurrentUserId()) {
+				ServerContext.getCurrentUser().setBirthDate(participant.getBirthDate());
+			}
+
+			sql = "insert into eventRegistrationParticipants(eventRegistrationId, userId, statusId, ageGroupId, addedDate) ";
+			sql += "values(:eventRegistrationId, :userId, :statusId, :ageGroupId, now())";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			participant.setId(ServerUtils.getIdFromKeys(keys));
+
+			if (participant.isWaiting()) {
+				data.addWarning("This participant has been added to the waiting list because the event or age group is full.");
+			}
+		}
+
+		// save dynamic fields if we have any
+		if (!Common.isNullOrEmpty(participant.getEventFields())) {
+			for (EventField f : participant.getEventFields()) {
+				f.setParticipantId(participant.getId());
+				saveFieldValue(f);
+			}
+		}
+
+		ArrayList<EventParticipant> list = getParticipants(new ArgMap<EventArg>(EventArg.REGISTRATION_ID, participant.getEventRegistrationId()));
+
+		// free events go straight to confirmed/paid
+		if (participant.getStatusId() == 1) {
+			for (EventParticipant p : list) {
+				if (p.getId() == participant.getId() && p.getPrice() == 0) {
+					sql = "update eventRegistrationParticipants set statusId = 2 where id = ?";
+					update(sql, p.getId());
+					p.setStatusId(2);
+					p.setStatus("Confirmed/Paid");
+				}
+			}
+		}
+
+		data.setData(list);
+
+		if (!Common.isNullOrEmpty(participant.getSeriesEventIds())) {
+			List<Integer> ids = new ArrayList<Integer>(participant.getSeriesEventIds());
+			participant.setSeriesEventIds(null);
+			for (int eventId : ids) {
+				int registrationId = queryForInt(0, "select id from eventRegistrations where eventId = ? and addedById = ?", eventId, ServerContext
+						.getCurrentUser().getId());
+
+				if (registrationId == 0) {
+					EventRegistration r = new EventRegistration();
+					r.setAddedById(ServerContext.getCurrentUser().getId());
+					r.setEventId(eventId);
+					r = saveRegistration(r);
+
+					registrationId = r.getId();
+
+				}
+
+				participant.setEventRegistrationId(registrationId);
+
+				if (participant.getAgeGroupId() != null) {
+					// get current age group info
+					Data d = queryForObject("select * from eventAgeGroups where id = ? limit 1", ServerUtils.getGenericRowMapper(), participant.getAgeGroupId());
+
+					// use it to find the corresponding age group in series event we're on
+					sql = "select id from eventAgeGroups where eventId = ? and minimumAge = ? and maximumAge = ? limit 1";
+					int seriesAgeGroupId = queryForInt(0, sql, eventId, d.getInt("minimumAge"), d.getInt("maximumAge"));
+
+					participant.setAgeGroupId(seriesAgeGroupId);
+				}
+
+				participant.setId(0);
+				saveParticipant(participant, false);
+			}
+		}
+
+		return data;
 	}
 
 }

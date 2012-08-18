@@ -60,6 +60,11 @@ public class DateTimeRangeBox extends Composite implements HasValidator, CustomF
 		startDateBox.addValueChangeHandler(handler);
 	}
 
+	public void clear() {
+		startDateBox.setValue(null);
+		endDateBox.setValue(null);
+	}
+
 	public Date getEndDate() {
 		return endDateBox.getValue();
 	}

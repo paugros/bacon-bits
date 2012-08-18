@@ -20,6 +20,9 @@ import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 public interface EventDao {
 
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
+	public void createSeries(Event event);
+
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void deleteAgeGroup(EventAgeGroup ageGroup);
 
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")

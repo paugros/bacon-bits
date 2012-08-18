@@ -28,6 +28,9 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 	private int addedById;
 	private int parentId;
 
+	// for bulk registration of a series
+	private ArrayList<Integer> seriesEventIds;
+
 	public EventParticipant() {
 
 	}
@@ -104,6 +107,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public double getPrice() {
 		return price;
+	}
+
+	public ArrayList<Integer> getSeriesEventIds() {
+		return seriesEventIds;
 	}
 
 	public String getStatus() {
@@ -200,6 +207,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void setSeriesEventIds(ArrayList<Integer> seriesEventIds) {
+		this.seriesEventIds = seriesEventIds;
 	}
 
 	public void setStatus(String status) {

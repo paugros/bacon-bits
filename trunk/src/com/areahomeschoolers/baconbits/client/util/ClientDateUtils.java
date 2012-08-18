@@ -430,15 +430,15 @@ public abstract class ClientDateUtils {
 			ranges.add(new Pair<Date, Date>());
 		}
 
-		ranges.get(0).setA(start);
-		ranges.get(ranges.size() - 1).setB(end);
+		ranges.get(0).setLeft(start);
+		ranges.get(ranges.size() - 1).setRight(end);
 
 		for (long i = 0; i < daysBetween; i++) {
 			Date tempStart = setDayTime(addDays(start, i + 1), "00:00:00");
 			Date tempEnd = setDayTime(addDays(start, i + 1), "00:00:00");
 
-			ranges.get((int) i).setB(tempEnd);
-			ranges.get((int) i + 1).setA(tempStart);
+			ranges.get((int) i).setRight(tempEnd);
+			ranges.get((int) i + 1).setLeft(tempStart);
 		}
 
 		return ranges;

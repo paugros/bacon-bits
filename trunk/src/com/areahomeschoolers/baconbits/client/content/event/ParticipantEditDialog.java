@@ -16,6 +16,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -31,6 +32,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
+import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
@@ -43,6 +45,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -58,6 +61,7 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 	private FieldTable fieldTable;
 	private MonthYearPicker birthDateInput;
 	private List<User> children;
+	private Map<CheckBox, Event> seriesMap;
 
 	public ParticipantEditDialog(EventPageData pd, ParameterHandler<EventRegistration> refreshCommand) {
 		setText("Register Participant");
@@ -155,6 +159,19 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 
 		entity.setEventRegistrationId(registration.getId());
 		entity.setEventFields(eventFields);
+
+		if (seriesMap != null) {
+			ArrayList<Integer> seriesIds = new ArrayList<Integer>();
+			for (CheckBox cb : seriesMap.keySet()) {
+				if (cb.getValue() && !seriesMap.get(cb).equals(pageData.getEvent())) {
+					seriesIds.add(seriesMap.get(cb).getId());
+				}
+			}
+
+			if (!seriesIds.isEmpty()) {
+				entity.setSeriesEventIds(seriesIds);
+			}
+		}
 
 		eventService.saveParticipant(entity, new Callback<ServerResponseData<ArrayList<EventParticipant>>>() {
 			@Override
@@ -330,6 +347,24 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 			}
 		});
 		fieldTable.addField(birthDateField);
+
+		if (!Common.isNullOrEmpty(pageData.getEventsInSeries()) && !entity.isSaved()) {
+			seriesMap = new HashMap<CheckBox, Event>();
+			VerticalPanel datePanel = new VerticalPanel();
+			for (Event e : pageData.getEventsInSeries()) {
+				CheckBox cb = new CheckBox(Formatter.formatDateTime(e.getStartDate()));
+				if (pageData.getEvent().getRequiredInSeries() || e.equals(pageData.getEvent())) {
+					cb.setValue(true);
+					cb.setEnabled(false);
+				}
+
+				datePanel.add(cb);
+
+				seriesMap.put(cb, e);
+			}
+
+			fieldTable.addField("Register for dates:", datePanel);
+		}
 
 		vp.add(fieldTable);
 		vp.add(fieldsPanel);
