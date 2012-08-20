@@ -3,37 +3,31 @@ package com.areahomeschoolers.baconbits.client.content;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.generated.Instantiable;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
-import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
-import com.areahomeschoolers.baconbits.shared.dto.SidebarEntity;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -68,53 +62,41 @@ public final class Layout {
 
 	private static int HEADER_HEIGHT = 52;
 	private static int MENU_HEIGHT = 22;
-	private static int SPLITTER_WIDTH = 9;
-	private static int DEFAULT_SIDEBAR_WIDTH = 200;
-	private static int sidebarWidth = DEFAULT_SIDEBAR_WIDTH;
 	private final MainLayoutDock dock = new MainLayoutDock(Unit.PX);
 	private final SearchBox searchBox;
+	private final SimplePanel mobileBodyPanel = new SimplePanel();
 	private final MainMenu menu;
-	private final ScrollPanel sidePanel = new ScrollPanel();
-	private final Grid splitter = new Grid(1, 1);
-	private final Image arrow = new Image(MainImageBundle.INSTANCE.arrowLeft());
 	private final ScrollPanel bodyPanel = new ScrollPanel();
 	private final AbsolutePanel ap = new AbsolutePanel();
 	// private final User currentUser = Application.getCurrentUser();
-	private Widget sidebar;
-	private final SimplePanel logoPanel = new SimplePanel();
-	private boolean sbIsCollapsed = false;
-	private boolean sbIsVisible = false;
 	private boolean headerIsVisible = true;
-	/**
-	 * Holds a reference to the latest panel queued to be displayed on the page when setPage is called
-	 */
+	// Holds a reference to the latest panel queued to be displayed on the page when setPage is called
 	private VerticalPanel currentPagePanel;
-	private final HorizontalPanel headerPanel;
-
-	private final HorizontalPanel menuPanel;
+	private final HorizontalPanel headerPanel = new HorizontalPanel();
+	private final HorizontalPanel menuPanel = new HorizontalPanel();
 
 	public Layout() {
-		headerPanel = new HorizontalPanel();
 		headerPanel.setStyleName("headerPanel");
 		headerPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		if (!ClientUtils.isMobileBrowser()) {
+			RootLayoutPanel.get().setStyleName("overflowHidden");
+		}
 
 		// logo
-		headerPanel.add(logoPanel);
-		PaddedPanel pp = new PaddedPanel();
-		pp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		Image logo = new Image(MainImageBundle.INSTANCE.logo());
 
-		pp.add(new Image(MainImageBundle.INSTANCE.logo()));
-
-		HTML logoDiv = new HTML("<a href=\"#" + PageUrl.home() + "\">" + pp + "</a>");
+		HTML logoDiv = new HTML("<a href=\"#" + PageUrl.home() + "\">" + logo + "</a>");
 		logoDiv.addMouseDownHandler(new MouseDownHandler() {
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
 				if ("Home".equals(HistoryToken.getElement("page"))) {
 					Application.reloadPage();
+				} else {
+					HistoryToken.set(PageUrl.home());
 				}
 			}
 		});
-		logoPanel.setWidget(logoDiv);
+		headerPanel.add(logoDiv);
 
 		SimplePanel spacer = new SimplePanel();
 		headerPanel.add(spacer);
@@ -178,7 +160,7 @@ public final class Layout {
 				}
 			});
 		}
-		logInOrOut.addStyleName("nowrap");
+		logInOrOut.setWordWrap(false);
 		sessionPanel.add(logInOrOut);
 
 		if (Application.isAuthenticated()) {
@@ -197,48 +179,42 @@ public final class Layout {
 					});
 				}
 			});
-			resetLabel.addStyleName("nowrap");
+			resetLabel.setWordWrap(false);
 			sessionPanel.add(resetLabel);
 		}
 
-		ap.setHeight("100%");
-		ap.getElement().getStyle().setOverflow(Overflow.VISIBLE);
-		bodyPanel.setStyleName("bodyPanel");
-		bodyPanel.add(ap);
-
-		sidePanel.setStyleName("sidePanel");
-		sidePanel.setWidth(sidebarWidth + "px");
-		splitter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setSidebarCollapsed(!sbIsCollapsed);
-			}
-		});
-		splitter.setStyleName("splitter");
-		splitter.setWidget(0, 0, arrow);
+		if (!ClientUtils.isMobileBrowser()) {
+			ap.setHeight("100%");
+			ap.getElement().getStyle().setOverflow(Overflow.VISIBLE);
+			bodyPanel.setStyleName("bodyPanel");
+			bodyPanel.add(ap);
+		}
 
 		menu = new MainMenu();
-		menuPanel = new HorizontalPanel();
 		menuPanel.setWidth("100%");
 		menuPanel.add(menu);
 		menuPanel.setCellWidth(menu, "100%");
 
-		dock.addStyleName("Dock");
-		dock.addNorth(headerPanel, HEADER_HEIGHT);
-		dock.addNorth(menuPanel, MENU_HEIGHT);
-		dock.addWest(sidePanel, 0);
-		dock.addWest(splitter, 0);
-		dock.add(bodyPanel);
-		RootLayoutPanel.get().add(dock);
+		if (ClientUtils.isMobileBrowser()) {
+			mobileBodyPanel.addStyleName("bodyPanel");
+			VerticalPanel vp = new VerticalPanel();
+			vp.setWidth("100%");
+			vp.add(headerPanel);
+			vp.add(menuPanel);
+			vp.add(mobileBodyPanel);
+			RootPanel.get().add(vp);
+		} else {
+			dock.addStyleName("Dock");
+			dock.addNorth(headerPanel, HEADER_HEIGHT);
+			dock.addNorth(menuPanel, MENU_HEIGHT);
+			dock.add(bodyPanel);
+			RootLayoutPanel.get().add(dock);
+		}
 
 		// status panel
 		StatusPanel sp = new StatusPanel();
 		Callback.setStatusPanel(sp);
 		RootPanel.get().add(sp);
-	}
-
-	public ScrollPanel getBodyPanel() {
-		return bodyPanel;
 	}
 
 	/**
@@ -254,27 +230,16 @@ public final class Layout {
 		return currentPagePanel;
 	}
 
-	public ScrollPanel getScrollPanel() {
-		return bodyPanel;
-	}
-
 	public SearchBox getSearchBox() {
 		return searchBox;
 	}
 
-	public Widget getSidebar() {
-		return sidebar;
-	}
-
-	public boolean getSidebarCollapsed() {
-		return sbIsCollapsed;
-	}
-
-	public boolean getSidebarVisible() {
-		return sbIsVisible;
-	}
-
 	public void setHeaderVisible(boolean visible) {
+		if (ClientUtils.isMobileBrowser()) {
+			headerPanel.setVisible(visible);
+			return;
+		}
+
 		if (visible == headerIsVisible) {
 			return;
 		}
@@ -296,92 +261,8 @@ public final class Layout {
 
 	public void setPage(String title, VerticalPanel page) {
 		if (currentPagePanel == page) {
-			setSidebarVisible(false);
 			addPageToBodyPanel(title, page);
 		}
-	}
-
-	public void setPage(String title, VerticalPanel page, Class<? extends Instantiable> sbType) {
-		if (currentPagePanel == page) {
-			String newSbType = Common.getSimpleClassName(sbType);
-			String oldSbType = null;
-			if (sidebar != null) {
-				oldSbType = Common.getSimpleClassName(sidebar.getClass());
-			}
-
-			if (!newSbType.equals(oldSbType)) {
-				sidebarWidth = DEFAULT_SIDEBAR_WIDTH;
-				sidePanel.clear();
-				dock.setWidgetSize(sidePanel, sidebarWidth);
-				dock.forceLayout();
-				sidePanel.setWidth("100%");
-
-				// sidebar = (Composite) Application.getFactory().newInstance(newSbType);
-				sidePanel.add(sidebar);
-			}
-
-			setSidebarVisible(true);
-			addPageToBodyPanel(title, page);
-		}
-	}
-
-	public void setPage(String title, VerticalPanel page, Widget customSidebar) {
-		setPage(title, page, customSidebar, DEFAULT_SIDEBAR_WIDTH);
-	}
-
-	public void setPage(String title, VerticalPanel page, Widget customSidebar, int width) {
-		sidebar = customSidebar;
-		sidePanel.clear();
-		sidePanel.add(customSidebar);
-		sidePanel.setWidth("100%");
-
-		sbIsCollapsed = false;
-		sbIsVisible = true;
-
-		addPageToBodyPanel(title, page);
-
-		sidebarWidth = width;
-		dock.setWidgetSize(sidePanel, width);
-		dock.setWidgetSize(splitter, SPLITTER_WIDTH);
-		dock.forceLayout();
-	}
-
-	public void setSidebarCollapsed(boolean collapsed) {
-		if (collapsed == sbIsCollapsed) {
-			return;
-		}
-
-		if (collapsed) {
-			dock.setWidgetSize(sidePanel, 0);
-			arrow.setResource(MainImageBundle.INSTANCE.arrowRight());
-		} else {
-			dock.setWidgetSize(sidePanel, sidebarWidth);
-			arrow.setResource(MainImageBundle.INSTANCE.arrowLeft());
-		}
-		dock.forceLayout();
-		sbIsCollapsed = collapsed;
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T extends SidebarEntity> void setSideBarEntity(T entity) {
-		if (sidebar instanceof EntitySidebar<?>) {
-			((EntitySidebar<T>) sidebar).setEntity(entity);
-		}
-	}
-
-	public void setSidebarVisible(boolean visible) {
-		if (!visible) {
-			dock.setWidgetSize(sidePanel, 0);
-			dock.setWidgetSize(splitter, 0);
-			dock.forceLayout();
-		} else {
-			if (!sbIsCollapsed) {
-				dock.setWidgetSize(sidePanel, sidebarWidth);
-			}
-			dock.setWidgetSize(splitter, SPLITTER_WIDTH);
-			dock.forceLayout();
-		}
-		sbIsVisible = visible;
 	}
 
 	private void addPageToBodyPanel(String title, VerticalPanel page) {
@@ -394,10 +275,16 @@ public final class Layout {
 		vp.add(footer);
 
 		Application.setTitle(title);
-		ap.clear();
-		ap.add(vp);
+		if (ClientUtils.isMobileBrowser()) {
+			mobileBodyPanel.clear();
+			mobileBodyPanel.setWidget(vp);
+			Window.scrollTo(0, 0);
+		} else {
+			ap.clear();
+			ap.add(vp);
+			bodyPanel.scrollToTop();
+		}
 
-		bodyPanel.scrollToTop();
 	}
 
 }
