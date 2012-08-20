@@ -80,8 +80,7 @@ public abstract class ClientUtils {
 	}
 
 	/**
-	 * Returns true if the client browser is running on an iPhone or Android. Right now this will return false for iPads because they're big enough to be
-	 * treated as browsers for screen layouts.
+	 * Returns true if the client browser is running on an iPhone, iPad or Android.
 	 * 
 	 * @return
 	 */
@@ -94,11 +93,7 @@ public abstract class ClientUtils {
 
 		appVersion = appVersion.toLowerCase();
 
-		if (appVersion.contains("ipad")) {
-			return false;
-		}
-
-		return (appVersion.contains("iphone") || appVersion.contains("android"));
+		return (appVersion.contains("iphone") || appVersion.contains("android") || appVersion.contains("ipad"));
 	}
 
 	/**
