@@ -76,34 +76,6 @@ img {
 /* -------------------------- CLASS/INSTANCE/PARTICULAR STYLES ---------------------------------- */
 /* styles in this section should be strongly associated with particular classes, instance */
 /* objects or use cases */
-.oldNamePanel {
-	margin-left: 10px;
-	color: #444444;
-}
-
-.businessCard {
-	background: url("images/cardBackground.png") repeat;
-	border: 1px solid #000000;
-}
-
-.businessCard .bottomPanel {
-	padding-top: 13px;
-	padding-left: 5px;
-	padding-right: 5px;
-	padding-bottom: 5px;
-}
-
-.businessCard .divider {
-	line-height: 2px;
-}
-
-.businessCard .topPanel {
-	padding-top: 5px;
-	padding-left: 5px;
-	padding-right: 5px;
-	padding-bottom: 0px;
-}
-
 .calendarToday {
 	background-color: #FFF7D7;
 	border: 1px solid #FFF7D7;
@@ -149,113 +121,8 @@ img {
 	background-color: #FFFFFF;
 }
 
-.developmentCycleTable {
-	border-collapse: collapse;
-}
-
-.developmentCycleTable td {
-	font-size: 10px;
-	font-weight: bold;
-	text-align: center;
-	vertical-align: middle;
-	border: 1px solid black;
-	cursor: default;
-}
-
-.DataTable {
-	border-collapse: collapse;
-	background: #F8F8F8;
-}
-
-.DataTable td {
-	border: 1px solid #ACACAC;
-}
-
-.DataTable td table td {
-	border: none;
-}
-
-.DataTable .sortableTableHeaderCell {
-	background: url("images/backgrounds.png") repeat-x 0px -72px;
-	white-space: nowrap;
-	padding-top: 0px;
-	padding-bottom: 0px;
-	border-bottom: 1px solid #333333;
-}
-
-.DataTable .sortableTableHeaderCell div {
-	color: #333333;
-	font-weight: bold;
-	padding-left: 2px;
-	padding-right: 2px;
-	padding-top: 0px;
-	padding-bottom: 0px;
-	white-space: nowrap;
-}
-
-.DataTable .flatTableHeaderRow,.DataTable .flatTableHeaderRow td,.DataTable .flatTableHeaderRow div {
-	background: none;
-	background-color: #E7F2FE;
-	color: #000000;
-}
-
-.DataTable .sortableTableHeaderRow {
-	cursor: pointer;
-}
-
-.DataTable .sortableTableFooterRow {
-	font-weight: bold;
-}
-
-.DataTable .selectCell {
-	text-align: center;
-	vertical-align: middle;
-}
-
 .RequiredListBox {
 	min-width: 100px;
-}
-
-.ctEvenRow, .ctEvenRow td {
-	background-color: #FFFFFF;
-}
-
-.ctOddRow, .ctOddRow td {
-	background-color: #F5F5F5;
-}
-
-.evenRow {
-	background-color: #FFFFFF;
-}
-
-.oddRow {
-	background-color: #F5F5F5;
-}
-
-
-.DataTable .leftColumn {
-	border-right: none;
-}
-
-.DataTable .middleColumn {
-	border-left: none;
-	border-right: none;
-}
-
-.DataTable .green {
-	background-color: #50FF50;
-}
-
-.DataTable .red {
-	background-color: #FF8080;
-}
-
-.DataTable .gold {
-	background-color: #FFFFA0;
-}
-
-.DataTable .rightColumn {
-	border-left: none;
 }
 
 .dottedUnderline {
@@ -355,14 +222,6 @@ img {
 	padding: 0px;
 }
 
-.eavFormCell {
-	padding: 0px;
-}
-
-.eavFormTable {
-	padding: 0px;
-}
-
 .footer {
 	padding-bottom: 10px;
 	text-align: center;
@@ -400,14 +259,6 @@ img {
 
 .GoogleMap .mapErrors {
 	margin: 10px;
-}
-
-.globalDocumentRowEven, .globalDocumentRowEven td {
-	background-color: #F0FFF0;
-}
-
-.globalDocumentRowOdd, .globalDocumentRowOdd td {
-	background-color: #D0F5D0;
 }
 
 .hiddenHeader thead { 
@@ -494,114 +345,13 @@ img {
 	background: url("images/backgrounds.png") repeat-x 0px 0px;
 }
 
-.MainLayoutDock .splitter {
-	width: 100%;
-	height: 100%;
-	padding: 0px;
-	border-spacing: 0px;
-	cursor: pointer;
-	text-align: center;
-	vertical-align: middle;
-}
-
-.MainLayoutDock .splitter td {
-	background-color: white;
-	border-left: 1px solid #999999;
-}
-
-.MainLayoutDock .splitter:hover td {
-	background-color: #C9E2FC;
-}
-
-.MainLayoutDock .sidePanel {
-	background-color: #e3f1ff;
-	vertical-align: top;
-	width: 100%;
-}
-
-.MainLayoutDock .bodyPanel {
+.bodyPanel {
 	background-color: white;
 }
 
-.MainLayoutDock .page {
+.page {
 	width: 100%;
 	vertical-align: top;
-}
-
-.notification {
-	color: white;
-	white-space: nowrap;
-	font-size: 10px;
-	padding-left: 2px;
-	padding-right: 2px;
-	text-align: center;
-}
-
-.notification-empty {
-	color: #DDDDDD;
-}
-
-.flag {
-	color: white;
-	width: 20px;
-	height: 13px;
-	border: 1px solid #000000;
-	cursor: pointer;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-.colorPickerGrid {
-	border: 1px solid #71AB69;
-	border-left: none;
-}
-
-.colorPickerCell {
-	padding: 0px;
-	padding: 1px 2px;
-	width: 10px;
-	border-left: 1px solid #71AB69;
-	margin: 0px;
-	cursor: pointer;
-}
-
-.FlagPanel {
-	border-top: 1px solid #4a7fb0;
-	border-bottom: 1px solid #085ba6;
-	border-right: none;
-	border-left: none;
-	background: url("images/backgrounds.png") repeat-x 0px -52px;
-	color: white;
-	height: 16px;
-	padding-right: 5px;
-	padding-left: 5px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-}
-
-.NotificationPanel {
-	border-top: 1px solid #4a7fb0;
-	border-bottom: 1px solid #085ba6;
-	border-right: none;
-	border-left: none;
-	background: url("images/backgrounds.png") repeat-x 0px -52px;
-	color: white;
-	height: 22px;
-	cursor: pointer;
-}
-
-.notificationDetailsPanel {
-	background-color: #FFFFFF;
-}
-
-.notificationAlertContent {
-	margin: 25px 25px 15px 15px;
-}
-
-.notificationAlertPanel {
-	border: 1px solid #F8E118;
-	vertical-align: middle;
-	background-color: #FCF3AA;
 }
 
 .menuLink,.menuLink:visited,.menuLink:hover {
@@ -610,16 +360,6 @@ img {
 	display: block;
 	padding: 2px 7px 2px 1px;
 	text-decoration: none;
-}
-
-.kbPendingKGroupOwnerNotification {
-	background-color: #FF9900;
-	border: 1px solid #FF9900;
-}
-
-.orderPageAlerts {
-	background-color: #FF9900;
-	border: 1px solid #EE9900;
 }
 
 .percentageBar-blue {
@@ -774,12 +514,6 @@ img {
 	background-color: #B9BEFB;
 	color: #0C188F;
 	border: 1px solid #999EDB;
-}
-
-.rsHeading {
-	font-weight: bold;
-	border-bottom: 1px solid black;
-	border-top: 1px solid black;
 }
 
 /*  --------------------------------------- GENERAL STYLES --------------------------------------- */
