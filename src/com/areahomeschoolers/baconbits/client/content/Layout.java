@@ -204,6 +204,7 @@ public final class Layout {
 			vp.setWidth("100%");
 			vp.add(headerPanel);
 			vp.add(menuPanel);
+			mobileBodyPanel.setWidth("100%");
 			vp.add(mobileBodyPanel);
 			RootPanel.get().add(vp);
 		} else {
