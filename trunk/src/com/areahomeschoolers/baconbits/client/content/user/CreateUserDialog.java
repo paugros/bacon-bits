@@ -62,7 +62,7 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 		String text = "<p align=center><b>WHE Terms & Conditions</b></p><ul>";
 		text += "<li>Sign up for activities are on a first come, first serve basis, as some activities are limited to a certain number of children.";
 		text += "<li>Children are officially registered when payment is received.";
-		text += "<li>Payment must be received within 1 week of registering and/or received prior to the posted deadline. If payment is not received within 1 week, your registration will be canceled.";
+		text += "<li>Payment must be received within 1 week of registering and/or received prior to the posted deadline. If payment is not received within 24 hours, your registration will be canceled.";
 		text += "<li>Due to unexpected last minute changes, WHE reserves the right to substitute comparable programs without notification.";
 		text += "<li>Always check email the day of events for program updates or cancellation.  WHE will always attempt to notify you of a change, but it is up to you to check for emails.";
 		text += "<li>WHE will not be held responsible for direction inaccuracies from GPS devices or mapping websites.";

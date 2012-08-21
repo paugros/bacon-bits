@@ -74,11 +74,14 @@ public final class Layout {
 	private VerticalPanel currentPagePanel;
 	private final HorizontalPanel headerPanel = new HorizontalPanel();
 	private final HorizontalPanel menuPanel = new HorizontalPanel();
+	private boolean isMobileBrowser = false;
 
 	public Layout() {
+		isMobileBrowser = ClientUtils.isMobileBrowser();
+
 		headerPanel.setStyleName("headerPanel");
 		headerPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		if (!ClientUtils.isMobileBrowser()) {
+		if (!isMobileBrowser) {
 			RootLayoutPanel.get().setStyleName("overflowHidden");
 		}
 
@@ -183,7 +186,7 @@ public final class Layout {
 			sessionPanel.add(resetLabel);
 		}
 
-		if (!ClientUtils.isMobileBrowser()) {
+		if (!isMobileBrowser) {
 			ap.setHeight("100%");
 			ap.getElement().getStyle().setOverflow(Overflow.VISIBLE);
 			bodyPanel.setStyleName("bodyPanel");
@@ -195,7 +198,7 @@ public final class Layout {
 		menuPanel.add(menu);
 		menuPanel.setCellWidth(menu, "100%");
 
-		if (ClientUtils.isMobileBrowser()) {
+		if (isMobileBrowser) {
 			mobileBodyPanel.addStyleName("bodyPanel");
 			VerticalPanel vp = new VerticalPanel();
 			vp.setWidth("100%");
@@ -235,7 +238,7 @@ public final class Layout {
 	}
 
 	public void setHeaderVisible(boolean visible) {
-		if (ClientUtils.isMobileBrowser()) {
+		if (isMobileBrowser) {
 			headerPanel.setVisible(visible);
 			return;
 		}
@@ -275,7 +278,7 @@ public final class Layout {
 		vp.add(footer);
 
 		Application.setTitle(title);
-		if (ClientUtils.isMobileBrowser()) {
+		if (isMobileBrowser) {
 			mobileBodyPanel.clear();
 			mobileBodyPanel.setWidget(vp);
 			Window.scrollTo(0, 0);
