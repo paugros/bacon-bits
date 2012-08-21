@@ -17,8 +17,16 @@ public class ServerResponseData<T> implements IsSerializable {
 		errors.add(error);
 	}
 
+	public void addErrors(ArrayList<String> errors) {
+		this.errors.addAll(errors);
+	}
+
 	public void addWarning(String warning) {
 		warnings.add(warning);
+	}
+
+	public void addWarnings(ArrayList<String> warnings) {
+		this.warnings.addAll(warnings);
 	}
 
 	public void copyErrorDataInto(ServerResponseData<?> intoResponse) {

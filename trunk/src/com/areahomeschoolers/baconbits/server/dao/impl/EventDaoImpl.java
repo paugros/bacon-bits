@@ -1080,8 +1080,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		ArgMap<EventArg> args = new ArgMap<EventArg>();
 		int ageGroupId = participant.getAgeGroupId() == null ? 0 : participant.getAgeGroupId();
-		args.put(EventArg.AGE_GROUP_ID, ageGroupId);
-		args.put(EventArg.REGISTRATION_ID, participant.getEventRegistrationId());
+
+		if (ageGroupId == 0) {
+			int eventId = queryForInt(0, "select eventId from eventRegistrations where id = ?", participant.getEventRegistrationId());
+			args.put(EventArg.EVENT_ID, eventId);
+		} else {
+			args.put(EventArg.AGE_GROUP_ID, ageGroupId);
+		}
 		Data waitData = getWaitData(args);
 		boolean eventIsFull = eventIsFull(waitData);
 		if (participant.getStatusId() == 1 && eventIsFull) {
@@ -1097,43 +1102,45 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				registerNextWaitingParticipant(waitData);
 			}
 		} else {
-			if (validateOverlaps) {
-				// validate for time overlaps
-				// get the event date being registered first
-				sql = "select e.startDate, e.endDate \n";
-				sql += "from eventRegistrations r \n";
-				sql += "join events e on e.id = r.eventId \n";
-				sql += "where r.id = ? limit 1";
-				Data event = queryForObject(sql, new RowMapper<Data>() {
-					@Override
-					public Data mapRow(ResultSet rs, int row) throws SQLException {
-						Data d = new Data();
-						d.put("startDate", rs.getTimestamp("startDate"));
-						d.put("endDate", rs.getTimestamp("endDate"));
-						return d;
-					}
-				}, participant.getEventRegistrationId());
-
-				// now see if it overlaps
-				sql = "select e.id, e.title \n";
-				sql += "from eventRegistrationParticipants p \n";
-				sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
-				sql += "join events e on e.id = r.eventId \n";
-				sql += "where p.statusId != 5 \n";
-				// sql += "and (? between e.startDate and e.endDate \n";
-				// sql += "or ? between e.startDate and e.endDate) \n";
-				sql += "and ((? >= e.startDate and ? < e.endDate) \n";
-				sql += "or (? > e.startDate and ? <= e.endDate)) \n";
-				sql += "and userId = ? limit 1";
-				Data existing = queryForObject(sql, ServerUtils.getGenericRowMapper(), event.getDate("startDate"), event.getDate("startDate"),
-						event.getDate("endDate"), event.getDate("endDate"), participant.getUserId());
-
-				if (existing != null) {
-					String m = "This participant is already registered for an event that conflicts with this one: ";
-					m += "<a href=\"" + ServerContext.getBaseUrl() + "#" + PageUrl.event(existing.getInt("id")) + "\">" + existing.get("title") + "</a>";
-					data.addError(m);
-					return data;
+			// validate for time overlaps
+			// get the event date being registered first
+			sql = "select e.startDate, e.endDate \n";
+			sql += "from eventRegistrations r \n";
+			sql += "join events e on e.id = r.eventId \n";
+			sql += "where r.id = ? limit 1";
+			Data event = queryForObject(sql, new RowMapper<Data>() {
+				@Override
+				public Data mapRow(ResultSet rs, int row) throws SQLException {
+					Data d = new Data();
+					d.put("startDate", rs.getTimestamp("startDate"));
+					d.put("endDate", rs.getTimestamp("endDate"));
+					return d;
 				}
+			}, participant.getEventRegistrationId());
+
+			// now see if it overlaps
+			sql = "select e.id, e.title \n";
+			sql += "from eventRegistrationParticipants p \n";
+			sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
+			sql += "join events e on e.id = r.eventId \n";
+			sql += "where p.statusId != 5 \n";
+			// sql += "and (? between e.startDate and e.endDate \n";
+			// sql += "or ? between e.startDate and e.endDate) \n";
+			sql += "and ((? >= e.startDate and ? < e.endDate) \n";
+			sql += "or (? > e.startDate and ? <= e.endDate)) \n";
+			sql += "and userId = ? limit 1";
+			Data existing = queryForObject(sql, ServerUtils.getGenericRowMapper(), event.getDate("startDate"), event.getDate("startDate"),
+					event.getDate("endDate"), event.getDate("endDate"), participant.getUserId());
+
+			if (existing != null) {
+				String m = "This participant is already registered for an event that conflicts with this one: ";
+				m += "<a href=\"" + ServerContext.getBaseUrl() + "#" + PageUrl.event(existing.getInt("id")) + "\">" + existing.get("title") + "</a>";
+				if (validateOverlaps) {
+					data.addError(m);
+				} else {
+					data.addWarning(m);
+				}
+				return data;
 			}
 
 			// create or update the associated user
@@ -1225,7 +1232,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				}
 
 				participant.setId(0);
-				saveParticipant(participant, false);
+				ServerResponseData<ArrayList<EventParticipant>> srd = saveParticipant(participant, false);
+
+				if (srd.hasWarnings()) {
+					data.addWarnings(srd.getWarnings());
+				}
 			}
 		}
 
