@@ -110,10 +110,14 @@ public class UserPage implements Page {
 				@Override
 				public void execute(VerticalPanel tabBody) {
 					ArgMap<EventArg> eventArgs = new ArgMap<EventArg>(EventArg.USER_ID, user.getId());
+					eventArgs.setStatus(Status.ALL);
+					eventArgs.put(EventArg.NOT_STATUS_ID, 5);
 					EventParticipantCellTable eventsTable = new EventParticipantCellTable(eventArgs);
 					eventsTable.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PRICE, ParticipantColumn.FIELDS,
 							ParticipantColumn.STATUS);
 					eventsTable.setTitle("Events");
+
+					eventsTable.addStatusFilterBox();
 
 					eventsTable.getTitleBar().addExcelControl();
 					eventsTable.getTitleBar().addSearchControl();
@@ -133,6 +137,8 @@ public class UserPage implements Page {
 					table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
 							ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE, ParticipantColumn.STATUS);
 					table.setTitle("Event Registrations");
+
+					table.addStatusFilterBox();
 
 					table.getTitleBar().addExcelControl();
 					table.getTitleBar().addSearchControl();

@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -17,8 +18,12 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -53,6 +58,38 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 		setDefaultSortColumn(EventColumn.START_DATE, SortDirection.SORT_ASC);
 		setDisplayColumns(EventColumn.REGISTERED, EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.PRICE, EventColumn.CATEGORY,
 				EventColumn.REGISTER);
+	}
+
+	public void addStatusFilterBox() {
+		final DefaultListBox filterBox = getTitleBar().addFilterListControl();
+		filterBox.addItem("Future");
+		filterBox.addItem("Past");
+		filterBox.addItem("All");
+		filterBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent e) {
+				getArgMap().remove(EventArg.SHOW_INACTIVE);
+
+				switch (filterBox.getSelectedIndex()) {
+				case 0:
+					getArgMap().setStatus(Status.ACTIVE);
+					break;
+				case 1:
+					getArgMap().setStatus(Status.INACTIVE);
+					break;
+				case 2:
+					getArgMap().setStatus(Status.ALL);
+					if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+						getArgMap().put(EventArg.SHOW_INACTIVE);
+					}
+					break;
+				}
+
+				populate();
+			}
+		});
+
+		filterBox.setSelectedIndex(0);
 	}
 
 	@Override

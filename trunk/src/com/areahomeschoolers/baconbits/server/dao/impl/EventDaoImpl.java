@@ -377,7 +377,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			}
 		}
 
-		sql += "and e.active = 1 ";
+		if (!args.getBoolean(EventArg.SHOW_INACTIVE)) {
+			sql += "and e.active = 1 ";
+		}
 
 		if (notStatusId > 0) {
 			sql += "and p.statusId != ? \n";
@@ -537,11 +539,14 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		if (args.getStatus() != Status.ALL) {
 			if (args.getStatus() == Status.ACTIVE) {
-				sql += "and e.endDate > now() and active = 1 \n";
+				sql += "and e.endDate > now() \n";
 			} else {
-				sql += "(and e.endDate < now() or active = 0) \n";
+				sql += "and e.endDate < now() \n";
 			}
+		}
 
+		if (!args.getBoolean(EventArg.SHOW_INACTIVE)) {
+			sql += "and e.active = 1 \n";
 		}
 
 		if (showCommunity) {

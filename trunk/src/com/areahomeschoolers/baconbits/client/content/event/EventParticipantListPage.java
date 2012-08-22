@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
@@ -54,6 +55,7 @@ public final class EventParticipantListPage implements Page {
 		}
 
 		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.INCLUDE_FIELDS);
+		args.setStatus(Status.ACTIVE);
 		args.put(EventArg.NOT_STATUS_ID, 5);
 		args.put(EventArg.PARENT_ID_PLUS_SELF, Application.getCurrentUser().getId());
 		final EventParticipantCellTable table = new EventParticipantCellTable(args);
@@ -63,6 +65,7 @@ public final class EventParticipantListPage implements Page {
 		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1500PX));
 		table.setTitle(title);
 
+		table.addStatusFilterBox();
 		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addSearchControl();
 
