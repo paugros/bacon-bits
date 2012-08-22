@@ -69,7 +69,7 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 	}
 
 	public void addStatusFilterBox() {
-		final DefaultListBox filterBox = getTitleBar().addFilterListControl();
+		final DefaultListBox filterBox = getTitleBar().addFilterListControl(false);
 		final ArgMap<EventArg> args = getArgMap();
 
 		filterBox.addItem("Future");
