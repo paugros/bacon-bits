@@ -45,6 +45,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	private TextBox searchControl;
 	private DefaultListBox filterListControl;
 	private Timer searchTimer;
+	private boolean clientOnlyFilterListControl;
 
 	private ClickLabel clearFilter;
 
@@ -114,6 +115,11 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public DefaultListBox addFilterListControl() {
+		return addFilterListControl(true);
+	}
+
+	public DefaultListBox addFilterListControl(boolean clientOnlyFilterListControl) {
+		this.clientOnlyFilterListControl = clientOnlyFilterListControl;
 		if (filterListControl == null) {
 			filterListControl = new DefaultListBox();
 			addControl("Show:", filterListControl);
@@ -328,7 +334,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		}
 
 		List<T> searchList = new ArrayList<T>();
-		if (filterListControl != null) {
+		if (filterListControl != null && clientOnlyFilterListControl) {
 			filterListControl.fireEvent(new ChangeEvent() {
 			});
 			if (cellTable != null && cellTable.getList() != null) {

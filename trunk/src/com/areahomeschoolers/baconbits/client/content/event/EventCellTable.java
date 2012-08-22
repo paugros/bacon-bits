@@ -61,7 +61,7 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 	}
 
 	public void addStatusFilterBox() {
-		final DefaultListBox filterBox = getTitleBar().addFilterListControl();
+		final DefaultListBox filterBox = getTitleBar().addFilterListControl(false);
 		filterBox.addItem("Future");
 		filterBox.addItem("Past");
 		filterBox.addItem("All");

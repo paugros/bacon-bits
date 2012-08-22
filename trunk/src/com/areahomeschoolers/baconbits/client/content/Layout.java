@@ -25,6 +25,7 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -137,19 +138,19 @@ public final class Layout {
 				public void onMouseDown(MouseDownEvent event) {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
 
-					// if (!GWT.isProdMode()) {
-					// loginService.loginAndGetApplicationData("paul.augros@gmail.com", "Borrow99dolls?", new AsyncCallback<ApplicationData>() {
-					// @Override
-					// public void onFailure(Throwable caught) {
-					// }
-					//
-					// @Override
-					// public void onSuccess(ApplicationData result) {
-					// Window.Location.reload();
-					// }
-					// });
-					// return;
-					// }
+					if (!GWT.isProdMode()) {
+						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "Borrow99dolls?", new AsyncCallback<ApplicationData>() {
+							@Override
+							public void onFailure(Throwable caught) {
+							}
+
+							@Override
+							public void onSuccess(ApplicationData result) {
+								Window.Location.reload();
+							}
+						});
+						return;
+					}
 
 					final LoginDialog ld = new LoginDialog(loginService);
 					ld.setLoginHandler(new LoginHandler() {
