@@ -7,7 +7,6 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
-import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
@@ -17,12 +16,14 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -68,42 +69,62 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 	}
 
 	public void addStatusFilterBox() {
-		final com.areahomeschoolers.baconbits.client.widgets.DefaultListBox filterBox = getTitleBar().addFilterListControl();
-		filterBox.addItem("Active");
+		final DefaultListBox filterBox = getTitleBar().addFilterListControl();
+		final ArgMap<EventArg> args = getArgMap();
+
+		filterBox.addItem("Future");
+		filterBox.addItem("Past");
 		filterBox.addItem("Canceled");
 		filterBox.addItem("All");
 		filterBox.addChangeHandler(new ChangeHandler() {
 			@Override
-			public void onChange(ChangeEvent event) {
+			public void onChange(ChangeEvent e) {
+				// reset state
+				args.remove(EventArg.SHOW_INACTIVE);
+				args.remove(EventArg.STATUS_ID);
+				args.put(EventArg.NOT_STATUS_ID, 5);
+
 				switch (filterBox.getSelectedIndex()) {
 				case 0:
-					for (EventParticipant participant : getFullList()) {
-						setItemVisible(participant, !participant.isCanceled(), false, false, false);
-					}
+					args.setStatus(Status.ACTIVE);
 					break;
 				case 1:
-					for (EventParticipant participant : getFullList()) {
-						setItemVisible(participant, participant.isCanceled(), false, false, false);
-					}
+					args.setStatus(Status.INACTIVE);
 					break;
 				case 2:
-					showAllItems();
+					args.remove(EventArg.NOT_STATUS_ID);
+					args.put(EventArg.STATUS_ID, 5);
+					break;
+				case 3:
+					args.setStatus(Status.ALL);
+					if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+						getArgMap().put(EventArg.SHOW_INACTIVE);
+					}
 					break;
 				}
 
-				refreshForCurrentState();
+				populate();
 			}
 		});
 
-		filterBox.setSelectedIndex(0);
+		int defaultIndex = 0;
+		switch (args.getStatus()) {
+		case ACTIVE:
+			defaultIndex = 0;
+			break;
+		case INACTIVE:
+			defaultIndex = 1;
+			break;
+		case ALL:
+			defaultIndex = 3;
+			break;
+		}
 
-		addDataReturnHandler(new DataReturnHandler() {
-			@Override
-			public void onDataReturn() {
-				filterBox.fireEvent(new ChangeEvent() {
-				});
-			}
-		});
+		if (args.getInt(EventArg.STATUS_ID) == 5) {
+			defaultIndex = 2;
+		}
+
+		filterBox.setSelectedIndex(defaultIndex);
 	}
 
 	public void setCancelHandler(ParameterHandler<EventParticipant> cancelHandler) {

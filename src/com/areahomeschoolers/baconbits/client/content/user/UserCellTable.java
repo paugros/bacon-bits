@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EmailDisplay;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
@@ -51,7 +52,7 @@ public final class UserCellTable extends EntityCellTable<User, UserArg, UserColu
 	}
 
 	public void addStatusFilterBox() {
-		final com.areahomeschoolers.baconbits.client.widgets.DefaultListBox filterBox = getTitleBar().addFilterListControl();
+		final DefaultListBox filterBox = getTitleBar().addFilterListControl();
 		filterBox.addItem("Active");
 		filterBox.addItem("Inactive");
 		filterBox.addItem("All");

@@ -116,6 +116,7 @@ public final class EventListPage implements Page {
 			table.getTitleBar().addLink(addLink);
 		}
 
+		table.addStatusFilterBox();
 		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addSearchControl();
 		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1300PX));
