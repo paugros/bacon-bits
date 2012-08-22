@@ -1094,6 +1094,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 		Data waitData = getWaitData(args);
 		boolean eventIsFull = eventIsFull(waitData);
+
 		if (participant.getStatusId() == 1 && eventIsFull) {
 			participant.setStatusId(3);
 		}
@@ -1103,7 +1104,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql = "update eventRegistrationParticipants set statusId = :statusId where id = :id ";
 			update(sql, namedParams);
 
-			if (participant.getStatusId() == 5 && eventIsFull) {
+			if (participant.getStatusId() == 5 && eventIsFull && (waitData.getInt("participants") == waitData.getInt("maxParticipants"))) {
 				registerNextWaitingParticipant(waitData);
 			}
 		} else {
