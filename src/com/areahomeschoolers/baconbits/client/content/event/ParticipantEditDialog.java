@@ -352,6 +352,11 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 			seriesMap = new HashMap<CheckBox, Event>();
 			VerticalPanel datePanel = new VerticalPanel();
 			for (Event e : pageData.getEventsInSeries()) {
+				// for non-required series, enforce the registration window on future events
+				if (!pageData.getEvent().getRequiredInSeries() && !e.allowRegistrations()) {
+					continue;
+				}
+
 				CheckBox cb = new CheckBox(Formatter.formatDateTime(e.getStartDate()));
 				if (pageData.getEvent().getRequiredInSeries() || e.equals(pageData.getEvent())) {
 					cb.setValue(true);
