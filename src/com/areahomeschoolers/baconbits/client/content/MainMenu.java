@@ -117,7 +117,6 @@ public final class MainMenu extends MenuBar {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Apologia Chemistry", PageUrl.articleGroup("55"));
 		addLinkToMenu(menu, "Mixed Class Day", PageUrl.articleGroup("37,38"));
-		addLinkToMenu(menu, "Parents' Support Meeting", PageUrl.articleGroup("33"));
 		addLinkToMenu(menu, "PE Activities", PageUrl.articleGroup("36"));
 
 		return menu;
@@ -178,6 +177,8 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "Homeschool Stories", PageUrl.articleGroup("15,16,14,13,12,11,10,9,8"));
 		addLinkToMenu(menu, "Homeschooling Methods", PageUrl.articleGroup("40"));
 		addLinkToMenu(menu, "Curriculum Providers", PageUrl.articleGroup("41"));
+		addLinkToMenu(menu, "Parents' Support Meeting", PageUrl.articleGroup("33"));
+
 		// addLinkToMenu(menu, "Managing Schedules", PageUrl.articleGroup("28,27"));
 		// addLinkToMenu(menu, "Reluctant Learners", PageUrl.articleGroup("24"));
 

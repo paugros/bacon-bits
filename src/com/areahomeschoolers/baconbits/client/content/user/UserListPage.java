@@ -1,6 +1,8 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
+import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
@@ -14,6 +16,11 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class UserListPage implements Page {
 	public UserListPage(final VerticalPanel page) {
+		if (!Application.isAuthenticated()) {
+			new ErrorPage(PageError.NOT_AUTHORIZED);
+			return;
+		}
+
 		ArgMap<UserArg> args = new ArgMap<UserArg>();
 		final String title = "Users";
 		UserCellTable table = new UserCellTable(args);
