@@ -1101,10 +1101,14 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(participant);
 		if (participant.isSaved()) {
+			// get the old status
+			sql = "select statusId from eventRegistrationParticipants where id = :id";
+			int oldStatusId = queryForInt(0, sql, namedParams);
+
 			sql = "update eventRegistrationParticipants set statusId = :statusId where id = :id ";
 			update(sql, namedParams);
 
-			if (participant.getStatusId() == 5 && eventIsFull && (waitData.getInt("participants") == waitData.getInt("maxParticipants"))) {
+			if (oldStatusId != 3 && participant.getStatusId() == 5 && eventIsFull && (waitData.getInt("participants") == waitData.getInt("maxParticipants"))) {
 				registerNextWaitingParticipant(waitData);
 			}
 		} else {
