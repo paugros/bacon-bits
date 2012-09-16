@@ -49,6 +49,8 @@ public interface EventDao {
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public ArrayList<EventParticipant> getParticipants(ArgMap<EventArg> args);
 
+	public ArrayList<Data> getParticipantStatusList();
+
 	public ArrayList<Data> getRegistrationSummary();
 
 	public Data getUnpaidBalance(int userId);
@@ -56,6 +58,9 @@ public interface EventDao {
 	public ArrayList<Data> getVolunteers(int eventId);
 
 	public ArrayList<Event> list(ArgMap<EventArg> args);
+
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
+	public void overrideParticipantStatus(EventParticipant participant);
 
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public PaypalData payForEvents(ArrayList<Integer> participantIds);

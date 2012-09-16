@@ -90,6 +90,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	}
 
 	@Override
+	public ArrayList<Data> getParticipantStatusList() {
+		return dao.getParticipantStatusList();
+	}
+
+	@Override
 	public ArrayList<Data> getRegistrationSummary() {
 		return dao.getRegistrationSummary();
 	}
@@ -107,6 +112,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	@Override
 	public ArrayList<Event> list(ArgMap<EventArg> args) {
 		return dao.list(args);
+	}
+
+	@Override
+	public void overrideParticipantStatus(EventParticipant participant) {
+		dao.overrideParticipantStatus(participant);
 	}
 
 	@Override

@@ -46,6 +46,8 @@ public interface EventService extends RemoteService {
 
 	public ArrayList<EventParticipant> getParticipants(ArgMap<EventArg> args);
 
+	public ArrayList<Data> getParticipantStatusList();
+
 	public ArrayList<Data> getRegistrationSummary();
 
 	public Data getUnpaidBalance(int userId);
@@ -53,6 +55,8 @@ public interface EventService extends RemoteService {
 	public ArrayList<Data> getVolunteers(int eventId);
 
 	public ArrayList<Event> list(ArgMap<EventArg> args);
+
+	public void overrideParticipantStatus(EventParticipant participant);
 
 	public PaypalData payForEvents(ArrayList<Integer> participantIds);
 
