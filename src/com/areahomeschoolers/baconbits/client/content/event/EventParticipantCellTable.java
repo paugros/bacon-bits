@@ -2,11 +2,13 @@ package com.areahomeschoolers.baconbits.client.content.event;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
@@ -17,6 +19,9 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
+import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
+import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -24,6 +29,7 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -33,6 +39,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
@@ -54,6 +61,8 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 			return title;
 		}
 	}
+
+	private List<Data> statusList;
 
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 
@@ -135,6 +144,12 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 		setDefaultSortColumn(ParticipantColumn.EVENT_DATE, SortDirection.SORT_ASC);
 		setDisplayColumns(ParticipantColumn.ATTENDED, ParticipantColumn.REGISTRANT_NAME, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE,
 				ParticipantColumn.AGE, ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS, ParticipantColumn.EDIT_STATUS);
+	}
+
+	private void populateStatusList(DefaultListBox lb) {
+		for (Data item : statusList) {
+			lb.addItem(item.get("status"), item.getId());
+		}
 	}
 
 	@Override
@@ -237,7 +252,75 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 				});
 				break;
 			case STATUS:
-				addTextColumn(col, new ValueGetter<String, EventParticipant>() {
+				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
+					@Override
+					protected Widget createWidget(final EventParticipant item) {
+						if (!Application.administratorOf(item.getEventGroupId())) {
+							return new Label(item.getStatus());
+						}
+
+						ClickLabel cl = new ClickLabel(item.getStatus(), new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								EntityEditDialog<EventParticipant> dialog = new EntityEditDialog<EventParticipant>() {
+									@Override
+									protected Widget createContent() {
+										FieldTable ft = new FieldTable();
+
+										final DefaultListBox statusInput = new DefaultListBox();
+										if (statusList == null) {
+											eventService.getParticipantStatusList(new Callback<ArrayList<Data>>() {
+												@Override
+												protected void doOnSuccess(ArrayList<Data> result) {
+													statusList = result;
+													populateStatusList(statusInput);
+													statusInput.setValue(item.getStatusId());
+												}
+											});
+										} else {
+											populateStatusList(statusInput);
+											statusInput.setValue(item.getStatusId());
+										}
+										FormField statusField = form.createFormField("Status:", statusInput);
+										statusField.setInitializer(new Command() {
+											@Override
+											public void execute() {
+												statusInput.setValue(item.getStatusId());
+											}
+										});
+										statusField.setDtoUpdater(new Command() {
+											@Override
+											public void execute() {
+												item.setStatusId(statusInput.getIntValue());
+												item.setStatus(statusInput.getSelectedText());
+											}
+										});
+										ft.addField(statusField);
+
+										return ft;
+									}
+								};
+
+								dialog.addFormSubmitHandler(new FormSubmitHandler() {
+									@Override
+									public void onFormSubmit(FormField formField) {
+										eventService.overrideParticipantStatus(item, new Callback<Void>() {
+											@Override
+											protected void doOnSuccess(Void result) {
+												refresh();
+											}
+										});
+									}
+								});
+
+								dialog.setText("Set Status");
+								dialog.center(item);
+							}
+						});
+
+						return cl;
+					}
+				}, new ValueGetter<String, EventParticipant>() {
 					@Override
 					public String get(EventParticipant item) {
 						return item.getStatus();

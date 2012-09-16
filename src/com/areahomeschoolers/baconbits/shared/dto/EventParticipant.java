@@ -17,6 +17,7 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 	// aux
 	private String status;
 	private int eventId;
+	private int eventGroupId;
 	private Date eventDate;
 	private String eventTitle;
 	private String fieldValues;
@@ -68,6 +69,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public List<EventField> getEventFields() {
 		return eventFields;
+	}
+
+	public int getEventGroupId() {
+		return eventGroupId;
 	}
 
 	public int getEventId() {
@@ -171,6 +176,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setEventFields(List<EventField> eventFields) {
 		this.eventFields = eventFields;
+	}
+
+	public void setEventGroupId(int eventGroupId) {
+		this.eventGroupId = eventGroupId;
 	}
 
 	public void setEventId(int eventId) {

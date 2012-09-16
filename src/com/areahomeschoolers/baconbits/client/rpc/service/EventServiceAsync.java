@@ -41,6 +41,8 @@ public interface EventServiceAsync {
 
 	void getParticipants(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventParticipant>> callback);
 
+	void getParticipantStatusList(AsyncCallback<ArrayList<Data>> callback);
+
 	void getRegistrationSummary(AsyncCallback<ArrayList<Data>> callback);
 
 	void getUnpaidBalance(int userId, AsyncCallback<Data> callback);
@@ -48,6 +50,8 @@ public interface EventServiceAsync {
 	void getVolunteers(int eventId, AsyncCallback<ArrayList<Data>> callback);
 
 	void list(ArgMap<EventArg> args, AsyncCallback<ArrayList<Event>> callback);
+
+	void overrideParticipantStatus(EventParticipant participant, AsyncCallback<Void> callback);
 
 	void payForEvents(ArrayList<Integer> participantIds, AsyncCallback<PaypalData> callback);
 

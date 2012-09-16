@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
@@ -351,7 +352,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select r.eventId, e.title, e.startDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
-		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, r.addedById, \n";
+		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, r.addedById, e.groupId, \n";
 		if (includeFields) {
 			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n";
 			sql += "from eventFieldValues v \n";
@@ -449,12 +450,20 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setEventTitle(rs.getString("title"));
 				p.setPaymentId(rs.getInt("paymentId"));
 				p.setEventDate(rs.getTimestamp("startDate"));
+				p.setEventGroupId(rs.getInt("groupId"));
 				if (includeFields) {
 					p.setFieldValues(rs.getString("fieldValues"));
 				}
 				return p;
 			}
 		}, sqlArgs.toArray());
+	}
+
+	@Override
+	public ArrayList<Data> getParticipantStatusList() {
+		String sql = "select * from eventParticipantStatus order by status";
+
+		return query(sql, ServerUtils.getGenericRowMapper());
 	}
 
 	@Override
@@ -690,6 +699,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		return data;
+	}
+
+	@Override
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
+	public void overrideParticipantStatus(EventParticipant participant) {
+		String sql = "update eventRegistrationParticipants set statusId = ? where id = ?";
+		update(sql, participant.getStatusId(), participant.getId());
 	}
 
 	@Override
