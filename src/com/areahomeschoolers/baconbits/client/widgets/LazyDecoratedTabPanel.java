@@ -107,7 +107,8 @@ public class LazyDecoratedTabPanel extends DecoratedTabPanel {
 		int widgetIndex = getWidgetCount();
 		int skipCount = 0;
 		for (Integer i : skipIndexes) {
-			if (i <= widgetIndex) {
+			// account for consecutive skips at the end
+			if (i <= (widgetIndex + skipCount + 1)) {
 				skipCount++;
 			}
 		}
