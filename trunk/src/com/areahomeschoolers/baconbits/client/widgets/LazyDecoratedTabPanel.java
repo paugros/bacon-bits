@@ -87,13 +87,14 @@ public class LazyDecoratedTabPanel extends DecoratedTabPanel {
 		// because we keep track of the tab by its widget, it doesn't matter if we rearrange the tabs after adding them
 		tabCommands.put(tabWidget, command);
 		add(tabWidget, tabText);
+		int originalRequestedIndex = getUrlIndex();
 
-		int requestedTab = getUrlIndex();
+		int requestedTab = originalRequestedIndex;
 		if (requestedTab == -1) {
 			requestedTab = 0;
 		}
 		for (int i : skipIndexes) {
-			if (i <= requestedTab) {
+			if (i <= originalRequestedIndex) {
 				requestedTab--;
 			}
 		}
