@@ -698,7 +698,8 @@ public class EventPage implements Page {
 					@Override
 					public void execute(final VerticalPanel tabBody) {
 						if (!Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
-							eventService.getVolunteers(calendarEvent.getId(), new Callback<ArrayList<Data>>() {
+							ArgMap<EventArg> volunteerArgs = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
+							eventService.getVolunteers(volunteerArgs, new Callback<ArrayList<Data>>() {
 								@Override
 								protected void doOnSuccess(ArrayList<Data> result) {
 									VerticalPanel vp = new VerticalPanel();
