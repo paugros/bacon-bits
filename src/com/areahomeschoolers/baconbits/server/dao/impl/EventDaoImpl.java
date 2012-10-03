@@ -528,8 +528,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	public ArrayList<Data> getVolunteers(ArgMap<EventArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int eventId = args.getInt(EventArg.EVENT_ID);
+		int userId = args.getInt(EventArg.USER_ID);
 
-		String sql = "select e.startDate, e.title, r.eventId, m.id, m.fulfilled, u.firstName, u.lastName, p.jobTitle, r.addedById ";
+		String sql = "select e.startDate, e.endDate, e.title, r.eventId, m.id, m.fulfilled, u.firstName, u.lastName, p.jobTitle, r.addedById ";
 		sql += "from eventVolunteerMapping m ";
 		sql += "join eventVolunteerPositions p on p.id = m.eventVolunteerPositionId ";
 		sql += "join eventRegistrations r on r.id = m.eventRegistrationId ";
@@ -539,6 +540,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		if (eventId > 0) {
 			sql += "and r.eventId = ? ";
 			sqlArgs.add(eventId);
+		}
+
+		if (userId > 0) {
+			sql += "and r.addedById = ? ";
+			sqlArgs.add(userId);
 		}
 
 		if (args.getStatus() != Status.ALL) {
