@@ -525,16 +525,33 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	public ArrayList<Data> getVolunteers(int eventId) {
-		String sql = "select m.id, m.fulfilled, u.firstName, u.lastName, p.jobTitle ";
+	public ArrayList<Data> getVolunteers(ArgMap<EventArg> args) {
+		List<Object> sqlArgs = new ArrayList<Object>();
+		int eventId = args.getInt(EventArg.EVENT_ID);
+
+		String sql = "select e.startDate, e.title, r.eventId, m.id, m.fulfilled, u.firstName, u.lastName, p.jobTitle, r.addedById ";
 		sql += "from eventVolunteerMapping m ";
 		sql += "join eventVolunteerPositions p on p.id = m.eventVolunteerPositionId ";
 		sql += "join eventRegistrations r on r.id = m.eventRegistrationId ";
+		sql += "join events e on e.id = r.eventId ";
 		sql += "join users u on u.id = r.addedById ";
-		sql += "where r.eventId = ? ";
+		sql += "where 1 = 1 ";
+		if (eventId > 0) {
+			sql += "and r.eventId = ? ";
+			sqlArgs.add(eventId);
+		}
+
+		if (args.getStatus() != Status.ALL) {
+			if (args.getStatus() == Status.ACTIVE) {
+				sql += "and e.endDate > adddate(now(), INTERVAL -2 DAY) \n";
+			} else {
+				sql += "and e.endDate < now() \n";
+			}
+		}
+
 		sql += "order by p.jobTitle, u.lastName, u.firstName";
 
-		return query(sql, ServerUtils.getGenericRowMapper(), eventId);
+		return query(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
 	}
 
 	@Override

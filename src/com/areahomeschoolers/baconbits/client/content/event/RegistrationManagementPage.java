@@ -9,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
@@ -27,6 +28,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -140,6 +142,87 @@ public class RegistrationManagementPage implements Page {
 				});
 
 				table.populate();
+			}
+		});
+
+		tabPanel.add("Filled Volunteer Positions", new TabPageCommand() {
+			@Override
+			public void execute(final VerticalPanel tabBody) {
+				final ArgMap<EventArg> args = new ArgMap<EventArg>();
+				args.setStatus(Status.ACTIVE);
+
+				GenericCellTable vt = new GenericCellTable() {
+					@Override
+					protected void fetchData() {
+						eventService.getVolunteers(args, getCallback());
+					}
+
+					@Override
+					protected void setColumns() {
+						addCompositeWidgetColumn("Event", new WidgetCellCreator<Data>() {
+							@Override
+							protected Widget createWidget(Data item) {
+								return new Hyperlink(item.get("title"), PageUrl.event(item.getId()));
+							}
+						}, new ValueGetter<String, Data>() {
+							@Override
+							public String get(Data item) {
+								return item.get("title");
+							}
+						});
+
+						addDateTimeColumn("Event date", new ValueGetter<Date, Data>() {
+							@Override
+							public Date get(Data item) {
+								return item.getDate("startDate");
+							}
+						});
+
+						addTextColumn("Position", new ValueGetter<String, Data>() {
+							@Override
+							public String get(Data item) {
+								return item.get("jobTitle");
+							}
+						});
+
+						addCompositeWidgetColumn("Name", new WidgetCellCreator<Data>() {
+							@Override
+							protected Widget createWidget(Data item) {
+								Hyperlink link = new Hyperlink(item.get("firstName") + " " + item.get("lastName"), PageUrl.user(item.getInt("addedById")));
+								return link;
+							}
+						});
+
+						addCheckboxColumn("Fulfilled", new ValueGetter<Boolean, Data>() {
+							@Override
+							public Boolean get(Data item) {
+								return item.getBoolean("fulfilled");
+							}
+						}, new FieldUpdater<Data, Boolean>() {
+							@Override
+							public void update(int index, Data item, Boolean value) {
+								eventService.setVolunteerFulFilled(item.getId(), value, new Callback<Void>(false) {
+									@Override
+									protected void doOnSuccess(Void result) {
+									}
+								});
+							}
+						});
+					}
+				};
+
+				vt.addDataReturnHandler(new DataReturnHandler() {
+					@Override
+					public void onDataReturn() {
+						tabPanel.selectTabNow(tabBody);
+					}
+				});
+
+				vt.setDefaultSortColumn(1, SortDirection.SORT_ASC);
+
+				tabBody.add(WidgetFactory.newSection(vt, ContentWidth.MAXWIDTH1200PX));
+
+				vt.populate();
 			}
 		});
 
