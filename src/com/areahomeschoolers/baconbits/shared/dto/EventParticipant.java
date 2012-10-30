@@ -28,6 +28,7 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 	private String addedByFirstName, addedByLastName;
 	private int addedById;
 	private int parentId;
+	private boolean updateAllInSeries;
 
 	// for bulk registration of a series
 	private ArrayList<Integer> seriesEventIds;
@@ -124,6 +125,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public int getStatusId() {
 		return statusId;
+	}
+
+	public boolean getUpdateAllInSeries() {
+		return updateAllInSeries;
 	}
 
 	public User getUser() {
@@ -228,6 +233,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setStatusId(int statusId) {
 		this.statusId = statusId;
+	}
+
+	public void setUpdateAllInSeries(boolean updateAllInSeries) {
+		this.updateAllInSeries = updateAllInSeries;
 	}
 
 	public void setUser(User user) {
