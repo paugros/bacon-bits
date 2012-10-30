@@ -871,6 +871,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTRATION_ID, registration.getId());
 			ArrayList<EventParticipant> participants = getParticipants(args);
 			for (EventParticipant p : participants) {
+				p.setUpdateAllInSeries(true);
 				p.setStatusId(registration.getCanceled() ? 5 : 1);
 				saveParticipant(p);
 			}
@@ -1285,6 +1286,49 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 				if (srd.hasWarnings()) {
 					data.addWarnings(srd.getWarnings());
+				}
+			}
+		}
+
+		// when cancelling or restoring a required series registration
+		if (participant.getUpdateAllInSeries()) {
+			participant.setUpdateAllInSeries(false);
+
+			sql = "select e.seriesId \n";
+			sql += "from eventRegistrationParticipants p \n";
+			sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
+			sql += "join events e on e.id = r.eventId \n";
+			sql += "where e.seriesId is not null and e.requiredInSeries = 1 \n";
+			sql += "and p.id = ? limit 1\n";
+			int seriesId = queryForInt(0, sql, participant.getId());
+
+			if (seriesId > 0) {
+				sql = "select p.id \n";
+				sql += "from eventRegistrationParticipants p \n";
+				sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
+				sql += "join events e on e.id = r.eventId \n";
+				sql += "where e.seriesId = ? \n";
+				sql += "and p.userId = ? and p.id != ?";
+
+				final List<Integer> ids = new ArrayList<Integer>();
+
+				query(sql, new RowMapper<Void>() {
+					@Override
+					public Void mapRow(ResultSet rs, int row) throws SQLException {
+						ids.add(rs.getInt("id"));
+						return null;
+					}
+				}, seriesId, participant.getUserId(), participant.getId());
+
+				if (!ids.isEmpty()) {
+					for (int id : ids) {
+						participant.setId(id);
+						ServerResponseData<ArrayList<EventParticipant>> srd = saveParticipant(participant, false);
+
+						if (srd.hasWarnings()) {
+							data.addWarnings(srd.getWarnings());
+						}
+					}
 				}
 			}
 		}
