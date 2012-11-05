@@ -903,7 +903,7 @@ public class EventPage implements Page {
 									@Override
 									protected void doOnSuccess(Void result) {
 										pageData.getVolunteerPositions().remove(v);
-										populateAgeGroups();
+										populateVolunteerPositions();
 									}
 								});
 							}

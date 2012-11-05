@@ -947,7 +947,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {
 			sql += "(select count(p.id) from eventRegistrationParticipants p join eventRegistrations r on r.id = p.eventRegistrationId and r.addedById = "
-					+ userId + " where r.eventId = e.id) as currentUserParticipantCount, \n";
+					+ userId + " where r.eventId = e.id and p.statusId != 5) as currentUserParticipantCount, \n";
 		} else {
 			sql += "0 as currentUserParticipantCount, ";
 		}
@@ -1173,7 +1173,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "from eventRegistrationParticipants p \n";
 			sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 			sql += "join events e on e.id = r.eventId \n";
-			sql += "where p.statusId != 5 \n";
+			sql += "where p.statusId != 5 and e.active = 1 \n";
 			// sql += "and (? between e.startDate and e.endDate \n";
 			// sql += "or ? between e.startDate and e.endDate) \n";
 			sql += "and ((? >= e.startDate and ? < e.endDate) \n";

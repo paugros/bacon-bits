@@ -104,7 +104,7 @@ public class MonthYearPicker extends Composite implements CustomFocusWidget, Has
 		}
 
 		DateTimeFormat dtf = DateTimeFormat.getFormat("yyyy/M/d");
-		String dateStr = yearPicker.getYear() + "/" + monthPicker.getMonth() + "/1";
+		String dateStr = yearPicker.getYear() + "/" + monthPicker.getMonth() + "/5";
 
 		return dtf.parse(dateStr);
 	}
