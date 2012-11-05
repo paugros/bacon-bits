@@ -90,7 +90,7 @@ public class EventVolunteerCellTable extends GenericCellTable {
 		addCompositeWidgetColumn("Event", new WidgetCellCreator<Data>() {
 			@Override
 			protected Widget createWidget(Data item) {
-				return new Hyperlink(item.get("title"), PageUrl.event(item.getId()));
+				return new Hyperlink(item.get("title"), PageUrl.event(item.getInt("eventId")));
 			}
 		}, new ValueGetter<String, Data>() {
 			@Override

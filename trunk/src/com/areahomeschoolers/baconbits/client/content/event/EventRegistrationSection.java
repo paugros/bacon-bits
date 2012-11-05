@@ -314,7 +314,7 @@ public class EventRegistrationSection extends Composite {
 							confirmText = "Really remove " + p.getFirstName() + " from the attendee list?";
 						}
 
-						if (pageData.getEvent().getSeriesId() > 0 && pageData.getEvent().getRequiredInSeries()) {
+						if (pageData.getEvent().getSeriesId() != null && pageData.getEvent().getSeriesId() > 0 && pageData.getEvent().getRequiredInSeries()) {
 							confirmText += "<br><br><b>NOTE: Because this event is part of a required series, this action will be performed for all events in the series.</b>";
 							p.setUpdateAllInSeries(true);
 						}
