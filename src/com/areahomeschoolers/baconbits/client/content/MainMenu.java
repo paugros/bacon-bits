@@ -118,6 +118,7 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "Apologia Chemistry", PageUrl.articleGroup("55"));
 		addLinkToMenu(menu, "Mixed Class Day", PageUrl.articleGroup("37,38"));
 		addLinkToMenu(menu, "PE Activities", PageUrl.articleGroup("36"));
+		addLinkToMenu(menu, "The Youth Booth", PageUrl.articleGroup("63"));
 
 		return menu;
 	}
