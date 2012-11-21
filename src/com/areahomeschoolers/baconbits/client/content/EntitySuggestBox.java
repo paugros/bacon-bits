@@ -19,7 +19,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestBox.DefaultSuggestionDisplay;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-import com.google.gwt.user.client.ui.TextBoxBase;
+import com.google.gwt.user.client.ui.ValueBoxBase;
 
 public class EntitySuggestBox extends Composite {
 	private final SuggestBox suggestBox;
@@ -35,7 +35,7 @@ public class EntitySuggestBox extends Composite {
 		initWidget(suggestBox);
 		suggestBox.setWidth("170px");
 
-		final TextBoxBase textBox = suggestBox.getTextBox();
+		final ValueBoxBase<String> textBox = suggestBox.getValueBox();
 		// textBox.getElement().getStyle().setPadding(3, Unit.PX);
 		suggestBox.addSelectionHandler(new SelectionHandler<Suggestion>() {
 			@Override
@@ -88,8 +88,8 @@ public class EntitySuggestBox extends Composite {
 		});
 	}
 
-	public TextBoxBase getTextBox() {
-		return suggestBox.getTextBox();
+	public ValueBoxBase<String> getTextBox() {
+		return suggestBox.getValueBox();
 	}
 
 	public boolean isClearOnFocus() {
@@ -123,7 +123,7 @@ public class EntitySuggestBox extends Composite {
 	}
 
 	public void setText(String text) {
-		suggestBox.getTextBox().setText(text);
+		suggestBox.setText(text);
 	}
 
 }

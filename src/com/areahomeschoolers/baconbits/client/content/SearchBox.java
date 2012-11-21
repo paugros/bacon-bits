@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestBox.DefaultSuggestionDisplay;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-import com.google.gwt.user.client.ui.TextBoxBase;
+import com.google.gwt.user.client.ui.ValueBoxBase;
 
 public final class SearchBox extends Composite {
 	private final SuggestBox searchSuggestBox;
@@ -40,7 +40,7 @@ public final class SearchBox extends Composite {
 		searchSuggestBox.setWidth("200px");
 		searchSuggestBox.setAutoSelectEnabled(false);
 
-		final TextBoxBase textBox = searchSuggestBox.getTextBox();
+		final ValueBoxBase<String> textBox = searchSuggestBox.getValueBox();
 		// textBox.getElement().getStyle().setPadding(3, Unit.PX);
 		textBox.addFocusHandler(new FocusHandler() {
 			@Override
@@ -98,7 +98,7 @@ public final class SearchBox extends Composite {
 	}
 
 	public void reset() {
-		searchSuggestBox.getTextBox().setText("");
+		searchSuggestBox.setText("");
 	}
 
 	private void hideSuggestions() {
