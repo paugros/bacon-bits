@@ -51,10 +51,11 @@ public final class Layout {
 			addStyleName("MainLayoutDock");
 		}
 
-		public double getWidgetSize(Widget widget) {
+		@Override
+		public Double getWidgetSize(Widget widget) {
 			LayoutData ld = (LayoutData) widget.getLayoutData();
 			if (ld == null) {
-				return 0;
+				return 0.0;
 			}
 			return ld.size;
 		}

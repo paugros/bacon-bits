@@ -38,7 +38,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.ValueUpdater;
-import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Element;
@@ -685,6 +684,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		return new ArrayList<T>(visibleItems);
 	}
 
+	@Override
 	public RowStyles<T> getRowStyles() {
 		return rowStyles;
 	}
@@ -1972,17 +1972,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	 */
 	protected List<T> preprocessResults(List<T> results) {
 		return results;
-	}
-
-	@Override
-	protected void renderRowValues(SafeHtmlBuilder sb, List<T> values, int start, SelectionModel<? super T> selectionModel) {
-		try {
-			super.renderRowValues(sb, values, start, selectionModel);
-		} catch (JavaScriptException e) {
-			// The JavaScriptException "(TypeError): this.insertBefore is not a function" gets caught
-			// here when this CellTable is populated with no results. Ideally we want to stop the
-			// exception from coming up in the first place but this will stop the exception from coming up.
-		}
 	}
 
 	/**
