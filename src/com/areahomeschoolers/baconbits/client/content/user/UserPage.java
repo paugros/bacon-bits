@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.book.BookCellTable;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerCellTable;
@@ -27,6 +28,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -247,6 +249,23 @@ public class UserPage implements Page {
 					tabPanel.selectTabNow(tabBody);
 				}
 			});
+
+			if (Application.memberOf(16)) {
+				tabPanel.add("Books", new TabPageCommand() {
+					@Override
+					public void execute(VerticalPanel tabBody) {
+						ArgMap<BookArg> args = new ArgMap<BookArg>(Status.ACTIVE);
+						args.put(BookArg.USER_ID, user.getId());
+
+						BookCellTable table = new BookCellTable(args);
+						table.setTitle("Books");
+						table.populate();
+
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));
+						tabPanel.selectTabNow(tabBody);
+					}
+				});
+			}
 
 			if (!Application.isAuthenticated()) {
 				form.setEnabled(false);

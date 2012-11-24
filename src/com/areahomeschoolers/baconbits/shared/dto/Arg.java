@@ -7,6 +7,10 @@ public interface Arg {
 		MOST_RECENT, IDS
 	}
 
+	public enum BookArg implements Arg, IsSerializable {
+		USER_ID
+	}
+
 	public enum DocumentArg implements Arg, IsSerializable {
 		ARTICLE_ID, EVENT_ID
 	}

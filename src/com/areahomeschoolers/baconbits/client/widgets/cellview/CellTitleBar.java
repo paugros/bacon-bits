@@ -269,11 +269,10 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		}
 		if (searchControl != null) {
 			searchTable();
+			searchControl.setFocus(false);
+			searchControl.fireEvent(new BlurEvent() {
+			});
 		}
-
-		searchControl.setFocus(false);
-		searchControl.fireEvent(new BlurEvent() {
-		});
 	}
 
 	/**
