@@ -141,7 +141,7 @@ public final class Layout {
 
 					if (!GWT.isProdMode()) {
 						// loginService.loginAndGetApplicationData("kristin@wearehomeeducators.com", "Redball1", new AsyncCallback<ApplicationData>() {
-						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "Borrow99dolls?", new AsyncCallback<ApplicationData>() {
+						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "Borrow88dolls?", new AsyncCallback<ApplicationData>() {
 							@Override
 							public void onFailure(Throwable caught) {
 							}

@@ -65,7 +65,7 @@ public abstract class Callback<T> implements AsyncCallback<T> {
 				dialog.center();
 			}
 		} else {
-			String message = "Sorry, Dash could not reach the server. ";
+			String message = "Sorry, the application could not reach the server. ";
 			message += "If the problem persists, please stop working until you are able to re-establish a network connection, as your unsaved changes may be lost.";
 			Label label = new Label(message);
 			label.setWidth("300px");
