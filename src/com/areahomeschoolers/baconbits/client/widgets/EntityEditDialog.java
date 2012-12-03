@@ -47,7 +47,7 @@ public abstract class EntityEditDialog<T> extends DefaultDialog {
 
 	public void center(T entity) {
 		setEntity(entity);
-		center();
+		super.center();
 	}
 
 	public VerticalPanel getAboveButtonPanel() {

@@ -5,16 +5,22 @@ import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookCol
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 
 public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
@@ -32,6 +38,7 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 		}
 	}
 
+	private BookDialog dialog;
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 
 	public BookCellTable(ArgMap<BookArg> args) {
@@ -83,6 +90,14 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 		});
 	}
 
+	public BookDialog getDialog() {
+		return dialog;
+	}
+
+	public void setDialog(BookDialog dialog) {
+		this.dialog = dialog;
+	}
+
 	@Override
 	protected void fetchData() {
 		bookService.list(getArgMap(), getCallback());
@@ -114,6 +129,22 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 					}
 				});
 			case TITLE:
+				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
+					@Override
+					protected Widget createWidget(final Book item) {
+						if (dialog == null) {
+							return new Label(item.getTitle());
+						}
+
+						return new ClickLabel(item.getTitle(), new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								dialog.center(item);
+							}
+						});
+					}
+				});
+
 				addTextColumn(col, new ValueGetter<String, Book>() {
 					@Override
 					public String get(Book item) {

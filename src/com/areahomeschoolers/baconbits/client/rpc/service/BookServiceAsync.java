@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
+import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface BookServiceAsync {
 
 	void getById(int bookId, AsyncCallback<Book> callback);
+
+	void getPageData(int bookId, AsyncCallback<BookPageData> callback);
 
 	void list(ArgMap<BookArg> args, AsyncCallback<ArrayList<Book>> callback);
 
