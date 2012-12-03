@@ -78,7 +78,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		String sql = "select * from bookCategories order by category";
 		pd.setCategories(query(sql, ServerUtils.getGenericRowMapper()));
 
-		sql = "select * from bookAgeLevels order by ageLevel";
+		sql = "select * from bookAgeLevels order by id";
 		pd.setAgeLevels(query(sql, ServerUtils.getGenericRowMapper()));
 
 		return pd;
