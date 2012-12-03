@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
+import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 
 @Repository
 public class BookDaoImpl extends SpringWrapper implements BookDao {
@@ -68,6 +69,19 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		String sql = createSqlBase() + "and b.id = ?";
 
 		return queryForObject(sql, new BookMapper(), bookId);
+	}
+
+	@Override
+	public BookPageData getPageData(int bookId) {
+		BookPageData pd = new BookPageData();
+
+		String sql = "select * from bookCategories order by category";
+		pd.setCategories(query(sql, ServerUtils.getGenericRowMapper()));
+
+		sql = "select * from bookAgeLevels order by ageLevel";
+		pd.setAgeLevels(query(sql, ServerUtils.getGenericRowMapper()));
+
+		return pd;
 	}
 
 	@Override

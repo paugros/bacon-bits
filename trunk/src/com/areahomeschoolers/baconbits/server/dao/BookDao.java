@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
+import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 
 public interface BookDao {
 	public Book getById(int bookId);
+
+	public BookPageData getPageData(int bookId);
 
 	public ArrayList<Book> list(ArgMap<BookArg> args);
 

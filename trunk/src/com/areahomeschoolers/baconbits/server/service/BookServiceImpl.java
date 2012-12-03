@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
+import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 
 @Controller
 @RequestMapping("/book")
@@ -29,6 +30,11 @@ public class BookServiceImpl extends GwtController implements BookService {
 	@Override
 	public Book getById(int bookId) {
 		return dao.getById(bookId);
+	}
+
+	@Override
+	public BookPageData getPageData(int bookId) {
+		return dao.getPageData(bookId);
 	}
 
 	@Override

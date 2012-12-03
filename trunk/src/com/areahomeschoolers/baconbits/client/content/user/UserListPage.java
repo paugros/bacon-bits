@@ -10,13 +10,14 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class UserListPage implements Page {
 	public UserListPage(final VerticalPanel page) {
-		if (!Application.isAuthenticated()) {
+		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
 		}

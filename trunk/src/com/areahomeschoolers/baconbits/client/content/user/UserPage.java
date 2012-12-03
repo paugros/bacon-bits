@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable;
+import com.areahomeschoolers.baconbits.client.content.book.BookDialog;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerCellTable;
@@ -33,9 +34,11 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
+import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -56,6 +59,7 @@ public class UserPage implements Page {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private UserFieldTable fieldTable;
 	private TabPage tabPanel;
+	private BookDialog bookDialog;
 
 	public UserPage(final VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
@@ -64,7 +68,7 @@ public class UserPage implements Page {
 		}
 
 		int userId = Url.getIntegerParameter("userId");
-		if (!Application.isAuthenticated() && userId < 0) {
+		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS) && userId < 0) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
 		}
@@ -250,14 +254,25 @@ public class UserPage implements Page {
 				}
 			});
 
-			if (Application.memberOf(16)) {
+			if (user.memberOf(16)) {
 				tabPanel.add("Books", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
 						ArgMap<BookArg> args = new ArgMap<BookArg>(Status.ACTIVE);
 						args.put(BookArg.USER_ID, user.getId());
 
-						BookCellTable table = new BookCellTable(args);
+						final BookCellTable table = new BookCellTable(args);
+						if (bookDialog == null) {
+							bookDialog = new BookDialog(table);
+						}
+						table.setDialog(bookDialog);
+
+						table.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								bookDialog.center(new Book());
+							}
+						}));
 						table.setTitle("Books");
 						table.populate();
 
@@ -267,7 +282,7 @@ public class UserPage implements Page {
 				});
 			}
 
-			if (!Application.isAuthenticated()) {
+			if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS) && !user.equals(Application.getCurrentUser())) {
 				form.setEnabled(false);
 			}
 

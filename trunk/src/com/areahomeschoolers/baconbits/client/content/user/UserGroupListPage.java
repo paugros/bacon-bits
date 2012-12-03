@@ -1,6 +1,8 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
+import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -10,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
@@ -17,12 +20,17 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class UserGroupListPage implements Page {
 	public UserGroupListPage(final VerticalPanel page) {
+		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+			new ErrorPage(PageError.NOT_AUTHORIZED);
+			return;
+		}
+
 		ArgMap<UserArg> args = new ArgMap<UserArg>();
 		final String title = "Groups";
 		final UserGroupCellTable table = new UserGroupCellTable(args);
 		table.setTitle(title);
 		table.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.START_DATE, UserGroupColumn.END_DATE);
-		if (Application.isAuthenticated()) {
+		if (Application.isSystemAdministrator()) {
 			table.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
 				@Override
 				public void onMouseDown(MouseDownEvent event) {
