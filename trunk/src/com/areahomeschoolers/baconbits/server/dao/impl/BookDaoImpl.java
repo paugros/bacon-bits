@@ -112,7 +112,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		String sql = createSqlBase();
 		if (userId > 0) {
 			sql += "and b.userId = ? ";
-			sqlArgs.add(ServerContext.getCurrentUserId());
+			sqlArgs.add(userId);
 		}
 
 		ArrayList<Book> data = query(sql, new BookMapper(), sqlArgs.toArray());
