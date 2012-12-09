@@ -1,10 +1,12 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
@@ -19,12 +21,13 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
-		TITLE("Title"), CATEGORY("Category"), AGE_LEVEL("Age level"), PRICE("Price");
+		USER("Seller"), TITLE("Title"), CATEGORY("Category"), AGE_LEVEL("Age level"), STATUS("Status"), PRICE("Price");
 
 		private String title;
 
@@ -53,8 +56,8 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 
 	public void addStatusFilterBox() {
 		final DefaultListBox filterBox = getTitleBar().addFilterListControl();
-		filterBox.addItem("Active");
-		filterBox.addItem("Inactive");
+		filterBox.addItem("Unsold");
+		filterBox.addItem("Sold");
 		filterBox.addItem("All");
 		filterBox.addChangeHandler(new ChangeHandler() {
 			@Override
@@ -62,12 +65,12 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 				switch (filterBox.getSelectedIndex()) {
 				case 0:
 					for (Book item : getFullList()) {
-						setItemVisible(item, item.isActive(), false, false, false);
+						setItemVisible(item, item.getStatusId() == 1, false, false, false);
 					}
 					break;
 				case 1:
 					for (Book item : getFullList()) {
-						setItemVisible(item, !item.isActive(), false, false, false);
+						setItemVisible(item, item.getStatusId() == 2, false, false, false);
 					}
 					break;
 				case 2:
@@ -107,13 +110,30 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 	protected void setColumns() {
 		for (BookColumn col : getDisplayColumns()) {
 			switch (col) {
-			case PRICE:
-				addCurrencyColumn(col, new ValueGetter<Double, Book>() {
+			case USER:
+				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
-					public Double get(Book item) {
+					protected Widget createWidget(Book item) {
+						return new Hyperlink(item.getUserFirstName() + " " + item.getUserLastName(), PageUrl.user(item.getUserId()));
+					}
+				});
+				break;
+			case STATUS:
+				addTextColumn(col, new ValueGetter<String, Book>() {
+					@Override
+					public String get(Book item) {
+						return item.getStatus();
+					}
+				});
+				break;
+			case PRICE:
+				addTotaledCurrencyColumn("Price", new ValueGetter<Number, Book>() {
+					@Override
+					public Number get(Book item) {
 						return item.getPrice();
 					}
 				});
+				break;
 			case AGE_LEVEL:
 				addTextColumn(col, new ValueGetter<String, Book>() {
 					@Override
@@ -121,6 +141,7 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 						return item.getAgeLevel();
 					}
 				});
+				break;
 			case CATEGORY:
 				addTextColumn(col, new ValueGetter<String, Book>() {
 					@Override
@@ -128,12 +149,15 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 						return item.getCategory();
 					}
 				});
+				break;
 			case TITLE:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
 					protected Widget createWidget(final Book item) {
-						if (dialog == null) {
-							return new Label(item.getTitle());
+						if (Application.getCurrentUserId() == item.getUserId() || dialog == null) {
+							if (dialog == null) {
+								return new Label(item.getTitle());
+							}
 						}
 
 						return new ClickLabel(item.getTitle(), new MouseDownHandler() {
@@ -144,13 +168,7 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 						});
 					}
 				});
-
-				addTextColumn(col, new ValueGetter<String, Book>() {
-					@Override
-					public String get(Book item) {
-						return item.getTitle();
-					}
-				});
+				break;
 
 			default:
 				new AssertionError();
