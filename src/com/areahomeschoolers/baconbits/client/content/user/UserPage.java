@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable;
+import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.book.BookDialog;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
@@ -266,17 +267,21 @@ public class UserPage implements Page {
 							bookDialog = new BookDialog(table);
 						}
 						table.setDialog(bookDialog);
+						table.addStatusFilterBox();
 
-						table.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
-							@Override
-							public void onMouseDown(MouseDownEvent event) {
-								bookDialog.center(new Book());
-							}
-						}));
+						if (Application.getCurrentUserId() == user.getId()) {
+							table.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
+								@Override
+								public void onMouseDown(MouseDownEvent event) {
+									bookDialog.center(new Book());
+								}
+							}));
+						}
 						table.setTitle("Books");
+						table.removeColumn(BookColumn.USER);
 						table.populate();
 
-						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
 						tabPanel.selectTabNow(tabBody);
 					}
 				});

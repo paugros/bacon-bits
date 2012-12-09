@@ -78,6 +78,7 @@ public final class MainMenu extends MenuBar {
 
 		addLinkToMenu(menu, "Add Article", PageUrl.article(0));
 		addLinkToMenu(menu, "Add User", PageUrl.user(0));
+		addLinkToMenu(menu, "Books", PageUrl.bookManagement());
 		addLinkToMenu(menu, "List Users", PageUrl.userList());
 		addLinkToMenu(menu, "List Groups", PageUrl.userGroupList());
 

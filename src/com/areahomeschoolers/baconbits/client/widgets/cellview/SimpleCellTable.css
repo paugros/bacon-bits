@@ -76,7 +76,12 @@
 }
 
 .cellTableFooter {
-	
+	border-top: 1px solid #ACACAC;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 8px;
+	padding-bottom: 6px;
+	overflow: hidden;
 }
 
 .cellTableSortedHeaderDescending {

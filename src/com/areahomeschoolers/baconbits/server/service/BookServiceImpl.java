@@ -13,11 +13,11 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 @Controller
 @RequestMapping("/book")
 public class BookServiceImpl extends GwtController implements BookService {
-
 	private static final long serialVersionUID = 1L;
 
 	private BookDao dao;
@@ -35,6 +35,11 @@ public class BookServiceImpl extends GwtController implements BookService {
 	@Override
 	public BookPageData getPageData(int bookId) {
 		return dao.getPageData(bookId);
+	}
+
+	@Override
+	public ArrayList<Data> getSummaryData(ArgMap<BookArg> args) {
+		return dao.getSummaryData(args);
 	}
 
 	@Override

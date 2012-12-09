@@ -16,30 +16,43 @@ import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public class BookDialog extends EntityEditDialog<Book> {
-
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private BookPageData pageData;
+	private boolean closeAfterSubmit = true;
 
 	public BookDialog(final BookCellTable cellTable) {
+		setAutoHide(false);
 		addFormSubmitHandler(new FormSubmitHandler() {
 			@Override
 			public void onFormSubmit(FormField formField) {
+				getButtonPanel().setEnabled(false);
 				entity.setStatusId(1);
 				bookService.save(entity, new Callback<Book>() {
 					@Override
 					protected void doOnSuccess(Book result) {
-						hide();
+						if (closeAfterSubmit) {
+							hide();
+						} else {
+							closeAfterSubmit = true;
+							setEntity(new Book());
+							form.initialize();
+						}
+						getButtonPanel().setEnabled(true);
 						cellTable.addItem(result);
 					}
 				});
 			}
 		});
 
+		getButtonPanel().getCloseButton().setText("Cancel");
 		bookService.getPageData(0, new Callback<BookPageData>() {
 			@Override
 			protected void doOnSuccess(BookPageData result) {
@@ -109,6 +122,7 @@ public class BookDialog extends EntityEditDialog<Book> {
 			ageInput.addItem(d.get("ageLevel"), d.getId());
 		}
 		FormField ageField = form.createFormField("Age level:", ageInput, ageDisplay);
+		ageField.getFieldLabel().setWordWrap(false);
 		ageField.setInitializer(new Command() {
 			@Override
 			public void execute() {
@@ -142,6 +156,17 @@ public class BookDialog extends EntityEditDialog<Book> {
 			}
 		});
 		ft.addField(priceField);
+
+		form.getSubmitButton().setText("Save and Close");
+		final Button save = new Button("Save and Add Another");
+		save.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				closeAfterSubmit = false;
+				form.getSubmitButton().click();
+			}
+		});
+		getButtonPanel().addRightButton(save);
 
 		return ft;
 	}

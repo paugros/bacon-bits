@@ -11,6 +11,10 @@ public class PageUrl {
 		return "page=ArticleGroup&articleIds=" + ids;
 	}
 
+	public static String bookManagement() {
+		return "page=BookManagement";
+	}
+
 	public static String event(int id) {
 		String url = "page=Event";
 		return (id == 0) ? url : url + "&eventId=" + id;

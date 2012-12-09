@@ -23,6 +23,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 @Repository
 public class BookDaoImpl extends SpringWrapper implements BookDao {
@@ -82,6 +83,25 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		pd.setAgeLevels(query(sql, ServerUtils.getGenericRowMapper()));
 
 		return pd;
+	}
+
+	@Override
+	public ArrayList<Data> getSummaryData(ArgMap<BookArg> args) {
+		int statusId = args.getInt(BookArg.STATUS_ID);
+		List<Object> sqlArgs = new ArrayList<Object>();
+
+		String sql = "select count(b.id) as total, sum(b.price) as totalPrice, b.userId, u.firstName, u.lastName \n";
+		sql += "from books b \n";
+		sql += "join users u on u.id = b.userId \n";
+		sql += "where 1 = 1 \n";
+		if (statusId > 0) {
+			sql += "and b.statusId = ? ";
+			sqlArgs.add(statusId);
+		}
+		sql += "group by u.firstName, u.lastName, b.userId ";
+		sql += "order by u.firstName, u.lastName";
+
+		return query(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
 	}
 
 	@Override

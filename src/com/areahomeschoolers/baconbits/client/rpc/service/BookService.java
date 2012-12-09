@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -18,6 +19,8 @@ public interface BookService extends RemoteService {
 	public Book getById(int bookId);
 
 	public BookPageData getPageData(int bookId);
+
+	public ArrayList<Data> getSummaryData(ArgMap<BookArg> args);
 
 	public ArrayList<Book> list(ArgMap<BookArg> args);
 
