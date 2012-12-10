@@ -44,6 +44,12 @@ public class GwtController extends RemoteServiceServlet implements ServletConfig
 		return null; // response handled by GWT RPC over XmlHttpRequest
 	}
 
+	// @Override
+	// public void init() throws ServletException {
+	// super.init();
+	// TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
+	// }
+
 	@Override
 	public void setServletConfig(ServletConfig conf) {
 		try {
@@ -61,19 +67,6 @@ public class GwtController extends RemoteServiceServlet implements ServletConfig
 	@Override
 	protected void checkPermutationStrongName() throws SecurityException {
 		return;
-	}
-
-	@Override
-	protected void doUnexpectedFailure(Throwable e) {
-		if ("class org.mortbay.jetty.EofException".equals(e.getClass().toString())) {
-			// We want to allow this. We know this will be thrown when pages are reloaded because an RPC call is made from
-			// a CloseHandler event. This exception happens then because the client it not there to receive the HttpResponse.
-			// We couldn't do an instanceof check because the server doesn't know about the EofException class.
-			return;
-		}
-
-		e.printStackTrace();
-		super.doUnexpectedFailure(e);
 	}
 
 }
