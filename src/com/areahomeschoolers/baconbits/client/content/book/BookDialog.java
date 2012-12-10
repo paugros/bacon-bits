@@ -118,8 +118,8 @@ public class BookDialog extends EntityEditDialog<Book> {
 
 		final Label ageDisplay = new Label();
 		final RequiredListBox ageInput = new RequiredListBox();
-		for (Data d : pageData.getAgeLevels()) {
-			ageInput.addItem(d.get("ageLevel"), d.getId());
+		for (Data d : pageData.getGradeLevels()) {
+			ageInput.addItem(d.get("gradeLevel"), d.getId());
 		}
 		FormField ageField = form.createFormField("Grade level:", ageInput, ageDisplay);
 		ageField.getFieldLabel().setWordWrap(false);

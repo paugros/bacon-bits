@@ -8,7 +8,7 @@ public class BookPageData implements IsSerializable {
 	private ArrayList<Data> categories;
 	private ArrayList<Data> gradeLevels;
 
-	public ArrayList<Data> getAgeLevels() {
+	public ArrayList<Data> getGradeLevels() {
 		return gradeLevels;
 	}
 
