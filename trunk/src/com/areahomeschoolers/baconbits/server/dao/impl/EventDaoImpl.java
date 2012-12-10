@@ -481,7 +481,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "group by e.id, e.title, e.startDate, a.minimumAge, a.maximumAge, a.minimumParticipants, a.maximumParticipants \n";
 		sql += "order by e.id, a.minimumAge";
 
-		List<Data> data = query(sql, ServerUtils.getGenericRowMapper());
+		List<Data> data = query(sql, ServerUtils.getGenericRowMapper(true));
 		Map<Integer, Data> map = new HashMap<Integer, Data>();
 
 		for (Data d : data) {
@@ -557,7 +557,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		sql += "order by p.jobTitle, u.lastName, u.firstName";
 
-		return query(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
+		return query(sql, ServerUtils.getGenericRowMapper(true), sqlArgs.toArray());
 	}
 
 	@Override
