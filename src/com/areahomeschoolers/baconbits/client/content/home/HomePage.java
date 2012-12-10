@@ -151,6 +151,10 @@ public class HomePage implements Page {
 				VerticalPanel vp = new VerticalPanel();
 				vp.add(new EventModulePanel("Community Events", result));
 
+				String text = "<iframe src=\"http://wms.assoc-amazon.com/20070822/US/html/searchbox_20.html?t=httpwhediment-20\" width=\"120\" height=\"90\" frameborder=\"0\" scrolling=\"no\"></iframe>";
+				SimplePanel sp = new SimplePanel(new HTML(text));
+				sp.addStyleName("mediumPadding");
+				vp.add(sp);
 				communityPanel.setWidget(vp);
 			}
 		});
