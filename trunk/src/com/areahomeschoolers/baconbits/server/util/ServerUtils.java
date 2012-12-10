@@ -38,32 +38,18 @@ public abstract class ServerUtils {
 
 	public static final String SQL_TOP_CLAUSE = "top " + (Common.MAX_DATA_ROWS + 1);
 
-	private final static RowMapper<Data> genericDateRowMapper = new RowMapper<Data>() {
-		@Override
-		public Data mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Data row = new Data();
-			ResultSetMetaData meta = rs.getMetaData();
-			for (int columnIndex = 1; columnIndex <= meta.getColumnCount(); columnIndex++) {
-				String value = (rs.getObject(columnIndex) == null) ? null : rs.getObject(columnIndex).toString();
-				try {
-					row.put(meta.getColumnName(columnIndex), rs.getDate(columnIndex));
-				} catch (Exception e) {
-					row.put(meta.getColumnName(columnIndex), value);
-				}
-			}
-
-			return row;
-		}
-	};
-
 	private final static RowMapper<Data> genericRowMapper = new RowMapper<Data>() {
 		@Override
 		public Data mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Data row = new Data();
 			ResultSetMetaData meta = rs.getMetaData();
 			for (int columnIndex = 1; columnIndex <= meta.getColumnCount(); columnIndex++) {
-				String value = (rs.getObject(columnIndex) == null) ? null : rs.getObject(columnIndex).toString();
-				row.put(meta.getColumnName(columnIndex), value);
+				if (meta.getColumnType(columnIndex) == 93) {
+					row.put(meta.getColumnName(columnIndex), rs.getTimestamp(columnIndex));
+				} else {
+					String value = (rs.getObject(columnIndex) == null) ? null : rs.getObject(columnIndex).toString();
+					row.put(meta.getColumnName(columnIndex), value);
+				}
 			}
 
 			return row;
@@ -173,19 +159,8 @@ public abstract class ServerUtils {
 		return nodes.item(0).getTextContent();
 	}
 
-	/**
-	 * @return The default row mapper, which simply maps each result set row to a Map of Strings (column names) to Strings (values).
-	 */
 	public static RowMapper<Data> getGenericRowMapper() {
-		return getGenericRowMapper(false);
-	}
-
-	/**
-	 * @return The default row mapper, which simply maps each result set row to a Map of Strings (column names) to Strings (values). The date values cannot be
-	 *         read on the server unless getDateValues = true, but his is slower so should only be used when necessary.
-	 */
-	public static RowMapper<Data> getGenericRowMapper(boolean getDateValues) {
-		return getDateValues ? genericDateRowMapper : genericRowMapper;
+		return genericRowMapper;
 	}
 
 	public final static int getIdFromKeys(KeyHolder keys) {
