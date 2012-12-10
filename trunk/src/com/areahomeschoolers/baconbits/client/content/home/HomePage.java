@@ -126,8 +126,6 @@ public class HomePage implements Page {
 
 				VerticalPanel vvp = new VerticalPanel();
 				vvp.setSpacing(8);
-				// Hyperlink link = new Hyperlink("See more events...", PageUrl.eventList());
-				// vvp.add(link);
 
 				Image image = new Image(MainImageBundle.INSTANCE.faceBook());
 				String text = "<p><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" target=\"_TOP\" ";
