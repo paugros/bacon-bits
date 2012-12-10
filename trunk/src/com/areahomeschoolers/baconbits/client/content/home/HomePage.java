@@ -102,6 +102,7 @@ public class HomePage implements Page {
 		grid.getCellFormatter().getElement(0, 0).getStyle().setBackgroundColor("#d8e6f7");
 		grid.getCellFormatter().getElement(0, 2).getStyle().setBackgroundColor("#ddf3da");
 		grid.getCellFormatter().setVerticalAlignment(0, 0, HasVerticalAlignment.ALIGN_TOP);
+		grid.getCellFormatter().setVerticalAlignment(0, 1, HasVerticalAlignment.ALIGN_TOP);
 		grid.getCellFormatter().setVerticalAlignment(0, 2, HasVerticalAlignment.ALIGN_TOP);
 		page.add(grid);
 

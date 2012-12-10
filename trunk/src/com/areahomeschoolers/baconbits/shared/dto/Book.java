@@ -10,7 +10,7 @@ public final class Book extends EntityDto<Book> {
 	private String title;
 	private int userId;
 	private int categoryId;
-	private int ageLevelId;
+	private int gradeLevelId;
 	private int statusId;
 	private double price;
 
@@ -18,18 +18,18 @@ public final class Book extends EntityDto<Book> {
 	private String userFirstName, userLastName;
 	private String status;
 	private String category;
-	private String ageLevel;
+	private String gradeLevel;
 
 	public Book() {
 
 	}
 
-	public String getAgeLevel() {
-		return ageLevel;
+	public String getGradeLevel() {
+		return gradeLevel;
 	}
 
-	public int getAgeLevelId() {
-		return ageLevelId;
+	public int getGradeLevelId() {
+		return gradeLevelId;
 	}
 
 	public String getCategory() {
@@ -72,12 +72,12 @@ public final class Book extends EntityDto<Book> {
 		return true;
 	}
 
-	public void setAgeLevel(String ageLevel) {
-		this.ageLevel = ageLevel;
+	public void setGradeLevel(String gradeLevel) {
+		this.gradeLevel = gradeLevel;
 	}
 
-	public void setAgeLevelId(int ageLevelId) {
-		this.ageLevelId = ageLevelId;
+	public void setGradeLevelId(int gradeLevelId) {
+		this.gradeLevelId = gradeLevelId;
 	}
 
 	public void setCategory(String category) {

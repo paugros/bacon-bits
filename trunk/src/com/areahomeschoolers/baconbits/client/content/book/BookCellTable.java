@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
-		USER("Seller"), TITLE("Title"), CATEGORY("Category"), AGE_LEVEL("Age level"), STATUS("Status"), PRICE("Price");
+		USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade level"), STATUS("Status"), PRICE("Price");
 
 		private String title;
 
@@ -134,11 +134,11 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 					}
 				});
 				break;
-			case AGE_LEVEL:
+			case GRADE_LEVEL:
 				addTextColumn(col, new ValueGetter<String, Book>() {
 					@Override
 					public String get(Book item) {
-						return item.getAgeLevel();
+						return item.getGradeLevel();
 					}
 				});
 				break;
