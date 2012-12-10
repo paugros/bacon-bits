@@ -46,7 +46,7 @@ public class BookDialog extends EntityEditDialog<Book> {
 							form.initialize();
 						}
 						getButtonPanel().setEnabled(true);
-						cellTable.addItem(result);
+						cellTable.populate();
 					}
 				});
 			}
@@ -121,19 +121,19 @@ public class BookDialog extends EntityEditDialog<Book> {
 		for (Data d : pageData.getAgeLevels()) {
 			ageInput.addItem(d.get("ageLevel"), d.getId());
 		}
-		FormField ageField = form.createFormField("Age level:", ageInput, ageDisplay);
+		FormField ageField = form.createFormField("Grade level:", ageInput, ageDisplay);
 		ageField.getFieldLabel().setWordWrap(false);
 		ageField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				ageDisplay.setText(entity.getAgeLevel());
-				ageInput.setValue(entity.getAgeLevelId());
+				ageDisplay.setText(entity.getGradeLevel());
+				ageInput.setValue(entity.getGradeLevelId());
 			}
 		});
 		ageField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setAgeLevelId(ageInput.getIntValue());
+				entity.setGradeLevelId(ageInput.getIntValue());
 			}
 		});
 		ft.addField(ageField);

@@ -33,8 +33,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		public Book mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Book book = new Book();
 			book.setId(rs.getInt("id"));
-			book.setAgeLevelId(rs.getInt("ageLevelId"));
-			book.setAgeLevel(rs.getString("ageLevel"));
+			book.setGradeLevelId(rs.getInt("gradeLevelId"));
+			book.setGradeLevel(rs.getString("gradeLevel"));
 			book.setCategory(rs.getString("category"));
 			book.setCategoryId(rs.getInt("categoryId"));
 			book.setPrice(rs.getDouble("price"));
@@ -54,12 +54,12 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 	}
 
 	public String createSqlBase() {
-		String sql = "select b.*, bs.status, ba.ageLevel, bc.category, u.firstName, u.lastName \n";
+		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, u.firstName, u.lastName \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
 		sql += "join bookStatus bs on bs.id = b.statusId \n";
 		sql += "join bookCategories bc on bc.id = b.categoryId \n";
-		sql += "join bookAgeLevels ba on ba.id = b.ageLevelId \n";
+		sql += "join bookGradeLevels ba on ba.id = b.gradeLevelId \n";
 		sql += "where 1 = 1 \n";
 
 		return sql;
@@ -79,8 +79,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		String sql = "select * from bookCategories order by category";
 		pd.setCategories(query(sql, ServerUtils.getGenericRowMapper()));
 
-		sql = "select * from bookAgeLevels order by id";
-		pd.setAgeLevels(query(sql, ServerUtils.getGenericRowMapper()));
+		sql = "select * from bookGradeLevels order by id";
+		pd.setGradeLevels(query(sql, ServerUtils.getGenericRowMapper()));
 
 		return pd;
 	}
@@ -125,14 +125,14 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(book);
 
 		if (book.isSaved()) {
-			String sql = "update books set title = :title, userId = :userId, categoryId = :categoryId, statusId = :statusId, price = :price, ageLevelId = :ageLevelId ";
+			String sql = "update books set title = :title, userId = :userId, categoryId = :categoryId, statusId = :statusId, price = :price, gradeLevelId = :gradeLevelId ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
 			book.setUserId(ServerContext.getCurrentUser().getId());
 
-			String sql = "insert into books (userId, title, categoryId, ageLevelId, statusId, price) values ";
-			sql += "(:userId, :title, :categoryId, :ageLevelId, :statusId, :price)";
+			String sql = "insert into books (userId, title, categoryId, gradeLevelId, statusId, price) values ";
+			sql += "(:userId, :title, :categoryId, :gradeLevelId, :statusId, :price)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

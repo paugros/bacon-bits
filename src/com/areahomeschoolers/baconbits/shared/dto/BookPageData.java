@@ -6,18 +6,18 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class BookPageData implements IsSerializable {
 	private ArrayList<Data> categories;
-	private ArrayList<Data> ageLevels;
+	private ArrayList<Data> gradeLevels;
 
 	public ArrayList<Data> getAgeLevels() {
-		return ageLevels;
+		return gradeLevels;
 	}
 
 	public ArrayList<Data> getCategories() {
 		return categories;
 	}
 
-	public void setAgeLevels(ArrayList<Data> ageLevels) {
-		this.ageLevels = ageLevels;
+	public void setGradeLevels(ArrayList<Data> gradeLevels) {
+		this.gradeLevels = gradeLevels;
 	}
 
 	public void setCategories(ArrayList<Data> categories) {
