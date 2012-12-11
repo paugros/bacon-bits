@@ -9,6 +9,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,7 +45,8 @@ public abstract class ServerUtils {
 			Data row = new Data();
 			ResultSetMetaData meta = rs.getMetaData();
 			for (int columnIndex = 1; columnIndex <= meta.getColumnCount(); columnIndex++) {
-				if (meta.getColumnType(columnIndex) == 93) {
+				int columnType = meta.getColumnType(columnIndex);
+				if (columnType == Types.TIMESTAMP || columnType == Types.DATE || columnType == Types.TIME) {
 					row.put(meta.getColumnName(columnIndex), rs.getTimestamp(columnIndex));
 				} else {
 					String value = (rs.getObject(columnIndex) == null) ? null : rs.getObject(columnIndex).toString();

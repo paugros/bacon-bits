@@ -26,7 +26,7 @@ public class FieldTable extends Composite {
 		DEFAULT, NARROW, WIDE, NONE
 	}
 
-	static HorizontalPanel createFieldLabelPanel(Label fieldLabel, Label requiredLabel) {
+	static HorizontalPanel createFieldLabelPanel(Widget fieldLabel, Label requiredLabel) {
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.add(requiredLabel);
 		hp.add(fieldLabel);

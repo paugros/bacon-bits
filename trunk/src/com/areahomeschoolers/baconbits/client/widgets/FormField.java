@@ -80,7 +80,7 @@ public class FormField extends Composite {
 	/**
 	 * This label contains the text label of the field, and the required asterisk. It is not automatically placed anywhere.
 	 */
-	private final HorizontalPanel labelPanel;
+	private HorizontalPanel labelPanel;
 	private Form form;
 	private Widget inputWidget, displayWidget;
 	private boolean isEmancipated = false;
@@ -104,7 +104,7 @@ public class FormField extends Composite {
 			}
 		}
 	});
-	private final Label fieldLabel;
+	private final Label fieldLabel = new Label();
 	private Label errorLabel = new Label();
 	private final Label requiredLabel = new Label("*");
 	private boolean isRequired;
@@ -116,55 +116,13 @@ public class FormField extends Composite {
 	private WidgetCreator inputCreator;
 	private LinkPanel linkPanel;
 
-	/**
-	 * New instance with the specified label, input and and display widgets.
-	 * 
-	 * @param label
-	 *            Label containing the text description of this field
-	 * @param inputWidget
-	 *            Widget used to capture user input
-	 * @param displayWidget
-	 *            Widget used to display data from the underlying DTO
-	 */
 	public FormField(String label, Widget inputWidget, Widget displayWidget) {
-		initWidget(fieldGrid);
-		addStyleName("FormField");
-
-		// label stuff
-		fieldLabel = new Label(label);
-		labelPanel = FieldTable.createFieldLabelPanel(fieldLabel, requiredLabel);
-		requiredLabel.setVisible(false);
-		fieldGrid.getCellFormatter().setVerticalAlignment(0, 1, HasVerticalAlignment.ALIGN_TOP);
-
-		setInputWidget(inputWidget);
-		setDisplayWidget(displayWidget);
-		vPanel.add(hPanel);
-		fieldGrid.setWidget(0, 0, vPanel);
-		setInputVisibility(!hasDisplayWidget, false);
-
-		submitButtonHandler = submitButton.addMouseDownHandler(new MouseDownHandler() {
-			@Override
-			public void onMouseDown(MouseDownEvent event) {
-				submit();
-			}
-		});
+		fieldLabel.setText(label);
+		init(fieldLabel, inputWidget, displayWidget);
 	}
 
-	/**
-	 * Create and immediately emancipate a new field.
-	 * 
-	 * @param label
-	 *            Label containing the text description of this field
-	 * @param inputWidget
-	 *            Widget used to capture user input
-	 * @param displayWidget
-	 *            Widget used to display data from the underlying DTO
-	 * @param saveAction
-	 *            The {@link FormSubmitHandler} to execute upon submission of this field
-	 */
-	public FormField(String label, Widget inputWidget, Widget displayWidget, FormSubmitHandler saveAction) {
-		this(label, inputWidget, displayWidget);
-		emancipate(saveAction);
+	public FormField(Widget label, Widget inputWidget, Widget displayWidget) {
+		init(label, inputWidget, displayWidget);
 	}
 
 	public HandlerRegistration addFormCancelHandler(final FormCancelHandler formCancelHandler) {
@@ -902,6 +860,28 @@ public class FormField extends Composite {
 		for (FormCancelHandler handler : cancelHandlers) {
 			handler.onFormCancel(this);
 		}
+	}
+
+	private void init(Widget label, Widget inputWidget, Widget displayWidget) {
+		initWidget(fieldGrid);
+		addStyleName("FormField");
+
+		labelPanel = FieldTable.createFieldLabelPanel(label, requiredLabel);
+		requiredLabel.setVisible(false);
+		fieldGrid.getCellFormatter().setVerticalAlignment(0, 1, HasVerticalAlignment.ALIGN_TOP);
+
+		setInputWidget(inputWidget);
+		setDisplayWidget(displayWidget);
+		vPanel.add(hPanel);
+		fieldGrid.setWidget(0, 0, vPanel);
+		setInputVisibility(!hasDisplayWidget, false);
+
+		submitButtonHandler = submitButton.addMouseDownHandler(new MouseDownHandler() {
+			@Override
+			public void onMouseDown(MouseDownEvent event) {
+				submit();
+			}
+		});
 	}
 
 	private void placeButton() {

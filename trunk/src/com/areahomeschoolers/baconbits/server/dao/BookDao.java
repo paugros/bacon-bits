@@ -9,6 +9,8 @@ import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 public interface BookDao {
+	public void delete(int bookId);
+
 	public Book getById(int bookId);
 
 	public BookPageData getPageData(int bookId);

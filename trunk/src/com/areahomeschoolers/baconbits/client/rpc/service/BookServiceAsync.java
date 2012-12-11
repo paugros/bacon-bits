@@ -12,6 +12,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface BookServiceAsync {
 
+	void delete(int bookId, AsyncCallback<Void> callback);
+
 	void getById(int bookId, AsyncCallback<Book> callback);
 
 	void getPageData(int bookId, AsyncCallback<BookPageData> callback);
