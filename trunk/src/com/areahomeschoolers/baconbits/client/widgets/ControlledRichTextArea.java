@@ -1,6 +1,13 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import com.areahomeschoolers.baconbits.client.content.document.FileUploadDialog;
+import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.images.richtext.RichTextImages;
+import com.areahomeschoolers.baconbits.client.validation.Validator;
+import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
+import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Document;
+import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -88,6 +95,30 @@ public class ControlledRichTextArea extends Composite {
 					if (url != null) {
 						formatter.insertImage(url);
 					}
+				} else if (sender == uploadImage) {
+					final FileUploadDialog uploadDialog = new FileUploadDialog(DocumentLinkType.HTML_IMAGE_INSERT, 0, false, new UploadCompleteHandler() {
+						@Override
+						public void onUploadComplete(int documentId) {
+							formatter.insertImage("/baconbits/service/file?id=" + documentId);
+						}
+					});
+
+					uploadDialog.getForm().addFormValidatorCommand(new ValidatorCommand() {
+						@Override
+						public void validate(Validator validator) {
+							String fileName = uploadDialog.getFileName();
+							if (Common.isNullOrBlank(fileName)) {
+								validator.setError(true);
+							}
+
+							if (!Document.hasImageExtension(fileName)) {
+								validator.setError(true);
+								validator.setErrorMessage("Invalid image file.");
+							}
+						}
+					});
+
+					uploadDialog.center();
 				} else if (sender == createLink) {
 					String url = Window.prompt("Enter a link URL:", "http://");
 					if (url != null) {
@@ -238,6 +269,7 @@ public class ControlledRichTextArea extends Composite {
 		private PushButton ol;
 		private PushButton ul;
 		private PushButton insertImage;
+		private PushButton uploadImage;
 		private PushButton createLink;
 		private PushButton removeLink;
 		private PushButton removeFormat;
@@ -283,6 +315,7 @@ public class ControlledRichTextArea extends Composite {
 				topPanel.add(ol = createPushButton(images.ol(), "Insert Ordered List"));
 				topPanel.add(ul = createPushButton(images.ul(), "Insert Unordered List"));
 				topPanel.add(insertImage = createPushButton(images.insertImage(), "Insert Image"));
+				topPanel.add(uploadImage = createPushButton(images.uploadImage(), "Upload Image"));
 				topPanel.add(createLink = createPushButton(images.createLink(), "Create Link"));
 				topPanel.add(removeLink = createPushButton(images.removeLink(), "Remove Link"));
 				topPanel.add(removeFormat = createPushButton(images.removeFormat(), "Remove Formatting"));
