@@ -3,13 +3,16 @@ package com.areahomeschoolers.baconbits.shared.dto;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.areahomeschoolers.baconbits.shared.Common;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public final class Document extends EntityDto<Document> {
 	public enum DocumentLinkType implements IsSerializable {
-		ARTICLE("article"), EVENT("event");
+		ARTICLE("article"), EVENT("event"), HTML_IMAGE_INSERT("");
 
 		private String entityType;
 		private static final Map<String, DocumentLinkType> lookup = new HashMap<String, DocumentLinkType>();
@@ -34,9 +37,43 @@ public final class Document extends EntityDto<Document> {
 	}
 
 	private static final long serialVersionUID = 1L;
+	public static final String[] imageExtensions = new String[] { "JPG", "JPEG", "GIF", "PNG" };
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public static boolean hasExtension(String fileName, List<String> allowedExtensions) {
+		String extension = Common.getFileExtension(fileName);
+
+		if (Common.isNullOrBlank(extension)) {
+			return false;
+		}
+
+		return isExtension(extension, allowedExtensions);
+	}
+
+	public static boolean hasImageExtension(String fileName) {
+		return hasExtension(fileName, Common.asList(imageExtensions));
+	}
+
+	public static boolean isImageExtension(String extension) {
+		return isExtension(extension, Common.asList(imageExtensions));
+	}
+
+	private static boolean isExtension(String extension, List<String> allowedExtensions) {
+		if (extension == null) {
+			return false;
+		}
+		extension = extension.toUpperCase();
+
+		for (String allowedExt : allowedExtensions) {
+			if (extension.equals(allowedExt)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private String description;
@@ -47,9 +84,12 @@ public final class Document extends EntityDto<Document> {
 	private byte[] data;
 	private Integer addedById;
 	private Date startDate, endDate, addedDate;
+
 	private int fileSize;
+
 	// one-time use for linking
 	private int linkId;
+
 	private DocumentLinkType linkType;
 
 	public Document() {

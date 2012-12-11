@@ -25,6 +25,12 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.DocumentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
+import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
+
+import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesService;
+import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.appengine.api.images.Transform;
 
 @Repository
 public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
@@ -98,6 +104,11 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 			String sql = "update documents set description = :description, startDate = :startDate, endDate = :endDate where id = :id";
 			update(sql, namedParams);
 		} else {
+			// scale if needed
+			if (document.getLinkType() != null && document.getLinkType() == DocumentLinkType.HTML_IMAGE_INSERT) {
+				scaleImageToMaximumSize(document, 600, 2000);
+			}
+
 			if (document.getStartDate() == null) {
 				document.setStartDate(new Date());
 			}
@@ -130,6 +141,46 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		}
 
 		return getById(document.getId());
+	}
+
+	/**
+	 * This function will reduce the size of the image of the provided document ID to the maximum dimensions provided. The image will have the same proportions
+	 * as the original image.
+	 * 
+	 * @param docId
+	 * @param response
+	 * @return
+	 */
+	public Document scaleImageToMaximumSize(Document d, int maxWidth, int maxHeight) {
+		ImagesService imagesService = ImagesServiceFactory.getImagesService();
+		Image image = ImagesServiceFactory.makeImage(d.getData());
+
+		int width = image.getWidth();
+		int height = image.getHeight();
+
+		if (width > maxWidth || height > maxHeight) {
+			// We need to find a new height and width that's within the maximum and still to scale with the original image.
+			double tooWideRatio = (double) width / (double) maxWidth;
+			double tooTallRatio = (double) height / (double) maxHeight;
+			double reductionDivisor = tooWideRatio > tooTallRatio ? tooWideRatio : tooTallRatio;
+
+			int newWidth = (int) (width / reductionDivisor);
+			int newHeight = (int) (height / reductionDivisor);
+
+			Transform resize = ImagesServiceFactory.makeResize(newWidth, newHeight);
+
+			Image newImage = imagesService.applyTransform(resize, image);
+
+			d.setData(newImage.getImageData());
+		}
+
+		return d;
+	}
+
+	public void scaleImageToMaximumSize(int docId, int maxWidth, int maxHeight) {
+		Document d = getById(docId);
+		d = scaleImageToMaximumSize(d, maxWidth, maxHeight);
+		save(d);
 	}
 
 	private Document createDocument(ResultSet rs) throws SQLException {
