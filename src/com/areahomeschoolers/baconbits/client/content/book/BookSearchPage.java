@@ -78,11 +78,11 @@ public final class BookSearchPage implements Page {
 					}
 				});
 				price.addItem("All prices");
-				price.addItem("< $1", "0-1");
+				price.addItem("< $1", "0-0.99");
 				price.addItem("$1 - $5", "1-5");
 				price.addItem("$5 - $10", "5-10");
 				price.addItem("$10 - $20", "10-20");
-				price.addItem("> $20", "20-1000");
+				price.addItem("> $20", "20.01-1000");
 
 				optionsPanel.add(category);
 				optionsPanel.add(grade);

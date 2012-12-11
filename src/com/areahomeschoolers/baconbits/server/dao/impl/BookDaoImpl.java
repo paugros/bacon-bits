@@ -140,7 +140,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 
 		if (priceBetween != null) {
 			String[] range = priceBetween.split("-");
-			if (range.length == 2 && Common.isInteger(range[0]) && Common.isInteger(range[1])) {
+			if (range.length == 2 && Common.isDouble(range[0]) && Common.isDouble(range[1])) {
 				sql += "and b.price between ? and ? ";
 				sqlArgs.add(Double.parseDouble(range[0]));
 				sqlArgs.add(Double.parseDouble(range[1]));
