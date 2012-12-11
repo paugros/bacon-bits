@@ -34,7 +34,7 @@ public class NumericTextBox extends TextBox implements com.areahomeschoolers.bac
 				if (!Common.isDouble(getValue())) {
 					validator.setError(true);
 				}
-			} else if (!Common.isInteger(getValue())) {
+			} else if (!Common.isNumeric(getValue())) {
 				validator.setError(true);
 			}
 

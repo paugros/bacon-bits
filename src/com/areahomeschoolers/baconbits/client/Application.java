@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.content.Layout;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleGroupPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
 import com.areahomeschoolers.baconbits.client.content.book.BookManagementPage;
+import com.areahomeschoolers.baconbits.client.content.book.BookSearchPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventListPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantListPage;
@@ -141,6 +142,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new EventPaymentPage(vp);
 		} else if ("BookManagement".equals(page)) {
 			new BookManagementPage(vp);
+		} else if ("BookSearch".equals(page)) {
+			new BookSearchPage(vp);
 		} else if ("RegistrationManagement".equals(page)) {
 			new RegistrationManagementPage(vp);
 		} else {

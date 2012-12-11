@@ -13,15 +13,40 @@ public final class Book extends EntityDto<Book> {
 	private int gradeLevelId;
 	private int statusId;
 	private double price;
+	private String isbn;
+	private String notes;
+	private Integer conditionId;
+	private Integer imageId;
 
 	// auxillary
 	private String userFirstName, userLastName;
 	private String status;
 	private String category;
 	private String gradeLevel;
+	private String condition;
 
 	public Book() {
 
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public int getCategoryId() {
+		return categoryId;
+	}
+
+	public String getCondition() {
+		return condition;
+	}
+
+	public Integer getConditionId() {
+		if (conditionId == null || conditionId == 0) {
+			return null;
+		}
+
+		return conditionId;
 	}
 
 	public String getGradeLevel() {
@@ -32,12 +57,20 @@ public final class Book extends EntityDto<Book> {
 		return gradeLevelId;
 	}
 
-	public String getCategory() {
-		return category;
+	public Integer getImageId() {
+		if (imageId == null || imageId == 0) {
+			return null;
+		}
+
+		return imageId;
 	}
 
-	public int getCategoryId() {
-		return categoryId;
+	public String getIsbn() {
+		return isbn;
+	}
+
+	public String getNotes() {
+		return notes;
 	}
 
 	public double getPrice() {
@@ -72,6 +105,22 @@ public final class Book extends EntityDto<Book> {
 		return true;
 	}
 
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public void setCondition(String condition) {
+		this.condition = condition;
+	}
+
+	public void setConditionId(int conditionId) {
+		this.conditionId = conditionId;
+	}
+
 	public void setGradeLevel(String gradeLevel) {
 		this.gradeLevel = gradeLevel;
 	}
@@ -80,12 +129,16 @@ public final class Book extends EntityDto<Book> {
 		this.gradeLevelId = gradeLevelId;
 	}
 
-	public void setCategory(String category) {
-		this.category = category;
+	public void setImageId(int imageId) {
+		this.imageId = imageId;
 	}
 
-	public void setCategoryId(int categoryId) {
-		this.categoryId = categoryId;
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 	public void setPrice(double price) {

@@ -176,14 +176,6 @@ public class Form {
 		return createFormField(label, inputWidget, null);
 	}
 
-	/**
-	 * Creates a grouped {@link FormField}, which implements {@link FormField}, and subjects it to grouped management.
-	 * 
-	 * @param label
-	 * @param inputWidget
-	 * @param displayWidget
-	 * @return The new field
-	 */
 	public FormField createFormField(String label, Widget inputWidget, Widget displayWidget) {
 		FormField field = new FormField(label, inputWidget, displayWidget);
 		field.setForm(this);
@@ -191,24 +183,16 @@ public class Form {
 		return field;
 	}
 
-	/**
-	 * Creates an emancipated {@link FormField}, which implements {@link FormField}, and subjects it to management.
-	 * 
-	 * @param label
-	 * @param inputWidget
-	 * @param displayWidget
-	 * @param formSubmitHandler
-	 * @return The new field
-	 */
-	public FormField createFormField(String label, Widget inputWidget, Widget displayWidget, FormSubmitHandler formSubmitHandler) {
-		FormField field = createFormField(label, inputWidget, displayWidget);
-		field.emancipate(formSubmitHandler);
-		return field;
-	}
-
 	public FormField createFormField(String label, WidgetCreator widgetCreator, Widget displayWidget) {
 		FormField field = createFormField(label, new Label(), displayWidget);
 		field.setInputCreator(widgetCreator);
+		return field;
+	}
+
+	public FormField createFormField(Widget label, Widget inputWidget, Widget displayWidget) {
+		FormField field = new FormField(label, inputWidget, displayWidget);
+		field.setForm(this);
+		allFormFields.add(field);
 		return field;
 	}
 

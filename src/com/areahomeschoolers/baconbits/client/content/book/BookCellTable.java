@@ -3,11 +3,13 @@ package com.areahomeschoolers.baconbits.client.content.book;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
-import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
@@ -16,6 +18,7 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -27,7 +30,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
-		USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade level"), STATUS("Status"), PRICE("Price");
+		USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE("Price"), PRICE(
+				"Price");
 
 		private String title;
 
@@ -64,33 +68,29 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 			public void onChange(ChangeEvent e) {
 				switch (filterBox.getSelectedIndex()) {
 				case 0:
-					for (Book item : getFullList()) {
-						setItemVisible(item, item.getStatusId() == 1, false, false, false);
-					}
+					getArgMap().put(BookArg.STATUS_ID, 1);
 					break;
 				case 1:
-					for (Book item : getFullList()) {
-						setItemVisible(item, item.getStatusId() == 2, false, false, false);
-					}
+					getArgMap().put(BookArg.STATUS_ID, 2);
 					break;
 				case 2:
-					showAllItems();
+					getArgMap().remove(BookArg.STATUS_ID);
 					break;
 				}
 
-				refreshForCurrentState();
+				populate();
 			}
 		});
 
-		filterBox.setSelectedIndex(0);
+		int statusId = getArgMap().getInt(BookArg.STATUS_ID);
 
-		addDataReturnHandler(new DataReturnHandler() {
-			@Override
-			public void onDataReturn() {
-				filterBox.fireEvent(new ChangeEvent() {
-				});
-			}
-		});
+		if (statusId == 1) {
+			filterBox.setSelectedIndex(0);
+		} else if (statusId == 2) {
+			filterBox.setSelectedIndex(1);
+		} else {
+			filterBox.setSelectedIndex(2);
+		}
 	}
 
 	public BookDialog getDialog() {
@@ -110,13 +110,23 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 	protected void setColumns() {
 		for (BookColumn col : getDisplayColumns()) {
 			switch (col) {
-			case USER:
-				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
+			case CONDITION:
+				addTextColumn(col, new ValueGetter<String, Book>() {
 					@Override
-					protected Widget createWidget(Book item) {
-						return new Hyperlink(item.getUserFirstName() + " " + item.getUserLastName(), PageUrl.user(item.getUserId()));
+					public String get(Book item) {
+						return item.getCondition();
 					}
 				});
+				break;
+			case USER:
+				if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+					addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
+						@Override
+						protected Widget createWidget(Book item) {
+							return new Hyperlink(item.getUserFirstName() + " " + item.getUserLastName(), PageUrl.user(item.getUserId()));
+						}
+					});
+				}
 				break;
 			case STATUS:
 				addTextColumn(col, new ValueGetter<String, Book>() {
@@ -127,6 +137,14 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 				});
 				break;
 			case PRICE:
+				addCurrencyColumn(col, new ValueGetter<Double, Book>() {
+					@Override
+					public Double get(Book item) {
+						return item.getPrice();
+					}
+				});
+				break;
+			case TOTALED_PRICE:
 				addTotaledCurrencyColumn("Price", new ValueGetter<Number, Book>() {
 					@Override
 					public Number get(Book item) {
@@ -154,10 +172,8 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
 					protected Widget createWidget(final Book item) {
-						if (Application.getCurrentUserId() == item.getUserId() || dialog == null) {
-							if (dialog == null) {
-								return new Label(item.getTitle());
-							}
+						if (Application.getCurrentUserId() != item.getUserId() || dialog == null) {
+							return new Label(item.getTitle());
 						}
 
 						return new ClickLabel(item.getTitle(), new MouseDownHandler() {
@@ -175,6 +191,32 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 				break;
 			}
 		}
+
+		addCompositeWidgetColumn("", new WidgetCellCreator<Book>() {
+			@Override
+			protected Widget createWidget(final Book item) {
+				if (Application.getCurrentUserId() != item.getUserId()) {
+					return new Label("");
+				}
+
+				return new ClickLabel("X", new MouseDownHandler() {
+					@Override
+					public void onMouseDown(MouseDownEvent event) {
+						ConfirmDialog.confirm("Confirm deletion of: " + item.getTitle(), new ConfirmHandler() {
+							@Override
+							public void onConfirm() {
+								bookService.delete(item.getId(), new Callback<Void>() {
+									@Override
+									protected void doOnSuccess(Void result) {
+										populate();
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
 	}
 
 }

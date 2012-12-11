@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.server.dao.BookDao;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -44,6 +45,11 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 			book.setUserLastName(rs.getString("lastName"));
 			book.setUserId(rs.getInt("userId"));
 			book.setTitle(rs.getString("title"));
+			book.setNotes(rs.getString("notes"));
+			book.setIsbn(rs.getString("isbn"));
+			book.setConditionId(rs.getInt("conditionId"));
+			book.setCondition(rs.getString("bookCondition"));
+			book.setImageId(rs.getInt("imageId"));
 			return book;
 		}
 	}
@@ -54,15 +60,22 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 	}
 
 	public String createSqlBase() {
-		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, u.firstName, u.lastName \n";
+		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, u.firstName, u.lastName, bo.bookCondition \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
 		sql += "join bookStatus bs on bs.id = b.statusId \n";
 		sql += "join bookCategories bc on bc.id = b.categoryId \n";
 		sql += "join bookGradeLevels ba on ba.id = b.gradeLevelId \n";
+		sql += "left join bookConditions bo on bo.id = b.conditionId \n";
 		sql += "where 1 = 1 \n";
 
 		return sql;
+	}
+
+	@Override
+	public void delete(int bookId) {
+		String sql = "delete from books where id = ?";
+		update(sql, bookId);
 	}
 
 	@Override
@@ -81,6 +94,12 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 
 		sql = "select * from bookGradeLevels order by id";
 		pd.setGradeLevels(query(sql, ServerUtils.getGenericRowMapper()));
+
+		sql = "select * from bookConditions order by id";
+		pd.setConditions(query(sql, ServerUtils.getGenericRowMapper()));
+
+		sql = "select * from bookStatus order by id";
+		pd.setStatuses(query(sql, ServerUtils.getGenericRowMapper()));
 
 		return pd;
 	}
@@ -107,12 +126,40 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 	@Override
 	public ArrayList<Book> list(ArgMap<BookArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
+		int statusId = args.getInt(BookArg.STATUS_ID);
 		int userId = args.getInt(BookArg.USER_ID);
+		int categoryId = args.getInt(BookArg.CATEGORY_ID);
+		int gradeLevelId = args.getInt(BookArg.GRADE_LEVEL_ID);
+		String priceBetween = args.getString(BookArg.PRICE_BETWEEN);
 
 		String sql = createSqlBase();
 		if (userId > 0) {
 			sql += "and b.userId = ? ";
 			sqlArgs.add(userId);
+		}
+
+		if (priceBetween != null) {
+			String[] range = priceBetween.split("-");
+			if (range.length == 2 && Common.isInteger(range[0]) && Common.isInteger(range[1])) {
+				sql += "and b.price between ? and ? ";
+				sqlArgs.add(Double.parseDouble(range[0]));
+				sqlArgs.add(Double.parseDouble(range[1]));
+			}
+		}
+
+		if (statusId > 0) {
+			sql += "and b.statusId = ? ";
+			sqlArgs.add(statusId);
+		}
+
+		if (categoryId > 0) {
+			sql += "and b.categoryId = ? ";
+			sqlArgs.add(categoryId);
+		}
+
+		if (gradeLevelId > 0) {
+			sql += "and b.gradeLevelId = ? ";
+			sqlArgs.add(gradeLevelId);
 		}
 
 		ArrayList<Book> data = query(sql, new BookMapper(), sqlArgs.toArray());
@@ -125,14 +172,15 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(book);
 
 		if (book.isSaved()) {
-			String sql = "update books set title = :title, userId = :userId, categoryId = :categoryId, statusId = :statusId, price = :price, gradeLevelId = :gradeLevelId ";
+			String sql = "update books set title = :title, userId = :userId, categoryId = :categoryId, statusId = :statusId, price = :price, gradeLevelId = :gradeLevelId, ";
+			sql += "isbn = :isbn, notes = :notes, conditionId = :conditionId, imageId = :imageId ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
 			book.setUserId(ServerContext.getCurrentUser().getId());
 
-			String sql = "insert into books (userId, title, categoryId, gradeLevelId, statusId, price) values ";
-			sql += "(:userId, :title, :categoryId, :gradeLevelId, :statusId, :price)";
+			String sql = "insert into books (userId, title, categoryId, gradeLevelId, statusId, price, isbn, notes, conditionId, imageId) values ";
+			sql += "(:userId, :title, :categoryId, :gradeLevelId, :statusId, :price, :isbn, :notes, :conditionId, :imageId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

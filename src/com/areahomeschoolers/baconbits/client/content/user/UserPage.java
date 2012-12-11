@@ -259,10 +259,11 @@ public class UserPage implements Page {
 				tabPanel.add("Books", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
-						ArgMap<BookArg> args = new ArgMap<BookArg>(Status.ACTIVE);
+						ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 						args.put(BookArg.USER_ID, user.getId());
 
 						final BookCellTable table = new BookCellTable(args);
+						table.removeColumn(BookColumn.PRICE);
 						if (bookDialog == null) {
 							bookDialog = new BookDialog(table);
 						}

@@ -6,8 +6,10 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
+import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
@@ -19,8 +21,10 @@ import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class BookDialog extends EntityEditDialog<Book> {
@@ -34,7 +38,9 @@ public class BookDialog extends EntityEditDialog<Book> {
 			@Override
 			public void onFormSubmit(FormField formField) {
 				getButtonPanel().setEnabled(false);
-				entity.setStatusId(1);
+				if (!entity.isSaved()) {
+					entity.setStatusId(1);
+				}
 				bookService.save(entity, new Callback<Book>() {
 					@Override
 					protected void doOnSuccess(Book result) {
@@ -75,9 +81,12 @@ public class BookDialog extends EntityEditDialog<Book> {
 	@Override
 	protected Widget createContent() {
 		FieldTable ft = new FieldTable();
+		ft.setLabelColumnWidth(LabelColumnWidth.NARROW);
+		ft.setWidth("600px");
 
 		final Label titleDisplay = new Label();
 		final RequiredTextBox titleInput = new RequiredTextBox();
+		titleInput.setVisibleLength(50);
 		titleInput.setMaxLength(200);
 		FormField titleField = form.createFormField("Title:", titleInput, titleDisplay);
 		titleField.setInitializer(new Command() {
@@ -156,6 +165,92 @@ public class BookDialog extends EntityEditDialog<Book> {
 			}
 		});
 		ft.addField(priceField);
+
+		// optional fields
+		final Label isbnDisplay = new Label();
+		final NumericTextBox isbnInput = new NumericTextBox();
+		isbnInput.setMaxLength(13);
+		isbnInput.setMinumumLength(13);
+		Anchor isbnLink = new Anchor("ISBN:", "http://en.wikipedia.org/wiki/International_Standard_Book_Number");
+		isbnLink.setTarget("_blank");
+		FormField isbnField = form.createFormField(isbnLink, isbnInput, isbnDisplay);
+		isbnField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				isbnDisplay.setText(entity.getIsbn());
+				isbnInput.setText(entity.getIsbn());
+			}
+		});
+		isbnField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				entity.setIsbn(isbnInput.getText());
+			}
+		});
+		ft.addField(isbnField);
+
+		final Label statusDisplay = new Label();
+		final DefaultListBox statusInput = new DefaultListBox();
+		for (Data item : pageData.getStatuses()) {
+			statusInput.addItem(item.get("status"), item.getId());
+		}
+		FormField statusField = form.createFormField("Status:", statusInput, statusDisplay);
+		statusField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				statusDisplay.setText(entity.getStatus());
+				statusInput.setValue(entity.getStatusId());
+			}
+		});
+		statusField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				entity.setStatusId(statusInput.getIntValue());
+			}
+		});
+		ft.addField(statusField);
+
+		final Label conditionDisplay = new Label();
+		final DefaultListBox conditionInput = new DefaultListBox();
+		conditionInput.addItem("", 0);
+		for (Data item : pageData.getConditions()) {
+			conditionInput.addItem(item.get("bookCondition"), item.getId());
+		}
+		FormField conditionField = form.createFormField("Condition:", conditionInput, conditionDisplay);
+		conditionField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				conditionDisplay.setText(entity.getCondition());
+				conditionInput.setValue(entity.getConditionId());
+			}
+		});
+		conditionField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				entity.setConditionId(conditionInput.getIntValue());
+			}
+		});
+		ft.addField(conditionField);
+
+		final Label notesDisplay = new Label();
+		final TextBox notesInput = new TextBox();
+		notesInput.setVisibleLength(50);
+		notesInput.setMaxLength(1000);
+		FormField notesField = form.createFormField("Notes:", notesInput, notesDisplay);
+		notesField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				notesDisplay.setText(entity.getNotes());
+				notesInput.setText(entity.getNotes());
+			}
+		});
+		notesField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				entity.setNotes(notesInput.getText());
+			}
+		});
+		ft.addField(notesField);
 
 		form.getSubmitButton().setText("Save and Close");
 		final Button save = new Button("Save and Add Another");
