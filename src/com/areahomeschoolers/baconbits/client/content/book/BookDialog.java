@@ -170,7 +170,7 @@ public class BookDialog extends EntityEditDialog<Book> {
 		final Label isbnDisplay = new Label();
 		final NumericTextBox isbnInput = new NumericTextBox();
 		isbnInput.setMaxLength(13);
-		isbnInput.setMinumumLength(13);
+		isbnInput.setMinumumLength(9);
 		Anchor isbnLink = new Anchor("ISBN:", "http://en.wikipedia.org/wiki/International_Standard_Book_Number");
 		isbnLink.setTarget("_blank");
 		FormField isbnField = form.createFormField(isbnLink, isbnInput, isbnDisplay);
