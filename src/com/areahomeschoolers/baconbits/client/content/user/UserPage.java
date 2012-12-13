@@ -264,6 +264,7 @@ public class UserPage implements Page {
 
 						final BookCellTable table = new BookCellTable(args);
 						table.removeColumn(BookColumn.PRICE);
+						table.removeColumn(BookColumn.CONTACT);
 						if (bookDialog == null) {
 							bookDialog = new BookDialog(table);
 						}

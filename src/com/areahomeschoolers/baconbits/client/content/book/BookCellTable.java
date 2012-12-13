@@ -3,11 +3,15 @@ package com.areahomeschoolers.baconbits.client.content.book;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
+import com.areahomeschoolers.baconbits.client.content.document.FileUploadDialog;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.validation.Validator;
+import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -15,9 +19,12 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
+import com.areahomeschoolers.baconbits.shared.dto.Document;
+import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -129,28 +136,47 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 			case IMAGE:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
-					protected Widget createWidget(Book item) {
-						if (Application.getCurrentUserId() != item.getUserId()) {
-							if (item.getImageId() == null) {
-								return new Label();
-							}
+					protected Widget createWidget(final Book item) {
+						final Image image = new Image("/baconbits/service/file?id=" + item.getSmallImageId());
 
-							Image image = new Image("/baconbits/service/file?id=" + item.getImageId());
+						if (Application.getCurrentUserId() != item.getUserId()) {
 							return image;
 						}
 
-						if (item.getImageId() == null) {
-							ClickLabel cl = new ClickLabel("Set image", new MouseDownHandler() {
-								@Override
-								public void onMouseDown(MouseDownEvent event) {
+						image.addStyleName("pointer");
 
-								}
-							});
+						image.addMouseDownHandler(new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								final FileUploadDialog uploadDialog = new FileUploadDialog(DocumentLinkType.BOOK, item.getId(), false,
+										new UploadCompleteHandler() {
+											@Override
+											public void onUploadComplete(int documentId) {
+												populate();
+												// image.setUrl("/baconbits/service/file?id=" + documentId);
+											}
+										});
 
-							return cl;
-						}
+								uploadDialog.getForm().addFormValidatorCommand(new ValidatorCommand() {
+									@Override
+									public void validate(Validator validator) {
+										String fileName = uploadDialog.getFileName();
+										if (Common.isNullOrBlank(fileName)) {
+											validator.setError(true);
+										}
 
-						return null;
+										if (!Document.hasImageExtension(fileName)) {
+											validator.setError(true);
+											validator.setErrorMessage("Invalid image file.");
+										}
+									}
+								});
+
+								uploadDialog.center();
+							}
+						});
+
+						return image;
 					}
 				});
 				break;
