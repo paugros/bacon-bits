@@ -6,6 +6,8 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
@@ -212,11 +214,13 @@ public class BookDialog extends EntityEditDialog<Book> {
 
 		final Label conditionDisplay = new Label();
 		final DefaultListBox conditionInput = new DefaultListBox();
+		Anchor conditionLink = new Anchor("Condition:", Url.getBaseUrl() + "#" + PageUrl.article(64));
+		conditionLink.setTarget("_blank");
 		conditionInput.addItem("", 0);
 		for (Data item : pageData.getConditions()) {
 			conditionInput.addItem(item.get("bookCondition"), item.getId());
 		}
-		FormField conditionField = form.createFormField("Condition:", conditionInput, conditionDisplay);
+		FormField conditionField = form.createFormField(conditionLink, conditionInput, conditionDisplay);
 		conditionField.setInitializer(new Command() {
 			@Override
 			public void execute() {

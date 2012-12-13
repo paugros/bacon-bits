@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -19,6 +20,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -35,6 +38,9 @@ public final class BookSearchPage implements Page {
 		optionsPanel.add(label);
 		optionsPanel.addStyleName("heavyPadding");
 		page.add(optionsPanel);
+		Hyperlink conditionLink = new Hyperlink("Click here", PageUrl.article(64));
+		String text = conditionLink + " for a description of book conditions.";
+		page.add(new HTML(text));
 
 		bookService.getPageData(0, new Callback<BookPageData>() {
 			@Override
@@ -92,7 +98,8 @@ public final class BookSearchPage implements Page {
 
 		final String title = "Books";
 
-		table.setDisplayColumns(BookColumn.USER, BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.GRADE_LEVEL, BookColumn.CONDITION, BookColumn.PRICE);
+		table.setDisplayColumns(BookColumn.IMAGE, BookColumn.USER, BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.GRADE_LEVEL, BookColumn.CONDITION,
+				BookColumn.PRICE, BookColumn.CONTACT);
 		table.setTitle(title);
 		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addSearchControl();

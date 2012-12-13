@@ -25,13 +25,14 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
-		USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE("Price"), PRICE(
-				"Price");
+		IMAGE(""), USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE(
+				"Price"), PRICE("Price"), CONTACT("Contact seller");
 
 		private String title;
 
@@ -110,6 +111,49 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 	protected void setColumns() {
 		for (BookColumn col : getDisplayColumns()) {
 			switch (col) {
+			case CONTACT:
+				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
+					@Override
+					protected Widget createWidget(Book item) {
+						ClickLabel cl = new ClickLabel("Contact", new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+
+							}
+						});
+
+						return cl;
+					}
+				});
+				break;
+			case IMAGE:
+				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
+					@Override
+					protected Widget createWidget(Book item) {
+						if (Application.getCurrentUserId() != item.getUserId()) {
+							if (item.getImageId() == null) {
+								return new Label();
+							}
+
+							Image image = new Image("/baconbits/service/file?id=" + item.getImageId());
+							return image;
+						}
+
+						if (item.getImageId() == null) {
+							ClickLabel cl = new ClickLabel("Set image", new MouseDownHandler() {
+								@Override
+								public void onMouseDown(MouseDownEvent event) {
+
+								}
+							});
+
+							return cl;
+						}
+
+						return null;
+					}
+				});
+				break;
 			case CONDITION:
 				addTextColumn(col, new ValueGetter<String, Book>() {
 					@Override
