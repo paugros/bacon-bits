@@ -105,8 +105,12 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 			update(sql, namedParams);
 		} else {
 			// scale if needed
-			if (document.getLinkType() != null && document.getLinkType() == DocumentLinkType.HTML_IMAGE_INSERT) {
-				scaleImageToMaximumSize(document, 600, 2000);
+			if (document.getLinkType() != null) {
+				if (document.getLinkType() == DocumentLinkType.HTML_IMAGE_INSERT) {
+					scaleImageToMaximumSize(document, 600, 2000);
+				} else if (document.getLinkType() == DocumentLinkType.BOOK) {
+					scaleImageToMaximumSize(document, 100, 100);
+				}
 			}
 
 			if (document.getStartDate() == null) {
@@ -136,7 +140,12 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 			document.setId(ServerUtils.getIdFromKeys(keys));
 
 			if (document.getLinkType() != null && document.getLinkId() > 0) {
-				link(document);
+				if (document.getLinkType() == DocumentLinkType.BOOK) {
+					sql = "update books set imageId = ? where id = ?";
+					update(sql, document.getId(), document.getLinkId());
+				} else {
+					link(document);
+				}
 			}
 		}
 
