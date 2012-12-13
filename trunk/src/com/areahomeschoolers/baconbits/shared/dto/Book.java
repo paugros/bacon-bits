@@ -17,6 +17,7 @@ public final class Book extends EntityDto<Book> {
 	private String notes;
 	private Integer conditionId;
 	private Integer imageId;
+	private Integer smallImageId;
 
 	// auxillary
 	private String userFirstName, userLastName;
@@ -75,6 +76,14 @@ public final class Book extends EntityDto<Book> {
 
 	public double getPrice() {
 		return price;
+	}
+
+	public Integer getSmallImageId() {
+		if (smallImageId == null || smallImageId == 0) {
+			return null;
+		}
+
+		return smallImageId;
 	}
 
 	public String getStatus() {
@@ -143,6 +152,10 @@ public final class Book extends EntityDto<Book> {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void setSmallImageId(Integer smallImageId) {
+		this.smallImageId = smallImageId;
 	}
 
 	public void setStatus(String status) {

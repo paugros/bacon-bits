@@ -50,6 +50,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 			book.setConditionId(rs.getInt("conditionId"));
 			book.setCondition(rs.getString("bookCondition"));
 			book.setImageId(rs.getInt("imageId"));
+			book.setSmallImageId(rs.getInt("smallImageId"));
 			return book;
 		}
 	}
@@ -173,14 +174,14 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 
 		if (book.isSaved()) {
 			String sql = "update books set title = :title, userId = :userId, categoryId = :categoryId, statusId = :statusId, price = :price, gradeLevelId = :gradeLevelId, ";
-			sql += "isbn = :isbn, notes = :notes, conditionId = :conditionId, imageId = :imageId ";
+			sql += "isbn = :isbn, notes = :notes, conditionId = :conditionId, imageId = :imageId, smallImageId = :smallImageId ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
 			book.setUserId(ServerContext.getCurrentUser().getId());
 
-			String sql = "insert into books (userId, title, categoryId, gradeLevelId, statusId, price, isbn, notes, conditionId, imageId) values ";
-			sql += "(:userId, :title, :categoryId, :gradeLevelId, :statusId, :price, :isbn, :notes, :conditionId, :imageId)";
+			String sql = "insert into books (userId, title, categoryId, gradeLevelId, statusId, price, isbn, notes, conditionId, imageId, smallImageId) values ";
+			sql += "(:userId, :title, :categoryId, :gradeLevelId, :statusId, :price, :isbn, :notes, :conditionId, 32, 34)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
