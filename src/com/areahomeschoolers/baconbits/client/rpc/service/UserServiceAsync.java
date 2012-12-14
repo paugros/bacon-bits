@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -26,6 +27,8 @@ public interface UserServiceAsync {
 	void save(User user, AsyncCallback<ServerResponseData<User>> callback);
 
 	void saveUserGroup(UserGroup group, AsyncCallback<UserGroup> callback);
+
+	void sendEmail(Email email, AsyncCallback<Void> callback);
 
 	void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add, AsyncCallback<Void> callback);
 

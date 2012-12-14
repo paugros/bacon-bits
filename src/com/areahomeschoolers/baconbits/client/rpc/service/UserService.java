@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -30,6 +31,8 @@ public interface UserService extends RemoteService {
 	public ServerResponseData<User> save(User user);
 
 	public UserGroup saveUserGroup(UserGroup group);
+
+	public void sendEmail(Email email);
 
 	public ServerResponseData<String> validatePassword(String password);
 

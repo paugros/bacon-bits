@@ -6,10 +6,16 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class AlertDialog extends DefaultDialog {
+	public static void alert(String content) {
+		AlertDialog ad = new AlertDialog("Message", new Label(content));
+		ad.center();
+	}
+
 	public static void alert(String caption, Widget content) {
 		AlertDialog ad = new AlertDialog(caption, content);
 		ad.center();

@@ -28,8 +28,8 @@ public class BookServiceImpl extends GwtController implements BookService {
 	}
 
 	@Override
-	public void delete(int bookId) {
-		dao.delete(bookId);
+	public void delete(Book book) {
+		dao.delete(book);
 	}
 
 	@Override
