@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -93,6 +94,14 @@ public class UserServiceImpl extends GwtController implements UserService {
 	@Override
 	public UserGroup saveUserGroup(UserGroup group) {
 		return dao.saveUserGroup(group);
+	}
+
+	@Override
+	public void sendEmail(Email email) {
+		Mailer mailer = new Mailer();
+		mailer.setEmail(email);
+
+		mailer.send();
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Email;
 
 public class Mailer {
 	private final List<String> tos = new ArrayList<String>();
@@ -164,6 +165,14 @@ public class Mailer {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public void setEmail(Email email) {
+		addTo(email.getTos());
+		addCc(email.getCcs());
+		addBcc(email.getBccs());
+		setSubject(email.getSubject());
+		setBody(email.getBody());
 	}
 
 	public void setHtmlMail(boolean isHtmlMail) {

@@ -51,6 +51,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 			book.setCondition(rs.getString("bookCondition"));
 			book.setImageId(rs.getInt("imageId"));
 			book.setSmallImageId(rs.getInt("smallImageId"));
+			book.setUserEmail(rs.getString("email"));
 			return book;
 		}
 	}
@@ -61,7 +62,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 	}
 
 	public String createSqlBase() {
-		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, u.firstName, u.lastName, bo.bookCondition \n";
+		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, u.firstName, u.lastName, u.email, bo.bookCondition \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
 		sql += "join bookStatus bs on bs.id = b.statusId \n";
@@ -74,9 +75,12 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 	}
 
 	@Override
-	public void delete(int bookId) {
+	public void delete(Book book) {
 		String sql = "delete from books where id = ?";
-		update(sql, bookId);
+		update(sql, book.getId());
+
+		sql = "delete from documents where id in(?, ?) and id > 34";
+		update(sql, book.getSmallImageId(), book.getImageId());
 	}
 
 	@Override

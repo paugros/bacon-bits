@@ -21,6 +21,7 @@ public final class Book extends EntityDto<Book> {
 
 	// auxillary
 	private String userFirstName, userLastName;
+	private String userEmail;
 	private String status;
 	private String category;
 	private String gradeLevel;
@@ -98,6 +99,10 @@ public final class Book extends EntityDto<Book> {
 		return title;
 	}
 
+	public String getUserEmail() {
+		return userEmail;
+	}
+
 	public String getUserFirstName() {
 		return userFirstName;
 	}
@@ -168,6 +173,10 @@ public final class Book extends EntityDto<Book> {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
 	}
 
 	public void setUserFirstName(String userFirstName) {

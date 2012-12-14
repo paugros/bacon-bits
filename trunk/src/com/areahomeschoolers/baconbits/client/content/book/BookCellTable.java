@@ -9,9 +9,13 @@ import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
+import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -25,6 +29,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
+import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -38,7 +43,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
-		IMAGE(""), USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE(
+		IMAGE("Image"), USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE(
 				"Price"), PRICE("Price"), CONTACT("Contact seller");
 
 		private String title;
@@ -119,13 +124,39 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 		for (BookColumn col : getDisplayColumns()) {
 			switch (col) {
 			case CONTACT:
+				if (!Application.isAuthenticated()) {
+					break;
+				}
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
-					protected Widget createWidget(Book item) {
+					protected Widget createWidget(final Book item) {
 						ClickLabel cl = new ClickLabel("Contact", new MouseDownHandler() {
 							@Override
 							public void onMouseDown(MouseDownEvent event) {
+								ConfirmDialog.confirm("Send a message to the seller? You will be copied on the email.", new ConfirmHandler() {
+									@Override
+									public void onConfirm() {
+										UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
+										Email e = new Email();
+										e.addTo(item.getUserEmail());
+										e.addCc(Application.getCurrentUser().getEmail());
+										e.setSubject("Buyer for book: " + item.getTitle());
+										String m = "Hello, someone is interested in buying a book that you have listed for sale. Details appear below.\n\n";
+										m += "Buyer: " + Application.getCurrentUser().getFullName() + "\n";
+										m += "Buyer email: " + Application.getCurrentUser().getEmail() + "\n";
+										m += "Title: " + item.getTitle() + "\n";
+										m += "Price: " + Formatter.formatCurrency(item.getPrice()) + "\n\n";
+										m += "NOTE: Please do not reply to the sender of this email. Reply to the Buyer email listed above instead.";
+										e.setBody(m);
+										userService.sendEmail(e, new Callback<Void>() {
+											@Override
+											protected void doOnSuccess(Void result) {
+												AlertDialog.alert("Message sent.");
+											}
+										});
+									}
+								});
 							}
 						});
 
@@ -243,7 +274,12 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 					@Override
 					protected Widget createWidget(final Book item) {
 						if (Application.getCurrentUserId() != item.getUserId() || dialog == null) {
-							return new Label(item.getTitle());
+							return new ClickLabel(item.getTitle(), new MouseDownHandler() {
+								@Override
+								public void onMouseDown(MouseDownEvent event) {
+									new BookDetailsDialog(item).center();
+								}
+							});
 						}
 
 						return new ClickLabel(item.getTitle(), new MouseDownHandler() {
@@ -275,7 +311,7 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 						ConfirmDialog.confirm("Confirm deletion of: " + item.getTitle(), new ConfirmHandler() {
 							@Override
 							public void onConfirm() {
-								bookService.delete(item.getId(), new Callback<Void>() {
+								bookService.delete(item, new Callback<Void>() {
 									@Override
 									protected void doOnSuccess(Void result) {
 										populate();
