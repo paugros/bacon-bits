@@ -23,6 +23,8 @@
   <!-- Other module inherits                                      -->
 
   <stylesheet src="BaconBits.css" />
+  <script src="jquery-1.3.2.js" />
+  <script src="jquery.barcode.0.3.js" />
   <!-- Specify the app entry point class.                         -->
   <entry-point class="com.areahomeschoolers.baconbits.client.BaconBitsEntryPoint"></entry-point>
 
