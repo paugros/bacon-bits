@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -21,6 +22,11 @@ public class BookDetailsDialog extends DefaultDialog {
 		this.book = b;
 		setText("Book Details");
 		vp.setSpacing(10);
+		String html = "<div id=\"barcode\" style=\"width:503px;height:50px;border:1px solid red;\" onclick=\"$('#barcode').barcode({code:'code39'});\">"
+				+ b.getId() + "</div>";
+		HTML bb = new HTML(html);
+		vp.add(bb);
+
 		pp.add(new Image("/baconbits/service/file?id=" + book.getImageId()));
 
 		VerticalPanel dt = new VerticalPanel();
@@ -35,7 +41,7 @@ public class BookDetailsDialog extends DefaultDialog {
 		dt.add(price);
 
 		if (!Common.isNullOrBlank(book.getIsbn())) {
-			Label isbn = new Label("ISBN:" + book.getIsbn());
+			Label isbn = new Label("ISBN: " + book.getIsbn());
 			dt.add(isbn);
 		}
 
