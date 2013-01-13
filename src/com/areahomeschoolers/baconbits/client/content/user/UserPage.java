@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
@@ -20,13 +21,16 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.FixedWidthLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
@@ -42,10 +46,17 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class UserPage implements Page {
@@ -94,6 +105,12 @@ public class UserPage implements Page {
 			}
 		});
 	}
+
+	private native void createBarcode(String bookId) /*-{
+		$wnd.$('#barcode_' + bookId).barcode({
+			code : 'code39'
+		});
+	}-*/;
 
 	private void createFieldTable() {
 		fieldTable = new UserFieldTable(form, user);
@@ -279,6 +296,14 @@ public class UserPage implements Page {
 								}
 							}));
 						}
+
+						table.getTitleBar().addLink(new ClickLabel("Print labels", new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								printLabels(table.getFullList());
+							}
+						}));
+
 						table.setTitle("Books");
 						table.removeColumn(BookColumn.USER);
 						table.populate();
@@ -297,6 +322,65 @@ public class UserPage implements Page {
 		}
 
 		Application.getLayout().setPage(title, page);
+	}
+
+	private void printLabels(List<Book> books) {
+		FlexTable ft = new FlexTable();
+		// ft.setBorderWidth(1);
+
+		ft.setCellPadding(0);
+		ft.setCellSpacing(0);
+		// ft.getElement().getStyle().setMarginLeft(30, Unit.PX);
+		// ft.getElement().getStyle().setMarginTop(55, Unit.PX);
+
+		RootPanel.get().clear();
+		RootPanel.get().getElement().getStyle().setPadding(0, Unit.PX);
+		RootPanel.get().add(ft);
+
+		for (int i = 0; i < books.size(); i++) {
+			Book book = books.get(i);
+			if (i % 3 == 0) {
+				ft.insertRow(ft.getRowCount());
+			}
+			int row = ft.getRowCount() - 1;
+			int cell = ft.getCellCount(row);
+
+			VerticalPanel vp = new VerticalPanel();
+			vp.setSpacing(0);
+			Label title = new FixedWidthLabel(book.getTitle(), 240);
+			// title.addStyleName("smallText");
+
+			Label category = new FixedWidthLabel(book.getCategory(), 240);
+			category.addStyleName("smallText");
+			category.getElement().getStyle().setPaddingBottom(4, Unit.PX);
+			vp.add(category);
+
+			vp.add(title);
+			vp.add(category);
+
+			String html = "<div id=\"barcode_" + book.getId() + "\" style=\"width:200px;height:25px;\">" + book.getId() + "</div>";
+			HTML barcode = new HTML(html);
+			vp.add(barcode);
+
+			PaddedPanel pp = new PaddedPanel(10);
+			Label price = new Label(Formatter.formatCurrency(book.getPrice()));
+			price.addStyleName("bold");
+			pp.add(price);
+			Label ids = new Label("S:" + user.getId() + " / I:" + book.getId());
+			pp.add(ids);
+			vp.add(pp);
+
+			SimplePanel sp = new SimplePanel(vp);
+			sp.setWidth("262px");
+			sp.setHeight("96px");
+			vp.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
+
+			ft.setWidget(row, cell, sp);
+			createBarcode(Integer.toString(book.getId()));
+		}
+
+		Window.setTitle(" ");
+		Window.print();
 	}
 
 	private void save(final FormField field) {
