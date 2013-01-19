@@ -23,4 +23,6 @@ public interface BookServiceAsync {
 	void list(ArgMap<BookArg> args, AsyncCallback<ArrayList<Book>> callback);
 
 	void save(Book book, AsyncCallback<Book> callback);
+
+	void sellBooks(ArrayList<Book> books, String email, AsyncCallback<Void> callback);
 }

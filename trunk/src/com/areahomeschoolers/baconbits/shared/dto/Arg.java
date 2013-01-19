@@ -8,7 +8,7 @@ public interface Arg {
 	}
 
 	public enum BookArg implements Arg, IsSerializable {
-		USER_ID, STATUS_ID, CATEGORY_ID, GRADE_LEVEL_ID, PRICE_BETWEEN
+		USER_ID, STATUS_ID, CATEGORY_ID, GRADE_LEVEL_ID, PRICE_BETWEEN, IDS
 	}
 
 	public enum DocumentArg implements Arg, IsSerializable {

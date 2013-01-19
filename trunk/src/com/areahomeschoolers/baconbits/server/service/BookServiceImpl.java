@@ -57,4 +57,9 @@ public class BookServiceImpl extends GwtController implements BookService {
 		return dao.save(book);
 	}
 
+	@Override
+	public void sellBooks(ArrayList<Book> books, String email) {
+		dao.sellBooks(books, email);
+	}
+
 }

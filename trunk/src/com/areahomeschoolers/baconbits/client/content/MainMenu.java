@@ -167,6 +167,9 @@ public final class MainMenu extends MenuBar {
 		MenuBar menu = new MenuBar(true);
 		// addLinkToMenu(menu, "Helpful Links", PageUrl.articleGroup("39"));
 		addLinkToMenu(menu, "Books For Sale", PageUrl.bookSearch());
+		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+			addLinkToMenu(menu, "Create Book Receipt", PageUrl.bookReceipt());
+		}
 		addLinkToMenu(menu, "Homeschooling Books", PageUrl.articleGroup("43"));
 		addLinkToMenu(menu, "Local Sports League Info", PageUrl.articleGroup("34"));
 

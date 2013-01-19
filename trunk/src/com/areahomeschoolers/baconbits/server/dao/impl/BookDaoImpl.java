@@ -2,6 +2,7 @@ package com.areahomeschoolers.baconbits.server.dao.impl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.BookDao;
+import com.areahomeschoolers.baconbits.server.util.Mailer;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
@@ -136,6 +138,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		int categoryId = args.getInt(BookArg.CATEGORY_ID);
 		int gradeLevelId = args.getInt(BookArg.GRADE_LEVEL_ID);
 		String priceBetween = args.getString(BookArg.PRICE_BETWEEN);
+		List<Integer> ids = args.getIntList(BookArg.IDS);
 
 		String sql = createSqlBase();
 		if (userId > 0) {
@@ -150,6 +153,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 				sqlArgs.add(Double.parseDouble(range[0]));
 				sqlArgs.add(Double.parseDouble(range[1]));
 			}
+		}
+
+		if (ids != null && !ids.isEmpty()) {
+			sql += "and b.id in(" + Common.join(ids, ",") + ") ";
 		}
 
 		if (statusId > 0) {
@@ -194,6 +201,52 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		}
 
 		return getById(book.getId());
+	}
+
+	@Override
+	public void sellBooks(ArrayList<Book> books, String email) {
+		String sql = "";
+		// check if email belongs to a registered user
+		Data boughtBy = null;
+		if (email != null) {
+			sql = "select id, firstName from users where email = ?";
+			boughtBy = queryForObject(sql, ServerUtils.getGenericRowMapper(), email.toLowerCase());
+		}
+
+		List<Integer> ids = new ArrayList<Integer>();
+		String html = "<html><body>\n";
+		if (boughtBy != null) {
+			html += "Hello " + boughtBy.get("firstName") + ",<br><br>\n";
+		}
+		html += "Below is your receipt for items purchased at the book sale:<br><br>\n";
+		html += "<table width=700><tr><td><b>ID</b></td><td><b>Title</b></td><td><b>Category</b></td><td><b>Price</b></td></tr>\n";
+		double total = 0.00;
+		for (Book b : books) {
+			ids.add(b.getId());
+			total += b.getPrice();
+			html += "<tr>\n";
+			html += "<td>" + b.getId() + "</td>\n";
+			html += "<td>" + b.getTitle() + "</td>\n";
+			html += "<td>" + b.getCategory() + "</td>\n";
+			html += "<td>" + NumberFormat.getCurrencyInstance().format(b.getPrice()) + "</td>\n";
+			html += "</tr>\n";
+		}
+		html += "<tr><td></td><td></td><td></td><td><b>";
+		html += NumberFormat.getCurrencyInstance().format(total);
+		html += "</b></td></tr>";
+		html += "</table></body></html>\n";
+
+		sql = "update books set statusId = 2, boughtById = ? where id in(" + Common.join(ids, ",") + ")";
+		Integer bid = (boughtBy == null) ? null : boughtBy.getId();
+		update(sql, bid);
+
+		Mailer m = new Mailer();
+		m.setHtmlMail(true);
+
+		m.setSubject("Book Sale Receipt");
+		m.setBody(html);
+		m.addTo(email);
+		m.send();
 	}
 
 }

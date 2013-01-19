@@ -20,4 +20,6 @@ public interface BookDao {
 	public ArrayList<Book> list(ArgMap<BookArg> args);
 
 	public Book save(Book book);
+
+	public void sellBooks(ArrayList<Book> books, String email);
 }
