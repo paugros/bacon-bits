@@ -26,6 +26,7 @@ public abstract class Callback<T> implements AsyncCallback<T> {
 	private static int callCount = 0;
 
 	public static void handleRpcExeption(Throwable caught) {
+		caught.printStackTrace();
 		String errorMessage = caught.toString();
 
 		if (Application.getRpcFailureCommand() != null) {

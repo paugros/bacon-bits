@@ -15,6 +15,10 @@ public class PageUrl {
 		return "page=BookManagement";
 	}
 
+	public static String bookReceipt() {
+		return "page=BookReceipt";
+	}
+
 	public static String bookSearch() {
 		return "page=BookSearch";
 	}
