@@ -169,6 +169,11 @@ img {
 	border-right: none;
 }
 
+.MAXWIDTH900PX {
+	width: 100%;
+	max-width: 900px;
+}
+
 .MAXWIDTH750PX {
 	width: 100%;
 	max-width: 750px;
