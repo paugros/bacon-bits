@@ -8,11 +8,13 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ButtonPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -96,6 +98,10 @@ public class EventSeriesDialog extends DefaultDialog {
 		save.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				if (Common.isNullOrEmpty(calendarEvent.getSeriesDates())) {
+					AlertDialog.alert("You must specify at least one series date and click Add.");
+					return;
+				}
 				save.setEnabled(false);
 				eventService.createSeries(calendarEvent, new Callback<Void>() {
 					@Override

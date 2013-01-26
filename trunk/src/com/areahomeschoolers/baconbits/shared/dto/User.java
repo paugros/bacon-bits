@@ -163,6 +163,15 @@ public final class User extends EntityDto<User> {
 		return groups.keySet().contains(groupId);
 	}
 
+	public boolean memberOfAny(int... groupIds) {
+		for (int id : groupIds) {
+			if (memberOf(id)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void setAccessLevels(HashSet<AccessLevel> accessLevels) {
 		this.accessLevels = accessLevels;
 	}

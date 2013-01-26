@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -32,6 +33,10 @@ public final class BookSearchPage implements Page {
 	private PaddedPanel optionsPanel = new PaddedPanel(15);
 
 	public BookSearchPage(final VerticalPanel page) {
+		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+			args.put(BookArg.ONLINE_ONLY);
+		}
+
 		optionsPanel.getElement().getStyle().setBackgroundColor("#c5eabf");
 		Label label = new Label("Filter for:");
 		label.addStyleName("bold");

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.util.Formatter;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.FormField.ButtonPlacement;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.EventField;
@@ -95,7 +94,7 @@ public class EventFormField {
 			if (field.getRequired()) {
 				inputWidget = new RequiredTextArea();
 			} else {
-				inputWidget = WidgetFactory.createStandardTextArea();
+				inputWidget = new DefaultTextArea();
 			}
 
 			final TextArea ta = (TextArea) inputWidget;

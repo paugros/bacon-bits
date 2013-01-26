@@ -17,7 +17,6 @@ import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -29,8 +28,6 @@ public abstract class WidgetFactory {
 	private static final String DEFAULT_PERCENTAGE_BAR_STYLE = "percentageBar-green";
 	public static final int PAGE_SPACING = 10;
 	public static final int SIDEBAR_SPACING = 5;
-	public static final int DEFAULT_TEXT_AREA_WIDTH = 50;
-	public static final int DEFAULT_TEXT_AREA_HEIGHT = 8;
 
 	public static ButtonBase createClickBox(Image image, ClickHandler ch) {
 		CustomButton cb = new CustomButton(image) {
@@ -87,13 +84,6 @@ public abstract class WidgetFactory {
 		grid.getCellFormatter().getElement(0, 1).getStyle().setWidth(100 - percent, Unit.PCT);
 
 		return grid;
-	}
-
-	public static TextArea createStandardTextArea() {
-		TextArea ta = new TextArea();
-		ta.setCharacterWidth(DEFAULT_TEXT_AREA_WIDTH);
-		ta.setVisibleLines(DEFAULT_TEXT_AREA_HEIGHT);
-		return ta;
 	}
 
 	public static Widget getToolTipLabel(String text, String toolTipText) {
