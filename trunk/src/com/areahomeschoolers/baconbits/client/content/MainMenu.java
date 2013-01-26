@@ -67,7 +67,7 @@ public final class MainMenu extends MenuBar {
 		addItem("WHE Classes/Activities", getClassesMenu());
 		// addItem("Educational Resources", getEducationMenu());
 		addItem("Support", getSupportMenu());
-		addItem("Books", getBooksMenu());
+		addItem("Books Store", getBooksMenu());
 		addItem("Resources", getResourcesMenu());
 		if (Application.isSystemAdministrator()) {
 			addItem("Admin", getAdminMenu());

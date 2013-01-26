@@ -58,6 +58,7 @@ public class EmailDialog extends DefaultDialog {
 					}
 
 					fromEmail = fromBox.getValue();
+					email.addCc(fromEmail);
 				}
 
 				send.setEnabled(false);
