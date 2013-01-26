@@ -150,6 +150,7 @@ public class MonthYearPicker extends Composite implements CustomFocusWidget, Has
 
 	@Override
 	public void setRequired(boolean required) {
+		validator.setRequired(required);
 		this.required = required;
 	}
 

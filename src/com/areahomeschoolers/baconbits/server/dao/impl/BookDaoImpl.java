@@ -217,7 +217,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		String sql = "";
 		// check if email belongs to a registered user
 		Data boughtBy = null;
-		if (email != null) {
+		if (!Common.isNullOrBlank(email)) {
 			sql = "select id, firstName from users where email = ?";
 			boughtBy = queryForObject(sql, ServerUtils.getGenericRowMapper(), email.toLowerCase());
 		}
@@ -249,13 +249,15 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		Integer bid = (boughtBy == null) ? null : boughtBy.getId();
 		update(sql, bid);
 
-		Mailer m = new Mailer();
-		m.setHtmlMail(true);
+		if (!Common.isNullOrBlank(email)) {
+			Mailer m = new Mailer();
+			m.setHtmlMail(true);
 
-		m.setSubject("Book Sale Receipt");
-		m.setBody(html);
-		m.addTo(email);
-		m.send();
+			m.setSubject("Book Sale Receipt");
+			m.setBody(html);
+			m.addTo(email);
+			m.send();
+		}
 	}
 
 }

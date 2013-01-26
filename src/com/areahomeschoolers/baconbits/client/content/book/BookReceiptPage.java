@@ -103,7 +103,6 @@ public final class BookReceiptPage implements Page {
 						emailBox.setFocus(true);
 					}
 				});
-				emailBox.setRequired(true);
 				pp.add(l);
 				pp.add(emailBox);
 
