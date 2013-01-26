@@ -893,7 +893,16 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				UserDao userDao = ServerContext.getDaoImpl("user");
 				User u = userDao.getById(registration.getAddedById());
 				Mailer mailer = new Mailer();
-				mailer.addTo(e.getNotificationEmail());
+				if (e.getNotificationEmail().contains(",")) {
+					String[] addrs = e.getNotificationEmail().split(", *");
+					for (String a : addrs) {
+						if (!a.trim().isEmpty()) {
+							mailer.addTo(a.trim());
+						}
+					}
+				} else {
+					mailer.addTo(e.getNotificationEmail());
+				}
 				String subject = "Event registration notification: " + e.getTitle();
 
 				String body = "Registrant: " + u.getFullName() + "\n";
