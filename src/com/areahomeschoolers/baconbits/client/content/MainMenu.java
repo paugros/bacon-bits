@@ -67,6 +67,7 @@ public final class MainMenu extends MenuBar {
 		addItem("WHE Classes/Activities", getClassesMenu());
 		// addItem("Educational Resources", getEducationMenu());
 		addItem("Support", getSupportMenu());
+		addItem("Books", getBooksMenu());
 		addItem("Resources", getResourcesMenu());
 		if (Application.isSystemAdministrator()) {
 			addItem("Admin", getAdminMenu());
@@ -78,7 +79,6 @@ public final class MainMenu extends MenuBar {
 
 		addLinkToMenu(menu, "Add Article", PageUrl.article(0));
 		addLinkToMenu(menu, "Add User", PageUrl.user(0));
-		addLinkToMenu(menu, "Books", PageUrl.bookManagement());
 		addLinkToMenu(menu, "List Users", PageUrl.userList());
 		addLinkToMenu(menu, "List Groups", PageUrl.userGroupList());
 
@@ -111,6 +111,16 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
+		return menu;
+	}
+
+	private MenuBar getBooksMenu() {
+		MenuBar menu = new MenuBar(true);
+		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
+			addLinkToMenu(menu, "Create Book Receipt", PageUrl.bookReceipt());
+		}
+		addLinkToMenu(menu, "Search Books", PageUrl.bookSearch());
 		return menu;
 	}
 
@@ -166,10 +176,6 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getResourcesMenu() {
 		MenuBar menu = new MenuBar(true);
 		// addLinkToMenu(menu, "Helpful Links", PageUrl.articleGroup("39"));
-		addLinkToMenu(menu, "Books For Sale", PageUrl.bookSearch());
-		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
-			addLinkToMenu(menu, "Create Book Receipt", PageUrl.bookReceipt());
-		}
 		addLinkToMenu(menu, "Homeschooling Books", PageUrl.articleGroup("43"));
 		addLinkToMenu(menu, "Local Sports League Info", PageUrl.articleGroup("34"));
 

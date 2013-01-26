@@ -19,8 +19,13 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -49,6 +54,13 @@ public final class BookReceiptPage implements Page {
 
 	private void initialize() {
 		final TextBox tb = new TextBox();
+		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+			@Override
+			public void execute() {
+				tb.setFocus(true);
+			}
+		});
+
 		Label l = new Label("Enter book IDs, separated by commas:");
 		HorizontalPanel hp = new PaddedPanel();
 		final Button submit = new Button("Submit");
@@ -56,10 +68,20 @@ public final class BookReceiptPage implements Page {
 		hp.add(tb);
 		hp.add(submit);
 
+		tb.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					submit.click();
+				}
+			}
+		});
+
 		submit.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 
+				PaddedPanel pp = new PaddedPanel();
 				if (table == null) {
 					ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 					table = new BookCellTable(args);
@@ -67,19 +89,34 @@ public final class BookReceiptPage implements Page {
 					table.setTitle("Book Receipt");
 					table.disablePaging();
 					page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
+					page.add(pp);
 				}
 
 				table.getArgMap().put(BookArg.IDS, tb.getText());
 				table.populate();
 
-				PaddedPanel pp = new PaddedPanel();
 				Label l = new Label("*Email receipt to:");
 				final EmailTextBox emailBox = new EmailTextBox();
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+					@Override
+					public void execute() {
+						emailBox.setFocus(true);
+					}
+				});
 				emailBox.setRequired(true);
 				pp.add(l);
 				pp.add(emailBox);
 
 				final Button sell = new Button("Mark Books as Sold");
+
+				emailBox.addKeyDownHandler(new KeyDownHandler() {
+					@Override
+					public void onKeyDown(KeyDownEvent event) {
+						if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+							sell.click();
+						}
+					}
+				});
 
 				sell.addClickHandler(new ClickHandler() {
 					@Override
@@ -111,8 +148,6 @@ public final class BookReceiptPage implements Page {
 				});
 
 				pp.add(sell);
-
-				page.add(pp);
 			}
 		});
 

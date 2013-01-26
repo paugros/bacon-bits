@@ -272,7 +272,7 @@ public class UserPage implements Page {
 				}
 			});
 
-			if (user.memberOf(16)) {
+			if (user.memberOfAny(16, 17)) {
 				tabPanel.add("Books", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
@@ -358,7 +358,7 @@ public class UserPage implements Page {
 			vp.add(title);
 			vp.add(category);
 
-			String html = "<div id=\"barcode_" + book.getId() + "\" style=\"width:200px;height:25px;\">" + book.getId() + "</div>";
+			String html = "<div id=\"barcode_" + book.getId() + "\" style=\"width:200px;height:25px;\">" + book.getId() + ",</div>";
 			HTML barcode = new HTML(html);
 			vp.add(barcode);
 

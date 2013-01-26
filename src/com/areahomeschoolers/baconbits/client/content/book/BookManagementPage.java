@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
@@ -19,6 +20,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,6 +49,13 @@ public final class BookManagementPage implements Page {
 					@Override
 					protected Widget createWidget(Data item) {
 						return new Hyperlink(item.get("firstName") + " " + item.get("lastName"), PageUrl.user(item.getInt("userId")) + "&tab=6");
+					}
+				});
+
+				addWidgetColumn("Groups", new WidgetCellCreator<Data>() {
+					@Override
+					protected Widget createWidget(Data item) {
+						return new HTML(Formatter.formatNoteText(item.get("groups")));
 					}
 				});
 

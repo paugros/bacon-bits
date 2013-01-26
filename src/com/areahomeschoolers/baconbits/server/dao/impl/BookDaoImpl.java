@@ -116,16 +116,20 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		int statusId = args.getInt(BookArg.STATUS_ID);
 		List<Object> sqlArgs = new ArrayList<Object>();
 
-		String sql = "select count(b.id) as total, sum(b.price) as totalPrice, b.userId, u.firstName, u.lastName \n";
+		String sql = "select bb.*, (select group_concat(groupName) from groups g \n";
+		sql += "join userGroupMembers ugm on ugm.groupId = g.id \n";
+		sql += "where bb.userId = ugm.userId and g.id in(16, 17)) as groups  from \n";
+		sql += "(select count(b.id) as total, sum(b.price) as totalPrice, b.userId, u.firstName, u.lastName \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
 		sql += "where 1 = 1 \n";
 		if (statusId > 0) {
-			sql += "and b.statusId = ? ";
+			sql += "and b.statusId = ? \n";
 			sqlArgs.add(statusId);
 		}
-		sql += "group by u.firstName, u.lastName, b.userId ";
-		sql += "order by u.firstName, u.lastName";
+		sql += "group by u.firstName, u.lastName, b.userId \n";
+		sql += "order by u.firstName, u.lastName \n";
+		sql += ") as bb";
 
 		return query(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
 	}
@@ -138,6 +142,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		int categoryId = args.getInt(BookArg.CATEGORY_ID);
 		int gradeLevelId = args.getInt(BookArg.GRADE_LEVEL_ID);
 		String priceBetween = args.getString(BookArg.PRICE_BETWEEN);
+		boolean hideOffline = args.getBoolean(BookArg.ONLINE_ONLY);
 		List<Integer> ids = args.getIntList(BookArg.IDS);
 
 		String sql = createSqlBase();
@@ -172,6 +177,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		if (gradeLevelId > 0) {
 			sql += "and b.gradeLevelId = ? ";
 			sqlArgs.add(gradeLevelId);
+		}
+
+		if (hideOffline) {
+			sql += "and b.userId in(select userId from userGroupMembers where groupId = 16) ";
 		}
 
 		ArrayList<Book> data = query(sql, new BookMapper(), sqlArgs.toArray());

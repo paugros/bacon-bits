@@ -1,14 +1,14 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class Email implements IsSerializable {
-	private ArrayList<String> tos = new ArrayList<String>();
-	private ArrayList<String> ccs = new ArrayList<String>();
-	private ArrayList<String> bccs = new ArrayList<String>();
+	private HashSet<String> tos = new HashSet<String>();
+	private HashSet<String> ccs = new HashSet<String>();
+	private HashSet<String> bccs = new HashSet<String>();
 	private String body;
 	private String subject;
 
@@ -46,7 +46,7 @@ public class Email implements IsSerializable {
 		}
 	}
 
-	public ArrayList<String> getBccs() {
+	public HashSet<String> getBccs() {
 		return bccs;
 	}
 
@@ -54,7 +54,7 @@ public class Email implements IsSerializable {
 		return body;
 	}
 
-	public ArrayList<String> getCcs() {
+	public HashSet<String> getCcs() {
 		return ccs;
 	}
 
@@ -62,7 +62,7 @@ public class Email implements IsSerializable {
 		return subject;
 	}
 
-	public ArrayList<String> getTos() {
+	public HashSet<String> getTos() {
 		return tos;
 	}
 

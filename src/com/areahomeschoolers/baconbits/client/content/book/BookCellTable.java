@@ -7,10 +7,10 @@ import com.areahomeschoolers.baconbits.client.content.document.FileUploadDialog;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
+import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
-import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
-import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.EmailDialog;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -26,16 +27,19 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
-import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -60,6 +64,9 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 
 	private BookDialog dialog;
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
+	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
+	private Article tc;
+	private boolean agreed = false;
 
 	public BookCellTable(ArgMap<BookArg> args) {
 		this();
@@ -69,6 +76,13 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 	private BookCellTable() {
 		setDefaultSortColumn(BookColumn.TITLE, SortDirection.SORT_ASC);
 		setDisplayColumns(BookColumn.values());
+
+		articleService.getById(66, new Callback<Article>() {
+			@Override
+			protected void doOnSuccess(Article result) {
+				tc = result;
+			}
+		});
 	}
 
 	public void addStatusFilterBox() {
@@ -114,6 +128,22 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 		this.dialog = dialog;
 	}
 
+	private void showEmailDialog(Book item) {
+		EmailDialog e = new EmailDialog();
+		e.addTo(item.getUserEmail());
+		e.setSubject("Buyer for book: " + item.getTitle());
+		String m = "Hello, someone is interested in buying a book that you have listed for sale. Details appear below.\n\n";
+		if (Application.isAuthenticated()) {
+			m += "Buyer: " + Application.getCurrentUser().getFullName() + "\n";
+		}
+		m += "Title: " + item.getTitle() + "\n";
+		m += "Price: " + Formatter.formatCurrency(item.getPrice()) + "\n\n";
+		m += "Message from buyer: ";
+		e.setHiddenAboveText(m);
+		e.setText("Email Seller");
+		e.center();
+	}
+
 	@Override
 	protected void fetchData() {
 		bookService.list(getArgMap(), getCallback());
@@ -124,39 +154,27 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 		for (BookColumn col : getDisplayColumns()) {
 			switch (col) {
 			case CONTACT:
-				if (!Application.isAuthenticated()) {
-					break;
-				}
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
 					protected Widget createWidget(final Book item) {
 						ClickLabel cl = new ClickLabel("Contact", new MouseDownHandler() {
 							@Override
 							public void onMouseDown(MouseDownEvent event) {
-								ConfirmDialog.confirm("Send a message to the seller? You will be copied on the email.", new ConfirmHandler() {
-									@Override
-									public void onConfirm() {
-										UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
-
-										Email e = new Email();
-										e.addTo(item.getUserEmail());
-										e.addCc(Application.getCurrentUser().getEmail());
-										e.setSubject("Buyer for book: " + item.getTitle());
-										String m = "Hello, someone is interested in buying a book that you have listed for sale. Details appear below.\n\n";
-										m += "Buyer: " + Application.getCurrentUser().getFullName() + "\n";
-										m += "Buyer email: " + Application.getCurrentUser().getEmail() + "\n";
-										m += "Title: " + item.getTitle() + "\n";
-										m += "Price: " + Formatter.formatCurrency(item.getPrice()) + "\n\n";
-										m += "NOTE: Please do not reply to the sender of this email. Reply to the Buyer email listed above instead.";
-										e.setBody(m);
-										userService.sendEmail(e, new Callback<Void>() {
-											@Override
-											protected void doOnSuccess(Void result) {
-												AlertDialog.alert("Message sent.");
-											}
-										});
-									}
-								});
+								if (!agreed && tc != null) {
+									HTML h = new HTML(tc.getArticle());
+									h.setWidth("400px");
+									AlertDialog ad = new AlertDialog(tc.getTitle(), h);
+									ad.getButton().addClickHandler(new ClickHandler() {
+										@Override
+										public void onClick(ClickEvent event) {
+											showEmailDialog(item);
+										}
+									});
+									ad.center();
+									agreed = true;
+								} else {
+									showEmailDialog(item);
+								}
 							}
 						});
 
