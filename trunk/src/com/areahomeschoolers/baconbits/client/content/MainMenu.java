@@ -67,7 +67,7 @@ public final class MainMenu extends MenuBar {
 		addItem("WHE Classes/Activities", getClassesMenu());
 		// addItem("Educational Resources", getEducationMenu());
 		addItem("Support", getSupportMenu());
-		addItem("Books Store", getBooksMenu());
+		addItem("Book Store", getBooksMenu());
 		addItem("Resources", getResourcesMenu());
 		if (Application.isSystemAdministrator()) {
 			addItem("Admin", getAdminMenu());
@@ -118,9 +118,21 @@ public final class MainMenu extends MenuBar {
 		MenuBar menu = new MenuBar(true);
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
+		}
+
+		addLinkToMenu(menu, "Book Seller Instructions", PageUrl.article(65));
+
+		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Create Book Receipt", PageUrl.bookReceipt());
 		}
+
+		if (Application.isAuthenticated() && Application.getCurrentUser().memberOfAny(16, 17)) {
+			addLinkToMenu(menu, "My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
+		}
+
 		addLinkToMenu(menu, "Search Books", PageUrl.bookSearch());
+		addLinkToMenu(menu, "Sign Up to Sell", PageUrl.event(46));
+
 		return menu;
 	}
 
