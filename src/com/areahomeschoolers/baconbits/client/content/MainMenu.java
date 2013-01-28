@@ -28,9 +28,9 @@ public final class MainMenu extends MenuBar {
 		String item;
 
 		if (isExternalUrl(url)) {
-			item = "<a href=\"" + url + "\" target=\"_blank\" class=\"menuLink\">" + name + "</a>";
+			item = "<a href=\"" + url + "\" target=\"_blank\" class=menuLink>" + name + "</a>";
 		} else {
-			item = "<a href=\"" + Url.getGwtCodeServerAsQueryString() + "#" + url + "\" class=\"menuLink\">" + name + "</a>";
+			item = "<a href=\"" + Url.getGwtCodeServerAsQueryString() + "#" + url + "\" class=menuLink>" + name + "</a>";
 		}
 		MenuItem mi = mb.addItem(item, true, new Command() {
 			@Override
