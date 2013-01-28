@@ -54,6 +54,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -276,6 +277,10 @@ public class UserPage implements Page {
 				tabPanel.add("Books", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
+						Hyperlink link = new Hyperlink("Click here", PageUrl.article(65));
+						String html = link.toString() + " for book seller instructions.";
+						tabBody.add(new HTML(html));
+
 						ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 						args.put(BookArg.USER_ID, user.getId());
 
