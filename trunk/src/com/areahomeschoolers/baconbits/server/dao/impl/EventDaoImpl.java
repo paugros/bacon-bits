@@ -581,10 +581,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "and e.active = 1 \n";
 		}
 
-		if (showCommunity) {
-			sql += "and e.categoryId = 6 ";
-		} else {
-			sql += "and e.categoryId != 6 ";
+		if (!(seriesId > 0)) {
+			if (showCommunity) {
+				sql += "and e.categoryId = 6 ";
+			} else {
+				sql += "and e.categoryId != 6 ";
+			}
 		}
 
 		if (seriesId > 0) {
@@ -599,6 +601,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		ArrayList<Event> data = query(sql, new EventMapper(), sqlArgs.toArray());
+
+		System.out.println(seriesId);
 
 		return data;
 	}

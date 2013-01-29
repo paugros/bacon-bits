@@ -12,7 +12,6 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
-import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -50,6 +49,7 @@ import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
@@ -660,20 +660,15 @@ public class EventPage implements Page {
 					@Override
 					public void execute(final VerticalPanel tabBody) {
 						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.SERIES_ID, calendarEvent.getSeriesId());
+						args.setStatus(Status.ALL);
 						EventCellTable table = new EventCellTable(args);
 						table.removeColumn(EventColumn.REGISTER);
 
 						table.setTitle("Event Series");
 
 						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1100PX));
-						table.populate();
-
-						table.addDataReturnHandler(new DataReturnHandler() {
-							@Override
-							public void onDataReturn() {
-								tabPanel.selectTabNow(tabBody);
-							}
-						});
+						table.populate(pageData.getEventsInSeries());
+						tabPanel.selectTabNow(tabBody);
 					}
 				});
 			} else {
