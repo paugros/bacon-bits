@@ -602,8 +602,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		ArrayList<Event> data = query(sql, new EventMapper(), sqlArgs.toArray());
 
-		System.out.println(seriesId);
-
 		return data;
 	}
 
@@ -801,10 +799,20 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			if (event.getCloneFromId() > 0) {
 				// clone age groups
-				sql = "insert into eventAgeGroups (eventId, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price) ";
-				sql += "select ?, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price ";
-				sql += "from eventAgeGroups where eventId = ?";
+				sql = "insert into eventAgeGroups (eventId, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price, clonedFromId) ";
+				sql += "select ?, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price, id ";
+				sql += "from eventAgeGroups where eventId = ? order by id";
 				update(sql, event.getId(), event.getCloneFromId());
+
+				// clone fields -- start by fetching all the age groups we just added, alogn with the ids of the age groups they were cloned from
+				sql = "select id, clonedFromId from eventAgeGroups where eventId = ?";
+				List<Data> ids = query(sql, ServerUtils.getGenericRowMapper(), event.getId());
+				// loop through each age group cloning all of its fields
+				for (Data d : ids) {
+					sql = "insert into eventFields (eventAgeGroupId, name, eventFieldTypeId, required, options, eventId)";
+					sql += "select ?, name, eventFieldTypeId, required, options, ? from eventFields where eventAgeGroupId = ?";
+					update(sql, d.getId(), event.getId(), d.getInt("clonedFromId"));
+				}
 
 				// clone volunteer positions
 				sql = "insert into eventVolunteerPositions (eventId, jobTitle, description, discount, positionCount) ";
@@ -1284,6 +1292,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		if (!Common.isNullOrEmpty(participant.getSeriesEventIds())) {
 			List<Integer> ids = new ArrayList<Integer>(participant.getSeriesEventIds());
+			// TODO eventually we'll want to copy field values to the other events when registering
+			// for now we just disable it
+			participant.setEventFields(null);
+
+			// this ensures we only enter this block once, avoiding infinite recursion
 			participant.setSeriesEventIds(null);
 			for (int eventId : ids) {
 				int registrationId = queryForInt(0, "select id from eventRegistrations where eventId = ? and addedById = ?", eventId, ServerContext
@@ -1296,7 +1309,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 					r = saveRegistration(r);
 
 					registrationId = r.getId();
-
 				}
 
 				participant.setEventRegistrationId(registrationId);
@@ -1321,7 +1333,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			}
 		}
 
-		// when cancelling or restoring a required series registration
+		// when canceling or restoring a required series registration
 		if (participant.getUpdateAllInSeries()) {
 			participant.setUpdateAllInSeries(false);
 
