@@ -17,7 +17,6 @@ import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
-import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -38,7 +37,7 @@ public final class BookReceiptPage implements Page {
 	private BookCellTable table;
 
 	public BookReceiptPage(final VerticalPanel p) {
-		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+		if (!Application.administratorOf(17)) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
 		}
