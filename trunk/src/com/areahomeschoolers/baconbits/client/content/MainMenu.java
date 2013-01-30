@@ -116,13 +116,14 @@ public final class MainMenu extends MenuBar {
 
 	private MenuBar getBooksMenu() {
 		MenuBar menu = new MenuBar(true);
+		addLinkToMenu(menu, "Search Books", PageUrl.bookSearch());
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
 		}
 
 		addLinkToMenu(menu, "Book Seller Instructions", PageUrl.article(65));
 
-		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+		if (Application.administratorOf(17)) {
 			addLinkToMenu(menu, "Create Book Receipt", PageUrl.bookReceipt());
 		}
 
@@ -130,7 +131,6 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
 		}
 
-		addLinkToMenu(menu, "Search Books", PageUrl.bookSearch());
 		addLinkToMenu(menu, "Sign Up to Sell", PageUrl.event(46));
 
 		return menu;
