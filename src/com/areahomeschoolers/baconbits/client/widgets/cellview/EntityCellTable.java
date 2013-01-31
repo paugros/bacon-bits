@@ -26,6 +26,7 @@ import com.areahomeschoolers.baconbits.client.widgets.HasDisableCriteria;
 import com.areahomeschoolers.baconbits.client.widgets.HasSortValue;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.VariableSizePager.PageSize;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -128,11 +129,12 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	}
 
 	private static final String TABLE_SORT_PREF = "tableSort.";
-	public static final int DEFAULT_PAGE_SIZE = 75;
-	private String defaultSizePrefName = "default";
 
+	public static final int DEFAULT_PAGE_SIZE = VariableSizePager.PageSize.P_050.getSize();
+	private String defaultSizePrefName = "default";
 	// Layout Data
 	protected EnumSet<C> displayColumns;
+
 	private Map<String, AggregateFooterData> aggregateFooterDataMap = new HashMap<String, AggregateFooterData>();
 	protected Map<String, ColumnData<T>> columnDataMap = new HashMap<String, ColumnData<T>>();
 	private ArgMap<U> args;
@@ -142,27 +144,27 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 			return item.getId();
 		}
 	};
-
 	// Events and Asynchronous handlers.
 	private List<DataReturnHandler> dataReturnHandlers = new ArrayList<DataReturnHandler>();
-	private Callback<ArrayList<T>> callback;
 
+	private Callback<ArrayList<T>> callback;
 	// Data Lists
 	protected Map<Object, T> entityIdMap = new HashMap<Object, T>();
+
 	protected Set<T> hiddenItems = new HashSet<T>();
 	protected Set<T> unfilteredList = new HashSet<T>();
 	protected ArrayList<T> visibleItems = new ArrayList<T>();
 	private List<T> initialSelectedItems = new ArrayList<T>();
-
 	// Sorting
 	private String defaultSortHeader = "";
+
 	private CellSortPolicy sortPolicy = CellSortPolicy.ON;
 	private SortDirection defaultSortDirection = SortDirection.SORT_ASC;
 	private HandlerRegistration sortRegistration;
 	private int defaultSortIndex = 0;
-
 	// Selection Systems
 	private CheckboxHeader<T, U> cbHeader;
+
 	private AbstractEditableCell<Boolean, Boolean> selectionCell;
 	private SelectionPolicy selectionPolicy = SelectionPolicy.NONE;
 	private Column<T, Boolean> selectionColumn = null;
@@ -170,20 +172,19 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	private Collection<Integer> initialSelectedItemIds = new HashSet<Integer>();
 	private T lastSelectedItem = null;
 	private Command clearCommand;
-
 	// States
 	private boolean isFinishedLoading;
+
 	private boolean linksOpenNewTab;
 	private boolean defaultByIndex = true;
 	private boolean hasBeenPopulated;
 	protected boolean maintainHidden = false;
-
 	// UI Components
 	private MaxHeightScrollPanel scrollPanel;
+
 	private CellTitleBar<T> titleBar = new CellTitleBar<T>("", TitleBarStyle.CELLTABLE);
 	private Set<WidgetCellCreator<?>> cellWidgetCreators = new HashSet<WidgetCellCreator<?>>();
 	private RowStyles<T> rowStyles;
-
 	private HashSet<EntityCellTable<T, U, C>> partners = new HashSet<EntityCellTable<T, U, C>>();
 
 	private HandlerRegistration noSortRegistration;
@@ -1100,6 +1101,14 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 
 	public void setLinksOpenNewTab(boolean linksOpenNewTab) {
 		this.linksOpenNewTab = linksOpenNewTab;
+	}
+
+	public void setPagerPageSize(PageSize p) {
+		if (titleBar == null || titleBar.getPager() == null) {
+			setPageSize(p.getSize());
+		} else {
+			titleBar.getPager().setPageSize(p);
+		}
 	}
 
 	@Override

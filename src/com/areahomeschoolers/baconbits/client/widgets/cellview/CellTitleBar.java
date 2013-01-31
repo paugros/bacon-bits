@@ -131,8 +131,6 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		if (cellTable != null) {
 			pagingControl = new VariableSizePager(this);
 			pagingControl.setDisplay(cellTable);
-			pagingControl.setPageSize(cellTable.getPageSize());
-			pagingControl.setPageStart(cellTable.getPageStart());
 			addControl(pagingControl);
 		}
 	}
@@ -152,7 +150,6 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		refreshControl.addMouseDownHandler(new MouseDownHandler() {
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
-				// Callback.incrementCallCount();
 				if (hasFilter()) {
 					clearFilter();
 				}

@@ -1,6 +1,5 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,12 +9,13 @@ import com.areahomeschoolers.baconbits.shared.Common;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class ArgMap<A extends Arg> implements Serializable, IsSerializable {
+public class ArgMap<A extends Arg> implements IsSerializable {
 	public enum Status implements IsSerializable {
-		ACTIVE, ALL, INACTIVE
-	}
+		ACTIVE, ALL, INACTIVE;
 
-	private static final long serialVersionUID = 1L;
+		private Status() {
+		}
+	}
 
 	private Status status = Status.ALL;
 	private HashMap<Arg, String> params = new HashMap<Arg, String>();

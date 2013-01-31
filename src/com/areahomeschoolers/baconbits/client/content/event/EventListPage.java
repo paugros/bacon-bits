@@ -52,7 +52,7 @@ public final class EventListPage implements Page {
 
 			HTML message = new HTML();
 			message.getElement().getStyle().setMarginBottom(10, Unit.PX);
-			String text = "<b><font class=errorText>New this year:</font></b> all events must be paid for using PayPal or credit card (MC, Visa, Discover).<br>You can register for all your events then pay all at once.<br>";
+			String text = "<b><font class=errorText>New this year:</font></b> all events must be paid for using PayPal or credit card (MC, Visa, Discover).<br>You can register for all your events then pay all at once. ";
 			text += "If payment is not received within 24 hours of registering, your registration will be canceled.";
 			message.setHTML(text);
 			vp.add(message);
