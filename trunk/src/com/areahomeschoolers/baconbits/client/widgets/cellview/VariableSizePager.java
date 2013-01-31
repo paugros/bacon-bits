@@ -1,14 +1,13 @@
 package com.areahomeschoolers.baconbits.client.widgets.cellview;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.util.UserPreferences;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -27,6 +26,25 @@ import com.google.gwt.view.client.HasRows;
 import com.google.gwt.view.client.Range;
 
 public class VariableSizePager extends AbstractPager {
+	public enum PageSize {
+		P_010("10", 10), P_025("25", 25), P_050("50", 50), P_075("75", 75), P_100("100", 100), ALL("All", Integer.MAX_VALUE);
+
+		private String text;
+		private int size;
+
+		private PageSize(String text, int size) {
+			this.text = text;
+			this.size = size;
+		}
+
+		public int getSize() {
+			return size;
+		}
+
+		public String getText() {
+			return text;
+		}
+	}
 
 	private static class ImageButton extends Image {
 		private boolean disabled;
@@ -79,7 +97,6 @@ public class VariableSizePager extends AbstractPager {
 	private int index = 0;
 	private DefaultListBox pageSizeListBox;
 	private boolean pageResizingEnabled = true;
-	private int defaultPageSize = 75;
 	private int pagingThreshold;
 	private static final String PAGE_SIZE_PREF = "tablePageSize.";
 	private List<ParameterHandler<Integer>> pageSizeChangeHandlers = new ArrayList<ParameterHandler<Integer>>();
@@ -137,37 +154,20 @@ public class VariableSizePager extends AbstractPager {
 		layout.add(prevPage);
 
 		pageSizeListBox = new DefaultListBox(false);
-		pageSizeListBox.addItem("10", 10);
-		pageSizeListBox.addItem("25", 25);
-		pageSizeListBox.addItem("50", 50);
-		pageSizeListBox.addItem("75", 75);
-		pageSizeListBox.addItem("100", 100);
+		for (PageSize p : EnumSet.allOf(PageSize.class)) {
+			pageSizeListBox.addItem(p.getText(), p.getSize());
+		}
+		// pageSizeListBox.addItem("10", 10);
+		// pageSizeListBox.addItem("25", 25);
+		// pageSizeListBox.addItem("50", 50);
+		// pageSizeListBox.addItem("75", 75);
+		// pageSizeListBox.addItem("100", 100);
 		// All should always be the last value to ensure that pre-selection works.
 		pageSizeListBox.addItem("All", Integer.MAX_VALUE);
 		pageSizeListBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				desiredPageSize = pageSizeListBox.getIntValue();
-				if (desiredPageSize == Integer.MAX_VALUE) {
-					if (getDisplay() != null) {
-						HasRows d = getDisplay();
-						d.setVisibleRange(0, d.getRowCount());
-					}
-					setNextPageButtonsDisabled(true);
-					setPrevPageButtonsDisabled(true);
-				} else {
-					if (getDisplay() != null) {
-						HasRows d = getDisplay();
-						Range r = d.getVisibleRange();
-						d.setVisibleRange(r.getStart(), Math.min(d.getRowCount() - r.getStart(), desiredPageSize));
-					}
-				}
-				titlebar.cellTable.refresh();
-				UserPreferences.save(getPageSizePrefString(), pageSizeListBox.getSelectedText());
-
-				for (ParameterHandler<Integer> ph : pageSizeChangeHandlers) {
-					ph.execute(desiredPageSize);
-				}
+				setPageSize(pageSizeListBox.getIntValue());
 			}
 		});
 		layout.add(pageSizeListBox);
@@ -191,10 +191,6 @@ public class VariableSizePager extends AbstractPager {
 				pageSizeChangeHandlers.remove(index);
 			}
 		};
-	}
-
-	public int getDefaultPageSize() {
-		return defaultPageSize;
 	}
 
 	@Override
@@ -237,28 +233,13 @@ public class VariableSizePager extends AbstractPager {
 		}
 	}
 
-	public void setDefaultPageSize(int defaultPageSize) {
-		this.defaultPageSize = defaultPageSize;
-	}
-
 	@Override
 	public void setDisplay(HasRows display) {
 		super.setDisplay(display);
-		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-			@Override
-			public void execute() {
-				if (getDisplay() != null && pageResizingEnabled) {
-					pageSizeListBox.setSelectedIndex(3);
-					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-						@Override
-						public void execute() {
-							pageSizeListBox.fireEvent(new ChangeEvent() {
-							});
-						}
-					});
-				}
-			}
-		});
+
+		if (desiredPageSize == 0) {
+			setPageSize(EntityCellTable.DEFAULT_PAGE_SIZE);
+		}
 	}
 
 	/**
@@ -285,8 +266,35 @@ public class VariableSizePager extends AbstractPager {
 
 	@Override
 	public void setPageSize(int pageSize) {
+		if (pageSize != pageSizeListBox.getIntValue()) {
+			pageSizeListBox.setValue(pageSize);
+		}
 		desiredPageSize = pageSize;
+		if (desiredPageSize == Integer.MAX_VALUE) {
+			if (getDisplay() != null) {
+				HasRows d = getDisplay();
+				d.setVisibleRange(0, d.getRowCount());
+			}
+			setNextPageButtonsDisabled(true);
+			setPrevPageButtonsDisabled(true);
+		} else {
+			if (getDisplay() != null) {
+				HasRows d = getDisplay();
+				Range r = d.getVisibleRange();
+				d.setVisibleRange(r.getStart(), Math.min(d.getRowCount() - r.getStart(), desiredPageSize));
+			}
+		}
+		titlebar.cellTable.refresh();
+		UserPreferences.save(getPageSizePrefString(), pageSizeListBox.getSelectedText());
+
+		for (ParameterHandler<Integer> ph : pageSizeChangeHandlers) {
+			ph.execute(desiredPageSize);
+		}
 		super.setPageSize(pageSize);
+	}
+
+	public void setPageSize(PageSize p) {
+		setPageSize(p.getSize());
 	}
 
 	@Override
