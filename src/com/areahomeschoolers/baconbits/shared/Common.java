@@ -311,6 +311,22 @@ public abstract class Common {
 		return (start <= now && end >= now);
 	}
 
+	public static boolean isAllLowerCase(String test) {
+		if (isNullOrBlank(test)) {
+			return false;
+		}
+
+		return test.matches("^[a-z]+$");
+	}
+
+	public static boolean isAllUpperCase(String test) {
+		if (isNullOrBlank(test)) {
+			return false;
+		}
+
+		return test.matches("^[A-Z]+$");
+	}
+
 	/**
 	 * @param number
 	 * @return Whether the string provided can be formatted as a Double
@@ -491,6 +507,16 @@ public abstract class Common {
 		list.add(str);
 
 		return list;
+	}
+
+	/**
+	 * Removes all non-alphanumeric characters, except spaces
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static String stripNonAlphaChars(String str) {
+		return str.replaceAll("[^A-Za-z]+", "");
 	}
 
 	/**
