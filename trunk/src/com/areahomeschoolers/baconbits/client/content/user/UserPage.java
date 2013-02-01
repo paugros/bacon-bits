@@ -404,7 +404,7 @@ public class UserPage implements Page {
 					HistoryToken.set(PageUrl.user(r.getData().getId()));
 				} else {
 					user = r.getData();
-					form.setDto(r.getData());
+					fieldTable.setUser(user);
 					field.setInputVisibility(false);
 				}
 			}

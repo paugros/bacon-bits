@@ -42,9 +42,11 @@ public class UserFieldTable extends FieldTable {
 	private User user;
 	private final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private final Label passwordLabel = new Label();
+	private final Form form;
 
-	public UserFieldTable(final Form form, User u) {
-		this.user = u;
+	public UserFieldTable(Form f, User u) {
+		form = f;
+		user = u;
 		setWidth("100%");
 
 		final Label firstNameDisplay = new Label();
@@ -69,7 +71,12 @@ public class UserFieldTable extends FieldTable {
 		firstNameField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				user.setFirstName(Common.ucWords(firstNameInput.getText().trim()));
+				String value = firstNameInput.getText().trim();
+				String test = Common.stripNonAlphaChars(firstNameInput.getText());
+				if (Common.isAllLowerCase(test) || Common.isAllUpperCase(test)) {
+					value = Common.ucWords(value);
+				}
+				user.setFirstName(value);
 			}
 		});
 		addField(firstNameField);
@@ -88,7 +95,12 @@ public class UserFieldTable extends FieldTable {
 		lastNameField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				user.setLastName(Common.ucWords(lastNameInput.getText().trim()));
+				String value = lastNameInput.getText().trim();
+				String test = Common.stripNonAlphaChars(lastNameInput.getText());
+				if (Common.isAllLowerCase(test) || Common.isAllUpperCase(test)) {
+					value = Common.ucWords(value);
+				}
+				user.setLastName(value);
 			}
 		});
 		addField(lastNameField);
@@ -363,6 +375,11 @@ public class UserFieldTable extends FieldTable {
 			addField("Last login:", Common.getDefaultIfNull(Formatter.formatDateTime(user.getLastLoginDate())));
 			addField("Date added:", Formatter.formatDateTime(user.getAddedDate()));
 		}
+	}
+
+	public void setUser(User u) {
+		user = u;
+		form.setDto(u);
 	}
 
 	private void updatePasswordLabel() {
