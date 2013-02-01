@@ -244,6 +244,11 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		firstNameField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
+				String value = firstNameInput.getText().trim();
+				String test = Common.stripNonAlphaChars(firstNameInput.getText());
+				if (Common.isAllLowerCase(test) || Common.isAllUpperCase(test)) {
+					value = Common.ucWords(value);
+				}
 				entity.setFirstName(firstNameInput.getText());
 			}
 		});
@@ -264,7 +269,12 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		lastNameField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setLastName(lastNameInput.getText());
+				String value = lastNameInput.getText().trim();
+				String test = Common.stripNonAlphaChars(lastNameInput.getText());
+				if (Common.isAllLowerCase(test) || Common.isAllUpperCase(test)) {
+					value = Common.ucWords(value);
+				}
+				entity.setLastName(value);
 			}
 		});
 		fieldTable.addField(lastNameField);
