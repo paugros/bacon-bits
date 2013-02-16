@@ -175,7 +175,11 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 			} else {
 				document.setFileType(item.getContentType());
 				if (document.getFileName() == null) {
-					document.setFileName(FilenameUtils.getName(item.getName()));
+					String name = FilenameUtils.getName(item.getName());
+					if (name.length() > 100) {
+						name = name.substring(0, 99);
+					}
+					document.setFileName(name);
 				}
 
 				if (document.getFileSize() > MAX_FILE_SIZE) {
