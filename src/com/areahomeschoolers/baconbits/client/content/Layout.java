@@ -140,6 +140,7 @@ public final class Layout {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
 
 					if (!GWT.isProdMode()) {
+						// loginService.loginAndGetApplicationData("kaugros@gmail.com", "Redball1", new AsyncCallback<ApplicationData>() {
 						// loginService.loginAndGetApplicationData("kristin@wearehomeeducators.com", "Redball1", new AsyncCallback<ApplicationData>() {
 						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "L33nfiatna", new AsyncCallback<ApplicationData>() {
 							@Override
