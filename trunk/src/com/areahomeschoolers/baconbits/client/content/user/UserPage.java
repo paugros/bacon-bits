@@ -34,6 +34,7 @@ import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
@@ -46,6 +47,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -285,6 +287,7 @@ public class UserPage implements Page {
 						args.put(BookArg.USER_ID, user.getId());
 
 						final BookCellTable table = new BookCellTable(args);
+						table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
 						table.removeColumn(BookColumn.PRICE);
 						table.removeColumn(BookColumn.CONTACT);
 						if (bookDialog == null) {
@@ -302,10 +305,17 @@ public class UserPage implements Page {
 							}));
 						}
 
-						table.getTitleBar().addLink(new ClickLabel("Print labels", new MouseDownHandler() {
+						table.getTitleBar().addLink(new ClickLabel("Print labels - all", new MouseDownHandler() {
 							@Override
 							public void onMouseDown(MouseDownEvent event) {
 								printLabels(table.getFullList());
+							}
+						}));
+
+						table.getTitleBar().addLink(new ClickLabel("Print labels - selected", new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								printLabels(table.getSelectedItems());
 							}
 						}));
 
@@ -331,15 +341,18 @@ public class UserPage implements Page {
 
 	private void printLabels(List<Book> books) {
 		FlexTable ft = new FlexTable();
-		// ft.setBorderWidth(1);
+		ft.setWidth("100%");
 
 		ft.setCellPadding(0);
 		ft.setCellSpacing(0);
-		// ft.getElement().getStyle().setMarginLeft(30, Unit.PX);
-		// ft.getElement().getStyle().setMarginTop(55, Unit.PX);
 
 		RootPanel.get().clear();
-		RootPanel.get().getElement().getStyle().setPadding(0, Unit.PX);
+		Style rootStyle = RootPanel.get().getElement().getStyle();
+		rootStyle.setPadding(0, Unit.PX);
+		rootStyle.setMarginTop(41, Unit.PX);
+		rootStyle.setMarginLeft(0, Unit.PX);
+		rootStyle.setMarginRight(0, Unit.PX);
+		rootStyle.setMarginBottom(0, Unit.PX);
 		RootPanel.get().add(ft);
 
 		for (int i = 0; i < books.size(); i++) {
@@ -352,10 +365,9 @@ public class UserPage implements Page {
 
 			VerticalPanel vp = new VerticalPanel();
 			vp.setSpacing(0);
-			Label title = new FixedWidthLabel(book.getTitle(), 240);
-			// title.addStyleName("smallText");
+			Label title = new FixedWidthLabel(book.getTitle(), 225);
 
-			Label category = new FixedWidthLabel(book.getCategory(), 240);
+			Label category = new FixedWidthLabel(book.getCategory(), 225);
 			category.addStyleName("smallText");
 			category.getElement().getStyle().setPaddingBottom(4, Unit.PX);
 			vp.add(category);
@@ -376,8 +388,8 @@ public class UserPage implements Page {
 			vp.add(pp);
 
 			SimplePanel sp = new SimplePanel(vp);
-			sp.setWidth("262px");
 			sp.setHeight("96px");
+			sp.getElement().getStyle().setMarginLeft(12, Unit.PX);
 			vp.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
 
 			ft.setWidget(row, cell, sp);

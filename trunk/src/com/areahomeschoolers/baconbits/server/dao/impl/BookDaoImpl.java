@@ -1,9 +1,14 @@
 package com.areahomeschoolers.baconbits.server.dao.impl;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -17,6 +22,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.BookDao;
+import com.areahomeschoolers.baconbits.server.dao.DocumentDao;
 import com.areahomeschoolers.baconbits.server.util.Mailer;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
@@ -27,6 +33,11 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.Document;
+import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
+
+import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesServiceFactory;
 
 @Repository
 public class BookDaoImpl extends SpringWrapper implements BookDao {
@@ -207,6 +218,46 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 			update(sql, namedParams, keys);
 
 			book.setId(ServerUtils.getIdFromKeys(keys));
+		}
+
+		if (!Common.isNullOrBlank(book.getImageUrl().trim())) {
+			String text = book.getImageUrl().trim();
+			if (!text.matches("^https?://.*")) {
+				text = "http://" + text;
+			}
+
+			try {
+				URL url = new URL(text);
+				InputStream in = new BufferedInputStream(url.openStream());
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				byte[] buf = new byte[1024];
+				int n = 0;
+				while (-1 != (n = in.read(buf))) {
+					out.write(buf, 0, n);
+				}
+				out.close();
+				in.close();
+
+				byte[] data = out.toByteArray();
+
+				Image image = ImagesServiceFactory.makeImage(data);
+				String ext = image.getFormat().toString().toLowerCase();
+
+				Document doc = new Document();
+				doc.setFileExtension(ext);
+				doc.setFileType("image/" + ext);
+				doc.setFileName("BookImage" + book.getId());
+				doc.setLinkType(DocumentLinkType.BOOK);
+				doc.setLinkId(book.getId());
+				doc.setData(data);
+				doc.setAddedById(ServerContext.getCurrentUserId());
+				doc.setAddedDate(new Date());
+				DocumentDao dao = ServerContext.getDaoImpl("document");
+				dao.save(doc);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 		}
 
 		return getById(book.getId());

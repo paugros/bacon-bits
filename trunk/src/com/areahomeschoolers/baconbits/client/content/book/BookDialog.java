@@ -236,6 +236,26 @@ public class BookDialog extends EntityEditDialog<Book> {
 		});
 		ft.addField(conditionField);
 
+		final Label imageDisplay = new Label();
+		final TextBox imageInput = new TextBox();
+		imageInput.setMaxLength(256);
+		imageInput.setVisibleLength(20);
+		FormField imageField = form.createFormField("Image URL:", imageInput, imageDisplay);
+		imageField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				imageDisplay.setText(entity.getImageUrl());
+				imageInput.setText(entity.getImageUrl());
+			}
+		});
+		imageField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				entity.setImageUrl(imageInput.getText());
+			}
+		});
+		ft.addField(imageField);
+
 		final Label notesDisplay = new Label();
 		final TextBox notesInput = new TextBox();
 		notesInput.setVisibleLength(50);

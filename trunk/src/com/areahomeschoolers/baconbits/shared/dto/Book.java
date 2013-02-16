@@ -18,6 +18,7 @@ public final class Book extends EntityDto<Book> {
 	private Integer conditionId;
 	private Integer imageId;
 	private Integer smallImageId;
+	private String imageUrl;
 
 	// auxillary
 	private String userFirstName, userLastName;
@@ -65,6 +66,10 @@ public final class Book extends EntityDto<Book> {
 		}
 
 		return imageId;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
 	}
 
 	public String getIsbn() {
@@ -145,6 +150,10 @@ public final class Book extends EntityDto<Book> {
 
 	public void setImageId(int imageId) {
 		this.imageId = imageId;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	public void setIsbn(String isbn) {

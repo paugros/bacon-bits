@@ -202,7 +202,6 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 											@Override
 											public void onUploadComplete(int documentId) {
 												populate();
-												// image.setUrl("/baconbits/service/file?id=" + documentId);
 											}
 										});
 
