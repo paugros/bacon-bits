@@ -5,10 +5,12 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
@@ -35,12 +37,14 @@ public final class BookReceiptPage implements Page {
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private VerticalPanel page;
 	private BookCellTable table;
+	private PaddedPanel totalPanel = new PaddedPanel();
 
 	public BookReceiptPage(final VerticalPanel p) {
 		if (!Application.administratorOf(17)) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
 		}
+		totalPanel.addStyleName("bold largeText");
 
 		this.page = p;
 
@@ -84,17 +88,29 @@ public final class BookReceiptPage implements Page {
 				if (table == null) {
 					ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 					table = new BookCellTable(args);
-					table.setDisplayColumns(BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.CONDITION, BookColumn.TOTALED_PRICE);
+					table.setDisplayColumns(BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.CONDITION, BookColumn.PRICE);
 					table.setTitle("Book Receipt");
 					table.disablePaging();
 					page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
+
+					table.addDataReturnHandler(new DataReturnHandler() {
+						@Override
+						public void onDataReturn() {
+							totalPanel.clear();
+							String totalText = "Total: " + Formatter.formatCurrency(table.getTotalPrice()) + " cash / ";
+							double creditTotal = table.getTotalPrice() + (table.getTotalPrice() * .03);
+							totalText += Formatter.formatCurrency(creditTotal) + " credit";
+							totalPanel.add(new Label(totalText));
+						}
+					});
+					page.add(totalPanel);
 					page.add(pp);
 				}
 
 				table.getArgMap().put(BookArg.IDS, tb.getText());
 				table.populate();
 
-				Label l = new Label("*Email receipt to:");
+				Label l = new Label("Email receipt to:");
 				final EmailTextBox emailBox = new EmailTextBox();
 				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 					@Override
@@ -119,7 +135,7 @@ public final class BookReceiptPage implements Page {
 				sell.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
-						if (Common.isNullOrBlank(emailBox.getValue())) {
+						if (!Common.isNullOrBlank(emailBox.getValue())) {
 							emailBox.getValidator().validate();
 							if (emailBox.getValidator().hasError()) {
 								return;

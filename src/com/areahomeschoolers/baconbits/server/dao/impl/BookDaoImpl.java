@@ -65,6 +65,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 			book.setImageId(rs.getInt("imageId"));
 			book.setSmallImageId(rs.getInt("smallImageId"));
 			book.setUserEmail(rs.getString("email"));
+			book.setSoldAtBookSale(rs.getBoolean("soldAtBookSale"));
 			return book;
 		}
 	}
@@ -125,6 +126,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 	@Override
 	public ArrayList<Data> getSummaryData(ArgMap<BookArg> args) {
 		int statusId = args.getInt(BookArg.STATUS_ID);
+		boolean soldAtBookSale = args.getBoolean(BookArg.SOLD_AT_BOOK_SALE);
 		List<Object> sqlArgs = new ArrayList<Object>();
 
 		String sql = "select bb.*, (select group_concat(groupName) from groups g \n";
@@ -137,6 +139,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		if (statusId > 0) {
 			sql += "and b.statusId = ? \n";
 			sqlArgs.add(statusId);
+		}
+		if (soldAtBookSale) {
+			sql += "and b.soldAtBookSale = ? \n";
+			sqlArgs.add(soldAtBookSale);
 		}
 		sql += "group by u.firstName, u.lastName, b.userId \n";
 		sql += "order by u.firstName, u.lastName \n";
@@ -296,7 +302,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		html += "</b></td></tr>";
 		html += "</table></body></html>\n";
 
-		sql = "update books set statusId = 2, boughtById = ? where id in(" + Common.join(ids, ",") + ")";
+		sql = "update books set statusId = 2, boughtById = ?, soldAtBookSale = 1 where id in(" + Common.join(ids, ",") + ")";
 		Integer bid = (boughtBy == null) ? null : boughtBy.getId();
 		update(sql, bid);
 

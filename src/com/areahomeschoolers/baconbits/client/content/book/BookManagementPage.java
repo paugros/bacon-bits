@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.GenericCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
@@ -20,6 +21,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -27,6 +30,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class BookManagementPage implements Page {
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
+	private ArgMap<BookArg> args = new ArgMap<BookArg>();
 
 	public BookManagementPage(final VerticalPanel page) {
 		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
@@ -35,11 +39,9 @@ public final class BookManagementPage implements Page {
 		}
 
 		final String title = "Books";
-		GenericCellTable table = new GenericCellTable() {
+		final GenericCellTable table = new GenericCellTable() {
 			@Override
 			protected void fetchData() {
-				ArgMap<BookArg> args = new ArgMap<BookArg>();
-				args.put(BookArg.STATUS_ID, 1);
 				bookService.getSummaryData(args, getCallback());
 			}
 
@@ -86,6 +88,38 @@ public final class BookManagementPage implements Page {
 				Application.getLayout().setPage(title, page);
 			}
 		});
+
+		final DefaultListBox filterBox = table.getTitleBar().addFilterListControl(false);
+		filterBox.addItem("Unsold");
+		filterBox.addItem("Sold");
+		filterBox.addItem("Sold at book sale");
+		filterBox.addItem("Sold online");
+		filterBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent e) {
+				switch (filterBox.getSelectedIndex()) {
+				case 0:
+					args.put(BookArg.STATUS_ID, 1);
+					break;
+				case 1:
+					args.put(BookArg.STATUS_ID, 2);
+					args.remove(BookArg.SOLD_AT_BOOK_SALE);
+					break;
+				case 2:
+					args.put(BookArg.STATUS_ID, 2);
+					args.put(BookArg.SOLD_AT_BOOK_SALE, true);
+					break;
+				case 3:
+					args.put(BookArg.STATUS_ID, 2);
+					args.put(BookArg.SOLD_AT_BOOK_SALE, false);
+					break;
+				}
+
+				table.populate();
+			}
+		});
+
+		filterBox.setSelectedIndex(0);
 
 		table.populate();
 	}

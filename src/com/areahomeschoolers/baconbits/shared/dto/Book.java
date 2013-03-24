@@ -19,6 +19,7 @@ public final class Book extends EntityDto<Book> {
 	private Integer imageId;
 	private Integer smallImageId;
 	private String imageUrl;
+	private boolean soldAtBookSale;
 
 	// auxillary
 	private String userFirstName, userLastName;
@@ -198,6 +199,14 @@ public final class Book extends EntityDto<Book> {
 
 	public void setUserLastName(String userLastName) {
 		this.userLastName = userLastName;
+	}
+
+	public boolean getSoldAtBookSale() {
+		return soldAtBookSale;
+	}
+
+	public void setSoldAtBookSale(boolean soldAtBookSale) {
+		this.soldAtBookSale = soldAtBookSale;
 	}
 
 }
