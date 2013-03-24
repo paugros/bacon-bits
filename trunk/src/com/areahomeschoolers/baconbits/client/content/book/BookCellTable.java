@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.document.FileUploadDialog;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
@@ -67,6 +68,7 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private Article tc;
 	private boolean agreed = false;
+	private double totalPrice;
 
 	public BookCellTable(ArgMap<BookArg> args) {
 		this();
@@ -74,6 +76,15 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 	}
 
 	private BookCellTable() {
+		addDataReturnHandler(new DataReturnHandler() {
+			@Override
+			public void onDataReturn() {
+				totalPrice = 0;
+				for (Book item : getFullList()) {
+					totalPrice += item.getPrice();
+				}
+			}
+		});
 		setDefaultSortColumn(BookColumn.TITLE, SortDirection.SORT_ASC);
 		setDisplayColumns(BookColumn.values());
 
@@ -122,6 +133,10 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 
 	public BookDialog getDialog() {
 		return dialog;
+	}
+
+	public double getTotalPrice() {
+		return totalPrice;
 	}
 
 	public void setDialog(BookDialog dialog) {
