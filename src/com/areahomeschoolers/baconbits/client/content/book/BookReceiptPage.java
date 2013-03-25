@@ -27,6 +27,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -88,7 +89,13 @@ public final class BookReceiptPage implements Page {
 				if (table == null) {
 					ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 					table = new BookCellTable(args);
-					table.setDisplayColumns(BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.CONDITION, BookColumn.PRICE);
+					table.setOnDelete(new Command() {
+						@Override
+						public void execute() {
+							populateTotalPanel();
+						}
+					});
+					table.setDisplayColumns(BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.CONDITION, BookColumn.PRICE, BookColumn.DELETE_PURCHASE);
 					table.setTitle("Book Receipt");
 					table.disablePaging();
 					page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
@@ -96,11 +103,7 @@ public final class BookReceiptPage implements Page {
 					table.addDataReturnHandler(new DataReturnHandler() {
 						@Override
 						public void onDataReturn() {
-							totalPanel.clear();
-							String totalText = "Total: " + Formatter.formatCurrency(table.getTotalPrice()) + " cash / ";
-							double creditTotal = table.getTotalPrice() + (table.getTotalPrice() * .03) + .3;
-							totalText += Formatter.formatCurrency(creditTotal) + " credit";
-							totalPanel.add(new Label(totalText));
+							populateTotalPanel();
 						}
 					});
 					page.add(totalPanel);
@@ -166,5 +169,13 @@ public final class BookReceiptPage implements Page {
 		});
 
 		page.add(hp);
+	}
+
+	private void populateTotalPanel() {
+		totalPanel.clear();
+		String totalText = "Total: " + Formatter.formatCurrency(table.getTotalPrice()) + " cash / ";
+		double creditTotal = table.getTotalPrice() + (table.getTotalPrice() * .03) + .3;
+		totalText += Formatter.formatCurrency(creditTotal) + " credit";
+		totalPanel.add(new Label(totalText));
 	}
 }
