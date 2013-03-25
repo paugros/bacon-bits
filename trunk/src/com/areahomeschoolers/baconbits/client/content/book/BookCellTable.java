@@ -40,6 +40,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -49,7 +50,7 @@ import com.google.gwt.user.client.ui.Widget;
 public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
 		IMAGE("Image"), USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE(
-				"Price"), PRICE("Price"), CONTACT("Contact seller");
+				"Price"), PRICE("Price"), CONTACT("Contact seller"), DELETE(""), DELETE_PURCHASE("");
 
 		private String title;
 
@@ -69,6 +70,7 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 	private Article tc;
 	private boolean agreed = false;
 	private double totalPrice;
+	private Command onDelete;
 
 	public BookCellTable(ArgMap<BookArg> args) {
 		this();
@@ -141,6 +143,10 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 
 	public void setDialog(BookDialog dialog) {
 		this.dialog = dialog;
+	}
+
+	public void setOnDelete(Command onDelete) {
+		this.onDelete = onDelete;
 	}
 
 	private void showEmailDialog(Book item) {
@@ -324,37 +330,60 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 				});
 				break;
 
-			default:
-				new AssertionError();
-				break;
-			}
-		}
-
-		addCompositeWidgetColumn("", new WidgetCellCreator<Book>() {
-			@Override
-			protected Widget createWidget(final Book item) {
-				if (Application.getCurrentUserId() != item.getUserId()) {
-					return new Label("");
-				}
-
-				return new ClickLabel("X", new MouseDownHandler() {
+			case DELETE:
+				addCompositeWidgetColumn("", new WidgetCellCreator<Book>() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
-						ConfirmDialog.confirm("Confirm deletion of: " + item.getTitle(), new ConfirmHandler() {
+					protected Widget createWidget(final Book item) {
+						if (Application.getCurrentUserId() != item.getUserId()) {
+							return new Label("");
+						}
+
+						return new ClickLabel("X", new MouseDownHandler() {
 							@Override
-							public void onConfirm() {
-								bookService.delete(item, new Callback<Void>() {
+							public void onMouseDown(MouseDownEvent event) {
+								ConfirmDialog.confirm("Confirm deletion of: " + item.getTitle(), new ConfirmHandler() {
 									@Override
-									protected void doOnSuccess(Void result) {
-										populate();
+									public void onConfirm() {
+										bookService.delete(item, new Callback<Void>() {
+											@Override
+											protected void doOnSuccess(Void result) {
+												populate();
+												if (onDelete != null) {
+													onDelete.execute();
+												}
+											}
+										});
 									}
 								});
 							}
 						});
 					}
 				});
+				break;
+
+			case DELETE_PURCHASE:
+				addCompositeWidgetColumn("", new WidgetCellCreator<Book>() {
+					@Override
+					protected Widget createWidget(final Book item) {
+						return new ClickLabel("X", new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								removeItem(item);
+								totalPrice -= item.getPrice();
+								if (onDelete != null) {
+									onDelete.execute();
+								}
+							}
+						});
+					}
+				});
+				break;
+
+			default:
+				new AssertionError();
+				break;
 			}
-		});
+		}
 	}
 
 }

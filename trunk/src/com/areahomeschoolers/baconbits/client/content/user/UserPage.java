@@ -287,6 +287,7 @@ public class UserPage implements Page {
 						args.put(BookArg.USER_ID, user.getId());
 
 						final BookCellTable table = new BookCellTable(args);
+						table.addColumn(BookColumn.DELETE);
 						table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
 						table.removeColumn(BookColumn.PRICE);
 						table.removeColumn(BookColumn.CONTACT);
