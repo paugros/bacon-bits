@@ -98,7 +98,7 @@ public final class BookReceiptPage implements Page {
 						public void onDataReturn() {
 							totalPanel.clear();
 							String totalText = "Total: " + Formatter.formatCurrency(table.getTotalPrice()) + " cash / ";
-							double creditTotal = table.getTotalPrice() + (table.getTotalPrice() * .03);
+							double creditTotal = table.getTotalPrice() + (table.getTotalPrice() * .03) + .3;
 							totalText += Formatter.formatCurrency(creditTotal) + " credit";
 							totalPanel.add(new Label(totalText));
 						}
