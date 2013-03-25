@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
+import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.appengine.api.utils.SystemProperty;
@@ -142,6 +143,20 @@ public class ServerContext implements ApplicationContextAware {
 		}
 
 		getSession().setAttribute("user", u);
+	}
+
+	public static void switchToUser(int userId) {
+		User currentUser = getCurrentUser();
+		if (currentUser.getId() == userId || currentUser.canSwitch() == false) {
+			return;
+		}
+		UserDao userDao = (UserDao) ctx.getBean("userDaoImpl");
+		User newCurrentUser = userDao.getById(userId);
+		newCurrentUser.setCanSwitch(true);
+		newCurrentUser.setOriginalUserId(currentUser.getOriginalUserId());
+		newCurrentUser.setOriginalEmail(currentUser.getOriginalEmail());
+
+		tl.get().request.getSession().setAttribute("user", newCurrentUser);
 	}
 
 	public static void unloadContext() {

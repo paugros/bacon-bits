@@ -22,16 +22,20 @@ import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
+import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.util.Mailer;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
+import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
@@ -53,7 +57,7 @@ import edu.vt.middleware.password.UppercaseCharacterRule;
 import edu.vt.middleware.password.WhitespaceRule;
 
 @Repository
-public class UserDaoImpl extends SpringWrapper implements UserDao {
+public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	private final class GroupMapper implements RowMapper<UserGroup> {
 		@Override
 		public UserGroup mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -160,6 +164,19 @@ public class UserDaoImpl extends SpringWrapper implements UserDao {
 		}
 
 		return pd;
+	}
+
+	@Override
+	public ArrayList<ServerSuggestion> getSuggestions(String token, int limit, Data options) {
+		String sql = "select u.id, concat(u.firstName, ' ', u.lastName, ' - ', u.email) as Suggestion, 'User' as entityType ";
+		sql += "from users u ";
+		sql += "where u.email is not null ";
+		sql += "and (concat(u.firstName, ' ', u.lastName) like ? or u.email like ?) and isActive(u.startDate, u.endDate) = 1 ";
+		sql += "order by concat(u.firstName, ' ', u.lastName) ";
+		sql += "limit " + Integer.toString(limit + 1);
+
+		String search = "%" + token + "%";
+		return query(sql, ServerUtils.getSuggestionMapper(), search, search);
 	}
 
 	@Override

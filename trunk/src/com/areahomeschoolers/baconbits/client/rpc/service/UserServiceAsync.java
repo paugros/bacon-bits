@@ -30,6 +30,8 @@ public interface UserServiceAsync {
 
 	void sendEmail(Email email, AsyncCallback<Void> callback);
 
+	void switchToUser(int userId, AsyncCallback<Void> callback);
+
 	void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add, AsyncCallback<Void> callback);
 
 	void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add, AsyncCallback<Void> callback);

@@ -31,8 +31,12 @@ public final class User extends EntityDto<User> {
 	private HashMap<Integer, Boolean> groups;
 	private Date startDate, endDate, addedDate, lastLoginDate, birthDate;
 	private Integer parentId;
+	private boolean canSwitch;
 
 	// aux
+	// these two keep track of your original user when switching
+	private int originalUserId;
+	private String originalEmail;
 	private String groupsText;
 	private boolean generatePassword;
 	private HashSet<AccessLevel> accessLevels;
@@ -47,6 +51,10 @@ public final class User extends EntityDto<User> {
 		}
 
 		return groups.get(groupId) == Boolean.TRUE;
+	}
+
+	public boolean canSwitch() {
+		return canSwitch;
 	}
 
 	public HashSet<AccessLevel> getAccessLevels() {
@@ -109,6 +117,14 @@ public final class User extends EntityDto<User> {
 		return mobilePhone;
 	}
 
+	public String getOriginalEmail() {
+		return originalEmail;
+	}
+
+	public int getOriginalUserId() {
+		return originalUserId;
+	}
+
 	public String getParentFirstName() {
 		return parentFirstName;
 	}
@@ -156,6 +172,10 @@ public final class User extends EntityDto<User> {
 		return active;
 	}
 
+	public boolean isSwitched() {
+		return originalUserId > 0 && getId() != originalUserId;
+	}
+
 	public boolean memberOf(Integer groupId) {
 		if (systemAdministrator || groupId == null || groupId == 0) {
 			return true;
@@ -190,6 +210,10 @@ public final class User extends EntityDto<User> {
 
 	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
+	}
+
+	public void setCanSwitch(boolean canSwitch) {
+		this.canSwitch = canSwitch;
 	}
 
 	public void setEmail(String email) {
@@ -235,6 +259,14 @@ public final class User extends EntityDto<User> {
 		this.mobilePhone = mobilePhone;
 	}
 
+	public void setOriginalEmail(String originalEmail) {
+		this.originalEmail = originalEmail;
+	}
+
+	public void setOriginalUserId(int originalUserId) {
+		this.originalUserId = originalUserId;
+	}
+
 	public void setParentFirstName(String parentFirstName) {
 		this.parentFirstName = parentFirstName;
 	}
@@ -265,6 +297,7 @@ public final class User extends EntityDto<User> {
 
 	public void setSystemAdministrator(boolean systemAdministrator) {
 		this.systemAdministrator = systemAdministrator;
+		canSwitch = systemAdministrator;
 	}
 
 }
