@@ -105,6 +105,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 	}
 
 	@Override
+	public void switchToUser(int userId) {
+		ServerContext.switchToUser(userId);
+	}
+
+	@Override
 	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add) {
 		dao.updateUserGroupRelation(users, g, add);
 	}

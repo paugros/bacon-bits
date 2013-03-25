@@ -3,10 +3,13 @@ package com.areahomeschoolers.baconbits.client.content;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
@@ -22,6 +25,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Window;
@@ -37,6 +42,7 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -115,9 +121,41 @@ public final class Layout {
 
 		ClickLabel logInOrOut = new ClickLabel();
 		if (Application.isAuthenticated()) {
-			Hyperlink name = new Hyperlink("Hello, " + Application.getCurrentUser().getFirstName(), PageUrl.user(Application.getCurrentUserId()));
-			name.addStyleName("nowrap");
-			sessionPanel.add(name);
+			if (Application.getCurrentUser().canSwitch()) {
+				final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
+				EntitySuggestBox userSearchBox = new EntitySuggestBox("User");
+				userSearchBox.setSelectionHandler(new ParameterHandler<Integer>() {
+					@Override
+					public void execute(Integer userId) {
+						userService.switchToUser(userId, new Callback<Void>() {
+							@Override
+							protected void doOnSuccess(Void result) {
+								Window.Location.reload();
+							}
+						});
+					}
+				});
+				userSearchBox.setResetHandler(new ParameterHandler<SuggestBox>() {
+					@Override
+					public void execute(SuggestBox suggestBox) {
+						suggestBox.setText(Application.getCurrentUser().getFullName());
+					}
+				});
+				userSearchBox.getElement().getStyle().setMarginLeft(20, Unit.PX);
+				userSearchBox.getTextBox().addDoubleClickHandler(new DoubleClickHandler() {
+					@Override
+					public void onDoubleClick(DoubleClickEvent event) {
+						HistoryToken.set(PageUrl.user(Application.getCurrentUser().getId()));
+					}
+				});
+				userSearchBox.setClearOnFocus(true);
+
+				sessionPanel.add(userSearchBox);
+			} else {
+				Hyperlink name = new Hyperlink("Hello, " + Application.getCurrentUser().getFirstName(), PageUrl.user(Application.getCurrentUserId()));
+				name.addStyleName("nowrap");
+				sessionPanel.add(name);
+			}
 
 			logInOrOut.setText("Log out");
 			logInOrOut.addMouseDownHandler(new MouseDownHandler() {

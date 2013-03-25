@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.rpc.service.SuggestService;
+import com.areahomeschoolers.baconbits.client.rpc.service.SuggestServiceAsync;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 
 /**
@@ -17,6 +22,7 @@ public class ServerSuggestOracle extends SuggestOracle {
 	 * Class to hold a response from the server.
 	 */
 	private static class ServerResponse {
+
 		/**
 		 * Request made by the SuggestBox.
 		 */
@@ -72,7 +78,6 @@ public class ServerSuggestOracle extends SuggestOracle {
 					}
 				}
 			}
-
 			return newSuggestions;
 		}
 
@@ -100,12 +105,12 @@ public class ServerSuggestOracle extends SuggestOracle {
 	/**
 	 * Number of suggestions to request from the server.
 	 */
-	// private static final int numberOfServerSuggestions = 200;
+	private static final int numberOfServerSuggestions = 200;
 
 	/**
 	 * The remote service that is the source of names.
 	 */
-	// private final SuggestServiceAsync namesService = (SuggestServiceAsync) ServiceCache.getService(SuggestService.class);
+	private SuggestServiceAsync namesService = (SuggestServiceAsync) ServiceCache.getService(SuggestService.class);
 
 	/**
 	 * Is there a request in progress
@@ -120,14 +125,14 @@ public class ServerSuggestOracle extends SuggestOracle {
 	/**
 	 * The most recent response from the server.
 	 */
-	private final ServerResponse mostRecentServerResponse = null;
+	private ServerResponse mostRecentServerResponse = null;
 
 	/**
 	 * What kind of thing the suggestion is for.
 	 */
 	private String suggestType;
 
-	// private GenericEntity options = new GenericEntity();
+	private Data options = new Data();
 
 	/**
 	 * Create a new instance.
@@ -160,7 +165,8 @@ public class ServerSuggestOracle extends SuggestOracle {
 	public void requestSuggestions(final Request request, final Callback callback) {
 		// Record this request as the most recent one.
 		mostRecentClientRequest = request;
-		// If there is not currently a request in progress return some suggestions. If there is a request in progress
+		// If there is not currently a request in progress return some
+		// suggestions. If there is a request in progress
 		// suggestions will be returned when it completes.
 		if (!requestInProgress) {
 			returnSuggestions(callback);
@@ -175,7 +181,7 @@ public class ServerSuggestOracle extends SuggestOracle {
 		if (options == null) {
 			options = new Data();
 		}
-		// this.options = options;
+		this.options = options;
 	}
 
 	/**
@@ -210,26 +216,27 @@ public class ServerSuggestOracle extends SuggestOracle {
 		}
 
 		requestInProgress = true;
-		// namesService.getSuggestions(request.getQuery(), suggestType, numberOfServerSuggestions, options, new AsyncCallback<ArrayList<ServerSuggestion>>() {
-		// @Override
-		// public void onFailure(Throwable caught) {
-		// requestInProgress = false;
-		// }
-		//
-		// @Override
-		// public void onSuccess(ArrayList<ServerSuggestion> suggestions) {
-		// String query = request.getQuery();
-		// // convert ServerSuggestions (dto) to HtmlSuggestions (has highlighting capability)
-		// List<HtmlSuggestion> htmlSuggestions = new ArrayList<HtmlSuggestion>();
-		// for (ServerSuggestion suggestion : suggestions) {
-		// htmlSuggestions.add(new HtmlSuggestion(suggestion, query));
-		// }
-		//
-		// requestInProgress = false;
-		// mostRecentServerResponse = new ServerResponse(request, numberOfServerSuggestions, htmlSuggestions);
-		// ServerSuggestOracle.this.returnSuggestions(callback);
-		// }
-		// });
+		namesService.getSuggestions(request.getQuery(), suggestType, numberOfServerSuggestions, options, new AsyncCallback<ArrayList<ServerSuggestion>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				requestInProgress = false;
+			}
+
+			@Override
+			public void onSuccess(ArrayList<ServerSuggestion> suggestions) {
+				String query = request.getQuery();
+				// convert ServerSuggestions (dto) to HtmlSuggestions (has
+				// highlighting capability)
+				requestInProgress = false;
+				List<HtmlSuggestion> htmlSuggestions = new ArrayList<HtmlSuggestion>();
+				for (ServerSuggestion suggestion : suggestions) {
+					htmlSuggestions.add(new HtmlSuggestion(suggestion, query));
+				}
+
+				mostRecentServerResponse = new ServerResponse(request, numberOfServerSuggestions, htmlSuggestions);
+				ServerSuggestOracle.this.returnSuggestions(callback);
+			}
+		});
 	}
 
 	/**
@@ -246,8 +253,10 @@ public class ServerSuggestOracle extends SuggestOracle {
 			callback.onSuggestionsReady(mostRecentClientRequest, new Response(Collections.<Suggestion> emptyList()));
 			return;
 		}
-		// If we have a response from the server, and it includes all the possible suggestions for its request, and
-		// that request is a superset of the request we're trying to satisfy now then use the server results, otherwise
+		// If we have a response from the server, and it includes all the
+		// possible suggestions for its request, and
+		// that request is a superset of the request we're trying to satisfy now
+		// then use the server results, otherwise
 		// ask the server for some suggestions.
 		if (mostRecentServerResponse != null) {
 			if (mostRecentQuery.equals(mostRecentServerResponse.getQuery())) {
