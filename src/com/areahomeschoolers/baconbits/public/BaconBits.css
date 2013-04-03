@@ -589,8 +589,7 @@ img {
 	cursor: pointer;
 }
 
-.printable {
-	width: 800px;
+.pageBreakAfter {
 	page-break-after: always;
 }
 

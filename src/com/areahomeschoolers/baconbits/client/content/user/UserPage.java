@@ -341,12 +341,6 @@ public class UserPage implements Page {
 	}
 
 	private void printLabels(List<Book> books) {
-		FlexTable ft = new FlexTable();
-		ft.setWidth("100%");
-
-		ft.setCellPadding(0);
-		ft.setCellSpacing(0);
-
 		RootPanel.get().clear();
 		Style rootStyle = RootPanel.get().getElement().getStyle();
 		rootStyle.setPadding(0, Unit.PX);
@@ -354,9 +348,20 @@ public class UserPage implements Page {
 		rootStyle.setMarginLeft(0, Unit.PX);
 		rootStyle.setMarginRight(0, Unit.PX);
 		rootStyle.setMarginBottom(0, Unit.PX);
-		RootPanel.get().add(ft);
+
+		FlexTable ft = null;
 
 		for (int i = 0; i < books.size(); i++) {
+			if (i % 30 == 0) {
+				ft = new FlexTable();
+				ft.addStyleName("pageBreakAfter");
+				ft.setWidth("100%");
+
+				ft.setCellPadding(0);
+				ft.setCellSpacing(0);
+				RootPanel.get().add(ft);
+			}
+
 			Book book = books.get(i);
 			if (i % 3 == 0) {
 				ft.insertRow(ft.getRowCount());
@@ -395,6 +400,7 @@ public class UserPage implements Page {
 
 			ft.setWidget(row, cell, sp);
 			createBarcode(Integer.toString(book.getId()));
+
 		}
 
 		Window.setTitle(" ");
