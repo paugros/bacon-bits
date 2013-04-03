@@ -353,6 +353,7 @@ public class UserPage implements Page {
 
 		for (int i = 0; i < books.size(); i++) {
 			if (i % 30 == 0) {
+				// insist on a page break every 30 labels
 				ft = new FlexTable();
 				ft.addStyleName("pageBreakAfter");
 				ft.setWidth("100%");
