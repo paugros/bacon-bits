@@ -65,7 +65,7 @@ public final class BookReceiptPage implements Page {
 			}
 		});
 
-		Label l = new Label("Enter book IDs, separated by commas:");
+		Label l = new Label("Enter book IDs, separated by plus signs:");
 		HorizontalPanel hp = new PaddedPanel();
 		final Button submit = new Button("Submit");
 		hp.add(l);
@@ -110,17 +110,11 @@ public final class BookReceiptPage implements Page {
 					page.add(pp);
 				}
 
-				table.getArgMap().put(BookArg.IDS, tb.getText());
+				table.getArgMap().put(BookArg.IDS, tb.getText().replaceAll("\\+", ","));
 				table.populate();
 
 				Label l = new Label("Email receipt to:");
 				final EmailTextBox emailBox = new EmailTextBox();
-				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-					@Override
-					public void execute() {
-						emailBox.setFocus(true);
-					}
-				});
 				pp.add(l);
 				pp.add(emailBox);
 

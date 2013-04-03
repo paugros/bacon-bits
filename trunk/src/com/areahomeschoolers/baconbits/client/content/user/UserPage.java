@@ -376,7 +376,7 @@ public class UserPage implements Page {
 			vp.add(title);
 			vp.add(category);
 
-			String html = "<div id=\"barcode_" + book.getId() + "\" style=\"width:200px;height:25px;\">" + book.getId() + ",</div>";
+			String html = "<div id=\"barcode_" + book.getId() + "\" style=\"width:200px;height:25px;\">" + book.getId() + "+</div>";
 			HTML barcode = new HTML(html);
 			vp.add(barcode);
 

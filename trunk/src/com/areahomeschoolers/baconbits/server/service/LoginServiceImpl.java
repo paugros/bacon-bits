@@ -39,15 +39,7 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 
 	@Override
 	public ApplicationData getApplicationData() {
-		// if (ServerContext.getSession().getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY) == null) {
-		// return null;
-		// }
-
 		User user = ServerContext.getCurrentUser();
-
-		// if (user == null) {
-		// return null;
-		// }
 
 		ApplicationData ap = new ApplicationData();
 		ap.setCurrentUser(user);
@@ -58,8 +50,6 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 	@Override
 	public boolean login(String username, String password) {
 		boolean success = true;
-		// String remoteIp = ServerContext.getRequest().getRemoteAddr();
-		// ApplicationContext ctx = ServerContext.getApplicationContext();
 
 		try {
 			Authentication request = new UsernamePasswordAuthenticationToken(username, password);
