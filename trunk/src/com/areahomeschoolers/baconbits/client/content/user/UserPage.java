@@ -344,17 +344,25 @@ public class UserPage implements Page {
 		RootPanel.get().clear();
 		Style rootStyle = RootPanel.get().getElement().getStyle();
 		rootStyle.setPadding(0, Unit.PX);
-		rootStyle.setMarginTop(41, Unit.PX);
+		rootStyle.setMarginTop(0, Unit.PX);
 		rootStyle.setMarginLeft(0, Unit.PX);
 		rootStyle.setMarginRight(0, Unit.PX);
 		rootStyle.setMarginBottom(0, Unit.PX);
 
 		FlexTable ft = null;
 
+		// layout variables
+		int columnWidth = 225;
+		int pageMarginTop = 40;
+		int labelsPerPage = 30;
+		int cellMarginLeft = 12;
+		int cellHeight = 96;
+
 		for (int i = 0; i < books.size(); i++) {
-			if (i % 30 == 0) {
+			if (i % labelsPerPage == 0) {
 				// insist on a page break every 30 labels
 				ft = new FlexTable();
+				ft.getElement().getStyle().setMarginTop(pageMarginTop, Unit.PX);
 				ft.addStyleName("pageBreakAfter");
 				ft.setWidth("100%");
 
@@ -372,9 +380,9 @@ public class UserPage implements Page {
 
 			VerticalPanel vp = new VerticalPanel();
 			vp.setSpacing(0);
-			Label title = new FixedWidthLabel(book.getTitle(), 225);
+			Label title = new FixedWidthLabel(book.getTitle(), columnWidth);
 
-			Label category = new FixedWidthLabel(book.getCategory(), 225);
+			Label category = new FixedWidthLabel(book.getCategory(), columnWidth);
 			category.addStyleName("smallText");
 			category.getElement().getStyle().setPaddingBottom(4, Unit.PX);
 			vp.add(category);
@@ -394,14 +402,15 @@ public class UserPage implements Page {
 			pp.add(ids);
 			vp.add(pp);
 
+			int column = ft.getCellCount(ft.getRowCount() - 1);
+
 			SimplePanel sp = new SimplePanel(vp);
-			sp.setHeight("96px");
-			sp.getElement().getStyle().setMarginLeft(12, Unit.PX);
-			vp.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
+			sp.setHeight(cellHeight + "px");
+			sp.getElement().getStyle().setMarginLeft(cellMarginLeft + (column * 5), Unit.PX);
+			sp.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
 
 			ft.setWidget(row, cell, sp);
 			createBarcode(Integer.toString(book.getId()));
-
 		}
 
 		Window.setTitle(" ");
