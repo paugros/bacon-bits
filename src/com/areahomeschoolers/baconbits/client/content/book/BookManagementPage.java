@@ -120,6 +120,8 @@ public final class BookManagementPage implements Page {
 		});
 
 		filterBox.setSelectedIndex(0);
+		filterBox.fireEvent(new ChangeEvent() {
+		});
 
 		table.populate();
 	}
