@@ -20,6 +20,7 @@ public class BookDetailsDialog extends DefaultDialog {
 	public BookDetailsDialog(Book b) {
 		this.book = b;
 		setText("Book Details");
+		setModal(false);
 		vp.setSpacing(10);
 
 		pp.add(new Image("/baconbits/service/file?id=" + book.getImageId()));
