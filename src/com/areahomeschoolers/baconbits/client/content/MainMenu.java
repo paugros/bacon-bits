@@ -131,7 +131,7 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
 		}
 
-		addLinkToMenu(menu, "Sign Up to Sell", PageUrl.event(471));
+		// addLinkToMenu(menu, "Sign Up to Sell", PageUrl.event(471));
 
 		return menu;
 	}

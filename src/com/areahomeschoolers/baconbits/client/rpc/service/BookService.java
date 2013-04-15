@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -29,4 +30,6 @@ public interface BookService extends RemoteService {
 	public Book save(Book book);
 
 	public void sellBooks(ArrayList<Book> books, String email);
+
+	public PaypalData signUpToSell();
 }

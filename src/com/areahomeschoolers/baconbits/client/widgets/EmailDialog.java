@@ -62,7 +62,7 @@ public class EmailDialog extends DefaultDialog {
 				}
 
 				send.setEnabled(false);
-				String body = "NOTE: Do not reply directly to this email. Reply to the sender listed below instead.\n\nSender: " + fromEmail + "\n\n";
+				String body = "NOTE: DO NOT REPLY TO THIS EMAIL. Reply to the sender listed below instead.\n\nSender: " + fromEmail + "\n\n";
 				if (!Common.isNullOrBlank(hiddenAboveText)) {
 					body += hiddenAboveText;
 				}
@@ -72,6 +72,8 @@ public class EmailDialog extends DefaultDialog {
 				if (!Common.isNullOrBlank(hiddenBelowText)) {
 					body += hiddenBelowText;
 				}
+
+				body += "NOTE: DO NOT REPLY TO THIS EMAIL.\n\n";
 
 				email.setBody(body);
 
@@ -88,6 +90,10 @@ public class EmailDialog extends DefaultDialog {
 
 		setWidget(vp);
 		setText("Send Email");
+	}
+
+	public void addBcc(String bccEmail) {
+		email.addBcc(bccEmail);
 	}
 
 	public void addTo(String toEmail) {

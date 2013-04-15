@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.home;
 import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -10,16 +11,27 @@ import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
+import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
+import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
+import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
+import com.google.gwt.dom.client.Style.Cursor;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
@@ -84,6 +96,7 @@ public class HomePage implements Page {
 	}
 
 	private final ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
+	private final BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private VerticalPanel page = new VerticalPanel();
 	private Grid grid = new Grid(1, 3);
@@ -91,12 +104,86 @@ public class HomePage implements Page {
 	private SimplePanel eventPanel = new SimplePanel();
 
 	private SimplePanel communityPanel = new SimplePanel();
+	private boolean paying = false;
 
 	public HomePage(VerticalPanel p) {
 		page = p;
+
+		if ("return".equals(Url.getParameter("ps"))) {
+			Application.refreshSecurityGroups(new Command() {
+				@Override
+				public void execute() {
+					if (Application.memberOf(16)) {
+						String text = "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>Book Store -> My Books</b> meu option.";
+						HTML label = new HTML(text);
+						label.setWidth("300px");
+						AlertDialog dialog = new AlertDialog("Thanks!", label);
+						dialog.getButton().addClickHandler(new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								HistoryToken.set(PageUrl.home(), false);
+								Window.Location.reload();
+							}
+						});
+
+						dialog.center();
+					}
+				}
+			});
+		}
+
+		VerticalPanel rightPanel = new VerticalPanel();
+		rightPanel.setSpacing(0);
+		if (!Application.memberOf(16)) {
+			VerticalPanel vp = new VerticalPanel();
+			vp.setWidth("100%");
+			vp.setSpacing(8);
+
+			Label label = new Label("Sell Your Books");
+			label.addStyleName("hugeText");
+			vp.add(label);
+			Image payButton = new Image(MainImageBundle.INSTANCE.paypalButton());
+			payButton.getElement().getStyle().setCursor(Cursor.POINTER);
+			payButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					if (!Application.isAuthenticated()) {
+						LoginDialog.showLogin();
+						return;
+					}
+
+					if (paying) {
+						return;
+					}
+
+					paying = true;
+
+					bookService.signUpToSell(new Callback<PaypalData>() {
+						@Override
+						protected void doOnFailure(Throwable caught) {
+							super.doOnFailure(caught);
+							paying = false;
+						}
+
+						@Override
+						protected void doOnSuccess(PaypalData result) {
+							Window.Location.replace(result.getAuthorizationUrl());
+						}
+					});
+				}
+			});
+
+			String text = "You can sell your used homeschool curriculum with us. Click the payment button ($5.00) to sign up as a book seller and begin listing your items.";
+			vp.add(new Label(text));
+			vp.add(payButton);
+
+			rightPanel.add(vp);
+		}
+
+		rightPanel.add(eventPanel);
 		grid.setWidget(0, 0, communityPanel);
 		grid.setWidget(0, 1, articlePanel);
-		grid.setWidget(0, 2, eventPanel);
+		grid.setWidget(0, 2, rightPanel);
 		grid.getCellFormatter().setWidth(0, 0, "250px");
 		grid.getCellFormatter().setWidth(0, 2, "250px");
 		grid.getCellFormatter().getElement(0, 0).getStyle().setBackgroundColor("#d8e6f7");

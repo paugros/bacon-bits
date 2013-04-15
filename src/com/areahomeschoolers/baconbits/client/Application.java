@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.content.Layout;
@@ -20,6 +21,9 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserPage;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
@@ -47,6 +51,7 @@ public final class Application implements ValueChangeHandler<String> {
 	private static Command rpcFailureCommand;
 	public static final String APPLICATION_NAME = "WHE";
 	private static boolean confirmNavigation = false;
+	private static UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
 	public static boolean administratorOf(Integer groupId) {
 		return isAuthenticated() && applicationData.getCurrentUser().administratorOf(groupId);
@@ -103,6 +108,16 @@ public final class Application implements ValueChangeHandler<String> {
 
 	public static boolean memberOf(Integer groupId) {
 		return isAuthenticated() && applicationData.getCurrentUser().memberOf(groupId);
+	}
+
+	public static void refreshSecurityGroups(final Command command) {
+		userService.refreshSecurityGroups(new Callback<HashMap<Integer, Boolean>>() {
+			@Override
+			protected void doOnSuccess(HashMap<Integer, Boolean> result) {
+				applicationData.getCurrentUser().setGroups(result);
+				command.execute();
+			}
+		});
 	}
 
 	public static void reloadPage() {

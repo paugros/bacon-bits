@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.BookDao;
 import com.areahomeschoolers.baconbits.server.dao.DocumentDao;
+import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
 import com.areahomeschoolers.baconbits.server.util.Mailer;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
@@ -35,6 +36,8 @@ import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
+import com.areahomeschoolers.baconbits.shared.dto.Payment;
+import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 import com.google.appengine.api.images.Image;
 import com.google.appengine.api.images.ImagesServiceFactory;
@@ -66,6 +69,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 			book.setSmallImageId(rs.getInt("smallImageId"));
 			book.setUserEmail(rs.getString("email"));
 			book.setSoldAtBookSale(rs.getBoolean("soldAtBookSale"));
+			book.setAuthor(rs.getString("author"));
 			return book;
 		}
 	}
@@ -127,6 +131,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 	public ArrayList<Data> getSummaryData(ArgMap<BookArg> args) {
 		int statusId = args.getInt(BookArg.STATUS_ID);
 		boolean soldAtBookSale = args.getBoolean(BookArg.SOLD_AT_BOOK_SALE);
+		boolean soldOnline = args.getBoolean(BookArg.SOLD_ONLINE);
 		List<Object> sqlArgs = new ArrayList<Object>();
 
 		String sql = "select bb.*, (select group_concat(groupName) from groups g \n";
@@ -140,10 +145,15 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 			sql += "and b.statusId = ? \n";
 			sqlArgs.add(statusId);
 		}
+
 		if (soldAtBookSale) {
-			sql += "and b.soldAtBookSale = ? \n";
-			sqlArgs.add(soldAtBookSale);
+			sql += "and b.soldAtBookSale = 1 \n";
 		}
+
+		if (soldOnline) {
+			sql += "and b.soldAtBookSale = 0 \n";
+		}
+
 		sql += "group by u.firstName, u.lastName, b.userId \n";
 		sql += "order by u.firstName, u.lastName \n";
 		sql += ") as bb";
@@ -211,14 +221,14 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 
 		if (book.isSaved()) {
 			String sql = "update books set title = :title, userId = :userId, categoryId = :categoryId, statusId = :statusId, price = :price, gradeLevelId = :gradeLevelId, ";
-			sql += "isbn = :isbn, notes = :notes, conditionId = :conditionId, imageId = :imageId, smallImageId = :smallImageId ";
+			sql += "isbn = :isbn, notes = :notes, conditionId = :conditionId, imageId = :imageId, smallImageId = :smallImageId, author = :author ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
 			book.setUserId(ServerContext.getCurrentUser().getId());
 
-			String sql = "insert into books (userId, title, categoryId, gradeLevelId, statusId, price, isbn, notes, conditionId, imageId, smallImageId) values ";
-			sql += "(:userId, :title, :categoryId, :gradeLevelId, :statusId, :price, :isbn, :notes, :conditionId, 32, 34)";
+			String sql = "insert into books (userId, title, categoryId, gradeLevelId, statusId, price, isbn, notes, conditionId, imageId, smallImageId, author) values ";
+			sql += "(:userId, :title, :categoryId, :gradeLevelId, :statusId, :price, :isbn, :notes, :conditionId, 32, 34, :author)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -315,6 +325,21 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 			m.addTo(email);
 			m.send();
 		}
+	}
+
+	@Override
+	public PaypalData signUpToSell() {
+		PaymentDao paymentDao = ServerContext.getDaoImpl("payment");
+		Payment p = new Payment();
+		p.setUserId(ServerContext.getCurrentUserId());
+		p.setPaymentTypeId(2);
+		p.setStatusId(1);
+		p.setAmount(5);
+		p.setReturnPage("Home");
+		p.setMemo("Payment for book selling registration");
+		p = paymentDao.save(p);
+
+		return p.getPaypalData();
 	}
 
 }

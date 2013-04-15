@@ -8,7 +8,7 @@ public interface Arg {
 	}
 
 	public enum BookArg implements Arg, IsSerializable {
-		USER_ID, STATUS_ID, CATEGORY_ID, GRADE_LEVEL_ID, PRICE_BETWEEN, IDS, ONLINE_ONLY, SOLD_AT_BOOK_SALE
+		USER_ID, STATUS_ID, CATEGORY_ID, GRADE_LEVEL_ID, PRICE_BETWEEN, IDS, ONLINE_ONLY, SOLD_AT_BOOK_SALE, SOLD_ONLINE
 	}
 
 	public enum DocumentArg implements Arg, IsSerializable {
@@ -17,6 +17,10 @@ public interface Arg {
 
 	public enum EventArg implements Arg, IsSerializable {
 		EVENT_ID, AGE_GROUP_ID, REGISTRATION_ID, PARTICIPANT_ID, UPCOMING_NUMBER, INCLUDE_FIELDS, PARENT_ID_PLUS_SELF, PARENT_ID, USER_ID, STATUS_ID, PARTICIPANT_IDS, NOT_STATUS_ID, SHOW_COMMUNITY, SERIES_ID, SHOW_INACTIVE
+	}
+
+	public enum PaymentArg implements Arg, IsSerializable {
+
 	}
 
 	public enum UserArg implements Arg, IsSerializable {

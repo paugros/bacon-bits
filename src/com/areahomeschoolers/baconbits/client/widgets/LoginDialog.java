@@ -1,6 +1,8 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.CreateUserDialog;
+import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -15,6 +17,7 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -43,6 +46,19 @@ public class LoginDialog extends DialogBox {
 	private static final String BAD_CREDENTIALS = "The username or password you entered is incorrect.";
 	private static final String SESSION_EXPIRED = "Your session has expired.  Please sign in again.";
 	private static boolean isShown;
+
+	public static void showLogin() {
+		LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
+		final LoginDialog ld = new LoginDialog(loginService);
+		ld.setLoginHandler(new LoginHandler() {
+			@Override
+			public void onLogin(ApplicationData ap) {
+				Window.Location.reload();
+			}
+		});
+		ld.center();
+	}
+
 	private CreateUserDialog createDialog = new CreateUserDialog();
 
 	public LoginDialog(LoginServiceAsync loginService) {

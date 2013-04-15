@@ -152,6 +152,7 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 	private void showEmailDialog(Book item) {
 		EmailDialog e = new EmailDialog();
 		e.addTo(item.getUserEmail());
+		e.addBcc("admin@wearehomeeducators.com");
 		e.setSubject("Buyer for book: " + item.getTitle());
 		String m = "Hello, someone is interested in buying a book that you have listed for sale. Details appear below.\n\n";
 		if (Application.isAuthenticated()) {

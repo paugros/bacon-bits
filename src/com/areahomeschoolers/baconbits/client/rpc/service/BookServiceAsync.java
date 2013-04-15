@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -25,4 +26,6 @@ public interface BookServiceAsync {
 	void save(Book book, AsyncCallback<Book> callback);
 
 	void sellBooks(ArrayList<Book> books, String email, AsyncCallback<Void> callback);
+
+	void signUpToSell(AsyncCallback<PaypalData> callback);
 }
