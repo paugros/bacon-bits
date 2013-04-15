@@ -11,8 +11,24 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class AlertDialog extends DefaultDialog {
-	public static void alert(String content) {
-		AlertDialog ad = new AlertDialog("Message", new Label(content));
+	private static final int defaultWidth = 300;
+
+	public static void alert(String labelText) {
+		alert("Message", labelText, defaultWidth);
+	}
+
+	public static void alert(String caption, String labelText) {
+		alert(caption, labelText, defaultWidth);
+	}
+
+	public static void alert(String caption, String labelText, int pixelWidth) {
+		Label label = new Label(labelText);
+
+		if (pixelWidth > 0) {
+			label.setWidth(pixelWidth + "px");
+		}
+
+		AlertDialog ad = new AlertDialog(caption, label);
 		ad.center();
 	}
 

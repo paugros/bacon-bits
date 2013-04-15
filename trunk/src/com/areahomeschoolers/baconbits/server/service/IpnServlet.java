@@ -137,17 +137,38 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 			sql += "rawData = ?, statusId = " + statusText + " where payKey = ?";
 			template.update(sql, paymentFee, txnId, rawData, key);
 
-			int participantStatusId = 0;
+			int paymentTypeId = template.queryForInt("select paymentTypeId from payments where payKey = ? limit 1", key);
 
-			if (paymentStatusId > 0) {
-				if (paymentStatusId == 2 || paymentStatusId == 11) {
-					participantStatusId = 2;
+			switch (paymentTypeId) {
+
+			case 1:
+				int participantStatusId = 0;
+
+				if (paymentStatusId > 0) {
+					if (paymentStatusId == 2 || paymentStatusId == 11) {
+						participantStatusId = 2;
+					}
+
+					if (participantStatusId > 0) {
+						sql = "update eventRegistrationParticipants set statusId = 2 where paymentId = (select id from payments where payKey = ? limit 1)";
+						template.update(sql, key);
+					}
+				}
+				break;
+			case 2:
+				int userId = template.queryForInt("select userId from payments where payKey = ? limit 1", key);
+
+				int count = template.queryForInt("select count(id) from userGroupMembers where userId = ? and groupId = 16", userId);
+
+				if (count > 0) {
+					break;
 				}
 
-				if (participantStatusId > 0) {
-					sql = "update eventRegistrationParticipants set statusId = 2 where paymentId = (select id from payments where payKey = ? limit 1)";
-					template.update(sql, key);
-				}
+				sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, 16, 0)";
+				template.update(sql, userId);
+				break;
+			default:
+				break;
 			}
 		}
 	}

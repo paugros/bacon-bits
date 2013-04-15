@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.server.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -56,6 +57,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 	@Override
 	public ArrayList<UserGroup> listGroups(ArgMap<UserArg> args) {
 		return dao.listGroups(args);
+	}
+
+	@Override
+	public HashMap<Integer, Boolean> refreshSecurityGroups() {
+		return dao.refreshSecurityGroups();
 	}
 
 	@Override

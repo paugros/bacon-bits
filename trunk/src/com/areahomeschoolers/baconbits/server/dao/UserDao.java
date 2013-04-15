@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.server.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +25,8 @@ public interface UserDao {
 	public ArrayList<UserGroup> listGroups(ArgMap<UserArg> args);
 
 	public void recordLogin(String username);
+
+	public HashMap<Integer, Boolean> refreshSecurityGroups();
 
 	public ServerResponseData<User> save(User user);
 

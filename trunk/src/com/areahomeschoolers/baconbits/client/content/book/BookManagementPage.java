@@ -104,14 +104,17 @@ public final class BookManagementPage implements Page {
 				case 1:
 					args.put(BookArg.STATUS_ID, 2);
 					args.remove(BookArg.SOLD_AT_BOOK_SALE);
+					args.remove(BookArg.SOLD_ONLINE);
 					break;
 				case 2:
 					args.put(BookArg.STATUS_ID, 2);
 					args.put(BookArg.SOLD_AT_BOOK_SALE, true);
+					args.put(BookArg.SOLD_ONLINE, false);
 					break;
 				case 3:
 					args.put(BookArg.STATUS_ID, 2);
 					args.put(BookArg.SOLD_AT_BOOK_SALE, false);
+					args.put(BookArg.SOLD_ONLINE, true);
 					break;
 				}
 

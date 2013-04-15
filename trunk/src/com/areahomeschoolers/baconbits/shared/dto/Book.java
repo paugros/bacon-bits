@@ -20,6 +20,7 @@ public final class Book extends EntityDto<Book> {
 	private Integer smallImageId;
 	private String imageUrl;
 	private boolean soldAtBookSale;
+	private String author;
 
 	// auxillary
 	private String userFirstName, userLastName;
@@ -31,6 +32,10 @@ public final class Book extends EntityDto<Book> {
 
 	public Book() {
 
+	}
+
+	public String getAuthor() {
+		return author;
 	}
 
 	public String getCategory() {
@@ -93,6 +98,10 @@ public final class Book extends EntityDto<Book> {
 		return smallImageId;
 	}
 
+	public boolean getSoldAtBookSale() {
+		return soldAtBookSale;
+	}
+
 	public String getStatus() {
 		return status;
 	}
@@ -123,6 +132,10 @@ public final class Book extends EntityDto<Book> {
 
 	public boolean isActive() {
 		return true;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
 	}
 
 	public void setCategory(String category) {
@@ -173,6 +186,10 @@ public final class Book extends EntityDto<Book> {
 		this.smallImageId = smallImageId;
 	}
 
+	public void setSoldAtBookSale(boolean soldAtBookSale) {
+		this.soldAtBookSale = soldAtBookSale;
+	}
+
 	public void setStatus(String status) {
 		this.status = status;
 	}
@@ -199,14 +216,6 @@ public final class Book extends EntityDto<Book> {
 
 	public void setUserLastName(String userLastName) {
 		this.userLastName = userLastName;
-	}
-
-	public boolean getSoldAtBookSale() {
-		return soldAtBookSale;
-	}
-
-	public void setSoldAtBookSale(boolean soldAtBookSale) {
-		this.soldAtBookSale = soldAtBookSale;
 	}
 
 }

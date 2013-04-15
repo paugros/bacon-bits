@@ -36,6 +36,11 @@ public class BookDetailsDialog extends DefaultDialog {
 		price.addStyleName("hugeText bold");
 		dt.add(price);
 
+		if (!Common.isNullOrBlank(book.getAuthor())) {
+			Label author = new Label("Author: " + book.getAuthor());
+			dt.add(author);
+		}
+
 		if (!Common.isNullOrBlank(book.getIsbn())) {
 			Label isbn = new Label("ISBN: " + book.getIsbn());
 			dt.add(isbn);

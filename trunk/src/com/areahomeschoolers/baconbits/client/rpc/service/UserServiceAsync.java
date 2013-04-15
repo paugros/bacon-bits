@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.rpc.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -23,6 +24,8 @@ public interface UserServiceAsync {
 	void list(ArgMap<UserArg> args, AsyncCallback<ArrayList<User>> callback);
 
 	void listGroups(ArgMap<UserArg> args, AsyncCallback<ArrayList<UserGroup>> callback);
+
+	void refreshSecurityGroups(AsyncCallback<HashMap<Integer, Boolean>> callback);
 
 	void save(User user, AsyncCallback<ServerResponseData<User>> callback);
 

@@ -273,6 +273,18 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
+	public HashMap<Integer, Boolean> refreshSecurityGroups() {
+		if (ServerContext.getCurrentUser() == null) {
+			return null;
+		}
+
+		HashMap<Integer, Boolean> groups = getSecurityGroups(ServerContext.getCurrentUserId());
+		ServerContext.getCurrentUser().setGroups(groups);
+
+		return groups;
+	}
+
+	@Override
 	public ServerResponseData<User> save(User user) {
 		ServerResponseData<User> retData = new ServerResponseData<User>();
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(user);
@@ -547,7 +559,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		final HashMap<Integer, Boolean> ret = new HashMap<Integer, Boolean>();
 
 		query(sql, new RowMapper<Void>() {
-
 			@Override
 			public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
 				ret.put(rs.getInt("groupId"), rs.getBoolean("isAdministrator"));

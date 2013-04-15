@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.rpc.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -27,6 +28,8 @@ public interface UserService extends RemoteService {
 	public ArrayList<User> list(ArgMap<UserArg> args);
 
 	public ArrayList<UserGroup> listGroups(ArgMap<UserArg> args);
+
+	public HashMap<Integer, Boolean> refreshSecurityGroups();
 
 	public ServerResponseData<User> save(User user);
 

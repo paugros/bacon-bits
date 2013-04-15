@@ -106,6 +106,25 @@ public class BookDialog extends EntityEditDialog<Book> {
 		});
 		ft.addField(titleField);
 
+		final Label authorDisplay = new Label();
+		final TextBox authorInput = new TextBox();
+		authorInput.setMaxLength(100);
+		FormField authorField = form.createFormField("Author:", authorInput, authorDisplay);
+		authorField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				authorDisplay.setText(entity.getAuthor());
+				authorInput.setText(entity.getAuthor());
+			}
+		});
+		authorField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				entity.setAuthor(authorInput.getText());
+			}
+		});
+		ft.addField(authorField);
+
 		final Label categoryDisplay = new Label();
 		final RequiredListBox categoryInput = new RequiredListBox();
 		for (Data d : pageData.getCategories()) {

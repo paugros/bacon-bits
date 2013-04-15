@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 @Controller
 @RequestMapping("/book")
@@ -60,6 +61,11 @@ public class BookServiceImpl extends GwtController implements BookService {
 	@Override
 	public void sellBooks(ArrayList<Book> books, String email) {
 		dao.sellBooks(books, email);
+	}
+
+	@Override
+	public PaypalData signUpToSell() {
+		return dao.signUpToSell();
 	}
 
 }
