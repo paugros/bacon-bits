@@ -44,12 +44,6 @@ public final class BookSearchPage implements Page {
 		optionsPanel.addStyleName("heavyPadding");
 		page.add(optionsPanel);
 
-		String warning = "This is a sample of our online book sale. The online sale will open on 4/13 and additional inventory will be available for purchase. ";
-		warning += "If you're interested in selling online with us, please register ";
-		Hyperlink registerLink = new Hyperlink("here", PageUrl.event(471));
-		warning += registerLink.toString() + ".";
-		page.add(new HTML(warning));
-
 		Hyperlink conditionLink = new Hyperlink("Click here", PageUrl.article(64));
 		String text = conditionLink + " for a description of book conditions.";
 		page.add(new HTML(text));

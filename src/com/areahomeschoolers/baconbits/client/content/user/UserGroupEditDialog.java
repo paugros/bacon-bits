@@ -1,19 +1,30 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.user.UserCellTable.UserColumn;
+import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
+import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.VariableSizePager.PageSize;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
@@ -40,7 +51,11 @@ public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 
 	@Override
 	protected Widget createContent() {
+		final VerticalPanel vp = new VerticalPanel();
+
 		FieldTable ft = new FieldTable();
+		ft.setLabelColumnWidth(LabelColumnWidth.NARROW);
+		ft.setWidth("600px");
 
 		final RequiredTextBox nameInput = new RequiredTextBox();
 		nameInput.setMaxLength(50);
@@ -60,6 +75,7 @@ public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 		ft.addField(nameField);
 
 		final TextBox descriptionInput = new TextBox();
+		descriptionInput.setVisibleLength(50);
 		descriptionInput.setMaxLength(100);
 		FormField descriptionField = form.createFormField("Description:", descriptionInput, null);
 		descriptionField.setInitializer(new Command() {
@@ -108,7 +124,35 @@ public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 		});
 		ft.addField(endField);
 
-		return ft;
+		vp.add(ft);
+
+		if (entity.isSaved()) {
+			ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
+			args.put(UserArg.GROUP_ID, entity.getId());
+			final UserCellTable userTable = new UserCellTable(args);
+			userTable.setPagerPageSize(PageSize.P_010);
+			userTable.getTitleBar().getPager().setPageResizingEnabled(false);
+			userTable.setDisplayColumns(UserColumn.NAME, UserColumn.EMAIL, UserColumn.HOME_PHONE);
+			userTable.setTitle("Members");
+			userTable.getTitleBar().addExcelControl();
+			userTable.getTitleBar().addSearchControl();
+			userTable.addDataReturnHandler(new DataReturnHandler() {
+				@Override
+				public void onDataReturn() {
+					vp.add(WidgetFactory.newSection(userTable));
+
+					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+						@Override
+						public void execute() {
+							center();
+						}
+					});
+				}
+			});
+			userTable.populate();
+
+		}
+		return vp;
 	}
 
 }

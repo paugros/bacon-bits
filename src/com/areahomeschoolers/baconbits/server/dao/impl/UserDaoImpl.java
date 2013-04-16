@@ -207,10 +207,16 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int parentIdPlusSelf = args.getInt(UserArg.PARENT_ID_PLUS_SELF);
 		int parentId = args.getInt(UserArg.PARENT_ID);
 		int registrationId = args.getInt(UserArg.NOT_ON_REGISTRATION_ID);
+		int groupId = args.getInt(UserArg.GROUP_ID);
 
 		String sql = SELECT;
+		if (groupId > 0) {
+			sql += "join userGroupMembers ugm on ugm.userId = u.id and ugm.groupId = ? \n";
+			sqlArgs.add(groupId);
+		}
+
 		if (registrationId > 0) {
-			sql += "left join eventRegistrationParticipants p on p.userId = u.id and p.eventRegistrationId = ? ";
+			sql += "left join eventRegistrationParticipants p on p.userId = u.id and p.eventRegistrationId = ? \n";
 			sqlArgs.add(registrationId);
 		}
 		sql += "where 1 = 1 ";
