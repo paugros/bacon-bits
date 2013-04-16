@@ -137,7 +137,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		}
 
 		Payment p = getById(payment.getId());
-		// send the PayPal payment information back to the client, so we can redirect them to make the payment
+		// send the PayPal payment information back to the client, so we can redirect them to PayPal to make the payment
 		p.setPaypalData(data);
 
 		return p;
