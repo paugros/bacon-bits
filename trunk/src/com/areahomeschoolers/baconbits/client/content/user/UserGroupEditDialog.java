@@ -108,6 +108,7 @@ public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 		});
 		ft.addField(startField);
 
+		// end date
 		final ValidatorDateBox endInput = new ValidatorDateBox();
 		FormField endField = form.createFormField("End date:", endInput, null);
 		endField.setInitializer(new Command() {
