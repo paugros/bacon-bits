@@ -115,6 +115,7 @@ public class HomePage implements Page {
 				public void execute() {
 					if (Application.memberOf(16)) {
 						String text = "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>Book Store -> My Books</b> meu option.";
+						text += "<br><br><b>NOTE: You may need to log out and log back in before you can see the My Books menu option.</b>";
 						HTML label = new HTML(text);
 						label.setWidth("300px");
 						AlertDialog dialog = new AlertDialog("Thanks!", label);
