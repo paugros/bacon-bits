@@ -70,6 +70,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 			book.setUserEmail(rs.getString("email"));
 			book.setSoldAtBookSale(rs.getBoolean("soldAtBookSale"));
 			book.setAuthor(rs.getString("author"));
+			book.setSoldDate(rs.getTimestamp("soldDate"));
 			return book;
 		}
 	}
@@ -219,9 +220,13 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 	public Book save(Book book) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(book);
 
+		if (book.getStatusId() == 2 && queryForInt(0, "select statusId from books where id = ?", book.getId()) != 2) {
+			book.setSoldDate(new Date());
+		}
+
 		if (book.isSaved()) {
 			String sql = "update books set title = :title, userId = :userId, categoryId = :categoryId, statusId = :statusId, price = :price, gradeLevelId = :gradeLevelId, ";
-			sql += "isbn = :isbn, notes = :notes, conditionId = :conditionId, imageId = :imageId, smallImageId = :smallImageId, author = :author ";
+			sql += "isbn = :isbn, notes = :notes, conditionId = :conditionId, imageId = :imageId, smallImageId = :smallImageId, author = :author, soldDate = :soldDate ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -312,7 +317,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		html += "</b></td></tr>";
 		html += "</table></body></html>\n";
 
-		sql = "update books set statusId = 2, boughtById = ?, soldAtBookSale = 1 where id in(" + Common.join(ids, ",") + ")";
+		sql = "update books set statusId = 2, boughtById = ?, soldAtBookSale = 1, soldDate = now() where id in(" + Common.join(ids, ",") + ")";
 		Integer bid = (boughtBy == null) ? null : boughtBy.getId();
 		update(sql, bid);
 

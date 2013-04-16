@@ -163,7 +163,6 @@ public class VariableSizePager extends AbstractPager {
 		// pageSizeListBox.addItem("75", 75);
 		// pageSizeListBox.addItem("100", 100);
 		// All should always be the last value to ensure that pre-selection works.
-		pageSizeListBox.addItem("All", Integer.MAX_VALUE);
 		pageSizeListBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {

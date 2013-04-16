@@ -164,6 +164,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new BookSearchPage(vp);
 		} else if ("RegistrationManagement".equals(page)) {
 			new RegistrationManagementPage(vp);
+		} else if ("UserGroup".equals(page)) {
+
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

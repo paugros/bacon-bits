@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import java.util.Date;
+
 public final class Book extends EntityDto<Book> {
 	private static final long serialVersionUID = 1L;
 
@@ -21,6 +23,7 @@ public final class Book extends EntityDto<Book> {
 	private String imageUrl;
 	private boolean soldAtBookSale;
 	private String author;
+	private Date soldDate;
 
 	// auxillary
 	private String userFirstName, userLastName;
@@ -100,6 +103,10 @@ public final class Book extends EntityDto<Book> {
 
 	public boolean getSoldAtBookSale() {
 		return soldAtBookSale;
+	}
+
+	public Date getSoldDate() {
+		return soldDate;
 	}
 
 	public String getStatus() {
@@ -188,6 +195,10 @@ public final class Book extends EntityDto<Book> {
 
 	public void setSoldAtBookSale(boolean soldAtBookSale) {
 		this.soldAtBookSale = soldAtBookSale;
+	}
+
+	public void setSoldDate(Date soldDate) {
+		this.soldDate = soldDate;
 	}
 
 	public void setStatus(String status) {

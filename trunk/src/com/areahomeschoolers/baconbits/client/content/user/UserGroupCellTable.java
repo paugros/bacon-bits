@@ -44,8 +44,6 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 	}
 
 	private User user;
-	private UserGroupEditDialog dialog = new UserGroupEditDialog(this);
-
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
 	public UserGroupCellTable(ArgMap<UserArg> args) {
@@ -58,7 +56,6 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 		setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION);
 
 		disablePaging();
-		dialog.setText("Edit Group");
 	}
 
 	public User getUser() {
@@ -86,6 +83,8 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 							return new ClickLabel(item.getGroupName(), new MouseDownHandler() {
 								@Override
 								public void onMouseDown(MouseDownEvent event) {
+									UserGroupEditDialog dialog = new UserGroupEditDialog(UserGroupCellTable.this);
+									dialog.setText("Edit Group");
 									dialog.center(item);
 								}
 							});
