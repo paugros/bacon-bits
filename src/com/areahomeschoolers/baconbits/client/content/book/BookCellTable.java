@@ -44,7 +44,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColumn> {
@@ -99,13 +98,15 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 	}
 
 	public void addStatusFilterBox() {
-		final DefaultListBox filterBox = getTitleBar().addFilterListControl();
-		filterBox.addItem("Unsold");
-		filterBox.addItem("Sold");
+		final DefaultListBox filterBox = getTitleBar().addFilterListControl(false);
+		filterBox.addItem("Listed - available");
+		filterBox.addItem("Unlisted - sold");
+		filterBox.addItem("Unlisted - deleted");
 		filterBox.addItem("All");
 		filterBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent e) {
+				System.out.println("changin");
 				switch (filterBox.getSelectedIndex()) {
 				case 0:
 					getArgMap().put(BookArg.STATUS_ID, 1);
@@ -114,6 +115,9 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 					getArgMap().put(BookArg.STATUS_ID, 2);
 					break;
 				case 2:
+					getArgMap().put(BookArg.STATUS_ID, 3);
+					break;
+				case 3:
 					getArgMap().remove(BookArg.STATUS_ID);
 					break;
 				}
@@ -123,13 +127,10 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 		});
 
 		int statusId = getArgMap().getInt(BookArg.STATUS_ID);
-
-		if (statusId == 1) {
-			filterBox.setSelectedIndex(0);
-		} else if (statusId == 2) {
-			filterBox.setSelectedIndex(1);
+		if (statusId > 0) {
+			filterBox.setSelectedIndex(statusId - 1);
 		} else {
-			filterBox.setSelectedIndex(2);
+			filterBox.setSelectedIndex(3);
 		}
 	}
 
@@ -332,34 +333,32 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 				break;
 
 			case DELETE:
-				addCompositeWidgetColumn("", new WidgetCellCreator<Book>() {
-					@Override
-					protected Widget createWidget(final Book item) {
-						if (Application.getCurrentUserId() != item.getUserId()) {
-							return new Label("");
-						}
-
-						return new ClickLabel("X", new MouseDownHandler() {
-							@Override
-							public void onMouseDown(MouseDownEvent event) {
-								ConfirmDialog.confirm("Confirm deletion of: " + item.getTitle(), new ConfirmHandler() {
-									@Override
-									public void onConfirm() {
-										bookService.delete(item, new Callback<Void>() {
-											@Override
-											protected void doOnSuccess(Void result) {
-												populate();
-												if (onDelete != null) {
-													onDelete.execute();
+				if (!(Application.isSystemAdministrator() || Application.getCurrentUser().isSwitched())) {
+					addCompositeWidgetColumn("", new WidgetCellCreator<Book>() {
+						@Override
+						protected Widget createWidget(final Book item) {
+							return new ClickLabel("X", new MouseDownHandler() {
+								@Override
+								public void onMouseDown(MouseDownEvent event) {
+									ConfirmDialog.confirm("Confirm deletion of: " + item.getTitle(), new ConfirmHandler() {
+										@Override
+										public void onConfirm() {
+											bookService.delete(item, new Callback<Void>() {
+												@Override
+												protected void doOnSuccess(Void result) {
+													populate();
+													if (onDelete != null) {
+														onDelete.execute();
+													}
 												}
-											}
-										});
-									}
-								});
-							}
-						});
-					}
-				});
+											});
+										}
+									});
+								}
+							});
+						}
+					});
+				}
 				break;
 
 			case DELETE_PURCHASE:
