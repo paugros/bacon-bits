@@ -91,11 +91,11 @@ public final class BookManagementPage implements Page {
 
 		// filter
 		final DefaultListBox filterBox = table.getTitleBar().addFilterListControl(false);
-		filterBox.addItem("Unsold");
-		filterBox.addItem("Sold");
-		filterBox.addItem("Sold at book sale");
-		filterBox.addItem("Sold online");
-		filterBox.addItem("Deleted");
+		filterBox.addItem("Listed - available");
+		filterBox.addItem("Unlisted - sold");
+		filterBox.addItem("... sold at book sale");
+		filterBox.addItem("... sold online");
+		filterBox.addItem("Unlisted - deleted");
 		filterBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent e) {
