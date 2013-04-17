@@ -94,12 +94,15 @@ public final class BookManagementPage implements Page {
 		filterBox.addItem("Sold");
 		filterBox.addItem("Sold at book sale");
 		filterBox.addItem("Sold online");
+		filterBox.addItem("Deleted");
 		filterBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent e) {
 				switch (filterBox.getSelectedIndex()) {
 				case 0:
 					args.put(BookArg.STATUS_ID, 1);
+					args.remove(BookArg.SOLD_AT_BOOK_SALE);
+					args.remove(BookArg.SOLD_ONLINE);
 					break;
 				case 1:
 					args.put(BookArg.STATUS_ID, 2);
@@ -115,6 +118,11 @@ public final class BookManagementPage implements Page {
 					args.put(BookArg.STATUS_ID, 2);
 					args.put(BookArg.SOLD_AT_BOOK_SALE, false);
 					args.put(BookArg.SOLD_ONLINE, true);
+					break;
+				case 4:
+					args.put(BookArg.STATUS_ID, 3);
+					args.remove(BookArg.SOLD_AT_BOOK_SALE);
+					args.remove(BookArg.SOLD_ONLINE);
 					break;
 				}
 

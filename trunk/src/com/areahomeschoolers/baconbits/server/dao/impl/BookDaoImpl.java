@@ -135,7 +135,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		boolean soldOnline = args.getBoolean(BookArg.SOLD_ONLINE);
 		List<Object> sqlArgs = new ArrayList<Object>();
 
-		String sql = "select bb.*, (select group_concat(groupName) from groups g \n";
+		String sql = "select bb.*, (select group_concat(groupName separator ', ') from groups g \n";
 		sql += "join userGroupMembers ugm on ugm.groupId = g.id \n";
 		sql += "where bb.userId = ugm.userId and g.id in(16, 17)) as groups  from \n";
 		sql += "(select count(b.id) as total, sum(b.price) as totalPrice, b.userId, u.firstName, u.lastName \n";
