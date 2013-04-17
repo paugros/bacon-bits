@@ -89,6 +89,7 @@ public final class BookManagementPage implements Page {
 			}
 		});
 
+		// filter
 		final DefaultListBox filterBox = table.getTitleBar().addFilterListControl(false);
 		filterBox.addItem("Unsold");
 		filterBox.addItem("Sold");
