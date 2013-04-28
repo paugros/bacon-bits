@@ -9,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.DocumentService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
+import com.areahomeschoolers.baconbits.client.rpc.service.PaymentService;
 import com.areahomeschoolers.baconbits.client.rpc.service.SuggestService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserPreferenceService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
@@ -55,6 +56,8 @@ public class ServiceCache {
 				proxy = (RemoteServiceProxy) GWT.create(BookService.class);
 			} else if ("SuggestService".equals(className)) {
 				proxy = (RemoteServiceProxy) GWT.create(SuggestService.class);
+			} else if ("PaymentService".equals(className)) {
+				proxy = (RemoteServiceProxy) GWT.create(PaymentService.class);
 			}
 
 			services.put(serviceClass, proxy);

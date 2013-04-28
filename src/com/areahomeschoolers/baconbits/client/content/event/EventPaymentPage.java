@@ -12,14 +12,20 @@ import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.rpc.service.PaymentService;
+import com.areahomeschoolers.baconbits.client.rpc.service.PaymentServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.GenericCellTable;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
@@ -37,11 +43,13 @@ import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 public final class EventPaymentPage implements Page {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
+	private PaymentServiceAsync paymentService = (PaymentServiceAsync) ServiceCache.getService(PaymentService.class);
 	private EventParticipantCellTable table;
 	private Label total;
 	private SimplePanel payContainer = new SimplePanel();
 	// used to prevent double pay
 	private boolean paying;
+	private GenericCellTable adjustments;
 
 	public EventPaymentPage(final VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
@@ -51,14 +59,14 @@ public final class EventPaymentPage implements Page {
 
 		final String title = "Event Payment / Checkout";
 		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID_PLUS_SELF, Application.getCurrentUser().getId());
-		args.put(EventArg.STATUS_ID, 1);
+		// args.put(EventArg.STATUS_ID, 1);
 
 		table = new EventParticipantCellTable(args);
-		table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.PRICE,
+		table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.TOTALED_PRICE,
 				ParticipantColumn.EDIT_STATUS);
 		table.disablePaging();
 		table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
-		table.setWidth("750px");
+		table.setWidth("850px");
 
 		final VerticalPanel vp = new VerticalPanel();
 		vp.setSpacing(15);
@@ -149,6 +157,48 @@ public final class EventPaymentPage implements Page {
 		});
 
 		table.populate();
+
+		adjustments = new GenericCellTable() {
+			@Override
+			protected void fetchData() {
+				ArgMap<PaymentArg> args = new ArgMap<PaymentArg>(PaymentArg.USER_ID, Application.getCurrentUserId());
+				args.put(PaymentArg.ADJUSTMENT_STATUS_ID, 1);
+				paymentService.getAdjustments(args, getCallback());
+			}
+
+			@Override
+			protected void setColumns() {
+				addTextColumn("Adjustment type", new ValueGetter<String, Data>() {
+					@Override
+					public String get(Data item) {
+						return item.get("adjustmentSource");
+					}
+				});
+
+				addTotaledCurrencyColumn("Amount", new ValueGetter<Number, Data>() {
+					@Override
+					public Number get(Data item) {
+						return item.getDouble("amount");
+					}
+				});
+			}
+		};
+		adjustments.setWidth("400px");
+
+		adjustments.addDataReturnHandler(new DataReturnHandler() {
+			@Override
+			public void onDataReturn() {
+				if (!adjustments.getFullList().isEmpty()) {
+					updateTotal();
+					if (!adjustments.isAttached()) {
+						vp.add(adjustments);
+						vp.setCellHorizontalAlignment(adjustments, HasHorizontalAlignment.ALIGN_RIGHT);
+					}
+				}
+			}
+		});
+
+		adjustments.populate();
 	}
 
 	private void updateTotal() {
@@ -159,6 +209,10 @@ public final class EventPaymentPage implements Page {
 		double totalAmount = 0.00;
 		for (EventParticipant p : table.getSelectedItems()) {
 			totalAmount += p.getPrice();
+		}
+
+		for (Data adjustment : adjustments.getFullList()) {
+			totalAmount += adjustment.getDouble("amount");
 		}
 
 		total.setText(Formatter.formatCurrency(totalAmount));

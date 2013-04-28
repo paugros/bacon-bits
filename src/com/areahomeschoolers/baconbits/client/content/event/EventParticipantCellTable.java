@@ -48,7 +48,7 @@ import com.google.gwt.user.client.ui.Widget;
 public final class EventParticipantCellTable extends EntityCellTable<EventParticipant, EventArg, ParticipantColumn> {
 	public enum ParticipantColumn implements EntityCellTableColumn<ParticipantColumn> {
 		ATTENDED("Attended"), EVENT("Event"), EVENT_DATE("Event date"), REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE(
-				"Age"), PRICE("Price"), FIELDS("Fields"), STATUS("Status"), EDIT_STATUS("");
+				"Age"), PRICE("Price"), TOTALED_PRICE("Price"), FIELDS("Fields"), STATUS("Status"), EDIT_STATUS("");
 
 		private String title;
 
@@ -213,6 +213,14 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 				addCurrencyColumn(col, new ValueGetter<Double, EventParticipant>() {
 					@Override
 					public Double get(EventParticipant item) {
+						return item.getPrice();
+					}
+				});
+				break;
+			case TOTALED_PRICE:
+				addTotaledCurrencyColumn("Price", new ValueGetter<Number, EventParticipant>() {
+					@Override
+					public Number get(EventParticipant item) {
 						return item.getPrice();
 					}
 				});
