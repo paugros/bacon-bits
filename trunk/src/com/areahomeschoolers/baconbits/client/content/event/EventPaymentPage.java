@@ -59,7 +59,7 @@ public final class EventPaymentPage implements Page {
 
 		final String title = "Event Payment / Checkout";
 		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID_PLUS_SELF, Application.getCurrentUser().getId());
-		// args.put(EventArg.STATUS_ID, 1);
+		args.put(EventArg.STATUS_ID, 1);
 
 		table = new EventParticipantCellTable(args);
 		table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.TOTALED_PRICE,
