@@ -24,6 +24,7 @@ import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.paypal.adaptive.api.requests.fnapi.SimplePay;
@@ -87,6 +88,29 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		sql += "where 1 = 1 \n";
 
 		return sql;
+	}
+
+	@Override
+	public ArrayList<Data> getAdjustments(ArgMap<PaymentArg> args) {
+		List<Object> sqlArgs = new ArrayList<Object>();
+		int userId = args.getInt(PaymentArg.USER_ID);
+		int statusId = args.getInt(PaymentArg.ADJUSTMENT_STATUS_ID);
+
+		String sql = "select a.*, s.status, ss.adjustmentSource from adjustments a \n";
+		sql += "join adjustmentStatus s on s.id = a.statusId \n";
+		sql += "join adjustmentSource ss on ss.id = a.adjustmentSourceId \n";
+		sql += "where 1 = 1 \n";
+		if (userId > 0) {
+			sql += "and a.userId = ? \n";
+			sqlArgs.add(userId);
+		}
+
+		if (statusId > 0) {
+			sql += "and a.statusId = ? \n";
+			sqlArgs.add(statusId);
+		}
+
+		return query(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
 	}
 
 	@Override

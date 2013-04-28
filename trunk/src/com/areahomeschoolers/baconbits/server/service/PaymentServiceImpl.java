@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 
 @Controller
@@ -24,6 +25,11 @@ public class PaymentServiceImpl extends GwtController implements PaymentService 
 	@Autowired
 	public PaymentServiceImpl(PaymentDao dao) {
 		this.dao = dao;
+	}
+
+	@Override
+	public ArrayList<Data> getAdjustments(ArgMap<PaymentArg> args) {
+		return dao.getAdjustments(args);
 	}
 
 	@Override

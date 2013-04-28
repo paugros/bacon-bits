@@ -602,6 +602,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			total += p.getPrice();
 		}
 
+		// add in adjustments
+		String sql = "select 1 as id, sum(amount) as total from adjustments where userId = ? and statusId = 1";
+		Data sum = queryForObject(sql, ServerUtils.getGenericRowMapper(), ServerContext.getCurrentUserId());
+		total += sum.getDouble("total");
+
 		// add a payment record
 		PaymentDao paymentDao = ServerContext.getDaoImpl("payment");
 		Payment p = new Payment();
@@ -613,8 +618,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		p.setMemo("Payment for events");
 		p = paymentDao.save(p);
 
-		String sql = "update eventRegistrationParticipants set paymentId = ? where id in(" + Common.join(participantIds, ", ") + ")";
+		sql = "update eventRegistrationParticipants set paymentId = ? where id in(" + Common.join(participantIds, ", ") + ")";
 		update(sql, p.getId());
+
+		sql = "insert into paymentAdjustmentMapping (paymentId, adjustmentId) \n";
+		sql += "select ?, a.id from adjustments a where a.userId = ? and a.statusId = 1";
+		update(sql, p.getId(), ServerContext.getCurrentUserId());
 
 		return p.getPaypalData();
 	}
@@ -814,6 +823,23 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	public void setVolunteerFulFilled(int id, boolean fulfilled) {
 		String sql = "update eventVolunteerMapping set fulfilled = ? where id = ?";
 		update(sql, fulfilled, id);
+
+		sql = "select m.*, r.addedById from eventVolunteerMapping m ";
+		sql += "join eventRegistrations r on r.id = m.eventRegistrationId ";
+		sql += "where m.id = ?";
+		Data mapping = queryForObject(sql, ServerUtils.getGenericRowMapper(), id);
+
+		if (!fulfilled) {
+			sql = "delete from adjustments where userId = ? and adjustmentSourceId = 2 and sourceItemId = ?";
+			update(sql, mapping.getInt("addedById"), mapping.getInt("eventVolunteerPositionId"));
+		} else {
+			sql = "select * from eventVolunteerPositions where id = ?";
+			Data position = queryForObject(sql, ServerUtils.getGenericRowMapper(), mapping.getInt("eventVolunteerPositionId"));
+			if (position.getDouble("discount") > 0) {
+				sql = "insert into adjustments (adjustmentSourceId, userId, sourceItemId, amount, statusId) values(2, ?, ?, ?, 1)";
+				update(sql, mapping.getInt("addedById"), mapping.getInt("eventVolunteerPositionId"), position.getDouble("discount") * -1);
+			}
+		}
 	}
 
 	private EventField createBaseEventField(ResultSet rs) throws SQLException {

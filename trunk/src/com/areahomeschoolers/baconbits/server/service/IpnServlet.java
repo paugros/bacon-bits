@@ -138,6 +138,11 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 			template.update(sql, paymentFee, txnId, rawData, key);
 
 			int paymentTypeId = template.queryForInt("select paymentTypeId from payments where payKey = ? limit 1", key);
+			int paymentId = template.queryForInt("select id from payments where payKey = ? limit 1", key);
+
+			// set adjustments as being applied
+			sql = "update adjustments set statusId = 2 where id in(select adjustmentId from paymentAdjustmentMapping where paymentId = ?)";
+			template.update(sql, paymentId);
 
 			switch (paymentTypeId) {
 
@@ -150,8 +155,8 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 					}
 
 					if (participantStatusId > 0) {
-						sql = "update eventRegistrationParticipants set statusId = 2 where paymentId = (select id from payments where payKey = ? limit 1)";
-						template.update(sql, key);
+						sql = "update eventRegistrationParticipants set statusId = 2 where paymentId = ?";
+						template.update(sql, paymentId);
 					}
 				}
 				break;
