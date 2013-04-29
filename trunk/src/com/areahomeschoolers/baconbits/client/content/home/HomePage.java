@@ -168,7 +168,11 @@ public class HomePage implements Page {
 
 						@Override
 						protected void doOnSuccess(PaypalData result) {
-							Window.Location.replace(result.getAuthorizationUrl());
+							if (result.getAuthorizationUrl() != null) {
+								Window.Location.replace(result.getAuthorizationUrl());
+							} else {
+								HistoryToken.set(PageUrl.home() + "&ps=return");
+							}
 						}
 					});
 				}
