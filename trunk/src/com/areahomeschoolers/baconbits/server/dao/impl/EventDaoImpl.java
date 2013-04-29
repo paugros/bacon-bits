@@ -507,20 +507,22 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int eventId = args.getInt(EventArg.EVENT_ID);
 		int userId = args.getInt(EventArg.USER_ID);
 
-		String sql = "select e.startDate, e.endDate, e.title, r.eventId, m.id, m.fulfilled, u.firstName, u.lastName, p.jobTitle, r.addedById ";
-		sql += "from eventVolunteerMapping m ";
-		sql += "join eventVolunteerPositions p on p.id = m.eventVolunteerPositionId ";
-		sql += "join eventRegistrations r on r.id = m.eventRegistrationId ";
-		sql += "join events e on e.id = r.eventId ";
-		sql += "join users u on u.id = r.addedById ";
+		String sql = "select e.startDate, e.endDate, e.title, r.eventId, m.id, m.fulfilled, u.firstName, u.lastName, \n";
+		sql += "p.jobTitle, r.addedById, case when a.id is null then 0 else 1 end as adjustmentApplied \n";
+		sql += "from eventVolunteerMapping m \n";
+		sql += "join eventVolunteerPositions p on p.id = m.eventVolunteerPositionId \n";
+		sql += "join eventRegistrations r on r.id = m.eventRegistrationId \n";
+		sql += "join events e on e.id = r.eventId \n";
+		sql += "join users u on u.id = r.addedById \n";
+		sql += "left join adjustments a on a.linkId = p.id and a.adjustmentTypeId = 2 and a.userId = u.id and a.statusId = 2 \n";
 		sql += "where 1 = 1 ";
 		if (eventId > 0) {
-			sql += "and r.eventId = ? ";
+			sql += "and r.eventId = ? \n";
 			sqlArgs.add(eventId);
 		}
 
 		if (userId > 0) {
-			sql += "and r.addedById = ? ";
+			sql += "and r.addedById = ? \n";
 			sqlArgs.add(userId);
 		}
 
@@ -602,11 +604,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			total += p.getPrice();
 		}
 
-		// add in adjustments
-		String sql = "select 1 as id, sum(amount) as total from adjustments where userId = ? and statusId = 1";
-		Data sum = queryForObject(sql, ServerUtils.getGenericRowMapper(), ServerContext.getCurrentUserId());
-		total += sum.getDouble("total");
-
 		// add a payment record
 		PaymentDao paymentDao = ServerContext.getDaoImpl("payment");
 		Payment p = new Payment();
@@ -618,12 +615,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		p.setMemo("Payment for events");
 		p = paymentDao.save(p);
 
-		sql = "update eventRegistrationParticipants set paymentId = ? where id in(" + Common.join(participantIds, ", ") + ")";
+		String sql = "update eventRegistrationParticipants set paymentId = ?";
+		// for zero or negative payments, update status now instead of waiting for ipn
+		if (p.getAmount() <= 0) {
+			sql += ", statusId = 2 ";
+		}
+		sql += " where id in(" + Common.join(participantIds, ", ") + ")";
 		update(sql, p.getId());
-
-		sql = "insert into paymentAdjustmentMapping (paymentId, adjustmentId) \n";
-		sql += "select ?, a.id from adjustments a where a.userId = ? and a.statusId = 1";
-		update(sql, p.getId(), ServerContext.getCurrentUserId());
 
 		return p.getPaypalData();
 	}

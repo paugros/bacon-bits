@@ -11,6 +11,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface PaymentServiceAsync {
 
+	void deleteAdjustment(int adjustmentId, AsyncCallback<Void> callback);
+
 	void getAdjustments(ArgMap<PaymentArg> args, AsyncCallback<ArrayList<Adjustment>> callback);
 
 	void getById(int paymentId, AsyncCallback<Payment> callback);
@@ -18,4 +20,6 @@ public interface PaymentServiceAsync {
 	void list(ArgMap<PaymentArg> args, AsyncCallback<ArrayList<Payment>> callback);
 
 	void save(Payment payment, AsyncCallback<Payment> callback);
+
+	void saveAdjustment(Adjustment adjustment, AsyncCallback<Adjustment> callback);
 }

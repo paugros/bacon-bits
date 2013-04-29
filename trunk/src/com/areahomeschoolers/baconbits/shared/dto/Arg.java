@@ -20,7 +20,7 @@ public interface Arg {
 	}
 
 	public enum PaymentArg implements Arg, IsSerializable {
-		USER_ID, ADJUSTMENT_STATUS_ID
+		USER_ID, STATUS_ID, TYPE_ID, ADJUSTMENT_ID
 	}
 
 	public enum UserArg implements Arg, IsSerializable {

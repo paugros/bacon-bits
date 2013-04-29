@@ -15,6 +15,7 @@ public class Adjustment extends EntityDto<Adjustment> {
 	private double amount;
 	private int statusId;
 	private Date addedDate;
+	private String description;
 
 	// aux
 	private String adjustmentType;
@@ -30,12 +31,20 @@ public class Adjustment extends EntityDto<Adjustment> {
 		return addedDate;
 	}
 
+	public String getAdjustmentType() {
+		return adjustmentType;
+	}
+
 	public int getAdjustmentTypeId() {
 		return adjustmentTypeId;
 	}
 
 	public double getAmount() {
 		return amount;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 
 	public int getLinkId() {
@@ -48,10 +57,6 @@ public class Adjustment extends EntityDto<Adjustment> {
 
 	public int getStatusId() {
 		return statusId;
-	}
-
-	public String getAdjustmentType() {
-		return adjustmentType;
 	}
 
 	public String getUserFullName() {
@@ -76,6 +81,10 @@ public class Adjustment extends EntityDto<Adjustment> {
 
 	public void setAmount(double amount) {
 		this.amount = amount;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setLinkId(int sourceLinkId) {

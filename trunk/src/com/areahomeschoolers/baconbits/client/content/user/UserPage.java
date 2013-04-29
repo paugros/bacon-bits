@@ -333,6 +333,16 @@ public class UserPage implements Page {
 				});
 			}
 
+			tabPanel.add("Payments", new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					UserPaymentSection pay = new UserPaymentSection(user, tabBody);
+					pay.populate();
+
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
+
 			if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS) && !user.equals(Application.getCurrentUser())) {
 				form.setEnabled(false);
 			}

@@ -28,6 +28,11 @@ public class PaymentServiceImpl extends GwtController implements PaymentService 
 	}
 
 	@Override
+	public void deleteAdjustment(int adjustmentId) {
+		dao.deleteAdjustment(adjustmentId);
+	}
+
+	@Override
 	public ArrayList<Adjustment> getAdjustments(ArgMap<PaymentArg> args) {
 		return dao.getAdjustments(args);
 	}
@@ -45,6 +50,11 @@ public class PaymentServiceImpl extends GwtController implements PaymentService 
 	@Override
 	public Payment save(Payment payment) {
 		return dao.save(payment);
+	}
+
+	@Override
+	public Adjustment saveAdjustment(Adjustment adjustment) {
+		return dao.saveAdjustment(adjustment);
 	}
 
 }

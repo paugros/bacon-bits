@@ -4,18 +4,29 @@ import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentCellTable.AdjustmentColumn;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.PaymentService;
 import com.areahomeschoolers.baconbits.client.rpc.service.PaymentServiceAsync;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.dto.Adjustment;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
+
 public final class AdjustmentCellTable extends EntityCellTable<Adjustment, PaymentArg, AdjustmentColumn> {
 	public enum AdjustmentColumn implements EntityCellTableColumn<AdjustmentColumn> {
-		TYPE("Adjustment type"), USER("User"), AMOUNT("Amount"), TOTALED_AMOUNT("Amount"), STATUS("Status"), ADDED_DATE("Added date");
+		TYPE("Adjustment type"), USER("User"), AMOUNT("Amount"), TOTALED_AMOUNT("Amount"), STATUS("Status"), ADDED_DATE("Added date"), DESCRIPTION(
+				"Description");
 
 		private String title;
 
@@ -30,6 +41,7 @@ public final class AdjustmentCellTable extends EntityCellTable<Adjustment, Payme
 	}
 
 	private PaymentServiceAsync paymentService = (PaymentServiceAsync) ServiceCache.getService(PaymentService.class);
+	private AdjustmentDialog dialog;
 
 	public AdjustmentCellTable(ArgMap<PaymentArg> args) {
 		this();
@@ -37,10 +49,19 @@ public final class AdjustmentCellTable extends EntityCellTable<Adjustment, Payme
 	}
 
 	private AdjustmentCellTable() {
-		setDefaultSortColumn(AdjustmentColumn.TYPE, SortDirection.SORT_ASC);
-		setDisplayColumns(AdjustmentColumn.ADDED_DATE, AdjustmentColumn.AMOUNT, AdjustmentColumn.STATUS, AdjustmentColumn.TYPE, AdjustmentColumn.USER);
+		setDefaultSortColumn(AdjustmentColumn.ADDED_DATE, SortDirection.SORT_DESC);
+		setDisplayColumns(AdjustmentColumn.ADDED_DATE, AdjustmentColumn.AMOUNT, AdjustmentColumn.STATUS, AdjustmentColumn.TYPE, AdjustmentColumn.USER,
+				AdjustmentColumn.DESCRIPTION);
 
 		disablePaging();
+	}
+
+	public AdjustmentDialog getDialog() {
+		return dialog;
+	}
+
+	public void setDialog(AdjustmentDialog dialog) {
+		this.dialog = dialog;
 	}
 
 	@Override
@@ -68,6 +89,14 @@ public final class AdjustmentCellTable extends EntityCellTable<Adjustment, Payme
 					}
 				});
 				break;
+			case DESCRIPTION:
+				addTextColumn(col, new ValueGetter<String, Adjustment>() {
+					@Override
+					public String get(Adjustment item) {
+						return item.getDescription();
+					}
+				});
+				break;
 			case TOTALED_AMOUNT:
 				addTotaledCurrencyColumn("Amount", new ValueGetter<Number, Adjustment>() {
 					@Override
@@ -85,12 +114,29 @@ public final class AdjustmentCellTable extends EntityCellTable<Adjustment, Payme
 				});
 				break;
 			case TYPE:
-				addTextColumn(col, new ValueGetter<String, Adjustment>() {
-					@Override
-					public String get(Adjustment item) {
-						return item.getAdjustmentType();
-					}
-				});
+				if (dialog != null) {
+					addCompositeWidgetColumn(col, new WidgetCellCreator<Adjustment>() {
+						@Override
+						protected Widget createWidget(final Adjustment item) {
+							if (item.getAdjustmentTypeId() != 1 || item.getStatusId() != 1) {
+								return new Label(item.getAdjustmentType());
+							}
+							return new ClickLabel(item.getAdjustmentType(), new MouseDownHandler() {
+								@Override
+								public void onMouseDown(MouseDownEvent event) {
+									dialog.center(item);
+								}
+							});
+						}
+					});
+				} else {
+					addTextColumn(col, new ValueGetter<String, Adjustment>() {
+						@Override
+						public String get(Adjustment item) {
+							return item.getAdjustmentType();
+						}
+					});
+				}
 				break;
 			case USER:
 				break;
@@ -99,6 +145,35 @@ public final class AdjustmentCellTable extends EntityCellTable<Adjustment, Payme
 				break;
 			}
 		}
+
+		if (dialog != null) {
+			addCompositeWidgetColumn("", new WidgetCellCreator<Adjustment>() {
+				@Override
+				protected Widget createWidget(final Adjustment item) {
+					if (item.getAdjustmentTypeId() != 1 || item.getStatusId() != 1) {
+						return new Label("");
+					}
+
+					return new ClickLabel("X", new MouseDownHandler() {
+						@Override
+						public void onMouseDown(MouseDownEvent event) {
+							ConfirmDialog.confirm("Really delete this adjustment?", new ConfirmHandler() {
+								@Override
+								public void onConfirm() {
+									paymentService.deleteAdjustment(item.getId(), new Callback<Void>() {
+										@Override
+										protected void doOnSuccess(Void result) {
+											removeItem(item);
+										}
+									});
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+
 	}
 
 }
