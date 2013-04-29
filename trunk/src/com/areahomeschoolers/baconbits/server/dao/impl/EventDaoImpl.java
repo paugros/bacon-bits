@@ -830,13 +830,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		Data mapping = queryForObject(sql, ServerUtils.getGenericRowMapper(), id);
 
 		if (!fulfilled) {
-			sql = "delete from adjustments where userId = ? and adjustmentSourceId = 2 and sourceItemId = ?";
+			sql = "delete from adjustments where userId = ? and adjustmentTypeId = 2 and linkId = ?";
 			update(sql, mapping.getInt("addedById"), mapping.getInt("eventVolunteerPositionId"));
 		} else {
 			sql = "select * from eventVolunteerPositions where id = ?";
 			Data position = queryForObject(sql, ServerUtils.getGenericRowMapper(), mapping.getInt("eventVolunteerPositionId"));
 			if (position.getDouble("discount") > 0) {
-				sql = "insert into adjustments (adjustmentSourceId, userId, sourceItemId, amount, statusId) values(2, ?, ?, ?, 1)";
+				sql = "insert into adjustments (adjustmentTypeId, userId, linkId, amount, statusId) values(2, ?, ?, ?, 1)";
 				update(sql, mapping.getInt("addedById"), mapping.getInt("eventVolunteerPositionId"), position.getDouble("discount") * -1);
 			}
 		}

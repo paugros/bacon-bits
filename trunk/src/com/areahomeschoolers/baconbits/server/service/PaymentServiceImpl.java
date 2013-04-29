@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.areahomeschoolers.baconbits.client.rpc.service.PaymentService;
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
+import com.areahomeschoolers.baconbits.shared.dto.Adjustment;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
-import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 
 @Controller
@@ -28,7 +28,7 @@ public class PaymentServiceImpl extends GwtController implements PaymentService 
 	}
 
 	@Override
-	public ArrayList<Data> getAdjustments(ArgMap<PaymentArg> args) {
+	public ArrayList<Adjustment> getAdjustments(ArgMap<PaymentArg> args) {
 		return dao.getAdjustments(args);
 	}
 
