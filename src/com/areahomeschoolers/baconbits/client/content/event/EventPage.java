@@ -718,6 +718,11 @@ public class EventPage implements Page {
 												});
 											}
 										});
+
+										// if they've already used the corresponding discount, don't allow it to be deleted
+										if (item.getBoolean("adjustmentApplied")) {
+											cb.setEnabled(false);
+										}
 										ft.setWidget(row, 0, cb);
 										Label name = new Label(item.get("firstName") + " " + item.get("lastName"));
 										name.getElement().getStyle().setMarginRight(30, Unit.PX);
@@ -725,7 +730,7 @@ public class EventPage implements Page {
 										Label title = new Label(item.get("jobTitle"));
 										title.getElement().getStyle().setMarginRight(20, Unit.PX);
 										ft.setWidget(row, 2, title);
-										if (Application.administratorOf(calendarEvent.getGroupId())) {
+										if (Application.administratorOf(calendarEvent.getGroupId()) && !item.getBoolean("adjustmentApplied")) {
 											ClickLabel cl = new ClickLabel("X", new MouseDownHandler() {
 												@Override
 												public void onMouseDown(MouseDownEvent event) {

@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentCellTable;
@@ -15,6 +16,7 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
@@ -127,7 +129,11 @@ public final class EventPaymentPage implements Page {
 
 								@Override
 								protected void doOnSuccess(PaypalData result) {
-									Window.Location.replace(result.getAuthorizationUrl());
+									if (result.getAuthorizationUrl() != null) {
+										Window.Location.replace(result.getAuthorizationUrl());
+									} else {
+										HistoryToken.set(PageUrl.eventParticipantList());
+									}
 								}
 
 							});
@@ -156,7 +162,7 @@ public final class EventPaymentPage implements Page {
 		table.populate();
 
 		ArgMap<PaymentArg> adjustmentArgs = new ArgMap<PaymentArg>(PaymentArg.USER_ID, Application.getCurrentUserId());
-		adjustmentArgs.put(PaymentArg.ADJUSTMENT_STATUS_ID, 1);
+		adjustmentArgs.put(PaymentArg.STATUS_ID, 1);
 		adjustments = new AdjustmentCellTable(adjustmentArgs);
 		adjustments.setDisplayColumns(AdjustmentColumn.TYPE, AdjustmentColumn.TOTALED_AMOUNT);
 		adjustments.setWidth("400px");

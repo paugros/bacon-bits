@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
@@ -25,6 +26,7 @@ import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.dto.Adjustment;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.paypal.adaptive.api.requests.fnapi.SimplePay;
@@ -63,6 +65,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			a.setStatusId(rs.getInt("statusId"));
 			a.setUserFullName(rs.getString("userFullName"));
 			a.setUserId(rs.getInt("userId"));
+			a.setDescription(rs.getString("description"));
 
 			return a;
 		}
@@ -79,7 +82,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			payment.setPaymentDate(rs.getTimestamp("paymentDate"));
 			payment.setPaymentFee(rs.getDouble("paymentFee"));
 			payment.setRawData(rs.getString("rawData"));
-			payment.setStatusId(rs.getInt("rawData"));
+			payment.setStatusId(rs.getInt("statusId"));
 			payment.setTransactionId(rs.getString("transactionId"));
 			payment.setUserId(rs.getInt("userId"));
 			payment.setUserFullName(rs.getString("userFullName"));
@@ -110,16 +113,26 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
+	public void deleteAdjustment(int adjustmentId) {
+		String sql = "delete from adjustments where id = ?";
+		update(sql, adjustmentId);
+	}
+
+	@Override
 	public ArrayList<Adjustment> getAdjustments(ArgMap<PaymentArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int userId = args.getInt(PaymentArg.USER_ID);
-		int statusId = args.getInt(PaymentArg.ADJUSTMENT_STATUS_ID);
+		int statusId = args.getInt(PaymentArg.STATUS_ID);
+		int typeId = args.getInt(PaymentArg.TYPE_ID);
+		int adjustmentId = args.getInt(PaymentArg.ADJUSTMENT_ID);
 
 		String sql = "select a.*, s.status, t.adjustmentType, \n";
 		sql += "concat(u.firstName, ' ', u.lastName) as userFullName from adjustments a \n";
 		sql += "join adjustmentStatus s on s.id = a.statusId \n";
 		sql += "join adjustmentTypes t on t.id = a.adjustmentTypeId \n";
 		sql += "join users u on u.id = a.userId \n";
+
 		sql += "where 1 = 1 \n";
 		if (userId > 0) {
 			sql += "and a.userId = ? \n";
@@ -129,6 +142,16 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		if (statusId > 0) {
 			sql += "and a.statusId = ? \n";
 			sqlArgs.add(statusId);
+		}
+
+		if (typeId > 0) {
+			sql += "and a.adjustmentTypeId = ? \n";
+			sqlArgs.add(typeId);
+		}
+
+		if (adjustmentId > 0) {
+			sql += "and a.id = ? \n";
+			sqlArgs.add(adjustmentId);
 		}
 
 		return query(sql, new AdjustmentMapper(), sqlArgs.toArray());
@@ -144,8 +167,25 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 	@Override
 	public ArrayList<Payment> list(ArgMap<PaymentArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
+		int userId = args.getInt(PaymentArg.USER_ID);
+		int statusId = args.getInt(PaymentArg.STATUS_ID);
+		int typeId = args.getInt(PaymentArg.TYPE_ID);
 
 		String sql = createSqlBase();
+		if (userId > 0) {
+			sql += "and p.userId = ? \n";
+			sqlArgs.add(userId);
+		}
+
+		if (statusId > 0) {
+			sql += "and p.statusId = ? \n";
+			sqlArgs.add(statusId);
+		}
+
+		if (typeId > 0) {
+			sql += "and p.paymentTypeId = ? \n";
+			sqlArgs.add(typeId);
+		}
 
 		ArrayList<Payment> data = query(sql, new PaymentMapper(), sqlArgs.toArray());
 
@@ -162,9 +202,18 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
+			// apply any pending adjustments
+			String sql = "select 1 as id, sum(amount) as total from adjustments where userId = ? and statusId = 1";
+			Data sum = queryForObject(sql, ServerUtils.getGenericRowMapper(), ServerContext.getCurrentUserId());
+			payment.setAmount(payment.getAmount() + sum.getDouble("total"));
+
+			// no need for pending status if payment amount is zero or less
+			if (payment.getAmount() <= 0) {
+				payment.setStatusId(2);
+			}
 			payment.setUserId(ServerContext.getCurrentUser().getId());
 
-			String sql = "insert into payments (userId, paymentTypeId, paymentDate, amount, statusId) values ";
+			sql = "insert into payments (userId, paymentTypeId, paymentDate, amount, statusId) values ";
 			sql += "(:userId, :paymentTypeId, now(), :amount, :statusId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
@@ -172,12 +221,35 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 
 			payment.setId(ServerUtils.getIdFromKeys(keys));
 
-			// when adding a new payment, we need to create a transaction with PayPal
-			data = makePayment(payment);
-			if (data.getPayKey() != null) {
-				// and then link it to our payment via a payKey
-				sql = "update payments set payKey = ? where id = ?";
-				update(sql, data.getPayKey(), payment.getId());
+			// link payment to applied adjustments
+			sql = "insert into paymentAdjustmentMapping (paymentId, adjustmentId) \n";
+			sql += "select ?, a.id from adjustments a where a.userId = ? and a.statusId = 1";
+			update(sql, payment.getId(), ServerContext.getCurrentUserId());
+
+			if (payment.getAmount() > 0) {
+				// when adding a new payment, we need to create a transaction with PayPal
+				data = makePayment(payment);
+				if (data.getPayKey() != null) {
+					// and then link it to our payment via a payKey
+					sql = "update payments set payKey = ? where id = ?";
+					update(sql, data.getPayKey(), payment.getId());
+				}
+			} else {
+				// if a negative value, we don't need PayPal
+				data = new PaypalData();
+				// mark all adjustments as applied
+				sql = "update adjustments set statusId = 2 where id in(select adjustmentId from paymentAdjustmentMapping where paymentId = ?)";
+				update(sql, payment.getId());
+
+				// then add a new adjustment for the left-over difference, if any
+				if (payment.getAmount() < 0) {
+					Adjustment adj = new Adjustment();
+					adj.setAmount(payment.getAmount());
+					adj.setUserId(payment.getUserId());
+					adj.setAdjustmentTypeId(3);
+					adj.setStatusId(1);
+					saveAdjustment(adj);
+				}
 			}
 		}
 
@@ -186,6 +258,31 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		p.setPaypalData(data);
 
 		return p;
+	}
+
+	@Override
+	public Adjustment saveAdjustment(Adjustment adjustment) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(adjustment);
+
+		if (adjustment.isSaved()) {
+			String sql = "update adjustments set statusId = :statusId, amount = :amount, description = :description ";
+			sql += "where id = :id";
+			update(sql, namedParams);
+		} else {
+			adjustment.setUserId(ServerContext.getCurrentUser().getId());
+
+			String sql = "insert into adjustments (userId, adjustmentTypeId, amount, statusId, description) values ";
+			sql += "(:userId, :adjustmentTypeId, :amount, :statusId, :description)";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			adjustment.setId(ServerUtils.getIdFromKeys(keys));
+		}
+
+		Adjustment a = getAdjustments(new ArgMap<PaymentArg>(PaymentArg.ADJUSTMENT_ID, adjustment.getId())).get(0);
+
+		return a;
 	}
 
 	private PaypalData makePayment(Payment p) {

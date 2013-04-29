@@ -15,6 +15,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("service/payment")
 public interface PaymentService extends RemoteService {
+	public void deleteAdjustment(int adjustmentId);
+
 	public ArrayList<Adjustment> getAdjustments(ArgMap<PaymentArg> args);
 
 	public Payment getById(int paymentId);
@@ -22,4 +24,6 @@ public interface PaymentService extends RemoteService {
 	public ArrayList<Payment> list(ArgMap<PaymentArg> args);
 
 	public Payment save(Payment payment);
+
+	public Adjustment saveAdjustment(Adjustment adjustment);
 }
