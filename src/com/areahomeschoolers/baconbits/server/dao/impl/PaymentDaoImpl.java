@@ -22,9 +22,9 @@ import com.areahomeschoolers.baconbits.server.paypal.PayPalCredentials;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
+import com.areahomeschoolers.baconbits.shared.dto.Adjustment;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
-import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.paypal.adaptive.api.requests.fnapi.SimplePay;
@@ -48,6 +48,25 @@ import com.paypal.adaptive.exceptions.RequestFailureException;
 
 @Repository
 public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
+
+	private final class AdjustmentMapper implements RowMapper<Adjustment> {
+		@Override
+		public Adjustment mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Adjustment a = new Adjustment();
+			a.setId(rs.getInt("id"));
+			a.setAddedDate(rs.getTimestamp("addedDate"));
+			a.setAdjustmentTypeId(rs.getInt("adjustmentTypeId"));
+			a.setAmount(rs.getDouble("amount"));
+			a.setAdjustmentType(rs.getString("adjustmentType"));
+			a.setLinkId(rs.getInt("linkId"));
+			a.setStatus(rs.getString("status"));
+			a.setStatusId(rs.getInt("statusId"));
+			a.setUserFullName(rs.getString("userFullName"));
+			a.setUserId(rs.getInt("userId"));
+
+			return a;
+		}
+	}
 
 	private final class PaymentMapper implements RowMapper<Payment> {
 		@Override
@@ -91,14 +110,16 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 	}
 
 	@Override
-	public ArrayList<Data> getAdjustments(ArgMap<PaymentArg> args) {
+	public ArrayList<Adjustment> getAdjustments(ArgMap<PaymentArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int userId = args.getInt(PaymentArg.USER_ID);
 		int statusId = args.getInt(PaymentArg.ADJUSTMENT_STATUS_ID);
 
-		String sql = "select a.*, s.status, ss.adjustmentSource from adjustments a \n";
+		String sql = "select a.*, s.status, t.adjustmentType, \n";
+		sql += "concat(u.firstName, ' ', u.lastName) as userFullName from adjustments a \n";
 		sql += "join adjustmentStatus s on s.id = a.statusId \n";
-		sql += "join adjustmentSource ss on ss.id = a.adjustmentSourceId \n";
+		sql += "join adjustmentTypes t on t.id = a.adjustmentTypeId \n";
+		sql += "join users u on u.id = a.userId \n";
 		sql += "where 1 = 1 \n";
 		if (userId > 0) {
 			sql += "and a.userId = ? \n";
@@ -110,7 +131,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			sqlArgs.add(statusId);
 		}
 
-		return query(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
+		return query(sql, new AdjustmentMapper(), sqlArgs.toArray());
 	}
 
 	@Override
