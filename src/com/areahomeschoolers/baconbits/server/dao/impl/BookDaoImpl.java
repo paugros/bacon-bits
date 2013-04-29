@@ -344,6 +344,12 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		p.setMemo("Payment for book selling registration");
 		p = paymentDao.save(p);
 
+		// if negative payment, don't wait for ipn
+		if (p.getAmount() <= 0 && !ServerContext.getCurrentUser().memberOf(16)) {
+			String sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, 16, 0)";
+			update(sql, ServerContext.getCurrentUserId());
+		}
+
 		return p.getPaypalData();
 	}
 
