@@ -50,7 +50,7 @@ public final class AdjustmentCellTable extends EntityCellTable<Adjustment, Payme
 
 	private AdjustmentCellTable() {
 		setDefaultSortColumn(AdjustmentColumn.ADDED_DATE, SortDirection.SORT_DESC);
-		setDisplayColumns(AdjustmentColumn.ADDED_DATE, AdjustmentColumn.AMOUNT, AdjustmentColumn.STATUS, AdjustmentColumn.TYPE, AdjustmentColumn.USER,
+		setDisplayColumns(AdjustmentColumn.ADDED_DATE, AdjustmentColumn.TOTALED_AMOUNT, AdjustmentColumn.STATUS, AdjustmentColumn.TYPE, AdjustmentColumn.USER,
 				AdjustmentColumn.DESCRIPTION);
 
 		disablePaging();
