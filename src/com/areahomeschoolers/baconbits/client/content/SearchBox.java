@@ -35,7 +35,7 @@ public final class SearchBox extends Composite {
 		hPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		hPanel.setSpacing(4);
 
-		final ServerSuggestOracle oracle = new ServerSuggestOracle("Account");
+		final ServerSuggestOracle oracle = new ServerSuggestOracle("User");
 		searchSuggestBox = new SuggestBox(oracle);
 		searchSuggestBox.setWidth("200px");
 		searchSuggestBox.setAutoSelectEnabled(false);
