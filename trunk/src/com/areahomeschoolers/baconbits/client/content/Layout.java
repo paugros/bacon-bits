@@ -113,7 +113,7 @@ public final class Layout {
 		headerPanel.setCellWidth(spacer, "100%");
 
 		searchBox = new SearchBox();
-		headerPanel.add(searchBox);
+		// headerPanel.add(searchBox);
 
 		LinkPanel sessionPanel = new LinkPanel();
 		headerPanel.add(sessionPanel);

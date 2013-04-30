@@ -494,11 +494,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "from eventRegistrationParticipants p \n";
 		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
+		sql += "join users u on u.id = r.addedById \n";
 		sql += "join events e on e.id = r.eventId \n";
 		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
-		sql += "where r.addedById = ? and p.statusId = 1";
+		sql += "where e.active = 1 and (u.parentId = ? or u.id = ?)  and p.statusId = 1";
 
-		return queryForObject(sql, ServerUtils.getGenericRowMapper(), userId);
+		return queryForObject(sql, ServerUtils.getGenericRowMapper(), userId, userId);
 	}
 
 	@Override
