@@ -38,7 +38,7 @@ public final class PaymentCellTable extends EntityCellTable<Payment, PaymentArg,
 
 	private PaymentCellTable() {
 		setDefaultSortColumn(PaymentColumn.PAYMENT_DATE, SortDirection.SORT_DESC);
-		setDisplayColumns(PaymentColumn.PAYMENT_DATE, PaymentColumn.AMOUNT, PaymentColumn.STATUS, PaymentColumn.TYPE, PaymentColumn.USER);
+		setDisplayColumns(PaymentColumn.PAYMENT_DATE, PaymentColumn.TOTALED_AMOUNT, PaymentColumn.STATUS, PaymentColumn.TYPE, PaymentColumn.USER);
 
 		disablePaging();
 	}
