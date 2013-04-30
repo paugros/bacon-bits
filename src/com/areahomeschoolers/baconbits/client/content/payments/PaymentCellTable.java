@@ -15,7 +15,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Payment;
 
 public final class PaymentCellTable extends EntityCellTable<Payment, PaymentArg, PaymentColumn> {
 	public enum PaymentColumn implements EntityCellTableColumn<PaymentColumn> {
-		TYPE("Payment type"), USER("User"), AMOUNT("Amount"), TOTALED_AMOUNT("Amount"), STATUS("Status"), PAYMENT_DATE("Added date");
+		TYPE("Payment type"), USER("User"), STATUS("Status"), PAYMENT_DATE("Added date"), AMOUNT("Amount"), TOTALED_AMOUNT("Amount");
 
 		private String title;
 
