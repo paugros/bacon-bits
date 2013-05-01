@@ -319,7 +319,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int registrationId = args.getInt(EventArg.REGISTRATION_ID);
 		int participantId = args.getInt(EventArg.PARTICIPANT_ID);
 		int eventId = args.getInt(EventArg.EVENT_ID);
-		int parentIdPlusSelf = args.getInt(EventArg.PARENT_ID_PLUS_SELF);
+		int registrationAddedById = args.getInt(EventArg.REGISTRATION_ADDED_BY_ID);
 		int parentId = args.getInt(EventArg.PARENT_ID);
 		int userId = args.getInt(EventArg.USER_ID);
 		int statusId = args.getInt(EventArg.STATUS_ID);
@@ -329,7 +329,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select r.eventId, e.title, e.startDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
-		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, r.addedById, e.groupId, \n";
+		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, r.addedById, e.groupId, e.seriesId, e.requiredInSeries, \n";
 		if (includeFields) {
 			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n";
 			sql += "from eventFieldValues v \n";
@@ -388,10 +388,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sqlArgs.add(userId);
 		}
 
-		if (parentIdPlusSelf > 0) {
-			sql += "and (u.parentId = ? or u.id = ?) \n";
-			sqlArgs.add(parentIdPlusSelf);
-			sqlArgs.add(parentIdPlusSelf);
+		if (registrationAddedById > 0) {
+			sql += "and r.addedById = ? \n";
+			sqlArgs.add(registrationAddedById);
 		}
 
 		if (parentId > 0) {
@@ -428,6 +427,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setPaymentId(rs.getInt("paymentId"));
 				p.setEventDate(rs.getTimestamp("startDate"));
 				p.setEventGroupId(rs.getInt("groupId"));
+				p.setEventSeriesId(rs.getInt("seriesId"));
+				p.setRequiredInSeries(rs.getBoolean("requiredInSeries"));
 				if (includeFields) {
 					p.setFieldValues(rs.getString("fieldValues"));
 				}
@@ -494,12 +495,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "from eventRegistrationParticipants p \n";
 		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
-		sql += "join users u on u.id = r.addedById \n";
 		sql += "join events e on e.id = r.eventId \n";
 		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
-		sql += "where e.active = 1 and (u.parentId = ? or u.id = ?)  and p.statusId = 1";
+		sql += "where e.active = 1 and r.addedById = ? and p.statusId = 1";
 
-		return queryForObject(sql, ServerUtils.getGenericRowMapper(), userId, userId);
+		return queryForObject(sql, ServerUtils.getGenericRowMapper(), userId);
 	}
 
 	@Override
@@ -662,7 +662,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				sql += "from eventAgeGroups where eventId = ? order by id";
 				update(sql, event.getId(), event.getCloneFromId());
 
-				// clone fields -- start by fetching all the age groups we just added, alogn with the ids of the age groups they were cloned from
+				// clone fields -- start by fetching all the age groups we just added, along with the ids of the age groups they were cloned from
 				sql = "select id, clonedFromId from eventAgeGroups where eventId = ?";
 				List<Data> ids = query(sql, ServerUtils.getGenericRowMapper(), event.getId());
 				// loop through each age group cloning all of its fields
@@ -1088,8 +1088,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 			sql += "join events e on e.id = r.eventId \n";
 			sql += "where p.statusId != 5 and e.active = 1 \n";
-			// sql += "and (? between e.startDate and e.endDate \n";
-			// sql += "or ? between e.startDate and e.endDate) \n";
 			sql += "and ((? >= e.startDate and ? < e.endDate) \n";
 			sql += "or (? > e.startDate and ? <= e.endDate)) \n";
 			sql += "and userId = ? limit 1";

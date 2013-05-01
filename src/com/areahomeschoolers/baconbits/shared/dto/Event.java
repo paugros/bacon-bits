@@ -38,6 +38,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private boolean requiredInSeries;
 
 	// auxilliary
+	private boolean saveAllInSeries;
 	private int cloneFromId;
 	private int currentUserParticipantCount;
 	private String agePrices;
@@ -216,6 +217,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		return requiresRegistration;
 	}
 
+	public boolean getSaveAllInSeries() {
+		return saveAllInSeries;
+	}
+
 	public boolean getSendSurvey() {
 		return sendSurvey;
 	}
@@ -378,6 +383,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public void setRequiresRegistration(boolean requiresRegistration) {
 		this.requiresRegistration = requiresRegistration;
+	}
+
+	public void setSaveAllInSeries(boolean saveAllInSeries) {
+		this.saveAllInSeries = saveAllInSeries;
 	}
 
 	public void setSendSurvey(boolean sendSurvey) {

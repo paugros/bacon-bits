@@ -76,7 +76,27 @@ import com.google.gwt.user.client.ui.Widget;
 public class EventPage implements Page {
 	private final Form form = new Form(new FormSubmitHandler() {
 		@Override
-		public void onFormSubmit(FormField formField) {
+		public void onFormSubmit(final FormField formField) {
+			// if (calendarEvent.isSaved() && calendarEvent.getSeriesId() != null) {
+			// ConfirmDialog confirm = new ConfirmDialog(null, null)
+			// confirm.confirm(ConfirmDialogType.YES_NO, "Make this change to all events in series?", new ConfirmHandler() {
+			// @Override
+			// public void onConfirm() {
+			// calendarEvent.setSaveAllInSeries(true);
+			// save(formField);
+			// }
+			// });
+			//
+			// confirm.addCancelHandler(new CancelHandler() {
+			// @Override
+			// public void onCancel() {
+			// calendarEvent.setSaveAllInSeries(false);
+			// save(formField);
+			// }
+			// });
+			// } else {
+			// save(formField);
+			// }
 			save(formField);
 		}
 	});

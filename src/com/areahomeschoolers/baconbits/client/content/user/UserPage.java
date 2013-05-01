@@ -166,7 +166,7 @@ public class UserPage implements Page {
 			tabPanel.add("Registrations", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID_PLUS_SELF, user.getId());
+					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTRATION_ADDED_BY_ID, user.getId());
 					args.put(EventArg.NOT_STATUS_ID, 5);
 					EventParticipantCellTable table = new EventParticipantCellTable(args);
 					table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
