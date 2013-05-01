@@ -144,10 +144,6 @@ public final class EventPaymentPage implements Page {
 								}
 							}
 
-							if (!items.isEmpty()) {
-								return;
-							}
-
 							if (paying) {
 								return;
 							}
