@@ -363,7 +363,7 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 					@Override
 					protected Widget createWidget(final EventParticipant item) {
 						int uid = Application.getCurrentUserId();
-						if (uid == 0) {
+						if (uid == 0 || item.getRequiredInSeries()) {
 							return new Label("");
 						}
 						if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {

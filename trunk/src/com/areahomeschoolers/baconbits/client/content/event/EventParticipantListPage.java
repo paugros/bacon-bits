@@ -64,7 +64,7 @@ public final class EventParticipantListPage implements Page {
 				ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.INCLUDE_FIELDS);
 				args.setStatus(Status.ACTIVE);
 				args.put(EventArg.NOT_STATUS_ID, 5);
-				args.put(EventArg.PARENT_ID_PLUS_SELF, Application.getCurrentUser().getId());
+				args.put(EventArg.REGISTRATION_ADDED_BY_ID, Application.getCurrentUser().getId());
 				final EventParticipantCellTable table = new EventParticipantCellTable(args);
 				table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
 						ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE, ParticipantColumn.FIELDS, ParticipantColumn.STATUS);

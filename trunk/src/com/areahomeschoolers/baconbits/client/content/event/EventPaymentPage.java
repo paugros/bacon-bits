@@ -1,5 +1,9 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
@@ -19,6 +23,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
+import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -57,7 +62,7 @@ public final class EventPaymentPage implements Page {
 		}
 
 		final String title = "Event Payment / Checkout";
-		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARENT_ID_PLUS_SELF, Application.getCurrentUser().getId());
+		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTRATION_ADDED_BY_ID, Application.getCurrentUser().getId());
 		args.put(EventArg.STATUS_ID, 1);
 
 		table = new EventParticipantCellTable(args);
@@ -89,6 +94,7 @@ public final class EventPaymentPage implements Page {
 			@Override
 			public void onDataReturn() {
 				payContainer.clear();
+
 				table.setSelectedItems(table.getFullList());
 				updateTotal();
 				table.getSelectionModel().addSelectionChangeHandler(new Handler() {
@@ -114,6 +120,30 @@ public final class EventPaymentPage implements Page {
 					logo.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
+							// list of selected items
+							List<EventParticipant> items = table.getSelectedItems();
+
+							// at least one is required
+							if (items.isEmpty()) {
+								AlertDialog.alert("Please select at least one item.");
+								return;
+							}
+
+							Map<Integer, Boolean> states = new HashMap<Integer, Boolean>();
+							for (EventParticipant p : table.getFullList()) {
+								if (p.getRequiredInSeries()) {
+									// required series events for the same series must be all of the same state
+									if (!states.containsKey(p.getEventSeriesId())) {
+										states.put(p.getEventSeriesId(), items.contains(p));
+									} else {
+										if (!states.get(p.getEventSeriesId()).equals(items.contains(p))) {
+											AlertDialog.alert("Event dates in the following series must be paid for together: " + p.getEventTitle());
+											return;
+										}
+									}
+								}
+							}
+
 							if (paying) {
 								return;
 							}

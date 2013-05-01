@@ -28,6 +28,8 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 	private String addedByFirstName, addedByLastName;
 	private int addedById;
 	private int parentId;
+	private int eventSeriesId;
+	private boolean requiredInSeries;
 	private boolean updateAllInSeries;
 
 	// for bulk registration of a series
@@ -84,6 +86,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 		return eventRegistrationId;
 	}
 
+	public int getEventSeriesId() {
+		return eventSeriesId;
+	}
+
 	public String getEventTitle() {
 		return eventTitle;
 	}
@@ -113,6 +119,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public double getPrice() {
 		return price;
+	}
+
+	public boolean getRequiredInSeries() {
+		return requiredInSeries;
 	}
 
 	public ArrayList<Integer> getSeriesEventIds() {
@@ -195,6 +205,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 		this.eventRegistrationId = eventRegistrationId;
 	}
 
+	public void setEventSeriesId(int eventSeriesId) {
+		this.eventSeriesId = eventSeriesId;
+	}
+
 	public void setEventTitle(String eventTitle) {
 		this.eventTitle = eventTitle;
 	}
@@ -221,6 +235,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void setRequiredInSeries(boolean requiredInSeries) {
+		this.requiredInSeries = requiredInSeries;
 	}
 
 	public void setSeriesEventIds(ArrayList<Integer> seriesEventIds) {
