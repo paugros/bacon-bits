@@ -27,6 +27,10 @@ public final class Document extends EntityDto<Document> {
 			return lookup.get(tableName);
 		}
 
+		private DocumentLinkType() {
+
+		}
+
 		private DocumentLinkType(String entityType) {
 			this.entityType = entityType;
 		}

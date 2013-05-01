@@ -30,6 +30,10 @@ public class UserGroup extends EntityDto<UserGroup> {
 
 		private final String displayName;
 
+		private AccessLevel() {
+			this.displayName = null;
+		}
+
 		private AccessLevel(int id, String displayName) {
 			this.id = id;
 			this.displayName = displayName;

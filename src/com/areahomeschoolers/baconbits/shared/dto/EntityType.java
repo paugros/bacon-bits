@@ -27,6 +27,10 @@ public enum EntityType implements IsSerializable, Serializable {
 
 	private final String displayName;
 
+	private EntityType() {
+		this.displayName = null;
+	}
+
 	private EntityType(int id, String displayName) {
 		this.id = id;
 		this.displayName = displayName;
