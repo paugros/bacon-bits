@@ -251,7 +251,7 @@ public class UserPage implements Page {
 				}
 			});
 
-			if (user.getParentId() == null) {
+			if (!user.isChild()) {
 				tabPanel.add("Children", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
@@ -328,7 +328,7 @@ public class UserPage implements Page {
 				});
 			}
 
-			if (user.getParentId() == null) {
+			if (!user.isChild()) {
 				tabPanel.add("Payments", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {

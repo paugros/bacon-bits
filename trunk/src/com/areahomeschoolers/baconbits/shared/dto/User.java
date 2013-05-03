@@ -187,6 +187,10 @@ public final class User extends EntityDto<User> {
 		return active;
 	}
 
+	public boolean isChild() {
+		return parentId != null;
+	}
+
 	public boolean isSwitched() {
 		return originalUserId > 0 && getId() != originalUserId;
 	}
