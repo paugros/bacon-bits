@@ -1,5 +1,8 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.event.EventCellTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -33,6 +36,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public final class EventListPage implements Page {
 	private MonthPicker monthBox;
 	private DefaultListBox ageBox;
+	private DefaultListBox categoryBox;
 	private EventCellTable table;
 	private boolean showCommunity = Url.getBooleanParameter("showCommunity");
 
@@ -50,16 +54,19 @@ public final class EventListPage implements Page {
 			HorizontalPanel hp = new HorizontalPanel();
 			hp.setWidth("100%");
 
-			HTML message = new HTML();
-			message.getElement().getStyle().setMarginBottom(10, Unit.PX);
-			String text = "<b><font class=errorText>New this year:</font></b> all events must be paid for using PayPal or credit card (MC, Visa, Discover).<br>You can register for all your events then pay all at once. ";
-			text += "If payment is not received within 24 hours of registering, your registration will be canceled.";
-			message.setHTML(text);
-			vp.add(message);
-
-			PaddedPanel pp = new PaddedPanel();
+			PaddedPanel pp = new PaddedPanel(10);
+			pp.setHeight("51px");
 			vp.add(pp);
 			pp.addStyleName("mediumPadding");
+			categoryBox = new DefaultListBox();
+			categoryBox.addItem("all", 0);
+			categoryBox.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					applyTableFilter();
+				}
+			});
+
 			ageBox = new DefaultListBox();
 			ageBox.addItem("all ages", 0);
 			for (int age = 1; age < 19; age++) {
@@ -83,22 +90,33 @@ public final class EventListPage implements Page {
 				}
 			});
 
-			Label show = new Label("Show events for ");
-			pp.add(show);
+			pp.add(new Label("Show "));
+			pp.add(categoryBox);
+			pp.add(new Label(" events for "));
 			pp.add(ageBox);
 
 			Label in = new Label("in");
 			pp.add(in);
 			pp.add(monthBox);
-			pp.getElement().getStyle().setBackgroundColor("#c5eabf");
+			pp.addStyleName("boxedBlurb");
 
 			for (int i = 0; i < pp.getWidgetCount(); i++) {
 				pp.setCellVerticalAlignment(pp.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
 			}
 
+			HTML message = new HTML();
+			message.getElement().getStyle().setMarginBottom(10, Unit.PX);
+			String text = "<ul><li>Events must be paid for using PayPal or credit card (MC, Visa, Discover)</li>";
+			text += "<li>Register for all your events and then pay for all at once</li>";
+			text += "<li>If payment is not received within 24 hours of registering, your registration will be canceled</li>";
+			text += "<li>No refunds</li></ul>";
+			message.setHTML(text);
+			message.addStyleName("smallText errorText");
+			vp.add(message);
+
 			hp.add(vp);
 
-			EventBalanceBox eb = new EventBalanceBox();
+			BalanceBox eb = new BalanceBox();
 			eb.populate();
 			hp.add(eb);
 			hp.setCellHorizontalAlignment(eb, HasHorizontalAlignment.ALIGN_RIGHT);
@@ -125,6 +143,15 @@ public final class EventListPage implements Page {
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
 			public void onDataReturn() {
+				// add in categories
+				Map<Integer, String> categories = new HashMap<Integer, String>();
+				for (Event item : table.getFullList()) {
+					categories.put(item.getCategoryId(), item.getCategory());
+				}
+
+				for (int id : categories.keySet()) {
+					categoryBox.addItem(categories.get(id), id);
+				}
 				Application.getLayout().setPage(title, page);
 			}
 		});
@@ -136,8 +163,9 @@ public final class EventListPage implements Page {
 		// first
 		int month = monthBox.getMonth();
 		int age = ageBox.getIntValue();
+		int categoryId = categoryBox.getIntValue();
 
-		if (month == 0 && age == 0) {
+		if (month == 0 && age == 0 && categoryId == 0) {
 			table.showAllItems();
 			return;
 		}
@@ -145,9 +173,13 @@ public final class EventListPage implements Page {
 		for (Event e : table.getFullList()) {
 			boolean monthMatch = false;
 			boolean ageMatch = false;
+			boolean categoryMatch = false;
 
 			// month
 			monthMatch = month == 0 || (ClientDateUtils.getMonth(e.getStartDate()) == month);
+
+			// category
+			categoryMatch = categoryId == 0 || (categoryId == e.getCategoryId());
 
 			// age
 			String rangeText = e.getAgeRanges();
@@ -164,10 +196,13 @@ public final class EventListPage implements Page {
 					int max = Integer.parseInt(limits[1]);
 
 					ageMatch = ((min == 0 || (min <= age)) && (max == 0 || (max >= age)));
+					if (ageMatch) {
+						break;
+					}
 				}
 			}
 
-			if (monthMatch && ageMatch) {
+			if (monthMatch && ageMatch && categoryMatch) {
 				table.showItem(e, false, false, false);
 			} else {
 				table.hideItem(e, false, false);

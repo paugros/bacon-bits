@@ -324,6 +324,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int userId = args.getInt(EventArg.USER_ID);
 		int statusId = args.getInt(EventArg.STATUS_ID);
 		int notStatusId = args.getInt(EventArg.NOT_STATUS_ID);
+		int registeredByOrAddedForId = args.getInt(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID);
 		final boolean includeFields = args.getBoolean(EventArg.INCLUDE_FIELDS);
 		List<Integer> ids = args.getIntList(EventArg.PARTICIPANT_IDS);
 
@@ -391,6 +392,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		if (registrationAddedById > 0) {
 			sql += "and r.addedById = ? \n";
 			sqlArgs.add(registrationAddedById);
+		}
+
+		if (registeredByOrAddedForId > 0) {
+			sql += "and (r.addedById = ? or p.userId = ?) \n";
+			sqlArgs.add(registeredByOrAddedForId);
+			sqlArgs.add(registeredByOrAddedForId);
 		}
 
 		if (parentId > 0) {

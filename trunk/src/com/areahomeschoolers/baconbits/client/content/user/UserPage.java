@@ -9,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.book.BookDialog;
+import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerCellTable;
@@ -56,6 +57,8 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -100,9 +103,18 @@ public class UserPage implements Page {
 
 				user = result.getUser();
 
+				HorizontalPanel hp = new HorizontalPanel();
+				hp.setWidth("100%");
 				Label heading = new Label(user.getFullName());
 				heading.addStyleName("hugeText");
-				page.add(heading);
+				hp.add(heading);
+				if (user.equals(Application.getCurrentUser())) {
+					BalanceBox bb = new BalanceBox();
+					bb.populate();
+					hp.add(bb);
+					hp.setCellHorizontalAlignment(bb, HasHorizontalAlignment.ALIGN_RIGHT);
+				}
+				page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH900PX));
 
 				initializePage();
 			}
@@ -132,7 +144,7 @@ public class UserPage implements Page {
 			tabPanel = new TabPage();
 			form.emancipate();
 
-			tabPanel.add("Main", new TabPageCommand() {
+			tabPanel.add("Profile", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
 					tabBody.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
@@ -144,29 +156,8 @@ public class UserPage implements Page {
 			tabPanel.add("Events", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					ArgMap<EventArg> eventArgs = new ArgMap<EventArg>(EventArg.USER_ID, user.getId());
-					eventArgs.setStatus(Status.ALL);
-					eventArgs.put(EventArg.NOT_STATUS_ID, 5);
-					EventParticipantCellTable eventsTable = new EventParticipantCellTable(eventArgs);
-					eventsTable.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PRICE, ParticipantColumn.FIELDS,
-							ParticipantColumn.STATUS);
-					eventsTable.setTitle("Events");
-
-					eventsTable.addStatusFilterBox();
-
-					eventsTable.getTitleBar().addExcelControl();
-					eventsTable.getTitleBar().addSearchControl();
-					eventsTable.populate();
-
-					tabBody.add(WidgetFactory.newSection(eventsTable, ContentWidth.MAXWIDTH1200PX));
-					tabPanel.selectTabNow(tabBody);
-				}
-			});
-
-			tabPanel.add("Registrations", new TabPageCommand() {
-				@Override
-				public void execute(VerticalPanel tabBody) {
-					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTRATION_ADDED_BY_ID, user.getId());
+					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
+					args.setStatus(Status.ACTIVE);
 					args.put(EventArg.NOT_STATUS_ID, 5);
 					EventParticipantCellTable table = new EventParticipantCellTable(args);
 					table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
@@ -260,20 +251,24 @@ public class UserPage implements Page {
 				}
 			});
 
-			tabPanel.add("Children", new TabPageCommand() {
-				@Override
-				public void execute(VerticalPanel tabBody) {
-					ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
-					args.put(UserArg.PARENT_ID, user.getId());
+			if (user.getParentId() == null) {
+				tabPanel.add("Children", new TabPageCommand() {
+					@Override
+					public void execute(VerticalPanel tabBody) {
+						ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
+						args.put(UserArg.PARENT_ID, user.getId());
 
-					UserCellTable table = new UserCellTable(args);
-					table.setTitle("Children");
-					table.populate();
+						UserCellTable table = new UserCellTable(args);
+						table.setTitle("Children");
+						table.populate();
 
-					tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));
-					tabPanel.selectTabNow(tabBody);
-				}
-			});
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));
+						tabPanel.selectTabNow(tabBody);
+					}
+				});
+			} else {
+				tabPanel.addSkipIndex();
+			}
 
 			if (user.memberOfAny(16, 17)) {
 				tabPanel.add("Books", new TabPageCommand() {
@@ -333,17 +328,22 @@ public class UserPage implements Page {
 				});
 			}
 
-			tabPanel.add("Payments", new TabPageCommand() {
-				@Override
-				public void execute(VerticalPanel tabBody) {
-					UserPaymentSection pay = new UserPaymentSection(user, tabBody);
-					pay.populate();
+			if (user.getParentId() == null) {
+				tabPanel.add("Payments", new TabPageCommand() {
+					@Override
+					public void execute(VerticalPanel tabBody) {
+						UserPaymentSection pay = new UserPaymentSection(user, tabBody);
+						pay.populate();
 
-					tabPanel.selectTabNow(tabBody);
-				}
-			});
+						tabPanel.selectTabNow(tabBody);
+					}
+				});
+			} else {
+				tabPanel.addSkipIndex();
+			}
 
-			if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS) && !user.equals(Application.getCurrentUser())) {
+			if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS) && !user.equals(Application.getCurrentUser())
+					&& Application.getCurrentUserId() != user.getParentId()) {
 				form.setEnabled(false);
 			}
 

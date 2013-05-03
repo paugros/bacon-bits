@@ -46,7 +46,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
-public final class EventPaymentPage implements Page {
+public final class PaymentPage implements Page {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private EventParticipantCellTable table;
 	private Label total;
@@ -55,7 +55,7 @@ public final class EventPaymentPage implements Page {
 	private boolean paying;
 	private AdjustmentCellTable adjustments;
 
-	public EventPaymentPage(final VerticalPanel page) {
+	public PaymentPage(final VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
@@ -162,7 +162,7 @@ public final class EventPaymentPage implements Page {
 									if (result.getAuthorizationUrl() != null) {
 										Window.Location.replace(result.getAuthorizationUrl());
 									} else {
-										HistoryToken.set(PageUrl.eventParticipantList());
+										HistoryToken.set(PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
 									}
 								}
 

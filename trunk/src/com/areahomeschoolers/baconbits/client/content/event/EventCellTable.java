@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class EventCellTable extends EntityCellTable<Event, EventArg, EventColumn> {
 	public enum EventColumn implements EntityCellTableColumn<EventColumn> {
-		REGISTERED(""), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), PRICE("Price"), CATEGORY("Category"), REGISTER(
+		REGISTERED(""), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), PRICE("Price"), AGES("Ages"), CATEGORY("Category"), REGISTER(
 				"Register");
 
 		private String title;
@@ -56,7 +56,7 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 
 	private EventCellTable() {
 		setDefaultSortColumn(EventColumn.START_DATE, SortDirection.SORT_ASC);
-		setDisplayColumns(EventColumn.REGISTERED, EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.PRICE, EventColumn.CATEGORY,
+		setDisplayColumns(EventColumn.REGISTERED, EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.PRICE, EventColumn.AGES,
 				EventColumn.REGISTER);
 	}
 
@@ -115,17 +115,43 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 					});
 				}
 				break;
-			case DESCRIPTION:
+			case AGES:
 				addTextColumn(col, new ValueGetter<String, Event>() {
 					@Override
 					public String get(Event item) {
-						HTML h = new HTML();
-						h.setHTML(item.getDescription().replaceAll("<br>", " "));
-						String text = h.getText();
-						if (text.length() > 100) {
-							text = text.substring(0, 101) + "...";
+						String text = "";
+						if (!Common.isNullOrBlank(item.getAgeRanges())) {
+							String[] p = item.getAgeRanges().split(",");
+							for (int i = 0; i < p.length; i++) {
+								text += p[i].replace("-0", "+");
+								if (i < p.length - 1) {
+									text += " / ";
+								}
+							}
+
+						} else {
+							text = "All ages";
 						}
 						return text;
+					}
+				});
+				break;
+			case DESCRIPTION:
+				addWidgetColumn(col, new WidgetCellCreator<Event>() {
+					@Override
+					protected Widget createWidget(Event item) {
+						HTML h = new HTML();
+						h.setHTML(item.getDescription().replaceAll("<br>", " "));
+						String text = h.getText().replaceAll("\\s+", " ");
+						if (text.length() > 85) {
+							text = text.substring(0, 86) + "...";
+						}
+						h.setTitle(text);
+
+						Label l = new Label(text);
+						l.addStyleName("smallText");
+						l.setTitle(h.getText());
+						return l;
 					}
 				});
 				break;
@@ -137,7 +163,11 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 						if (!Common.isNullOrBlank(item.getAgePrices())) {
 							String[] p = item.getAgePrices().split(",");
 							for (int i = 0; i < p.length; i++) {
-								text += Formatter.formatCurrency(p[i]);
+								if ("0.00".equals(p[i])) {
+									text += "Free";
+								} else {
+									text += Formatter.formatCurrency(p[i]);
+								}
 								if (i < p.length - 1) {
 									text += " / ";
 								}
@@ -158,7 +188,9 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Event>() {
 					@Override
 					protected Widget createWidget(Event item) {
-						return new Hyperlink(item.getTitle(), PageUrl.event(item.getId()));
+						Hyperlink h = new Hyperlink(item.getTitle(), PageUrl.event(item.getId()));
+						h.addStyleName("bold");
+						return h;
 					}
 				}, new ValueGetter<String, Event>() {
 					@Override

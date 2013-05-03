@@ -77,7 +77,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	private final class UserMapper implements RowMapper<User> {
 		@Override
 		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-			//
 			User user = new User();
 			user.setId(rs.getInt("id"));
 			user.setEmail(rs.getString("email"));
@@ -99,6 +98,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			user.setParentFirstName(rs.getString("parentFirstName"));
 			user.setParentLastName(rs.getString("parentLastName"));
 			user.setGroupsText(rs.getString("groupsText"));
+			user.setSex(rs.getString("sex"));
 			return user;
 		}
 	}
@@ -334,16 +334,16 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (user.isSaved()) {
 			sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, email = :email, ";
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
-			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest where id = :id";
+			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (user.getStartDate() == null) {
 				user.setStartDate(new Date());
 			}
 			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
-			sql += "address, isSystemAdministrator, resetPassword, birthDate, parentId) values ";
+			sql += "address, isSystemAdministrator, resetPassword, birthDate, parentId, sex) values ";
 			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
-			sql += ":address, :systemAdministrator, :resetPassword, :birthDate, :parentId)";
+			sql += ":address, :systemAdministrator, :resetPassword, :birthDate, :parentId, :sex)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
