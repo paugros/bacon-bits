@@ -181,7 +181,7 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5");
 		}
 		if (!Application.getCurrentUser().isChild()) {
-			addLinkToMenu(menu, "Children", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
+			addLinkToMenu(menu, "Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
 		}
 		addLinkToMenu(menu, "Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
 		if (!Application.getCurrentUser().isChild()) {
