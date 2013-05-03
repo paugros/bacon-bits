@@ -161,8 +161,7 @@ public class UserFieldTable extends FieldTable {
 			passwordField.emancipate();
 			passwordField.getLinkPanel().clear();
 			passwordField.setEnabled(false);
-			if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS) || user.equals(Application.getCurrentUser())
-					|| Application.getCurrentUserId() == user.getParentId()) {
+			if (UserPage.canEditUser(user)) {
 				passwordField.getLinkPanel().add(new ClickLabel("Reset password", new MouseDownHandler() {
 					@Override
 					public void onMouseDown(MouseDownEvent event) {

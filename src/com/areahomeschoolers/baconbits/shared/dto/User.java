@@ -188,7 +188,7 @@ public final class User extends EntityDto<User> {
 	}
 
 	public boolean isChild() {
-		return parentId != null;
+		return parentId != null && parentId != 0;
 	}
 
 	public boolean isSwitched() {

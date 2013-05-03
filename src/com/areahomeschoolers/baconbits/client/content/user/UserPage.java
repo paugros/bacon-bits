@@ -66,6 +66,26 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class UserPage implements Page {
+	public static boolean canEditUser(User user) {
+		if (!Application.isAuthenticated()) {
+			return false;
+		}
+
+		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+			return true;
+		}
+
+		if (user.equals(Application.getCurrentUser())) {
+			return true;
+		}
+
+		if (user.isChild() && Application.getCurrentUserId() != user.getParentId()) {
+			return true;
+		}
+
+		return false;
+	}
+
 	private final Form form = new Form(new FormSubmitHandler() {
 		@Override
 		public void onFormSubmit(FormField formField) {
@@ -77,6 +97,7 @@ public class UserPage implements Page {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private UserFieldTable fieldTable;
 	private TabPage tabPanel;
+
 	private BookDialog bookDialog;
 
 	public UserPage(final VerticalPanel page) {
@@ -342,8 +363,7 @@ public class UserPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS) && !user.equals(Application.getCurrentUser())
-					&& Application.getCurrentUserId() != user.getParentId()) {
+			if (!canEditUser(user)) {
 				form.setEnabled(false);
 			}
 
