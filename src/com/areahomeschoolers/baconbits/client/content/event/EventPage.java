@@ -66,7 +66,9 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -111,7 +113,7 @@ public class EventPage implements Page {
 	private VolunteerPositionEditDialog volunteerDialog;
 	private AgeGroupEditDialog ageDialog;
 
-	public EventPage(VerticalPanel page) {
+	public EventPage(final VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
 		if (!Application.isAuthenticated() && eventId < 0) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
@@ -143,6 +145,17 @@ public class EventPage implements Page {
 						populateVolunteerPositions();
 					}
 				});
+
+				HorizontalPanel hp = new HorizontalPanel();
+				hp.setWidth("100%");
+				Label heading = new Label(calendarEvent.getTitle() + " - " + Formatter.formatDateTime(calendarEvent.getStartDate()));
+				heading.addStyleName("hugeText");
+				hp.add(heading);
+				BalanceBox bb = new BalanceBox();
+				bb.populate();
+				hp.add(bb);
+				hp.setCellHorizontalAlignment(bb, HasHorizontalAlignment.ALIGN_RIGHT);
+				page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH900PX));
 
 				initializePage();
 			}
