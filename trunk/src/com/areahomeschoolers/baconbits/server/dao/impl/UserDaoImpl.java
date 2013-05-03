@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
@@ -38,6 +39,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 import edu.vt.middleware.password.CharacterCharacteristicsRule;
@@ -140,7 +142,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	public User getById(int userId) {
 		User u = queryForObject(SELECT + "where u.id = ?", new UserMapper(), userId);
 
-		u.setGroups(getSecurityGroups(u.getId()));
+		u.setGroups(populateSecurityGroups(u));
 
 		// ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 		// args.put(UserArg.PARENT_ID, u.getId());
@@ -191,7 +193,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			throw new UsernameNotFoundException("Username not found or duplicate: " + username);
 		}
 
-		user.setGroups(getSecurityGroups(user.getId()));
+		user.setGroups(populateSecurityGroups(user));
 
 		// ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 		// args.put(UserArg.PARENT_ID, user.getId());
@@ -284,8 +286,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			return null;
 		}
 
-		HashMap<Integer, Boolean> groups = getSecurityGroups(ServerContext.getCurrentUserId());
-		ServerContext.getCurrentUser().setGroups(groups);
+		HashMap<Integer, Boolean> groups = populateSecurityGroups(ServerContext.getCurrentUser());
 
 		return groups;
 	}
@@ -560,19 +561,42 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		return group;
 	}
 
-	private HashMap<Integer, Boolean> getSecurityGroups(int id) {
+	private HashMap<Integer, Boolean> populateSecurityGroups(User user) {
 		String sql = "select groupId, isAdministrator from userGroupMembers where userId = ?";
-		final HashMap<Integer, Boolean> ret = new HashMap<Integer, Boolean>();
+		final HashMap<Integer, Boolean> groups = new HashMap<Integer, Boolean>();
 
 		query(sql, new RowMapper<Void>() {
 			@Override
 			public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-				ret.put(rs.getInt("groupId"), rs.getBoolean("isAdministrator"));
+				groups.put(rs.getInt("groupId"), rs.getBoolean("isAdministrator"));
 				return null;
 			}
-		}, id);
+		}, user.getId());
 
-		return ret;
+		user.setGroups(groups);
+
+		HashSet<AccessLevel> levels = new HashSet<AccessLevel>();
+
+		// this logic duplicated from CustomUserDetailsService - not auto-synced
+		levels.add(AccessLevel.SITE_MEMBERS);
+		if (user.getSystemAdministrator()) {
+			levels.add(AccessLevel.SYSTEM_ADMINISTRATORS);
+			levels.add(AccessLevel.GROUP_ADMINISTRATORS);
+			levels.add(AccessLevel.GROUP_MEMBERS);
+		} else {
+			if (!groups.isEmpty()) {
+				levels.add(AccessLevel.GROUP_MEMBERS);
+			}
+
+			if (groups.containsValue(true)) {
+				levels.add(AccessLevel.GROUP_ADMINISTRATORS);
+			}
+		}
+
+		user.setAccessLevels(levels);
+		user.setGroups(groups);
+
+		return groups;
 	}
 
 }

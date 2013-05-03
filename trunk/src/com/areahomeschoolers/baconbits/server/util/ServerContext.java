@@ -156,7 +156,7 @@ public class ServerContext implements ApplicationContextAware {
 		newCurrentUser.setOriginalUserId(currentUser.getOriginalUserId());
 		newCurrentUser.setOriginalEmail(currentUser.getOriginalEmail());
 
-		tl.get().request.getSession().setAttribute("user", newCurrentUser);
+		getSession().setAttribute("user", newCurrentUser);
 	}
 
 	public static void unloadContext() {
