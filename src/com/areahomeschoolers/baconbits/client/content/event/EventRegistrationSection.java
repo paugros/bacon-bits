@@ -372,7 +372,7 @@ public class EventRegistrationSection extends Composite {
 			if (!pageData.getRegistration().getParticipants().isEmpty()) {
 				String text = "All done here? ";
 				if (hasPay) {
-					Hyperlink payLink = new Hyperlink("Pay now", PageUrl.eventPayment());
+					Hyperlink payLink = new Hyperlink("Pay now", PageUrl.payment());
 					text += payLink.toString() + " or ";
 					Hyperlink eventLink = new Hyperlink("continue registering", PageUrl.eventList());
 					text += eventLink.toString() + ".";

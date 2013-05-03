@@ -32,6 +32,7 @@ public final class User extends EntityDto<User> {
 	private Date startDate, endDate, addedDate, lastLoginDate, birthDate;
 	private Integer parentId;
 	private boolean canSwitch;
+	private String sex;
 
 	// aux
 	// these two keep track of your original user when switching
@@ -150,6 +151,20 @@ public final class User extends EntityDto<User> {
 
 	public boolean getResetPassword() {
 		return resetPassword;
+	}
+
+	public String getSex() {
+		return sex;
+	}
+
+	public String getSexyText() {
+		if ("f".equals(sex)) {
+			return "Female";
+		} else if ("m".equals(sex)) {
+			return "Male";
+		}
+
+		return "";
 	}
 
 	public Date getStartDate() {
@@ -289,6 +304,10 @@ public final class User extends EntityDto<User> {
 
 	public void setResetPassword(boolean resetPassword) {
 		this.resetPassword = resetPassword;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
 	}
 
 	public void setStartDate(Date startDate) {

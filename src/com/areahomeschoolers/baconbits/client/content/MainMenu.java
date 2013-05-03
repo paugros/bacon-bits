@@ -65,10 +65,12 @@ public final class MainMenu extends MenuBar {
 		addItem("About", getHomeMenu());
 		addItem("Event Registration", getEventsMenu());
 		addItem("WHE Classes/Activities", getClassesMenu());
-		// addItem("Educational Resources", getEducationMenu());
 		addItem("Support", getSupportMenu());
 		addItem("Book Store", getBooksMenu());
 		addItem("Resources", getResourcesMenu());
+		if (Application.isAuthenticated()) {
+			addItem("My Items", getMyItemsMenu());
+		}
 		if (Application.isSystemAdministrator()) {
 			addItem("Admin", getAdminMenu());
 		}
@@ -127,12 +129,6 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "Create Book Receipt", PageUrl.bookReceipt());
 		}
 
-		if (Application.isAuthenticated() && Application.getCurrentUser().memberOfAny(16, 17)) {
-			addLinkToMenu(menu, "My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
-		}
-
-		// addLinkToMenu(menu, "Sign Up to Sell", PageUrl.event(471));
-
 		return menu;
 	}
 
@@ -148,7 +144,6 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getEducationMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Arts/Crafts", PageUrl.articleGroup("26,23"));
-		// addLinkToMenu(menu, "Language Arts", PageUrl.articleGroup("26,23"));
 		addLinkToMenu(menu, "Math", PageUrl.articleGroup("25"));
 		addLinkToMenu(menu, "Preschool", PageUrl.articleGroup("5,23"));
 		addLinkToMenu(menu, "Science", PageUrl.articleGroup("30"));
@@ -160,10 +155,6 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getEventsMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Events", PageUrl.eventList());
-		if (Application.isAuthenticated()) {
-			addLinkToMenu(menu, "My Event Registrations", PageUrl.eventParticipantList());
-			addLinkToMenu(menu, "My Outstanding Event Balance", PageUrl.eventPayment());
-		}
 
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
@@ -184,9 +175,22 @@ public final class MainMenu extends MenuBar {
 		return menu;
 	}
 
+	private MenuBar getMyItemsMenu() {
+		MenuBar menu = new MenuBar(true);
+		if (Application.getCurrentUser().memberOfAny(16, 17)) {
+			addLinkToMenu(menu, "Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5");
+		}
+		addLinkToMenu(menu, "Children", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
+		addLinkToMenu(menu, "Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
+		addLinkToMenu(menu, "Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
+		addLinkToMenu(menu, "Profile", PageUrl.user(Application.getCurrentUserId()));
+		addLinkToMenu(menu, "Shopping Cart", PageUrl.payment());
+
+		return menu;
+	}
+
 	private MenuBar getResourcesMenu() {
 		MenuBar menu = new MenuBar(true);
-		// addLinkToMenu(menu, "Helpful Links", PageUrl.articleGroup("39"));
 		addLinkToMenu(menu, "Homeschooling Books", PageUrl.articleGroup("43"));
 		addLinkToMenu(menu, "Local Sports League Info", PageUrl.articleGroup("34"));
 
@@ -201,9 +205,6 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "Homeschooling Methods", PageUrl.articleGroup("40"));
 		addLinkToMenu(menu, "Curriculum Providers", PageUrl.articleGroup("41"));
 		addLinkToMenu(menu, "Parents' Support Meeting", PageUrl.articleGroup("33"));
-
-		// addLinkToMenu(menu, "Managing Schedules", PageUrl.articleGroup("28,27"));
-		// addLinkToMenu(menu, "Reluctant Learners", PageUrl.articleGroup("24"));
 
 		return menu;
 	}

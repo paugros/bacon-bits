@@ -1,33 +1,33 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style.Cursor;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 
-public class EventBalanceBox extends Composite {
-	private PaddedPanel pp = new PaddedPanel();
+public class BalanceBox extends Composite {
+	private HTML label = new HTML();
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 
-	public EventBalanceBox() {
-		initWidget(pp);
+	public BalanceBox() {
+		// initWidget(pp);
+		initWidget(label);
+		label.setStyleName("BalanceBox");
 	}
 
 	public void populate() {
-		pp.clear();
+		// pp.clear();
+		label.setText("");
 
 		eventService.getUnpaidBalance(Application.getCurrentUserId(), new Callback<Data>() {
 			@Override
@@ -36,19 +36,16 @@ public class EventBalanceBox extends Composite {
 					return;
 				}
 
-				String message = "You have " + result.getInt("itemCount") + " unpaid items totaling ";
+				String message = "<span style=\"font-weight: bold; font-size: 11px; text-decoration: underline;\">Your shopping cart</span><br>";
+				message += result.getInt("itemCount") + " items / ";
 				message += Formatter.formatCurrency(result.getDouble("balance"));
-				Label l = new Label(message);
-				l.addStyleName("largeText");
-				pp.add(l);
-
-				Image logo = new Image(MainImageBundle.INSTANCE.paypalButton());
-				logo.getElement().getStyle().setCursor(Cursor.POINTER);
-				String h = "<a href=\"" + GWT.getHostPageBaseURL() + "#" + PageUrl.eventPayment() + "\">";
-				h += logo.toString() + "</a>";
-				HTML html = new HTML(h);
-
-				pp.add(html);
+				label.setHTML(message);
+				label.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						HistoryToken.set(PageUrl.payment());
+					}
+				});
 			}
 		});
 	}

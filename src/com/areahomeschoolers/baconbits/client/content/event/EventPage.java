@@ -646,7 +646,7 @@ public class EventPage implements Page {
 					if (pageData.getRegistration() != null) {
 						for (EventParticipant p : pageData.getRegistration().getParticipants()) {
 							if (p.getPrice() > 0 && p.getStatusId() == 1) {
-								tb.addLink(new Hyperlink("Pay", PageUrl.eventPayment()));
+								tb.addLink(new Hyperlink("Pay", PageUrl.payment()));
 								break;
 							}
 						}

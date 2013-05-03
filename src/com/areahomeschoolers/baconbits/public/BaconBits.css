@@ -448,6 +448,29 @@ img {
 	margin-left: -41px;
 }
 
+.BalanceBox {
+	color: #327526;
+	background-color: #c5eabf;
+	vertical-align: middle;
+	border: 2px solid #439b33;
+	padding: 1px 15px 3px 15px;
+	cursor: pointer;
+	white-space: nowrap;
+	font-size: 16px;
+	display: table;
+}
+
+.BalanceBox:hover {
+	background-color: #e0f4dd;
+	border-color: #6bc95a;
+}
+
+.boxedBlurb {
+	background-color: #c5eabf;
+	border: 2px solid #439b33;
+	padding: 18px;
+}
+
 .tabPanel {
 	margin-top: 5px;
 }

@@ -28,6 +28,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -160,10 +161,15 @@ public class UserFieldTable extends FieldTable {
 			passwordField.emancipate();
 			passwordField.getLinkPanel().clear();
 			passwordField.setEnabled(false);
-			if (Application.isAuthenticated()) {
+			if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS) || user.equals(Application.getCurrentUser())
+					|| Application.getCurrentUserId() == user.getParentId()) {
 				passwordField.getLinkPanel().add(new ClickLabel("Reset password", new MouseDownHandler() {
 					@Override
 					public void onMouseDown(MouseDownEvent event) {
+						if (user.getEmail() == null) {
+							AlertDialog.alert("Please specify an email address before resetting the password.");
+							return;
+						}
 						String msg = "Reset the password for this user? Login information will be sent to their email address.";
 						ConfirmDialog.confirm(msg, new ConfirmHandler() {
 							@Override
@@ -283,6 +289,27 @@ public class UserFieldTable extends FieldTable {
 		});
 		addField(mobilePhoneField);
 
+		final Label sexDisplay = new Label();
+		final DefaultListBox sexInput = new DefaultListBox();
+		sexInput.addItem("", "");
+		sexInput.addItem("Female", "f");
+		sexInput.addItem("Male", "m");
+		FormField sexField = f.createFormField("Sex:", sexInput, sexDisplay);
+		sexField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				sexDisplay.setText(user.getSexyText());
+				sexInput.setValue(user.getSex());
+			}
+		});
+		sexField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				user.setSex(sexInput.getValue());
+			}
+		});
+		addField(sexField);
+
 		final Label birthDisplay = new Label();
 		final ValidatorDateBox birthInput = new ValidatorDateBox();
 		FormField birthField = form.createFormField("Birth date:", birthInput, birthDisplay);
@@ -333,7 +360,7 @@ public class UserFieldTable extends FieldTable {
 			addField("Parent:", new Hyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId())));
 		}
 
-		if (Application.isAuthenticated()) {
+		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			final Label startDateDisplay = new Label();
 			final ValidatorDateBox startDateInput = new ValidatorDateBox();
 			FormField startDateField = form.createFormField("Start date:", startDateInput, startDateDisplay);
@@ -387,6 +414,8 @@ public class UserFieldTable extends FieldTable {
 
 		if (user.getResetPassword()) {
 			pwd = "Sent to user, will be reset upon first login.";
+		} else if (user.getPasswordDigest() == null) {
+			pwd = "Has not been set.";
 		} else {
 			pwd = "Has been set by the user.";
 		}

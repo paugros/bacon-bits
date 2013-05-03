@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -37,12 +38,10 @@ public final class BookSearchPage implements Page {
 			args.put(BookArg.ONLINE_ONLY);
 		}
 
-		optionsPanel.getElement().getStyle().setBackgroundColor("#c5eabf");
+		optionsPanel.addStyleName("boxedBlurb");
 		Label label = new Label("Filter for:");
 		label.addStyleName("bold");
 		optionsPanel.add(label);
-		optionsPanel.addStyleName("heavyPadding");
-		page.add(optionsPanel);
 
 		Hyperlink conditionLink = new Hyperlink("Click here", PageUrl.article(64));
 		String text = conditionLink + " for a description of book conditions.";
@@ -99,6 +98,12 @@ public final class BookSearchPage implements Page {
 				optionsPanel.add(category);
 				optionsPanel.add(grade);
 				optionsPanel.add(price);
+
+				for (int i = 0; i < optionsPanel.getWidgetCount(); i++) {
+					optionsPanel.setCellVerticalAlignment(optionsPanel.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+				}
+
+				page.insert(optionsPanel, 0);
 			}
 		});
 
