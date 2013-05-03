@@ -450,13 +450,14 @@ img {
 
 .BalanceBox {
 	color: #327526;
+	text-align: left;
 	background-color: #c5eabf;
 	vertical-align: middle;
 	border: 2px solid #439b33;
-	padding: 1px 15px 3px 15px;
+	padding: 0px 15px 2px 15px;
 	cursor: pointer;
 	white-space: nowrap;
-	font-size: 16px;
+	font-size: 14px;
 	display: table;
 }
 

@@ -245,10 +245,6 @@ public class EventRegistrationSection extends Composite {
 
 		VerticalPanel summary = new VerticalPanel();
 		summary.addStyleName("mediumPadding");
-		Label title = new Label(pageData.getEvent().getTitle() + " - " + Formatter.formatDateTime(pageData.getEvent().getStartDate()));
-		title.addStyleName("largeText");
-
-		summary.add(title);
 		if (!Common.isNullOrBlank(pageData.getEvent().getRegistrationInstructions())) {
 			HTML instructions = new HTML("<span class=errorText><b>NOTE: </b>" + pageData.getEvent().getRegistrationInstructions() + "</span>");
 			instructions.addStyleName("italic");
