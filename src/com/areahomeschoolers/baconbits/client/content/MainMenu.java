@@ -180,11 +180,17 @@ public final class MainMenu extends MenuBar {
 		if (Application.getCurrentUser().memberOfAny(16, 17)) {
 			addLinkToMenu(menu, "Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5");
 		}
-		addLinkToMenu(menu, "Children", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
+		if (!Application.getCurrentUser().isChild()) {
+			addLinkToMenu(menu, "Children", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
+		}
 		addLinkToMenu(menu, "Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
-		addLinkToMenu(menu, "Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
+		if (!Application.getCurrentUser().isChild()) {
+			addLinkToMenu(menu, "Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
+		}
 		addLinkToMenu(menu, "Profile", PageUrl.user(Application.getCurrentUserId()));
-		addLinkToMenu(menu, "Shopping Cart", PageUrl.payment());
+		if (!Application.getCurrentUser().isChild()) {
+			addLinkToMenu(menu, "Shopping Cart", PageUrl.payment());
+		}
 
 		return menu;
 	}
