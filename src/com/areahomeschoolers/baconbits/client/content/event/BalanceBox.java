@@ -20,13 +20,10 @@ public class BalanceBox extends Composite {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 
 	public BalanceBox() {
-		// initWidget(pp);
 		initWidget(label);
-		label.setStyleName("BalanceBox");
 	}
 
 	public void populate() {
-		// pp.clear();
 		label.setText("");
 
 		eventService.getUnpaidBalance(Application.getCurrentUserId(), new Callback<Data>() {
@@ -39,6 +36,7 @@ public class BalanceBox extends Composite {
 				String message = "<span style=\"font-weight: bold; font-size: 11px; text-decoration: underline;\">Your shopping cart</span><br>";
 				message += result.getInt("itemCount") + " items / ";
 				message += Formatter.formatCurrency(result.getDouble("balance"));
+				label.setStyleName("BalanceBox");
 				label.setHTML(message);
 				label.addClickHandler(new ClickHandler() {
 					@Override
