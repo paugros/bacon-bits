@@ -273,7 +273,7 @@ public class UserPage implements Page {
 			});
 
 			if (!user.isChild()) {
-				tabPanel.add("Children", new TabPageCommand() {
+				tabPanel.add("Family", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
 						ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
