@@ -188,7 +188,7 @@ public final class MainMenu extends MenuBar {
 		if (!Application.getCurrentUser().isChild()) {
 			addLinkToMenu(menu, "Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
 		}
-		addLinkToMenu(menu, "Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=3");
+		addLinkToMenu(menu, "Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=2");
 		if (!Application.getCurrentUser().isChild()) {
 			addLinkToMenu(menu, "Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
 		}
