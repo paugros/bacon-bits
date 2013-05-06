@@ -253,6 +253,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		return documentCount > 0;
 	}
 
+	public boolean isSeriesChild() {
+		return seriesId != null && seriesId != getId();
+	}
+
 	public void setAccessLevel(String accessLevel) {
 		this.accessLevel = accessLevel;
 	}

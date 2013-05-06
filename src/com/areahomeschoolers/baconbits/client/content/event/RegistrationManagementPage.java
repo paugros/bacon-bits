@@ -107,6 +107,7 @@ public class RegistrationManagementPage implements Page {
 
 				table.setDefaultSortColumn("Event date", SortDirection.SORT_ASC);
 				table.setTitle("Registration Summary");
+				table.getTitleBar().addSearchControl();
 				table.populate();
 
 				tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
@@ -150,6 +151,7 @@ public class RegistrationManagementPage implements Page {
 				args.setStatus(Status.ACTIVE);
 
 				EventVolunteerCellTable vt = new EventVolunteerCellTable(args);
+				vt.getTitleBar().addSearchControl();
 
 				vt.addDataReturnHandler(new DataReturnHandler() {
 					@Override

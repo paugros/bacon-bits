@@ -619,7 +619,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		p.setPaymentTypeId(1);
 		p.setStatusId(1);
 		p.setAmount(total);
-		p.setReturnPage("EventParticipantList");
+		p.setReturnPage("User&tab=1&userId=" + ServerContext.getCurrentUserId());
 		p.setMemo("Payment for events");
 		p = paymentDao.save(p);
 
@@ -766,7 +766,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			Event e = getById(registration.getEventId());
 
-			if (!Common.isNullOrBlank(e.getNotificationEmail())) {
+			if (!Common.isNullOrBlank(e.getNotificationEmail()) && !e.isSeriesChild()) {
 				UserDao userDao = ServerContext.getDaoImpl("user");
 				User u = userDao.getById(registration.getAddedById());
 				Mailer mailer = new Mailer();
@@ -1120,6 +1120,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			u.setFirstName(participant.getFirstName());
 			u.setLastName(participant.getLastName());
 			u.setBirthDate(participant.getBirthDate());
+			u.setSex(participant.getSex());
 			if (u.getId() != ServerContext.getCurrentUserId()) {
 				u.setParentId(ServerContext.getCurrentUserId());
 			}

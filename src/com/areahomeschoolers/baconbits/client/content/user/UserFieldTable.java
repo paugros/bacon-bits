@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
@@ -126,6 +127,26 @@ public class UserFieldTable extends FieldTable {
 			}
 		});
 		addField(emailField);
+
+		final Label sexDisplay = new Label();
+		final RequiredListBox sexInput = new RequiredListBox();
+		sexInput.addItem("Female", "f");
+		sexInput.addItem("Male", "m");
+		FormField sexField = f.createFormField("Sex:", sexInput, sexDisplay);
+		sexField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				sexDisplay.setText(user.getSexyText());
+				sexInput.setValue(user.getSex());
+			}
+		});
+		sexField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				user.setSex(sexInput.getValue());
+			}
+		});
+		addField(sexField);
 
 		if (Application.isSystemAdministrator()) {
 			final Label adminDisplay = new Label();
@@ -287,27 +308,6 @@ public class UserFieldTable extends FieldTable {
 			}
 		});
 		addField(mobilePhoneField);
-
-		final Label sexDisplay = new Label();
-		final DefaultListBox sexInput = new DefaultListBox();
-		sexInput.addItem("", "");
-		sexInput.addItem("Female", "f");
-		sexInput.addItem("Male", "m");
-		FormField sexField = f.createFormField("Sex:", sexInput, sexDisplay);
-		sexField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				sexDisplay.setText(user.getSexyText());
-				sexInput.setValue(user.getSex());
-			}
-		});
-		sexField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				user.setSex(sexInput.getValue());
-			}
-		});
-		addField(sexField);
 
 		final Label birthDisplay = new Label();
 		final ValidatorDateBox birthInput = new ValidatorDateBox();

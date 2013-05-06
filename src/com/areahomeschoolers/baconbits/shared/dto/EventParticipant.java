@@ -31,6 +31,7 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 	private int eventSeriesId;
 	private boolean requiredInSeries;
 	private boolean updateAllInSeries;
+	private String sex;
 
 	// for bulk registration of a series
 	private ArrayList<Integer> seriesEventIds;
@@ -127,6 +128,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public ArrayList<Integer> getSeriesEventIds() {
 		return seriesEventIds;
+	}
+
+	public String getSex() {
+		return sex;
 	}
 
 	public String getStatus() {
@@ -243,6 +248,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setSeriesEventIds(ArrayList<Integer> seriesEventIds) {
 		this.seriesEventIds = seriesEventIds;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
 	}
 
 	public void setStatus(String status) {

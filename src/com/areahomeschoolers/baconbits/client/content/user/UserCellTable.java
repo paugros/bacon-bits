@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class UserCellTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
-		NAME("Name"), EMAIL("Email"), HOME_PHONE("Home phone"), MOBILE_PHONE("Mobile phone"), GROUP("Group(s)"), STATUS("Status");
+		NAME("Name"), EMAIL("Email"), SEX("Sex"), HOME_PHONE("Home phone"), MOBILE_PHONE("Mobile phone"), GROUP("Group(s)"), STATUS("Status");
 
 		private String title;
 
@@ -112,6 +112,14 @@ public final class UserCellTable extends EntityCellTable<User, UserArg, UserColu
 					@Override
 					protected Widget createWidget(User item) {
 						return new Hyperlink(item.getFullName(), PageUrl.user(item.getId()));
+					}
+				});
+				break;
+			case SEX:
+				addTextColumn(col, new ValueGetter<String, User>() {
+					@Override
+					public String get(User item) {
+						return item.getSexyText();
 					}
 				});
 				break;
