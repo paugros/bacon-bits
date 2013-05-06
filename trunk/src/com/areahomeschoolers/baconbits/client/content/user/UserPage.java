@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCell
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerCellTable;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.user.UserCellTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
@@ -97,6 +98,7 @@ public class UserPage implements Page {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private UserFieldTable fieldTable;
 	private TabPage tabPanel;
+	private boolean addingChild;
 
 	private BookDialog bookDialog;
 
@@ -107,7 +109,11 @@ public class UserPage implements Page {
 		}
 
 		int userId = Url.getIntegerParameter("userId");
-		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS) && userId < 0) {
+		if (userId < 0 && (Url.getIntegerParameter("pp") == 1 || !Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS))) {
+			addingChild = true;
+		}
+
+		if (!Application.isAuthenticated() && userId < 0) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
 		}
@@ -124,18 +130,24 @@ public class UserPage implements Page {
 
 				user = result.getUser();
 
-				HorizontalPanel hp = new HorizontalPanel();
-				hp.setWidth("100%");
-				Label heading = new Label(user.getFullName());
-				heading.addStyleName("hugeText");
-				hp.add(heading);
-				if (user.equals(Application.getCurrentUser())) {
-					BalanceBox bb = new BalanceBox();
-					bb.populate();
-					hp.add(bb);
-					hp.setCellHorizontalAlignment(bb, HasHorizontalAlignment.ALIGN_RIGHT);
+				if (addingChild) {
+					user.setParentId(Application.getCurrentUserId());
 				}
-				page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH900PX));
+
+				if (user.isSaved()) {
+					HorizontalPanel hp = new HorizontalPanel();
+					hp.setWidth("100%");
+					Label heading = new Label(user.getFullName());
+					heading.addStyleName("hugeText");
+					hp.add(heading);
+					if (user.equals(Application.getCurrentUser())) {
+						BalanceBox bb = new BalanceBox();
+						bb.populate();
+						hp.add(bb);
+						hp.setCellHorizontalAlignment(bb, HasHorizontalAlignment.ALIGN_RIGHT);
+					}
+					page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH900PX));
+				}
 
 				initializePage();
 			}
@@ -177,6 +189,28 @@ public class UserPage implements Page {
 			tabPanel.add("Events", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
+					String paymentAction = Url.getParameter("ps");
+					if (paymentAction != null) {
+						String text = null;
+						String subText = "";
+						if ("return".equals(paymentAction)) {
+							text = "Thank you for your purchase.";
+							subText = "Below are the events you've registered to attend. Payments may take a few minutes to be reflected here.";
+						} else if ("cancel".equals(paymentAction)) {
+							text = "We're sorry you canceled your purchase.";
+							subText += "You can change your mind at any time.";
+						}
+
+						if (text != null) {
+							VerticalPanel vp = new VerticalPanel();
+							Label message = new Label(text);
+							message.addStyleName("largeText");
+							vp.add(message);
+							vp.add(new Label(subText));
+							tabBody.add(vp);
+						}
+					}
+
 					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
 					args.setStatus(Status.ACTIVE);
 					args.put(EventArg.NOT_STATUS_ID, 5);
@@ -280,7 +314,12 @@ public class UserPage implements Page {
 						args.put(UserArg.PARENT_ID, user.getId());
 
 						UserCellTable table = new UserCellTable(args);
-						table.setTitle("Children");
+						Hyperlink addChild = new Hyperlink("Add", PageUrl.user(0) + "&pp=1");
+						table.getTitleBar().addLink(addChild);
+						table.removeColumn(UserColumn.HOME_PHONE);
+						table.removeColumn(UserColumn.MOBILE_PHONE);
+						table.setTitle("Family Members");
+						table.disablePaging();
 						table.populate();
 
 						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));

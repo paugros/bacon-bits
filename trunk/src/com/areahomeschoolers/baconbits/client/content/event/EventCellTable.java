@@ -8,9 +8,11 @@ import com.areahomeschoolers.baconbits.client.content.event.EventCellTable.Event
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -190,7 +192,17 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 					protected Widget createWidget(Event item) {
 						Hyperlink h = new Hyperlink(item.getTitle(), PageUrl.event(item.getId()));
 						h.addStyleName("bold");
-						return h;
+
+						if (ClientDateUtils.daysBetween(item.getAddedDate(), new Date()) > 14) {
+							return h;
+						}
+
+						PaddedPanel pp = new PaddedPanel();
+						pp.add(h);
+						Label l = new Label("NEW!");
+						l.addStyleName("errorText bold smallText");
+						pp.add(l);
+						return pp;
 					}
 				}, new ValueGetter<String, Event>() {
 					@Override

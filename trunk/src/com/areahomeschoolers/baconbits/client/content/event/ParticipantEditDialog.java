@@ -25,6 +25,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.MonthYearPicker;
+import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -117,6 +118,7 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 				entity.setLastName(u.getLastName());
 				entity.setBirthDate(u.getBirthDate());
 				entity.setUserId(u.getId());
+				entity.setSex(u.getSex());
 
 				form.initialize();
 				birthDateInput.fireValueChangeCommands();
@@ -307,9 +309,10 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 				public void execute() {
 					Date d = birthDateInput.getValue();
 					if (d != null) {
-						int age = (int) (ClientDateUtils.daysBetween(d, new Date()) / 365);
+						int age = (int) (ClientDateUtils.daysBetween(d, pageData.getEvent().getStartDate()) / 365);
 
 						for (EventAgeGroup g : pageData.getAgeGroups()) {
+							// logic to pick an age group based on birth date
 							if (age >= g.getMinimumAge() && (age <= g.getMaximumAge() || (g.getMaximumAge() == 0))) {
 								entity.setAgeGroupId(g.getId());
 								eventService.getFields(new ArgMap<EventArg>(EventArg.AGE_GROUP_ID, g.getId()), new Callback<ArrayList<EventField>>() {
@@ -358,6 +361,26 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 			}
 		});
 		fieldTable.addField(birthDateField);
+
+		final Label sexDisplay = new Label();
+		final RequiredListBox sexInput = new RequiredListBox();
+		sexInput.addItem("Female", "f");
+		sexInput.addItem("Male", "m");
+		FormField sexField = form.createFormField("Sex:", sexInput, sexDisplay);
+		sexField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				sexDisplay.setText(entity.getSex() == "f" ? "Female" : "Male");
+				sexInput.setValue(entity.getSex());
+			}
+		});
+		sexField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				entity.setSex(sexInput.getValue());
+			}
+		});
+		fieldTable.addField(sexField);
 
 		if (!Common.isNullOrEmpty(pageData.getEventsInSeries()) && !entity.isSaved()) {
 			seriesMap = new HashMap<CheckBox, Event>();

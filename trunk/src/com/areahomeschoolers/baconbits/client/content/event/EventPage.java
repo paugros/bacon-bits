@@ -146,16 +146,18 @@ public class EventPage implements Page {
 					}
 				});
 
-				HorizontalPanel hp = new HorizontalPanel();
-				hp.setWidth("100%");
-				Label heading = new Label(calendarEvent.getTitle() + " - " + Formatter.formatDateTime(calendarEvent.getStartDate()));
-				heading.addStyleName("hugeText");
-				hp.add(heading);
-				BalanceBox bb = new BalanceBox();
-				bb.populate();
-				hp.add(bb);
-				hp.setCellHorizontalAlignment(bb, HasHorizontalAlignment.ALIGN_RIGHT);
-				page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH900PX));
+				if (calendarEvent.isSaved()) {
+					HorizontalPanel hp = new HorizontalPanel();
+					hp.setWidth("100%");
+					Label heading = new Label(calendarEvent.getTitle() + " - " + Formatter.formatDateTime(calendarEvent.getStartDate()));
+					heading.addStyleName("hugeText");
+					hp.add(heading);
+					BalanceBox bb = new BalanceBox();
+					bb.populate();
+					hp.add(bb);
+					hp.setCellHorizontalAlignment(bb, HasHorizontalAlignment.ALIGN_RIGHT);
+					page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH900PX));
+				}
 
 				initializePage();
 			}

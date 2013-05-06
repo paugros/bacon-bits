@@ -87,6 +87,22 @@ public class EventVolunteerCellTable extends GenericCellTable {
 
 	@Override
 	protected void setColumns() {
+		addCheckboxColumn("Fulfilled", new ValueGetter<Boolean, Data>() {
+			@Override
+			public Boolean get(Data item) {
+				return item.getBoolean("fulfilled");
+			}
+		}, new FieldUpdater<Data, Boolean>() {
+			@Override
+			public void update(int index, Data item, Boolean value) {
+				eventService.setVolunteerFulFilled(item.getId(), value, new Callback<Void>(false) {
+					@Override
+					protected void doOnSuccess(Void result) {
+					}
+				});
+			}
+		});
+
 		addCompositeWidgetColumn("Event", new WidgetCellCreator<Data>() {
 			@Override
 			protected Widget createWidget(Data item) {
@@ -121,21 +137,6 @@ public class EventVolunteerCellTable extends GenericCellTable {
 			}
 		});
 
-		addCheckboxColumn("Fulfilled", new ValueGetter<Boolean, Data>() {
-			@Override
-			public Boolean get(Data item) {
-				return item.getBoolean("fulfilled");
-			}
-		}, new FieldUpdater<Data, Boolean>() {
-			@Override
-			public void update(int index, Data item, Boolean value) {
-				eventService.setVolunteerFulFilled(item.getId(), value, new Callback<Void>(false) {
-					@Override
-					protected void doOnSuccess(Void result) {
-					}
-				});
-			}
-		});
 	}
 
 }
