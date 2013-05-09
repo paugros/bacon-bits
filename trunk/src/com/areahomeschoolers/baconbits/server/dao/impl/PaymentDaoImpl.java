@@ -66,6 +66,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			a.setUserFullName(rs.getString("userFullName"));
 			a.setUserId(rs.getInt("userId"));
 			a.setDescription(rs.getString("description"));
+			a.setAddedById(rs.getInt("addedById"));
 
 			return a;
 		}
