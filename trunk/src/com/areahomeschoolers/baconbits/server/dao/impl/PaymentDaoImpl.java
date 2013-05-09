@@ -269,10 +269,10 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
-			adjustment.setUserId(ServerContext.getCurrentUser().getId());
+			adjustment.setAddedById(ServerContext.getCurrentUser().getId());
 
-			String sql = "insert into adjustments (userId, adjustmentTypeId, amount, statusId, description) values ";
-			sql += "(:userId, :adjustmentTypeId, :amount, :statusId, :description)";
+			String sql = "insert into adjustments (userId, addedById, adjustmentTypeId, amount, statusId, description) values ";
+			sql += "(:userId, :addedById, :adjustmentTypeId, :amount, :statusId, :description)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
