@@ -16,6 +16,7 @@ public class Adjustment extends EntityDto<Adjustment> {
 	private int statusId;
 	private Date addedDate;
 	private String description;
+	private int addedById;
 
 	// aux
 	private String adjustmentType;
@@ -25,6 +26,10 @@ public class Adjustment extends EntityDto<Adjustment> {
 
 	public Adjustment() {
 
+	}
+
+	public int getAddedById() {
+		return addedById;
 	}
 
 	public Date getAddedDate() {
@@ -65,6 +70,10 @@ public class Adjustment extends EntityDto<Adjustment> {
 
 	public int getUserId() {
 		return userId;
+	}
+
+	public void setAddedById(int addedById) {
+		this.addedById = addedById;
 	}
 
 	public void setAddedDate(Date addedDate) {
