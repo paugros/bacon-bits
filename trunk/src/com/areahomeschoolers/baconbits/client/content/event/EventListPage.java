@@ -122,7 +122,29 @@ public final class EventListPage implements Page {
 			hp.setCellHorizontalAlignment(eb, HasHorizontalAlignment.ALIGN_RIGHT);
 
 			page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH1300PX));
+
+			table.addDataReturnHandler(new DataReturnHandler() {
+				@Override
+				public void onDataReturn() {
+					// add in categories
+					Map<Integer, String> categories = new HashMap<Integer, String>();
+					for (Event item : table.getFullList()) {
+						categories.put(item.getCategoryId(), item.getCategory());
+					}
+
+					for (int id : categories.keySet()) {
+						categoryBox.addItem(categories.get(id), id);
+					}
+				}
+			});
 		}
+
+		table.addDataReturnHandler(new DataReturnHandler() {
+			@Override
+			public void onDataReturn() {
+				Application.getLayout().setPage(title, page);
+			}
+		});
 
 		if (showCommunity) {
 			table.removeColumn(EventColumn.CATEGORY);
@@ -139,22 +161,6 @@ public final class EventListPage implements Page {
 		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addSearchControl();
 		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1300PX));
-
-		table.addDataReturnHandler(new DataReturnHandler() {
-			@Override
-			public void onDataReturn() {
-				// add in categories
-				Map<Integer, String> categories = new HashMap<Integer, String>();
-				for (Event item : table.getFullList()) {
-					categories.put(item.getCategoryId(), item.getCategory());
-				}
-
-				for (int id : categories.keySet()) {
-					categoryBox.addItem(categories.get(id), id);
-				}
-				Application.getLayout().setPage(title, page);
-			}
-		});
 
 		table.populate();
 	}
