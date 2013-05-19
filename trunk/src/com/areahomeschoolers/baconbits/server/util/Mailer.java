@@ -104,8 +104,7 @@ public class Mailer {
 	}
 
 	public void send() {
-
-		if (tos.isEmpty()) {
+		if (tos.isEmpty() && ccs.isEmpty() && bccs.isEmpty()) {
 			return;
 		}
 
@@ -168,6 +167,7 @@ public class Mailer {
 	}
 
 	public void setEmail(Email email) {
+		setHtmlMail(email.isHtmlMail());
 		addTo(email.getTos());
 		addCc(email.getCcs());
 		addBcc(email.getBccs());

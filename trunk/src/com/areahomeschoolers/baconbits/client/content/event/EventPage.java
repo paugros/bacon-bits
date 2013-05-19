@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -29,6 +30,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeBox;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.EmailDialog;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
@@ -112,6 +114,7 @@ public class EventPage implements Page {
 	private FlexTable volunteerTable = new FlexTable();
 	private VolunteerPositionEditDialog volunteerDialog;
 	private AgeGroupEditDialog ageDialog;
+	private EmailDialog emailDialog;
 
 	public EventPage(final VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -804,13 +807,38 @@ public class EventPage implements Page {
 						}
 
 						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
+						args.put(EventArg.NOT_STATUS_ID, 5);
 						args.put(EventArg.INCLUDE_FIELDS);
-						EventParticipantCellTable table = new EventParticipantCellTable(args);
+						final EventParticipantCellTable table = new EventParticipantCellTable(args);
+
 						table.addStatusFilterBox();
 						table.getTitleBar().addExcelControl();
 						table.getTitleBar().addSearchControl();
 						table.populate();
 						table.setTitle("Participants");
+						table.addDataReturnHandler(new DataReturnHandler() {
+							@Override
+							public void onDataReturn() {
+								if (emailDialog != null) {
+									return;
+								}
+
+								table.getTitleBar().addLink(new ClickLabel("Email Registrants", new MouseDownHandler() {
+									@Override
+									public void onMouseDown(MouseDownEvent event) {
+										emailDialog = new EmailDialog();
+										String subject = calendarEvent.getTitle() + " - " + Formatter.formatDateTime(calendarEvent.getStartDate());
+										emailDialog.setSubject(subject);
+										emailDialog.setShowSubjectBox(true);
+										for (EventParticipant p : table.getFullList()) {
+											emailDialog.addBcc(p.getRegistrantEmailAddress());
+										}
+										emailDialog.center();
+									}
+								}));
+							}
+						});
+
 						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1200PX));
 						tabPanel.selectTabNow(tabBody);
 					}
