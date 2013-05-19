@@ -106,7 +106,6 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 		filterBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent e) {
-				System.out.println("changin");
 				switch (filterBox.getSelectedIndex()) {
 				case 0:
 					getArgMap().put(BookArg.STATUS_ID, 1);

@@ -87,11 +87,11 @@ public class EmailDialog extends DefaultDialog {
 			vp.setSpacing(10);
 			// vp.add(new Label("You will be copied on this email."));
 			//
-			// PaddedPanel fp = new PaddedPanel();
-			// fp.add(new Label("Your email:"));
-			// fp.add(fromPanel);
-
-			// vp.add(fp);
+			PaddedPanel fp = new PaddedPanel();
+			fromBox.setVisibleLength(30);
+			fp.add(new Label("Your email:"));
+			fp.add(fromPanel);
+			vp.add(fp);
 
 			if (showSubjectBox) {
 				subjectBox.setVisibleLength(68);
