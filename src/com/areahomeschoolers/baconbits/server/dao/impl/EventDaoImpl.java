@@ -330,7 +330,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select r.eventId, e.title, e.startDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
-		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, r.addedById, e.groupId, e.seriesId, e.requiredInSeries, \n";
+		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, up.email as registrantEmailAddress, \n";
+		sql += "r.addedById, e.groupId, e.seriesId, e.requiredInSeries, \n";
 		if (includeFields) {
 			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n";
 			sql += "from eventFieldValues v \n";
@@ -435,6 +436,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setEventDate(rs.getTimestamp("startDate"));
 				p.setEventGroupId(rs.getInt("groupId"));
 				p.setEventSeriesId(rs.getInt("seriesId"));
+				p.setRegistrantEmailAddress(rs.getString("registrantEmailAddress"));
 				p.setRequiredInSeries(rs.getBoolean("requiredInSeries"));
 				if (includeFields) {
 					p.setFieldValues(rs.getString("fieldValues"));

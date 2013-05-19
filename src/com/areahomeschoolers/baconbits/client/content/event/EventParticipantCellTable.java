@@ -83,8 +83,13 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 
 		filterBox.addItem("Future");
 		filterBox.addItem("Past");
+		filterBox.addItem("Registered/Pending");
+		filterBox.addItem("Confirmed/Paid");
+		filterBox.addItem("Waiting");
+		filterBox.addItem("Attended");
 		filterBox.addItem("Canceled");
 		filterBox.addItem("All");
+
 		filterBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent e) {
@@ -101,10 +106,22 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 					args.setStatus(Status.INACTIVE);
 					break;
 				case 2:
+					args.put(EventArg.STATUS_ID, 1);
+					break;
+				case 3:
+					args.put(EventArg.STATUS_ID, 2);
+					break;
+				case 4:
+					args.put(EventArg.STATUS_ID, 3);
+					break;
+				case 5:
+					args.put(EventArg.STATUS_ID, 4);
+					break;
+				case 6:
 					args.remove(EventArg.NOT_STATUS_ID);
 					args.put(EventArg.STATUS_ID, 5);
 					break;
-				case 3:
+				case 7:
 					args.setStatus(Status.ALL);
 					if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 						getArgMap().put(EventArg.SHOW_INACTIVE);
@@ -116,21 +133,28 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 			}
 		});
 
-		int defaultIndex = 0;
-		switch (args.getStatus()) {
-		case ACTIVE:
-			defaultIndex = 0;
-			break;
-		case INACTIVE:
+		int defaultIndex = 7;
+
+		if (args.getStatus() == Status.INACTIVE) {
 			defaultIndex = 1;
-			break;
-		case ALL:
-			defaultIndex = 3;
-			break;
 		}
 
-		if (args.getInt(EventArg.STATUS_ID) == 5) {
+		switch (args.getInt(EventArg.STATUS_ID)) {
+		case 1:
 			defaultIndex = 2;
+			break;
+		case 2:
+			defaultIndex = 3;
+			break;
+		case 3:
+			defaultIndex = 4;
+			break;
+		case 4:
+			defaultIndex = 5;
+			break;
+		case 5:
+			defaultIndex = 6;
+			break;
 		}
 
 		filterBox.setSelectedIndex(defaultIndex);

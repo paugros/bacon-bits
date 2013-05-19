@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.document.FileUploadDialog;
 import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.images.richtext.RichTextImages;
@@ -8,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -319,18 +321,24 @@ public class ControlledRichTextArea extends Composite {
 				topPanel.add(createLink = createPushButton(images.createLink(), "Create Link"));
 				topPanel.add(removeLink = createPushButton(images.removeLink(), "Remove Link"));
 				topPanel.add(removeFormat = createPushButton(images.removeFormat(), "Remove Formatting"));
-				htmlLink = new ClickLabel("Edit HTML");
-				htmlLink.addClickHandler(handler);
-				htmlLink.getElement().getStyle().setTextDecoration(TextDecoration.UNDERLINE);
-				topPanel.add(htmlLink);
-				insertLink = new ClickLabel("Insert HTML");
-				insertLink.getElement().getStyle().setTextDecoration(TextDecoration.UNDERLINE);
-				insertLink.addClickHandler(handler);
+				if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+					htmlLink = new ClickLabel("Edit HTML");
+					htmlLink.setWordWrap(false);
+					htmlLink.addClickHandler(handler);
+					htmlLink.getElement().getStyle().setTextDecoration(TextDecoration.UNDERLINE);
+					topPanel.add(htmlLink);
+					insertLink = new ClickLabel("Insert HTML");
+					insertLink.setWordWrap(false);
+					insertLink.getElement().getStyle().setTextDecoration(TextDecoration.UNDERLINE);
+					insertLink.addClickHandler(handler);
+				}
 				bottomPanel.add(backColors = createColorList("Background"));
 				bottomPanel.add(foreColors = createColorList("Foreground"));
 				bottomPanel.add(fonts = createFontList());
 				bottomPanel.add(fontSizes = createFontSizes());
-				bottomPanel.add(insertLink);
+				if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+					bottomPanel.add(insertLink);
+				}
 
 				// We only use these handlers for updating status, so don't hook them up
 				// unless at least basic editing is supported.

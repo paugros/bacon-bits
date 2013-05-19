@@ -155,12 +155,12 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 		e.addTo(item.getUserEmail());
 		e.addBcc("admin@wearehomeeducators.com");
 		e.setSubject("Buyer for book: " + item.getTitle());
-		String m = "Hello, someone is interested in buying a book that you have listed for sale. Details appear below.\n\n";
+		String m = "Hello, someone is interested in buying a book that you have listed for sale. Details appear below.<br><br>";
 		if (Application.isAuthenticated()) {
-			m += "Buyer: " + Application.getCurrentUser().getFullName() + "\n";
+			m += "Buyer: " + Application.getCurrentUser().getFullName() + "<br>";
 		}
-		m += "Title: " + item.getTitle() + "\n";
-		m += "Price: " + Formatter.formatCurrency(item.getPrice()) + "\n\n";
+		m += "Title: " + item.getTitle() + "<br>";
+		m += "Price: " + Formatter.formatCurrency(item.getPrice()) + "<br><br>";
 		m += "Message from buyer: ";
 		e.setHiddenAboveText(m);
 		e.setText("Email Seller");

@@ -32,6 +32,7 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 	private boolean requiredInSeries;
 	private boolean updateAllInSeries;
 	private String sex;
+	private String registrantEmailAddress;
 
 	// for bulk registration of a series
 	private ArrayList<Integer> seriesEventIds;
@@ -120,6 +121,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public double getPrice() {
 		return price;
+	}
+
+	public String getRegistrantEmailAddress() {
+		return registrantEmailAddress;
 	}
 
 	public boolean getRequiredInSeries() {
@@ -240,6 +245,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void setRegistrantEmailAddress(String registrantEmailAddress) {
+		this.registrantEmailAddress = registrantEmailAddress;
 	}
 
 	public void setRequiredInSeries(boolean requiredInSeries) {
