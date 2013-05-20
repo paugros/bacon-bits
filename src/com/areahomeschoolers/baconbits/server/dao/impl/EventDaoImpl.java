@@ -21,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.server.dao.ArticleDao;
 import com.areahomeschoolers.baconbits.server.dao.EventDao;
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
@@ -40,6 +41,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Pair;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
@@ -216,6 +218,33 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				return f;
 			}
 		}, sqlArgs.toArray());
+	}
+
+	@Override
+	public HomePageData getHomePageData() {
+		HomePageData pd = new HomePageData();
+		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
+		args.put(EventArg.UPCOMING_NUMBER, 5);
+
+		pd.setUpcomingEvents(list(args));
+
+		args.put(EventArg.SHOW_COMMUNITY);
+		pd.setCommunityEvents(list(args));
+
+		args.remove(EventArg.SHOW_COMMUNITY);
+		args.put(EventArg.NEWLY_ADDED);
+		pd.setNewlyAddedEvents(list(args));
+
+		if (ServerContext.isAuthenticated()) {
+			args.remove(EventArg.NEWLY_ADDED);
+			args.put(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, ServerContext.getCurrentUserId());
+			pd.setMyUpcomingEvents(list(args));
+		}
+
+		ArticleDao articleDao = ServerContext.getDaoImpl("article");
+		pd.setIntro(articleDao.getById(6));
+
+		return pd;
 	}
 
 	@Override
@@ -555,6 +584,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		int upcoming = args.getInt(EventArg.UPCOMING_NUMBER);
 		boolean showCommunity = args.getBoolean(EventArg.SHOW_COMMUNITY);
 		int seriesId = args.getInt(EventArg.SERIES_ID);
+		boolean newlyAdded = args.getBoolean(EventArg.NEWLY_ADDED);
+		int registeredByOrAddedForId = args.getInt(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID);
 
 		String sql = createSqlBase();
 
@@ -581,6 +612,17 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		if (seriesId > 0) {
 			sql += "and e.seriesId = ? ";
 			sqlArgs.add(seriesId);
+		}
+
+		if (registeredByOrAddedForId > 0) {
+			sql += "and (e.id in(select distinct r.eventId from eventRegistrations r ";
+			sql += "join eventRegistrationParticipants p on p.eventRegistrationId = r.id where r.addedById = ? or p.userId = ?)) \n";
+			sqlArgs.add(registeredByOrAddedForId);
+			sqlArgs.add(registeredByOrAddedForId);
+		}
+
+		if (newlyAdded) {
+			sql += "and e.startDate <= date_add(now(), interval -2 week) and (e.seriesId = e.id or e.seriesId is null) \n";
 		}
 
 		sql += "order by e.startDate ";

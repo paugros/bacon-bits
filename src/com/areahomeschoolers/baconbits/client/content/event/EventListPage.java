@@ -39,11 +39,15 @@ public final class EventListPage implements Page {
 	private DefaultListBox categoryBox;
 	private EventCellTable table;
 	private boolean showCommunity = Url.getBooleanParameter("showCommunity");
+	private boolean newlyAdded = Url.getBooleanParameter("newlyAdded");
 
 	public EventListPage(final VerticalPanel page) {
 		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 		if (showCommunity) {
 			args.put(EventArg.SHOW_COMMUNITY);
+		}
+		if (newlyAdded) {
+			args.put(EventArg.NEWLY_ADDED);
 		}
 		final String title = showCommunity ? "Community Events" : "Events";
 		table = new EventCellTable(args);

@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
@@ -43,6 +44,8 @@ public interface EventDao {
 
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public ArrayList<EventField> getFields(ArgMap<EventArg> args);
+
+	public HomePageData getHomePageData();
 
 	public EventPageData getPageData(int id);
 

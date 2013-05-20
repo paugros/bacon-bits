@@ -344,6 +344,31 @@ img {
 	width: 100%;
 }
 
+.hoverLinkTable {
+	
+}
+
+.hoverLinkTable td {
+	padding: 8px;
+	font-weight: bold;
+	white-space: nowrap
+}
+
+.hoverLinkTable td:hover {
+	background-color: #c5eabf;
+	cursor: pointer;
+}
+
+.hoverLinkTable a {
+	white-space: nowrap;
+	display: block;
+	color: #327526;
+}
+
+.hoverLinkTable a:hover {
+	text-decoration: none;
+}
+
 .headerPanel {
 	width: 100%;
 	height: 100%;

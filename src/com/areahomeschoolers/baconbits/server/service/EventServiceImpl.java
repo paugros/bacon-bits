@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
@@ -77,6 +78,11 @@ public class EventServiceImpl extends GwtController implements EventService {
 	@Override
 	public ArrayList<EventField> getFields(ArgMap<EventArg> args) {
 		return dao.getFields(args);
+	}
+
+	@Override
+	public HomePageData getHomePageData() {
+		return dao.getHomePageData();
 	}
 
 	@Override

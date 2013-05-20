@@ -1,16 +1,16 @@
 package com.areahomeschoolers.baconbits.client.content.home;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
+import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
-import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
-import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
@@ -20,11 +20,10 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
-import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
-import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
-import com.areahomeschoolers.baconbits.shared.dto.Article;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
+import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
+import com.areahomeschoolers.baconbits.shared.dto.Pair;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 import com.google.gwt.dom.client.Style.Cursor;
@@ -33,9 +32,11 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -44,7 +45,11 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class HomePage implements Page {
 	private class EventModulePanel extends Composite {
-		public EventModulePanel(String title, ArrayList<Event> events) {
+
+		public EventModulePanel(String title, ArrayList<Event> events, String extraParams) {
+			if (extraParams == null) {
+				extraParams = "";
+			}
 			VerticalPanel vp = new VerticalPanel();
 			vp.setWidth("100%");
 			vp.setSpacing(8);
@@ -52,7 +57,6 @@ public class HomePage implements Page {
 			Label label = new Label(title);
 			label.addStyleName("hugeText");
 			vp.add(label);
-			boolean community = false;
 
 			for (Event e : events) {
 				VerticalPanel ep = new VerticalPanel();
@@ -63,7 +67,6 @@ public class HomePage implements Page {
 
 				String subText = Formatter.formatDateTime(e.getStartDate());
 				if (e.getCategoryId() == 6) {
-					community = true;
 					subText += " - " + Formatter.formatCurrency(e.getPrice());
 				}
 				Label date = new Label(subText);
@@ -84,10 +87,7 @@ public class HomePage implements Page {
 			if (events.isEmpty()) {
 				vp.add(new Label("None right now."));
 			} else {
-				String url = PageUrl.eventList();
-				if (community) {
-					url += "&showCommunity=true";
-				}
+				String url = PageUrl.eventList() + extraParams;
 				vp.add(new Hyperlink("See more events...", url));
 			}
 
@@ -95,13 +95,13 @@ public class HomePage implements Page {
 		}
 	}
 
-	private final ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private final BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private VerticalPanel page = new VerticalPanel();
 	private Grid grid = new Grid(1, 3);
-	private SimplePanel articlePanel = new SimplePanel();
+	private VerticalPanel centerPanel = new VerticalPanel();
 	private SimplePanel eventPanel = new SimplePanel();
+	private HomePageData pageData;
 
 	private SimplePanel communityPanel = new SimplePanel();
 	private boolean paying = false;
@@ -187,7 +187,7 @@ public class HomePage implements Page {
 
 		rightPanel.add(eventPanel);
 		grid.setWidget(0, 0, communityPanel);
-		grid.setWidget(0, 1, articlePanel);
+		grid.setWidget(0, 1, centerPanel);
 		grid.setWidget(0, 2, rightPanel);
 		grid.getCellFormatter().setWidth(0, 0, "250px");
 		grid.getCellFormatter().setWidth(0, 2, "250px");
@@ -198,23 +198,14 @@ public class HomePage implements Page {
 		grid.getCellFormatter().setVerticalAlignment(0, 2, HasVerticalAlignment.ALIGN_TOP);
 		page.add(grid);
 
-		articleService.getById(6, new Callback<Article>() {
+		eventService.getHomePageData(new Callback<HomePageData>() {
 			@Override
-			protected void doOnSuccess(Article result) {
-				articlePanel.setWidget(new ArticleWidget(result));
+			protected void doOnSuccess(HomePageData result) {
+				pageData = result;
 
-				Application.getLayout().setPage("Home", page);
-			}
-		});
-
-		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
-		args.put(EventArg.UPCOMING_NUMBER, 5);
-
-		eventService.list(args, new Callback<ArrayList<Event>>() {
-			@Override
-			protected void doOnSuccess(ArrayList<Event> result) {
-				VerticalPanel vp = new VerticalPanel();
-				vp.add(new EventModulePanel("Upcoming Events", result));
+				// upcoming
+				VerticalPanel uvp = new VerticalPanel();
+				uvp.add(new EventModulePanel("Upcoming Events", pageData.getUpcomingEvents(), null));
 
 				VerticalPanel vvp = new VerticalPanel();
 				vvp.setSpacing(8);
@@ -227,27 +218,114 @@ public class HomePage implements Page {
 
 				HTML fb = new HTML(text);
 				vvp.add(fb);
-				vp.add(vvp);
+				uvp.add(vvp);
 
-				eventPanel.setWidget(vp);
-			}
-		});
+				eventPanel.setWidget(uvp);
 
-		args.put(EventArg.SHOW_COMMUNITY);
+				// community
+				VerticalPanel cvp = new VerticalPanel();
+				cvp.add(new EventModulePanel("Community Events", pageData.getCommunityEvents(), "&showCommunity=true"));
 
-		eventService.list(args, new Callback<ArrayList<Event>>() {
-			@Override
-			protected void doOnSuccess(ArrayList<Event> result) {
-				VerticalPanel vp = new VerticalPanel();
-				vp.add(new EventModulePanel("Community Events", result));
-
-				String text = "<iframe src=\"http://wms.assoc-amazon.com/20070822/US/html/searchbox_20.html?t=httpwhediment-20\" width=\"120\" height=\"90\" frameborder=\"0\" scrolling=\"no\"></iframe>";
-				SimplePanel sp = new SimplePanel(new HTML(text));
+				String ftext = "<iframe src=\"http://wms.assoc-amazon.com/20070822/US/html/searchbox_20.html?t=httpwhediment-20\" width=\"120\" height=\"90\" frameborder=\"0\" scrolling=\"no\"></iframe>";
+				SimplePanel sp = new SimplePanel(new HTML(ftext));
 				sp.addStyleName("mediumPadding");
-				vp.add(sp);
-				communityPanel.setWidget(vp);
+				cvp.add(sp);
+				communityPanel.setWidget(cvp);
+
+				// new
+				if (!pageData.getNewlyAddedEvents().isEmpty()) {
+					centerPanel.add(new EventModulePanel("Newly Added Events", pageData.getNewlyAddedEvents(), "&newlyAdded=1"));
+				}
+
+				if (Application.isAuthenticated()) {
+					HorizontalPanel hp = new PaddedPanel(15);
+
+					// links
+					Image linkImage = new Image(MainImageBundle.INSTANCE.link());
+					hp.add(linkImage);
+
+					List<Pair<String, String>> links = new ArrayList<Pair<String, String>>();
+
+					links.add(new Pair<String, String>("Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
+					if (Application.getCurrentUser().memberOfAny(16, 17)) {
+						links.add(new Pair<String, String>("Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5"));
+					}
+					links.add(new Pair<String, String>("Profile", PageUrl.user(Application.getCurrentUserId())));
+					if (!Application.getCurrentUser().isChild()) {
+						links.add(new Pair<String, String>("Shopping Cart", PageUrl.payment()));
+					}
+					if (!Application.getCurrentUser().isChild()) {
+						links.add(new Pair<String, String>("Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
+					}
+					links.add(new Pair<String, String>("Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=2"));
+					if (!Application.getCurrentUser().isChild()) {
+						links.add(new Pair<String, String>("Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6"));
+					}
+
+					FlexTable ft = new FlexTable();
+					// ft.setWidth("280px");
+					ft.addStyleName("hoverLinkTable");
+					for (int i = 0; i < links.size(); i++) {
+						if (i % 2 == 0) {
+							ft.insertRow(ft.getRowCount());
+						}
+						int row = ft.getRowCount() - 1;
+						int cell = ft.getCellCount(row);
+
+						Pair<String, String> item = links.get(i);
+						Hyperlink link = new Hyperlink(item.getLeft(), item.getRight());
+						ft.setWidget(row, cell, link);
+					}
+					ft.getColumnFormatter().setWidth(0, "50%");
+
+					VerticalPanel lp = new VerticalPanel();
+					lp.add(ft);
+
+					BalanceBox bb = new BalanceBox();
+					bb.populate();
+					lp.add(bb);
+					lp.setCellVerticalAlignment(bb, HasVerticalAlignment.ALIGN_BOTTOM);
+
+					hp.add(lp);
+
+					// my events
+					if (!pageData.getMyUpcomingEvents().isEmpty()) {
+						VerticalPanel vp = new VerticalPanel();
+						vp.setSpacing(8);
+
+						Hyperlink titleLink = new Hyperlink(".:: My Upcoming Events ::.", PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
+						titleLink.addStyleName("largeText");
+						vp.add(titleLink);
+
+						for (Event e : pageData.getMyUpcomingEvents()) {
+							VerticalPanel mhp = new VerticalPanel();
+
+							Hyperlink link = new Hyperlink(e.getTitle(), PageUrl.event(e.getId()));
+							link.addStyleName("mediumText");
+							mhp.add(link);
+
+							HTML date = new HTML(Formatter.formatDateTime(e.getStartDate()));
+							date.setWordWrap(false);
+							date.getElement().getStyle().setColor("#555555");
+							date.addStyleName("italic");
+							mhp.add(date);
+
+							vp.add(mhp);
+						}
+
+						hp.add(vp);
+					}
+
+					centerPanel.add(hp);
+				}
+
+				// introduction
+				centerPanel.add(new ArticleWidget(pageData.getIntro()));
+
+				Application.getLayout().setPage("Home", page);
 			}
 		});
 
 	}
+
 }
