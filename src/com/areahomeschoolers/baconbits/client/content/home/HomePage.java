@@ -1,13 +1,11 @@
 package com.areahomeschoolers.baconbits.client.content.home;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
-import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -23,7 +21,6 @@ import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
-import com.areahomeschoolers.baconbits.shared.dto.Pair;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 import com.google.gwt.dom.client.Style.Cursor;
@@ -32,7 +29,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -241,52 +237,52 @@ public class HomePage implements Page {
 					HorizontalPanel hp = new PaddedPanel(15);
 
 					// links
-					Image linkImage = new Image(MainImageBundle.INSTANCE.link());
-					hp.add(linkImage);
+					// Image linkImage = new Image(MainImageBundle.INSTANCE.link());
+					// hp.add(linkImage);
 
-					List<Pair<String, String>> links = new ArrayList<Pair<String, String>>();
-
-					links.add(new Pair<String, String>("Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
-					if (Application.getCurrentUser().memberOfAny(16, 17)) {
-						links.add(new Pair<String, String>("Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5"));
-					}
-					links.add(new Pair<String, String>("Profile", PageUrl.user(Application.getCurrentUserId())));
-					if (!Application.getCurrentUser().isChild()) {
-						links.add(new Pair<String, String>("Shopping Cart", PageUrl.payment()));
-					}
-					if (!Application.getCurrentUser().isChild()) {
-						links.add(new Pair<String, String>("Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
-					}
-					links.add(new Pair<String, String>("Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=2"));
-					if (!Application.getCurrentUser().isChild()) {
-						links.add(new Pair<String, String>("Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6"));
-					}
-
-					FlexTable ft = new FlexTable();
-					// ft.setWidth("280px");
-					ft.addStyleName("hoverLinkTable");
-					for (int i = 0; i < links.size(); i++) {
-						if (i % 2 == 0) {
-							ft.insertRow(ft.getRowCount());
-						}
-						int row = ft.getRowCount() - 1;
-						int cell = ft.getCellCount(row);
-
-						Pair<String, String> item = links.get(i);
-						Hyperlink link = new Hyperlink(item.getLeft(), item.getRight());
-						ft.setWidget(row, cell, link);
-					}
-					ft.getColumnFormatter().setWidth(0, "50%");
-
-					VerticalPanel lp = new VerticalPanel();
-					lp.add(ft);
-
-					BalanceBox bb = new BalanceBox();
-					bb.populate();
-					lp.add(bb);
-					lp.setCellVerticalAlignment(bb, HasVerticalAlignment.ALIGN_BOTTOM);
-
-					hp.add(lp);
+					// List<Pair<String, String>> links = new ArrayList<Pair<String, String>>();
+					//
+					// links.add(new Pair<String, String>("Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
+					// if (Application.getCurrentUser().memberOfAny(16, 17)) {
+					// links.add(new Pair<String, String>("Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5"));
+					// }
+					// links.add(new Pair<String, String>("Profile", PageUrl.user(Application.getCurrentUserId())));
+					// if (!Application.getCurrentUser().isChild()) {
+					// links.add(new Pair<String, String>("Shopping Cart", PageUrl.payment()));
+					// }
+					// if (!Application.getCurrentUser().isChild()) {
+					// links.add(new Pair<String, String>("Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
+					// }
+					// links.add(new Pair<String, String>("Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=2"));
+					// if (!Application.getCurrentUser().isChild()) {
+					// links.add(new Pair<String, String>("Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6"));
+					// }
+					//
+					// FlexTable ft = new FlexTable();
+					// // ft.setWidth("280px");
+					// ft.addStyleName("hoverLinkTable");
+					// for (int i = 0; i < links.size(); i++) {
+					// if (i % 2 == 0) {
+					// ft.insertRow(ft.getRowCount());
+					// }
+					// int row = ft.getRowCount() - 1;
+					// int cell = ft.getCellCount(row);
+					//
+					// Pair<String, String> item = links.get(i);
+					// Hyperlink link = new Hyperlink(item.getLeft(), item.getRight());
+					// ft.setWidget(row, cell, link);
+					// }
+					// ft.getColumnFormatter().setWidth(0, "50%");
+					//
+					// VerticalPanel lp = new VerticalPanel();
+					// lp.add(ft);
+					//
+					// BalanceBox bb = new BalanceBox();
+					// bb.populate();
+					// lp.add(bb);
+					// lp.setCellVerticalAlignment(bb, HasVerticalAlignment.ALIGN_BOTTOM);
+					//
+					// hp.add(lp);
 
 					// my events
 					if (!pageData.getMyUpcomingEvents().isEmpty()) {
