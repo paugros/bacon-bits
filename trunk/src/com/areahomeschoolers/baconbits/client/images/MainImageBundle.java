@@ -53,6 +53,8 @@ public interface MainImageBundle extends ClientBundle {
 	@Source("file/zip.png")
 	ImageResource fileIconZip();
 
+	ImageResource link();
+
 	ImageResource logo();
 
 	ImageResource mapShadow();

@@ -85,8 +85,6 @@ public class EmailDialog extends DefaultDialog {
 			textArea.getTextArea().setHeight("400px");
 			bp = new ButtonPanel(this);
 			vp.setSpacing(10);
-			// vp.add(new Label("You will be copied on this email."));
-			//
 			PaddedPanel fp = new PaddedPanel();
 			fromBox.setVisibleLength(30);
 			fp.add(new Label("Your email:"));

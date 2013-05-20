@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
@@ -36,6 +37,8 @@ public interface EventServiceAsync {
 	void getEventFieldTypes(AsyncCallback<ArrayList<Data>> callback);
 
 	void getFields(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventField>> callback);
+
+	void getHomePageData(AsyncCallback<HomePageData> callback);
 
 	void getPageData(int id, AsyncCallback<EventPageData> callback);
 
