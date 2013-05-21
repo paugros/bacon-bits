@@ -616,7 +616,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		if (registeredByOrAddedForId > 0) {
 			sql += "and (e.id in(select distinct r.eventId from eventRegistrations r ";
-			sql += "join eventRegistrationParticipants p on p.eventRegistrationId = r.id where r.addedById = ? or p.userId = ?)) \n";
+			sql += "join eventRegistrationParticipants p on p.eventRegistrationId = r.id and p.statusId in(1, 2) where r.addedById = ? or p.userId = ?)) \n";
 			sqlArgs.add(registeredByOrAddedForId);
 			sqlArgs.add(registeredByOrAddedForId);
 		}

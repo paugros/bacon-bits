@@ -171,7 +171,7 @@ public final class Layout {
 				}
 			});
 		} else {
-			logInOrOut.setText("Log in");
+			logInOrOut.setText("Log in / Create account");
 			logInOrOut.addMouseDownHandler(new MouseDownHandler() {
 				@Override
 				public void onMouseDown(MouseDownEvent event) {

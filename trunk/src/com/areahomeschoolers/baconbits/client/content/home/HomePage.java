@@ -1,11 +1,13 @@
 package com.areahomeschoolers.baconbits.client.content.home;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
+import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -19,11 +21,14 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
+import com.areahomeschoolers.baconbits.shared.dto.Pair;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 import com.google.gwt.dom.client.Style.Cursor;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -63,7 +68,12 @@ public class HomePage implements Page {
 
 				String subText = Formatter.formatDateTime(e.getStartDate());
 				if (e.getCategoryId() == 6) {
-					subText += " - " + Formatter.formatCurrency(e.getPrice());
+					subText += " - ";
+					if (e.getPrice() > 0) {
+						subText += Formatter.formatCurrency(e.getPrice());
+					} else {
+						subText += "Free";
+					}
 				}
 				Label date = new Label(subText);
 				date.addStyleName("italic");
@@ -182,6 +192,7 @@ public class HomePage implements Page {
 		}
 
 		rightPanel.add(eventPanel);
+		centerPanel.setSpacing(10);
 		grid.setWidget(0, 0, communityPanel);
 		grid.setWidget(0, 1, centerPanel);
 		grid.setWidget(0, 2, rightPanel);
@@ -229,68 +240,53 @@ public class HomePage implements Page {
 				communityPanel.setWidget(cvp);
 
 				// new
-				if (!pageData.getNewlyAddedEvents().isEmpty()) {
-					centerPanel.add(new EventModulePanel("Newly Added Events", pageData.getNewlyAddedEvents(), "&newlyAdded=1"));
+				if (!Common.isNullOrEmpty(pageData.getNewlyAddedEvents())) {
+					VerticalPanel nvp = new VerticalPanel();
+					nvp.getElement().getStyle().setBackgroundColor("#ffe8eb");
+
+					nvp.setSpacing(8);
+
+					Label label = new Label("Newly Added Events");
+					label.addStyleName("largeText");
+					nvp.add(label);
+
+					for (Event e : pageData.getNewlyAddedEvents()) {
+						HTML h = new HTML();
+						Hyperlink link = new Hyperlink(e.getTitle(), PageUrl.event(e.getId()));
+
+						String ntext = link.toString() + "&nbsp;-&nbsp;";
+						ntext += "<i>" + Formatter.formatDateTime(e.getStartDate()) + "</i><br>";
+
+						h.setHTML(e.getDescription().replaceAll("<br>", " "));
+						String d = h.getText();
+						if (d.length() > 100) {
+							d = d.substring(0, 101) + "...";
+						}
+						ntext += d;
+
+						h.setHTML(ntext);
+						nvp.add(h);
+					}
+
+					String url = PageUrl.eventList() + "&newlyAdded=1";
+					nvp.add(new Hyperlink("See more...", url));
+
+					centerPanel.add(nvp);
 				}
 
 				if (Application.isAuthenticated()) {
-					HorizontalPanel hp = new PaddedPanel(15);
-
-					// links
-					// Image linkImage = new Image(MainImageBundle.INSTANCE.link());
-					// hp.add(linkImage);
-
-					// List<Pair<String, String>> links = new ArrayList<Pair<String, String>>();
-					//
-					// links.add(new Pair<String, String>("Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
-					// if (Application.getCurrentUser().memberOfAny(16, 17)) {
-					// links.add(new Pair<String, String>("Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5"));
-					// }
-					// links.add(new Pair<String, String>("Profile", PageUrl.user(Application.getCurrentUserId())));
-					// if (!Application.getCurrentUser().isChild()) {
-					// links.add(new Pair<String, String>("Shopping Cart", PageUrl.payment()));
-					// }
-					// if (!Application.getCurrentUser().isChild()) {
-					// links.add(new Pair<String, String>("Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
-					// }
-					// links.add(new Pair<String, String>("Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=2"));
-					// if (!Application.getCurrentUser().isChild()) {
-					// links.add(new Pair<String, String>("Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6"));
-					// }
-					//
-					// FlexTable ft = new FlexTable();
-					// // ft.setWidth("280px");
-					// ft.addStyleName("hoverLinkTable");
-					// for (int i = 0; i < links.size(); i++) {
-					// if (i % 2 == 0) {
-					// ft.insertRow(ft.getRowCount());
-					// }
-					// int row = ft.getRowCount() - 1;
-					// int cell = ft.getCellCount(row);
-					//
-					// Pair<String, String> item = links.get(i);
-					// Hyperlink link = new Hyperlink(item.getLeft(), item.getRight());
-					// ft.setWidget(row, cell, link);
-					// }
-					// ft.getColumnFormatter().setWidth(0, "50%");
-					//
-					// VerticalPanel lp = new VerticalPanel();
-					// lp.add(ft);
-					//
-					// BalanceBox bb = new BalanceBox();
-					// bb.populate();
-					// lp.add(bb);
-					// lp.setCellVerticalAlignment(bb, HasVerticalAlignment.ALIGN_BOTTOM);
-					//
-					// hp.add(lp);
+					HorizontalPanel hp = new PaddedPanel(10);
 
 					// my events
-					if (!pageData.getMyUpcomingEvents().isEmpty()) {
+					if (!Common.isNullOrEmpty(pageData.getMyUpcomingEvents())) {
 						VerticalPanel vp = new VerticalPanel();
+						vp.setWidth("250px");
+						vp.addStyleName("dottedBorder");
+						vp.getElement().getStyle().setBackgroundColor("#EEEEEE");
 						vp.setSpacing(8);
 
 						Hyperlink titleLink = new Hyperlink(".:: My Upcoming Events ::.", PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
-						titleLink.addStyleName("largeText");
+						titleLink.addStyleName("largeText nowrap");
 						vp.add(titleLink);
 
 						for (Event e : pageData.getMyUpcomingEvents()) {
@@ -302,7 +298,7 @@ public class HomePage implements Page {
 
 							HTML date = new HTML(Formatter.formatDateTime(e.getStartDate()));
 							date.setWordWrap(false);
-							date.getElement().getStyle().setColor("#555555");
+							// date.getElement().getStyle().setColor("#555555");
 							date.addStyleName("italic");
 							mhp.add(date);
 
@@ -311,6 +307,48 @@ public class HomePage implements Page {
 
 						hp.add(vp);
 					}
+
+					// links
+					List<Pair<String, String>> links = new ArrayList<Pair<String, String>>();
+
+					links.add(new Pair<String, String>("Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
+					if (Application.getCurrentUser().memberOfAny(16, 17)) {
+						links.add(new Pair<String, String>("Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5"));
+					}
+					links.add(new Pair<String, String>("Profile", PageUrl.user(Application.getCurrentUserId())));
+					if (!Application.getCurrentUser().isChild()) {
+						links.add(new Pair<String, String>("Shopping Cart", PageUrl.payment()));
+					}
+					if (!Application.getCurrentUser().isChild()) {
+						links.add(new Pair<String, String>("Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
+					}
+					links.add(new Pair<String, String>("Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=2"));
+					if (!Application.getCurrentUser().isChild()) {
+						links.add(new Pair<String, String>("Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6"));
+					}
+
+					VerticalPanel lp = new VerticalPanel();
+					Label linkLabel = new Label("Links");
+					linkLabel.addStyleName("largeText");
+					linkLabel.getElement().getStyle().setMarginBottom(4, Unit.PX);
+					lp.add(linkLabel);
+
+					for (Pair<String, String> item : links) {
+						Hyperlink link = new Hyperlink(item.getLeft(), item.getRight());
+						lp.add(link);
+					}
+
+					VerticalPanel rp = new VerticalPanel();
+					rp.setSpacing(8);
+
+					rp.add(lp);
+
+					BalanceBox bb = new BalanceBox();
+					bb.populate();
+					rp.add(bb);
+					rp.setCellVerticalAlignment(bb, HasVerticalAlignment.ALIGN_BOTTOM);
+
+					hp.add(rp);
 
 					centerPanel.add(hp);
 				}
