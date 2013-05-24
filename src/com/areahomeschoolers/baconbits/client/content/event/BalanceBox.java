@@ -4,8 +4,8 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
-import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
-import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.rpc.service.PaymentService;
+import com.areahomeschoolers.baconbits.client.rpc.service.PaymentServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.HTML;
 
 public class BalanceBox extends Composite {
 	private HTML label = new HTML();
-	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
+	private PaymentServiceAsync paymentService = (PaymentServiceAsync) ServiceCache.getService(PaymentService.class);
 
 	public BalanceBox() {
 		initWidget(label);
@@ -26,7 +26,7 @@ public class BalanceBox extends Composite {
 	public void populate() {
 		label.setText("");
 
-		eventService.getUnpaidBalance(Application.getCurrentUserId(), new Callback<Data>() {
+		paymentService.getUnpaidBalance(Application.getCurrentUserId(), new Callback<Data>() {
 			@Override
 			protected void doOnSuccess(Data result) {
 				if (result.getDouble("balance") == 0) {

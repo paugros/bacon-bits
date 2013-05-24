@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.PaymentService;
 import com.areahomeschoolers.baconbits.client.rpc.service.PaymentServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
@@ -18,11 +19,13 @@ import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.shared.dto.Adjustment;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class UserPaymentSection {
@@ -34,6 +37,15 @@ public class UserPaymentSection {
 
 	public UserPaymentSection(User u, VerticalPanel tabPanel) {
 		user = u;
+
+		final Label balanceLabel = new Label();
+		balanceLabel.addStyleName("largeText");
+		paymentService.getUnpaidBalance(user.getId(), new Callback<Data>() {
+			@Override
+			protected void doOnSuccess(Data result) {
+				balanceLabel.setText("Outstanding balance: " + Formatter.formatCurrency(result.getDouble("balance")));
+			}
+		});
 
 		ArgMap<PaymentArg> adjustmentArgs = new ArgMap<PaymentArg>(PaymentArg.USER_ID, user.getId());
 		adjustmentTable = new AdjustmentCellTable(adjustmentArgs);
@@ -74,6 +86,7 @@ public class UserPaymentSection {
 		paymentTable.setTitle("Payments");
 		paymentTable.removeColumn(PaymentColumn.USER);
 
+		tabPanel.add(balanceLabel);
 		tabPanel.add(WidgetFactory.newSection(adjustmentTable, ContentWidth.MAXWIDTH1000PX));
 		tabPanel.add(WidgetFactory.newSection(paymentTable, ContentWidth.MAXWIDTH1000PX));
 	}

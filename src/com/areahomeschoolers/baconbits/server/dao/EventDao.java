@@ -56,8 +56,6 @@ public interface EventDao {
 
 	public ArrayList<Data> getRegistrationSummary();
 
-	public Data getUnpaidBalance(int userId);
-
 	public ArrayList<Data> getVolunteers(ArgMap<EventArg> args);
 
 	public ArrayList<Event> list(ArgMap<EventArg> args);

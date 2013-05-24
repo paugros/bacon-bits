@@ -352,7 +352,6 @@ public class HomePage implements Page {
 
 					centerPanel.add(hp);
 				}
-
 				// introduction
 				centerPanel.add(new ArticleWidget(pageData.getIntro()));
 

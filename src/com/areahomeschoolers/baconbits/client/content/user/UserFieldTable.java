@@ -109,8 +109,11 @@ public class UserFieldTable extends FieldTable {
 
 		final FieldDisplayLink emailDisplay = new FieldDisplayLink();
 		final EmailTextBox emailInput = new EmailTextBox();
-		emailInput.setRequired(true);
+		if (user.getParentId() == null || user.getEmail() != null) {
+			emailInput.setRequired(true);
+		}
 		emailInput.setMaxLength(100);
+		emailInput.setVisibleLength(40);
 		FormField emailField = form.createFormField("Email:", emailInput, emailDisplay);
 		emailField.setInitializer(new Command() {
 			@Override

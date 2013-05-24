@@ -241,8 +241,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			pd.setMyUpcomingEvents(list(args));
 		}
 
+		int articleId = ServerContext.isAuthenticated() ? 68 : 6;
 		ArticleDao articleDao = ServerContext.getDaoImpl("article");
-		pd.setIntro(articleDao.getById(6));
+		pd.setIntro(articleDao.getById(articleId));
 
 		return pd;
 	}
@@ -525,19 +526,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		return new ArrayList<Data>(map.values());
-	}
-
-	@Override
-	public Data getUnpaidBalance(int userId) {
-		String sql = "select count(p.id) as itemCount, sum(case isnull(a.price) when true then e.price else a.price end) as balance \n";
-		sql += "from eventRegistrationParticipants p \n";
-		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
-		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
-		sql += "join events e on e.id = r.eventId \n";
-		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
-		sql += "where e.active = 1 and r.addedById = ? and p.statusId = 1";
-
-		return queryForObject(sql, ServerUtils.getGenericRowMapper(), userId);
 	}
 
 	@Override
@@ -1167,6 +1155,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			u.setSex(participant.getSex());
 			if (u.getId() != ServerContext.getCurrentUserId()) {
 				u.setParentId(ServerContext.getCurrentUserId());
+				u.setHomePhone(ServerContext.getCurrentUser().getHomePhone());
+				u.setAddress(ServerContext.getCurrentUser().getAddress());
 			}
 
 			UserDao userDao = ServerContext.getDaoImpl("user");
