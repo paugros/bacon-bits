@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
+import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -29,6 +30,7 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 
 	public CreateUserDialog() {
 		setText("Create Account");
+		setAutoHide(false);
 
 		form.getSubmitButton().setText("Create");
 		form.addFormSubmitHandler(new FormSubmitHandler() {
@@ -37,6 +39,12 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 				userService.save(entity, new Callback<ServerResponseData<User>>() {
 					@Override
 					protected void doOnSuccess(ServerResponseData<User> result) {
+						if (result.hasErrors()) {
+							new ServerResponseDialog(result).center();
+							form.getSubmitButton().setEnabled(true);
+							return;
+						}
+
 						loginService.login(entity.getUserName(), entity.getPassword(), new Callback<Boolean>() {
 							@Override
 							protected void doOnSuccess(Boolean result) {
