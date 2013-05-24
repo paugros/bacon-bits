@@ -251,7 +251,7 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 				if (Common.isAllLowerCase(test) || Common.isAllUpperCase(test)) {
 					value = Common.ucWords(value);
 				}
-				entity.setFirstName(firstNameInput.getText());
+				entity.setFirstName(value);
 			}
 		});
 		fieldTable.addField(firstNameField);

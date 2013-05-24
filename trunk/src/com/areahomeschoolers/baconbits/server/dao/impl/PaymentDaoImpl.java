@@ -166,6 +166,19 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 	}
 
 	@Override
+	public Data getUnpaidBalance(int userId) {
+		String sql = "select count(p.id) as itemCount, sum(case isnull(a.price) when true then e.price else a.price end) as balance \n";
+		sql += "from eventRegistrationParticipants p \n";
+		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
+		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
+		sql += "join events e on e.id = r.eventId \n";
+		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
+		sql += "where e.active = 1 and r.addedById = ? and p.statusId = 1";
+
+		return queryForObject(sql, ServerUtils.getGenericRowMapper(), userId);
+	}
+
+	@Override
 	public ArrayList<Payment> list(ArgMap<PaymentArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int userId = args.getInt(PaymentArg.USER_ID);

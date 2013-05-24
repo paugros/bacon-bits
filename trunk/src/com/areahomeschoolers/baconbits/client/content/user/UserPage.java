@@ -98,7 +98,6 @@ public class UserPage implements Page {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private UserFieldTable fieldTable;
 	private TabPage tabPanel;
-	private boolean addingChild;
 
 	private BookDialog bookDialog;
 
@@ -109,9 +108,6 @@ public class UserPage implements Page {
 		}
 
 		int userId = Url.getIntegerParameter("userId");
-		if (userId < 0 && (Url.getIntegerParameter("pp") == 1 || !Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS))) {
-			addingChild = true;
-		}
 
 		if (!Application.isAuthenticated() && userId < 0) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
@@ -129,10 +125,6 @@ public class UserPage implements Page {
 				}
 
 				user = result.getUser();
-
-				if (addingChild) {
-					user.setParentId(Application.getCurrentUserId());
-				}
 
 				if (user.isSaved()) {
 					HorizontalPanel hp = new HorizontalPanel();
@@ -313,8 +305,19 @@ public class UserPage implements Page {
 						ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 						args.put(UserArg.PARENT_ID, user.getId());
 
-						UserCellTable table = new UserCellTable(args);
-						Hyperlink addChild = new Hyperlink("Add", PageUrl.user(0) + "&pp=1");
+						final UserCellTable table = new UserCellTable(args);
+						ClickLabel addChild = new ClickLabel("Add Family Member", new MouseDownHandler() {
+							@Override
+							public void onMouseDown(MouseDownEvent event) {
+								CreateFamilyMemberDialog dialog = new CreateFamilyMemberDialog(user, new Command() {
+									@Override
+									public void execute() {
+										table.populate();
+									}
+								});
+								dialog.center(new User());
+							}
+						});
 						table.getTitleBar().addLink(addChild);
 						table.removeColumn(UserColumn.HOME_PHONE);
 						table.removeColumn(UserColumn.MOBILE_PHONE);
