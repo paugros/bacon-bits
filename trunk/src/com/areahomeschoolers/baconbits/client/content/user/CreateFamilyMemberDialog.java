@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
+import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -23,6 +24,7 @@ public class CreateFamilyMemberDialog extends EntityEditDialog<User> {
 
 	public CreateFamilyMemberDialog(User parent, final Command saveCommand) {
 		setText("Add Family Member");
+		setAutoHide(false);
 
 		this.parent = parent;
 
@@ -33,6 +35,12 @@ public class CreateFamilyMemberDialog extends EntityEditDialog<User> {
 				userService.save(entity, new Callback<ServerResponseData<User>>() {
 					@Override
 					protected void doOnSuccess(ServerResponseData<User> result) {
+						if (result.hasErrors()) {
+							new ServerResponseDialog(result).center();
+							form.getSubmitButton().setEnabled(true);
+							return;
+						}
+
 						saveCommand.execute();
 						hide();
 					}
