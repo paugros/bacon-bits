@@ -204,17 +204,6 @@ public class ServerSuggestOracle extends SuggestOracle {
 			return;
 		}
 
-		if (suggestType.equals("Contact")) {
-			String queryToken = request.getQuery();
-			for (char c : queryToken.toCharArray()) {
-				if (!Character.isLetter(c)) {
-					queryToken = queryToken.replaceAll("[^\\d]", "");
-					request.setQuery(queryToken);
-					break;
-				}
-			}
-		}
-
 		requestInProgress = true;
 		namesService.getSuggestions(request.getQuery(), suggestType, numberOfServerSuggestions, options, new AsyncCallback<ArrayList<ServerSuggestion>>() {
 			@Override

@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.Suggestible;
+import com.areahomeschoolers.baconbits.server.dao.TagDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.util.Mailer;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
@@ -31,12 +32,14 @@ import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -152,10 +155,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
-	public UserPageData getPageData(int userId) {
+	public UserPageData getPageData(final int userId) {
 		UserPageData pd = new UserPageData();
 		if (userId > 0) {
 			pd.setUser(getById(userId));
+			TagDao tagDao = ServerContext.getDaoImpl("tag");
+			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.ENTITY_ID, userId);
+			args.put(TagArg.MAPPING_TYPE, TagMappingType.USER.toString());
+			pd.setInterests(tagDao.list(args));
 
 			if (pd.getUser() == null) {
 				return null;
