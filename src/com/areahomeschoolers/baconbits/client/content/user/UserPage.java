@@ -36,6 +36,7 @@ import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
+import com.areahomeschoolers.baconbits.client.widgets.TagSection;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
@@ -44,6 +45,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -98,6 +100,7 @@ public class UserPage implements Page {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private UserFieldTable fieldTable;
 	private TabPage tabPanel;
+	private UserPageData pageData;
 
 	private BookDialog bookDialog;
 
@@ -123,6 +126,7 @@ public class UserPage implements Page {
 					new ErrorPage(PageError.PAGE_NOT_FOUND);
 					return;
 				}
+				pageData = result;
 
 				user = result.getUser();
 
@@ -173,6 +177,10 @@ public class UserPage implements Page {
 				@Override
 				public void execute(VerticalPanel tabBody) {
 					tabBody.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
+					// interests
+					if (Application.getCurrentUser().getSystemAdministrator()) {
+						tabBody.add(new TagSection(TagMappingType.USER, user.getId(), pageData.getInterests()));
+					}
 
 					tabPanel.selectTabNow(tabBody);
 				}

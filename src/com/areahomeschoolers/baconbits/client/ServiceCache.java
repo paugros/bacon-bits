@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.PaymentService;
 import com.areahomeschoolers.baconbits.client.rpc.service.SuggestService;
+import com.areahomeschoolers.baconbits.client.rpc.service.TagService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserPreferenceService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -58,6 +59,8 @@ public class ServiceCache {
 				proxy = (RemoteServiceProxy) GWT.create(SuggestService.class);
 			} else if ("PaymentService".equals(className)) {
 				proxy = (RemoteServiceProxy) GWT.create(PaymentService.class);
+			} else if ("TagService".equals(className)) {
+				proxy = (RemoteServiceProxy) GWT.create(TagService.class);
 			}
 
 			services.put(serviceClass, proxy);

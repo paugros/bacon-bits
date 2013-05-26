@@ -41,6 +41,13 @@ public interface Arg {
 		}
 	}
 
+	public enum TagArg implements Arg, IsSerializable {
+		ENTITY_ID, MAPPING_TYPE, MAPPING_ID;
+		private TagArg() {
+
+		}
+	}
+
 	public enum UserArg implements Arg, IsSerializable {
 		USER_ID, PARENT_ID_PLUS_SELF, PARENT_ID, NOT_ON_REGISTRATION_ID, GROUP_ID;
 
