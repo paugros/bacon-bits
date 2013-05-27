@@ -9,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagService;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -53,6 +54,7 @@ public class TagSection extends Composite {
 					tagService.deleteMapping(tag, new Callback<Void>(false) {
 						@Override
 						protected void doOnSuccess(Void result) {
+							tags.remove(tag);
 						}
 					});
 				}
@@ -99,6 +101,7 @@ public class TagSection extends Composite {
 		suggestBox = new EntitySuggestBox("Tag");
 		suggestBox.getTextBox().setWidth("150px");
 		suggestBox.getTextBox().getElement().setAttribute("maxlength", "25");
+		allowedChars.addAll(ClientUtils.ALLOWED_KEY_CODES);
 		allowedChars.add(new Character(' '));
 		suggestBox.getTextBox().addKeyPressHandler(new KeyPressHandler() {
 			@Override
@@ -106,8 +109,8 @@ public class TagSection extends Composite {
 				Character characterCode = (char) event.getNativeEvent().getCharCode();
 				Character keyCode = (char) event.getNativeEvent().getKeyCode();
 
-				if ((!Character.isDigit(characterCode) && !Character.isLetter(characterCode) && !allowedChars.contains(characterCode) && !allowedChars
-						.contains(keyCode)) || event.isShiftKeyDown()) {
+				if (!Character.isDigit(characterCode) && !Character.isLetter(characterCode) && !allowedChars.contains(characterCode)
+						&& !allowedChars.contains(keyCode)) {
 					event.preventDefault();
 				}
 			}
@@ -185,6 +188,7 @@ public class TagSection extends Composite {
 			@Override
 			protected void doOnSuccess(Tag result) {
 				fp.add(new TagWidget(result));
+				tags.add(result);
 			}
 		});
 	}
