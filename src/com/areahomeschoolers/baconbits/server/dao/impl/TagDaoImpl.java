@@ -120,6 +120,8 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				sql += "and tm.id = ? ";
 				sqlArgs.add(mappingId);
 			}
+
+			sql += "order by tm.id";
 		}
 
 		return query(sql, new RowMapper<Tag>() {
