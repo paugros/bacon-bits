@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.EntitySuggestBox;
@@ -16,8 +17,11 @@ import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -58,7 +62,9 @@ public class TagSection extends Composite {
 			x.getElement().getStyle().setPadding(4, Unit.PX);
 
 			hp.add(label);
-			hp.add(x);
+			if (editingEnabled) {
+				hp.add(x);
+			}
 			hp.setCellVerticalAlignment(x, HasVerticalAlignment.ALIGN_MIDDLE);
 			initWidget(hp);
 		}
@@ -70,12 +76,48 @@ public class TagSection extends Composite {
 	private Button add = new Button("Add");
 	private FlowPanel fp = new FlowPanel();
 	private TagServiceAsync tagService = (TagServiceAsync) ServiceCache.getService(TagService.class);
+	private TagMappingType mappingType;
+	private int entityId;
+	private final List<Character> allowedChars = new ArrayList<Character>();
+	private boolean editingEnabled;
 
-	public TagSection(final TagMappingType mappingType, final int entityId, ArrayList<Tag> t) {
+	public TagSection(TagMappingType mappingType, int entityId, ArrayList<Tag> t) {
 		this.tags = t;
+		this.mappingType = mappingType;
+		this.entityId = entityId;
 
+		// populate();
+
+		initWidget(vp);
+	}
+
+	public boolean isEditingEnabled() {
+		return editingEnabled;
+	}
+
+	public void populate() {
 		suggestBox = new EntitySuggestBox("Tag");
 		suggestBox.getTextBox().setWidth("150px");
+		suggestBox.getTextBox().getElement().setAttribute("maxlength", "25");
+		allowedChars.add(new Character(' '));
+		suggestBox.getTextBox().addKeyPressHandler(new KeyPressHandler() {
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				Character characterCode = (char) event.getNativeEvent().getCharCode();
+				Character keyCode = (char) event.getNativeEvent().getKeyCode();
+
+				if ((!Character.isDigit(characterCode) && !Character.isLetter(characterCode) && !allowedChars.contains(characterCode) && !allowedChars
+						.contains(keyCode)) || event.isShiftKeyDown()) {
+					event.preventDefault();
+				}
+			}
+		});
+		suggestBox.setSubmitWithoutSelectionCommand(new Command() {
+			@Override
+			public void execute() {
+				addNewTag();
+			}
+		});
 		suggestBox.setSelectionHandler(new ParameterHandler<Integer>() {
 			@Override
 			public void execute(Integer tagId) {
@@ -84,12 +126,12 @@ public class TagSection extends Composite {
 				tag.setMappingType(mappingType);
 				tag.setEntityId(entityId);
 				suggestBox.reset();
-				tagService.addMapping(tag, new Callback<Tag>() {
-					@Override
-					protected void doOnSuccess(Tag result) {
-						fp.add(new TagWidget(result));
-					}
-				});
+
+				if (tags.contains(tag)) {
+					return;
+				}
+
+				saveTagMapping(tag);
 			}
 		});
 		suggestBox.setResetHandler(new ParameterHandler<SuggestBox>() {
@@ -99,25 +141,52 @@ public class TagSection extends Composite {
 			}
 		});
 		suggestBox.setClearOnFocus(true);
+		suggestBox.setAutoSelectEnabled(false);
 
-		fp.setWidth("550px");
+		fp.setWidth("600px");
 		vp.setSpacing(8);
 		HorizontalPanel hp = new HorizontalPanel();
 		add.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-
+				addNewTag();
 			}
 		});
 		hp.add(suggestBox);
 		hp.add(add);
-		vp.add(hp);
+		hp.setCellVerticalAlignment(add, HasVerticalAlignment.ALIGN_MIDDLE);
+
+		if (editingEnabled) {
+			vp.add(hp);
+		}
+
 		vp.add(fp);
 
 		for (Tag tag : tags) {
 			fp.add(new TagWidget(tag));
 		}
-
-		initWidget(vp);
 	}
+
+	public void setEditingEnabled(boolean editingEnabled) {
+		this.editingEnabled = editingEnabled;
+	}
+
+	private void addNewTag() {
+		Tag tag = new Tag();
+		tag.setName(suggestBox.getValue());
+		tag.setMappingType(mappingType);
+		tag.setEntityId(entityId);
+
+		saveTagMapping(tag);
+	}
+
+	private void saveTagMapping(Tag tag) {
+		tagService.addMapping(tag, new Callback<Tag>() {
+			@Override
+			protected void doOnSuccess(Tag result) {
+				fp.add(new TagWidget(result));
+			}
+		});
+	}
+
 }

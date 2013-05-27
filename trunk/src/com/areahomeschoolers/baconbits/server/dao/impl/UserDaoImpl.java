@@ -314,7 +314,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		// verify no duplicate name in same family
-		if (user.getParentId() > 0) {
+		if (user.isChild()) {
 			sql = "select count(id) from users where lower(firstName) = ? and lower(lastName) = ? and parentId = ? and id != ?";
 			conflict = queryForInt(sql, user.getFirstName().toLowerCase(), user.getLastName().toLowerCase(), user.getParentId(), user.getId());
 

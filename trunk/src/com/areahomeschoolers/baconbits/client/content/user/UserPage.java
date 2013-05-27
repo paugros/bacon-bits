@@ -176,10 +176,26 @@ public class UserPage implements Page {
 			tabPanel.add("Profile", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					tabBody.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
+					tabBody.add(WidgetFactory.newSection("Basic Information", fieldTable, ContentWidth.MAXWIDTH1100PX));
 					// interests
 					if (Application.getCurrentUser().getSystemAdministrator()) {
-						tabBody.add(new TagSection(TagMappingType.USER, user.getId(), pageData.getInterests()));
+						VerticalPanel tp = new VerticalPanel();
+						Label heading = new Label("My Interests");
+						heading.addStyleName("hugeText");
+						tp.add(heading);
+						String txt = "Interests can be anything: hobbies, academic topics, religions, curriculum publishers, teaching styles, recreational activities, sports, or whatever else. ";
+						txt += "We'll use these interests to help you find other homeschoolers with similar interests, and to show you events, articles and books relating to your interests. ";
+						txt += "The most useful interests are neither too general nor too specific.";
+						Label sub = new Label(txt);
+						sub.getElement().getStyle().setColor("#666666");
+						tp.add(sub);
+						tp.setWidth("600px");
+
+						tabBody.add(tp);
+						TagSection ts = new TagSection(TagMappingType.USER, user.getId(), pageData.getInterests());
+						ts.setEditingEnabled(user.getId() == Application.getCurrentUserId());
+						ts.populate();
+						tabBody.add(ts);
 					}
 
 					tabPanel.selectTabNow(tabBody);
