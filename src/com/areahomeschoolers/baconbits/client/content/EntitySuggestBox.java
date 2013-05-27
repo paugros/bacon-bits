@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SuggestBox;
@@ -27,6 +28,7 @@ public class EntitySuggestBox extends Composite {
 	private boolean selecting, clearOnFocus;
 	private ParameterHandler<Integer> selectionHandler;
 	private ParameterHandler<SuggestBox> resetHandler;
+	private Command submitWithoutSelectionCommand;
 
 	public EntitySuggestBox(String suggestType) {
 		oracle = new ServerSuggestOracle(suggestType);
@@ -74,12 +76,14 @@ public class EntitySuggestBox extends Composite {
 			}
 		});
 
-		suggestBox.addKeyDownHandler(new KeyDownHandler() {
+		suggestBox.getValueBox().addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				switch (event.getNativeKeyCode()) {
 				case KeyCodes.KEY_ENTER:
-					break;
+					if (!selecting) {
+						submitWithoutSelectionCommand.execute();
+					}
 				case KeyCodes.KEY_ESCAPE:
 					reset();
 					break;
@@ -90,6 +94,10 @@ public class EntitySuggestBox extends Composite {
 
 	public ValueBoxBase<String> getTextBox() {
 		return suggestBox.getValueBox();
+	}
+
+	public String getValue() {
+		return suggestBox.getValue();
 	}
 
 	public boolean isClearOnFocus() {
@@ -103,6 +111,10 @@ public class EntitySuggestBox extends Composite {
 		if (resetHandler != null) {
 			resetHandler.execute(suggestBox);
 		}
+	}
+
+	public void setAutoSelectEnabled(boolean enabled) {
+		suggestBox.setAutoSelectEnabled(enabled);
 	}
 
 	public void setClearOnFocus(boolean clearOnFocus) {
@@ -120,6 +132,10 @@ public class EntitySuggestBox extends Composite {
 
 	public void setSelectionHandler(ParameterHandler<Integer> handler) {
 		selectionHandler = handler;
+	}
+
+	public void setSubmitWithoutSelectionCommand(Command command) {
+		submitWithoutSelectionCommand = command;
 	}
 
 	public void setText(String text) {

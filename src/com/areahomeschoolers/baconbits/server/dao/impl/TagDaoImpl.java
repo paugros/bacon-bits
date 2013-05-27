@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.dao.TagDao;
+import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -36,17 +37,47 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 	}
 
 	@Override
-	public Tag addMapping(Tag mappingTag) {
-		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(mappingTag);
+	public Tag addMapping(Tag tag) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(tag);
+		String sql = "";
+		if (!tag.isSaved()) {
+			// new tag dupe validation
+			String name = tag.getName();
 
-		String sql = "insert into " + mappingTag.getMappingTable() + "(" + mappingTag.getMappingColumn() + ", tagId) ";
+			name = name.trim();
+			name = name.replaceAll("[^0-9A-Za-z ]+", "");
+			name = name.replaceAll("\\s+", " ");
+
+			String[] words = name.split(" ");
+			for (int i = 0; i < words.length; i++) {
+				String word = words[i];
+				if (Common.isAllLowerCase(word)) {
+					words[i] = Common.ucWords(word);
+				}
+			}
+
+			String nameout = Common.join(words, " ");
+			int tagId = queryForInt(0, "select id from tags where lower(name) = ?", nameout.toLowerCase());
+			if (tagId > 0) {
+				tag.setId(tagId);
+			} else {
+				tag.setName(nameout);
+				tag.setAddedById(ServerContext.getCurrentUserId());
+				sql = "insert into tags (name, addedById) values(:name, :addedById)";
+				KeyHolder keys = new GeneratedKeyHolder();
+				update(sql, namedParams, keys);
+				tag.setId(ServerUtils.getIdFromKeys(keys));
+			}
+		}
+
+		sql = "insert into " + tag.getMappingTable() + "(" + tag.getMappingColumn() + ", tagId) ";
 		sql += "values(:entityId, :id)";
 
 		KeyHolder keys = new GeneratedKeyHolder();
 		update(sql, namedParams, keys);
 
 		ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_ID, ServerUtils.getIdFromKeys(keys));
-		args.put(TagArg.MAPPING_TYPE, mappingTag.getMappingType().toString());
+		args.put(TagArg.MAPPING_TYPE, tag.getMappingType().toString());
 		return list(args).get(0);
 	}
 
