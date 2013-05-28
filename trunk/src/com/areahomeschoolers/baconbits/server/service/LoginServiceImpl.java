@@ -17,10 +17,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
+import com.areahomeschoolers.baconbits.server.dao.TagDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
@@ -43,6 +47,13 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 
 		ApplicationData ap = new ApplicationData();
 		ap.setCurrentUser(user);
+
+		if (user != null) {
+			TagDao tagDao = ServerContext.getDaoImpl("tag");
+			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_TYPE, TagMappingType.USER.toString());
+			args.put(TagArg.ENTITY_ID, user.getId());
+			ap.setInterests(tagDao.list(args));
+		}
 
 		return ap;
 	}
