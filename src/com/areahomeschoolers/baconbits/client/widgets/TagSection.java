@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.EntitySuggestBox;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
@@ -13,9 +14,6 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
-import com.google.gwt.dom.client.Style.BorderStyle;
-import com.google.gwt.dom.client.Style.Display;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -36,17 +34,12 @@ public class TagSection extends Composite {
 	private class TagWidget extends Composite {
 		public TagWidget(final Tag tag) {
 			HorizontalPanel hp = new HorizontalPanel();
-			hp.getElement().getStyle().setBackgroundColor("#d2d6ec");
-			hp.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-			hp.getElement().getStyle().setBorderWidth(1, Unit.PX);
-			hp.getElement().getStyle().setBorderColor("#6974be");
-			hp.getElement().getStyle().setColor("#2b3262");
-			hp.getElement().getStyle().setMarginRight(5, Unit.PX);
-			hp.getElement().getStyle().setMarginBottom(2, Unit.PX);
-			hp.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
+			hp.addStyleName("TagWidget");
+			if (Application.getApplicationData().getInterests().contains(tag)) {
+				hp.addStyleDependentName("common");
+			}
+
 			Label label = new Label(tag.getName());
-			label.getElement().getStyle().setPadding(4, Unit.PX);
-			label.getElement().getStyle().setPaddingLeft(8, Unit.PX);
 			ClickLabel x = new ClickLabel("x", new MouseDownHandler() {
 				@Override
 				public void onMouseDown(MouseDownEvent event) {
@@ -59,9 +52,7 @@ public class TagSection extends Composite {
 					});
 				}
 			});
-			x.getElement().getStyle().setColor("#444444");
-			x.getElement().getStyle().setMarginRight(4, Unit.PX);
-			x.getElement().getStyle().setPadding(4, Unit.PX);
+			x.addStyleName("tagX");
 
 			hp.add(label);
 			if (editingEnabled) {

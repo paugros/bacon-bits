@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
@@ -10,6 +11,7 @@ public class ApplicationData implements IsSerializable {
 	private Data userPreferences;
 	private LinkedHashMap<Integer, Date> userActivity;
 	private boolean isLive;
+	private ArrayList<Tag> interests = new ArrayList<Tag>();
 
 	public ApplicationData() {
 
@@ -17,6 +19,10 @@ public class ApplicationData implements IsSerializable {
 
 	public User getCurrentUser() {
 		return currentUser;
+	}
+
+	public ArrayList<Tag> getInterests() {
+		return interests;
 	}
 
 	public LinkedHashMap<Integer, Date> getUserActivity() {
@@ -33,6 +39,10 @@ public class ApplicationData implements IsSerializable {
 
 	public void setCurrentUser(User currentUser) {
 		this.currentUser = currentUser;
+	}
+
+	public void setInterests(ArrayList<Tag> interests) {
+		this.interests = interests;
 	}
 
 	public void setLive(boolean isLive) {

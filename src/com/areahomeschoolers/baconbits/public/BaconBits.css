@@ -371,35 +371,6 @@ img {
 	text-decoration: none;
 }
 
-.percentageBar-blue {
-	background-color: #004DFF;
-	border: 1px solid #001DDF;
-}
-
-.percentageBar-empty {
-	background-color: #E5E5E5;
-	border: 1px solid #C5C5C5;
-}
-
-.percentageBar-green {
-	background-color: #008800;
-	border: 1px solid #005500;
-}
-
-.percentageBar-red {
-	background-color: #FF0000;
-	border: 1px solid #550000;
-}
-
-.percentageBar-leftBorder {
-	border-left: 3px solid black;
-}
-
-.percentageBar-yellow {
-	background-color: #F1B421;
-	border: 1px solid #805F11;
-}
-
 .sectionContent {
 	width: 100%;
 	padding: 6px 2px;
@@ -439,6 +410,28 @@ img {
 .sessionPanel {
 	padding-left: 20px;
 	padding-right: 10px;
+}
+
+.TagWidget {
+	background-color: #d2d6ec;
+	border: 1px solid #6974be;
+	color: #2b3262;
+	margin-right: 5px;
+	margin-bottom: 2px;
+	display: inline-block;
+}
+
+.TagWidget-common {
+	background-color: #c5eabf;
+	border: 2px solid #439b33;
+}
+
+.TagWidget td {
+	padding: 4px;
+}
+
+.tagX {
+	color: #444444;
 }
 
 .StatusPanel {
