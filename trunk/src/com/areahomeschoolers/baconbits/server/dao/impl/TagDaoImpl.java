@@ -141,26 +141,4 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		}, sqlArgs.toArray());
 	}
 
-	@Override
-	public Tag save(Tag tag) {
-		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(tag);
-
-		if (tag.isSaved()) {
-			String sql = "update tags set title = :title, tag = :tag, startDate = :startDate, endDate = :endDate, ";
-			sql += "groupId = :groupId, accessLevelId = :accessLevelId ";
-			sql += "where id = :id";
-			update(sql, namedParams);
-		} else {
-			String sql = "insert into tags (addedById, startDate, endDate, addedDate, title, tag, groupId, accessLevelId) values ";
-			sql += "(:addedById, :startDate, :endDate, now(), :title, :tag, :groupId, :accessLevelId)";
-
-			KeyHolder keys = new GeneratedKeyHolder();
-			update(sql, namedParams, keys);
-
-			tag.setId(ServerUtils.getIdFromKeys(keys));
-		}
-
-		return tag;
-	}
-
 }

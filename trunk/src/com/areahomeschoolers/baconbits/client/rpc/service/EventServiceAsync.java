@@ -19,55 +19,54 @@ import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface EventServiceAsync {
+	public void createSeries(Event event, AsyncCallback<Void> callback);
 
-	void createSeries(Event event, AsyncCallback<Void> callback);
+	public void deleteAgeGroup(EventAgeGroup ageGroup, AsyncCallback<Void> callback);
 
-	void deleteAgeGroup(EventAgeGroup ageGroup, AsyncCallback<Void> callback);
+	public void deleteEventField(int fieldId, AsyncCallback<Void> callback);
 
-	void deleteEventField(int fieldId, AsyncCallback<Void> callback);
+	public void deleteEventParticipant(EventParticipant participant, AsyncCallback<Void> callback);
 
-	void deleteEventParticipant(EventParticipant participant, AsyncCallback<Void> callback);
+	public void deleteVolunteerPosition(EventVolunteerPosition position, AsyncCallback<Void> callback);
 
-	void deleteVolunteerPosition(EventVolunteerPosition position, AsyncCallback<Void> callback);
+	public void deleteVolunteerPositionMapping(int id, AsyncCallback<Void> callback);
 
-	void deleteVolunteerPositionMapping(int id, AsyncCallback<Void> callback);
+	public void getById(int id, AsyncCallback<Event> callback);
 
-	void getById(int id, AsyncCallback<Event> callback);
+	public void getEventFieldTypes(AsyncCallback<ArrayList<Data>> callback);
 
-	void getEventFieldTypes(AsyncCallback<ArrayList<Data>> callback);
+	public void getFields(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventField>> callback);
 
-	void getFields(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventField>> callback);
+	public void getHomePageData(AsyncCallback<HomePageData> callback);
 
-	void getHomePageData(AsyncCallback<HomePageData> callback);
+	public void getPageData(int id, AsyncCallback<EventPageData> callback);
 
-	void getPageData(int id, AsyncCallback<EventPageData> callback);
+	public void getParticipants(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventParticipant>> callback);
 
-	void getParticipants(ArgMap<EventArg> args, AsyncCallback<ArrayList<EventParticipant>> callback);
+	public void getParticipantStatusList(AsyncCallback<ArrayList<Data>> callback);
 
-	void getParticipantStatusList(AsyncCallback<ArrayList<Data>> callback);
+	public void getRegistrationSummary(AsyncCallback<ArrayList<Data>> callback);
 
-	void getRegistrationSummary(AsyncCallback<ArrayList<Data>> callback);
+	public void getVolunteers(ArgMap<EventArg> args, AsyncCallback<ArrayList<Data>> callback);
 
-	void getVolunteers(ArgMap<EventArg> args, AsyncCallback<ArrayList<Data>> callback);
+	public void list(ArgMap<EventArg> args, AsyncCallback<ArrayList<Event>> callback);
 
-	void list(ArgMap<EventArg> args, AsyncCallback<ArrayList<Event>> callback);
+	public void overrideParticipantStatus(EventParticipant participant, AsyncCallback<Void> callback);
 
-	void overrideParticipantStatus(EventParticipant participant, AsyncCallback<Void> callback);
+	public void payForEvents(ArrayList<Integer> participantIds, AsyncCallback<PaypalData> callback);
 
-	void payForEvents(ArrayList<Integer> participantIds, AsyncCallback<PaypalData> callback);
+	public void save(Event event, AsyncCallback<Event> callback);
 
-	void save(Event event, AsyncCallback<Event> callback);
+	public void saveAgeGroup(EventAgeGroup ageGroup, AsyncCallback<EventAgeGroup> callback);
 
-	void saveAgeGroup(EventAgeGroup ageGroup, AsyncCallback<EventAgeGroup> callback);
+	public void saveEventField(EventField field, AsyncCallback<EventField> callback);
 
-	void saveEventField(EventField field, AsyncCallback<EventField> callback);
+	public void saveParticipant(EventParticipant participant, AsyncCallback<ServerResponseData<ArrayList<EventParticipant>>> callback);
 
-	void saveParticipant(EventParticipant participant, AsyncCallback<ServerResponseData<ArrayList<EventParticipant>>> callback);
+	public void saveRegistration(EventRegistration registration, AsyncCallback<EventRegistration> callback);
 
-	void saveRegistration(EventRegistration registration, AsyncCallback<EventRegistration> callback);
+	public void saveVolunteerPosition(EventVolunteerPosition position, AsyncCallback<EventVolunteerPosition> callback);
 
-	void saveVolunteerPosition(EventVolunteerPosition position, AsyncCallback<EventVolunteerPosition> callback);
-
-	void setVolunteerFulFilled(int id, boolean fulfilled, AsyncCallback<Void> callback);
+	public void setVolunteerFulFilled(int id, boolean fulfilled, AsyncCallback<Void> callback);
 
 }

@@ -11,18 +11,17 @@ import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface PaymentServiceAsync {
+	public void deleteAdjustment(int adjustmentId, AsyncCallback<Void> callback);
 
-	void deleteAdjustment(int adjustmentId, AsyncCallback<Void> callback);
+	public void getAdjustments(ArgMap<PaymentArg> args, AsyncCallback<ArrayList<Adjustment>> callback);
 
-	void getAdjustments(ArgMap<PaymentArg> args, AsyncCallback<ArrayList<Adjustment>> callback);
+	public void getById(int paymentId, AsyncCallback<Payment> callback);
 
-	void getById(int paymentId, AsyncCallback<Payment> callback);
+	public void getUnpaidBalance(int userId, AsyncCallback<Data> callback);
 
-	void getUnpaidBalance(int userId, AsyncCallback<Data> callback);
+	public void list(ArgMap<PaymentArg> args, AsyncCallback<ArrayList<Payment>> callback);
 
-	void list(ArgMap<PaymentArg> args, AsyncCallback<ArrayList<Payment>> callback);
+	public void save(Payment payment, AsyncCallback<Payment> callback);
 
-	void save(Payment payment, AsyncCallback<Payment> callback);
-
-	void saveAdjustment(Adjustment adjustment, AsyncCallback<Adjustment> callback);
+	public void saveAdjustment(Adjustment adjustment, AsyncCallback<Adjustment> callback);
 }

@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagService;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -75,6 +76,7 @@ public class TagSection extends Composite {
 	private int entityId;
 	private final List<Character> allowedChars = new ArrayList<Character>();
 	private boolean editingEnabled;
+	private final static String MAX_MESSAGE = "You already have the maximum number of interests (" + Constants.maxInterests + ").";
 
 	public TagSection(TagMappingType mappingType, int entityId, ArrayList<Tag> t) {
 		this.tags = t;
@@ -168,6 +170,11 @@ public class TagSection extends Composite {
 	}
 
 	private void addNewTag() {
+		if (tags.size() >= Constants.maxInterests) {
+			AlertDialog.alert(MAX_MESSAGE);
+			return;
+		}
+
 		Tag tag = new Tag();
 		tag.setName(suggestBox.getValue());
 		tag.setMappingType(mappingType);
@@ -177,6 +184,11 @@ public class TagSection extends Composite {
 	}
 
 	private void saveTagMapping(Tag tag) {
+		if (tags.size() >= Constants.maxInterests) {
+			AlertDialog.alert(MAX_MESSAGE);
+			return;
+		}
+
 		tagService.addMapping(tag, new Callback<Tag>() {
 			@Override
 			protected void doOnSuccess(Tag result) {

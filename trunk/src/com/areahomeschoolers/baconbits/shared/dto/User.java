@@ -41,6 +41,7 @@ public final class User extends EntityDto<User> {
 	private String groupsText;
 	private boolean generatePassword;
 	private HashSet<AccessLevel> accessLevels;
+	private boolean isChild;
 
 	public User() {
 
@@ -188,7 +189,7 @@ public final class User extends EntityDto<User> {
 	}
 
 	public boolean isChild() {
-		return parentId != null && parentId != 0;
+		return isChild;
 	}
 
 	public boolean isSwitched() {
@@ -233,6 +234,10 @@ public final class User extends EntityDto<User> {
 
 	public void setCanSwitch(boolean canSwitch) {
 		this.canSwitch = canSwitch;
+	}
+
+	public void setChild(boolean isChild) {
+		this.isChild = isChild;
 	}
 
 	public void setEmail(String email) {

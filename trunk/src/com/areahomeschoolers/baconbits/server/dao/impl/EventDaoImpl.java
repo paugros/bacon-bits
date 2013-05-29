@@ -555,7 +555,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		if (args.getStatus() != Status.ALL) {
 			if (args.getStatus() == Status.ACTIVE) {
-				sql += "and e.endDate > adddate(now(), INTERVAL -2 DAY) \n";
+				sql += "and e.endDate > date_add(now(), interval -2 day) \n";
 			} else {
 				sql += "and e.endDate < now() \n";
 			}

@@ -5,15 +5,15 @@ import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface LoginServiceAsync {
-	void getApplicationData(AsyncCallback<ApplicationData> callback);
+	public void getApplicationData(AsyncCallback<ApplicationData> callback);
 
-	void login(String username, String password, AsyncCallback<Boolean> callback);
+	public void login(String username, String password, AsyncCallback<Boolean> callback);
 
-	void loginAndGetApplicationData(String username, String password, AsyncCallback<ApplicationData> callback);
+	public void loginAndGetApplicationData(String username, String password, AsyncCallback<ApplicationData> callback);
 
-	void loginForPasswordReset(int id, String digest, AsyncCallback<ApplicationData> callback);
+	public void loginForPasswordReset(int id, String digest, AsyncCallback<ApplicationData> callback);
 
-	void logout(AsyncCallback<Void> callback);
+	public void logout(AsyncCallback<Void> callback);
 
-	void sendPasswordResetEmail(String username, AsyncCallback<Boolean> callback);
+	public void sendPasswordResetEmail(String username, AsyncCallback<Boolean> callback);
 }

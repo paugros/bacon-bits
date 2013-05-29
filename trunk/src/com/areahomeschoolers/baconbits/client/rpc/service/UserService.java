@@ -37,13 +37,13 @@ public interface UserService extends RemoteService {
 
 	public void sendEmail(Email email);
 
+	public void switchToUser(int userId);
+
+	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add);
+
+	public void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add);
+
+	public void updateUserGroupRelation(User u, UserGroup g, boolean add);
+
 	public ServerResponseData<String> validatePassword(String password);
-
-	void switchToUser(int userId);
-
-	void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add);
-
-	void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add);
-
-	void updateUserGroupRelation(User u, UserGroup g, boolean add);
 }

@@ -49,7 +49,7 @@ public interface Arg {
 	}
 
 	public enum UserArg implements Arg, IsSerializable {
-		USER_ID, PARENT_ID_PLUS_SELF, PARENT_ID, NOT_ON_REGISTRATION_ID, GROUP_ID;
+		USER_ID, PARENT_ID_PLUS_SELF, PARENT_ID, NOT_ON_REGISTRATION_ID, GROUP_ID, HIDE_KIDS;
 
 		private UserArg() {
 
