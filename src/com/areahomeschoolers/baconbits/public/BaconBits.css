@@ -379,6 +379,10 @@ img {
 	border-top: none;
 }
 
+.sectionContent td, .sectionContent div, .sectionContent span, .sectionContent a {
+	font-size: small;
+}
+
 .FormField .sectionContent {
 	padding: 0px;
 }

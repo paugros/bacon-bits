@@ -21,7 +21,7 @@ public class ApplicationData implements IsSerializable {
 		return currentUser;
 	}
 
-	public ArrayList<Tag> getInterests() {
+	public ArrayList<Tag> getUserInterests() {
 		return interests;
 	}
 
