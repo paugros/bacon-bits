@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.client;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
@@ -83,6 +85,10 @@ public final class Application implements ValueChangeHandler<String> {
 
 	public static Map<Integer, Date> getUserActivity() {
 		return applicationData.getUserActivity();
+	}
+
+	public static ArrayList<Tag> getUserInterests() {
+		return applicationData.getUserInterests();
 	}
 
 	public static Data getUserPreferences() {

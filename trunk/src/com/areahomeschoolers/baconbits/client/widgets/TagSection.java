@@ -35,8 +35,10 @@ public class TagSection extends Composite {
 		public TagWidget(final Tag tag) {
 			HorizontalPanel hp = new HorizontalPanel();
 			hp.addStyleName("TagWidget");
-			if (Application.getApplicationData().getInterests().contains(tag)) {
-				hp.addStyleDependentName("common");
+			if (Application.getUserInterests().contains(tag)) {
+				if (tag.getMappingType() != TagMappingType.USER || tag.getEntityId() != Application.getCurrentUserId()) {
+					hp.addStyleDependentName("common");
+				}
 			}
 
 			Label label = new Label(tag.getName());
