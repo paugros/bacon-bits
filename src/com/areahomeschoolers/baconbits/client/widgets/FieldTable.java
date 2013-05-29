@@ -3,8 +3,6 @@ package com.areahomeschoolers.baconbits.client.widgets;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.areahomeschoolers.baconbits.client.util.ClientUtils;
-
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.TableRowElement;
@@ -103,12 +101,6 @@ public class FieldTable extends Composite {
 		flexTable.getFlexCellFormatter().setColSpan(0, 0, 2);
 	}
 
-	// public void addTitleBar(TitleBar titleBar) {
-	// int index = flexTable.getRowCount();
-	// flexTable.setWidget(index, 0, titleBar);
-	// flexTable.getFlexCellFormatter().setColSpan(index, 0, 2);
-	// }
-
 	public void clear() {
 		flexTable.removeAllRows();
 	}
@@ -134,19 +126,10 @@ public class FieldTable extends Composite {
 		return flexTable;
 	}
 
-	public boolean getParentRowVisibility(Widget widget) {
-		TableRowElement element = (TableRowElement) ClientUtils.getParentElementByTagName(widget.getElement(), "TR");
-		return flexTable.getRowFormatter().isVisible(element.getRowIndex());
-	}
-
 	public void removeAllRows() {
 		if (flexTable.getRowCount() > 0) {
 			flexTable.removeAllRows();
 		}
-	}
-
-	public void setFlexTable(FlexTable flexTable) {
-		this.flexTable = flexTable;
 	}
 
 	public void setLabelColumnWidth(LabelColumnWidth width) {
@@ -167,19 +150,6 @@ public class FieldTable extends Composite {
 		}
 
 		flexTable.getColumnFormatter().setStyleName(0, style);
-	}
-
-	public void setParentRowVisibility(boolean visible, FormField... fields) {
-		for (FormField field : fields) {
-			if (field == null) {
-				continue;
-			}
-			field.setEnabled(visible);
-			TableRowElement element = parentRows.get(field);
-			if (element != null) {
-				flexTable.getRowFormatter().setVisible(element.getRowIndex(), visible);
-			}
-		}
 	}
 
 	public void setText(String text) {

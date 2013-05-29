@@ -9,10 +9,9 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface ArticleServiceAsync {
+	public void getById(int articleId, AsyncCallback<Article> callback);
 
-	void getById(int articleId, AsyncCallback<Article> callback);
+	public void list(ArgMap<ArticleArg> args, AsyncCallback<ArrayList<Article>> callback);
 
-	void list(ArgMap<ArticleArg> args, AsyncCallback<ArrayList<Article>> callback);
-
-	void save(Article article, AsyncCallback<Article> callback);
+	public void save(Article article, AsyncCallback<Article> callback);
 }

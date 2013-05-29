@@ -104,6 +104,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			user.setParentLastName(rs.getString("parentLastName"));
 			user.setGroupsText(rs.getString("groupsText"));
 			user.setSex(rs.getString("sex"));
+			user.setChild(rs.getBoolean("isChild"));
 			return user;
 		}
 	}
@@ -136,6 +137,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	public UserDaoImpl(DataSource dataSource) {
 		super(dataSource);
 		SELECT = "select isActive(u.startDate, u.endDate) as isEnabled, u.*, uu.firstName as parentFirstName, uu.lastName as parentLastName, ";
+		SELECT += "case when u.birthDate < date_add(now(), interval -18 year) then 0 else 1 end as isChild, ";
 		SELECT += "(select group_concat(g.groupName separator '\n') from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id) as groupsText ";
 		SELECT += "from users u \n";
 		SELECT += "left join users uu on uu.id = u.parentId \n";
@@ -217,6 +219,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int parentId = args.getInt(UserArg.PARENT_ID);
 		int registrationId = args.getInt(UserArg.NOT_ON_REGISTRATION_ID);
 		int groupId = args.getInt(UserArg.GROUP_ID);
+		boolean hideKids = args.getBoolean(UserArg.HIDE_KIDS);
 
 		String sql = SELECT;
 		if (groupId > 0) {
@@ -242,6 +245,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "and (u.parentId = ? or u.id = ?) ";
 			sqlArgs.add(parentIdPlusSelf);
 			sqlArgs.add(parentIdPlusSelf);
+		}
+
+		if (hideKids) {
+			sql += "and u.birthDate < date_add(now(), interval -18 year) ";
 		}
 
 		if (parentId > 0) {

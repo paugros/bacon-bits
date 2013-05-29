@@ -12,20 +12,19 @@ import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface BookServiceAsync {
+	public void delete(Book book, AsyncCallback<Void> callback);
 
-	void delete(Book book, AsyncCallback<Void> callback);
+	public void getById(int bookId, AsyncCallback<Book> callback);
 
-	void getById(int bookId, AsyncCallback<Book> callback);
+	public void getPageData(int bookId, AsyncCallback<BookPageData> callback);
 
-	void getPageData(int bookId, AsyncCallback<BookPageData> callback);
+	public void getSummaryData(ArgMap<BookArg> args, AsyncCallback<ArrayList<Data>> callback);
 
-	void getSummaryData(ArgMap<BookArg> args, AsyncCallback<ArrayList<Data>> callback);
+	public void list(ArgMap<BookArg> args, AsyncCallback<ArrayList<Book>> callback);
 
-	void list(ArgMap<BookArg> args, AsyncCallback<ArrayList<Book>> callback);
+	public void save(Book book, AsyncCallback<Book> callback);
 
-	void save(Book book, AsyncCallback<Book> callback);
+	public void sellBooks(ArrayList<Book> books, String email, AsyncCallback<Void> callback);
 
-	void sellBooks(ArrayList<Book> books, String email, AsyncCallback<Void> callback);
-
-	void signUpToSell(AsyncCallback<PaypalData> callback);
+	public void signUpToSell(AsyncCallback<PaypalData> callback);
 }

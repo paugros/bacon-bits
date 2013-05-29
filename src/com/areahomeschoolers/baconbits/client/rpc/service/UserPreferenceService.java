@@ -10,9 +10,9 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("service/userPreference")
 public interface UserPreferenceService extends RemoteService {
-	Data getPreferencesByGroupName(int userId, String group);
+	public Data getPreferencesByGroupName(int userId, String group);
 
-	void set(int userId, String key, String value);
+	public void set(int userId, String key, String value);
 
-	Data setPreferencesByGroupPrefix(int userId, String group, Data prefs);
+	public Data setPreferencesByGroupPrefix(int userId, String group, Data prefs);
 }

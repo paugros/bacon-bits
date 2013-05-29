@@ -6,7 +6,6 @@ import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
-import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
@@ -21,6 +20,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
+import com.areahomeschoolers.baconbits.client.widgets.MonthYearPicker;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
@@ -150,6 +150,38 @@ public class UserFieldTable extends FieldTable {
 			}
 		});
 		addField(sexField);
+
+		final MonthYearPicker birthDateInput = new MonthYearPicker();
+		birthDateInput.setRequired(true);
+		birthDateInput.setEarliestMonth(1995, 1);
+		birthDateInput.getYearPicker().getListBox().insertItem("Adult", "1994", 1);
+
+		final Label birthDateDisplay = new Label();
+		final FormField birthDateField = form.createFormField("Birth month / year:", birthDateInput, birthDateDisplay);
+		birthDateField.setRequired(true);
+		birthDateField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				String text = "";
+				if (user.getBirthDate() != null) {
+					text = Formatter.formatDate(user.getBirthDate(), "MMMM");
+					if (!user.isChild()) {
+						text += " (Adult)";
+					} else {
+						text += " " + Formatter.formatDate(user.getBirthDate(), "yyyy");
+					}
+				}
+				birthDateDisplay.setText(text);
+				birthDateInput.setValue(user.getBirthDate());
+			}
+		});
+		birthDateField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				user.setBirthDate(birthDateInput.getValue());
+			}
+		});
+		addField(birthDateField);
 
 		if (Application.isSystemAdministrator()) {
 			final Label adminDisplay = new Label();
@@ -311,30 +343,6 @@ public class UserFieldTable extends FieldTable {
 			}
 		});
 		addField(mobilePhoneField);
-
-		final Label birthDisplay = new Label();
-		final ValidatorDateBox birthInput = new ValidatorDateBox();
-		FormField birthField = form.createFormField("Birth date:", birthInput, birthDisplay);
-		birthField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				String text = Formatter.formatDate(user.getBirthDate());
-				if (user.getBirthDate() != null) {
-					if (ClientDateUtils.getYear(user.getBirthDate()) < 1995) {
-						text = "Adult";
-					}
-				}
-				birthDisplay.setText(text);
-				birthInput.setValue(user.getBirthDate());
-			}
-		});
-		birthField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				user.setBirthDate(birthInput.getValue());
-			}
-		});
-		addField(birthField);
 
 		final FieldDisplayLink addressDisplay = new FieldDisplayLink();
 		addressDisplay.setTarget("_blank");

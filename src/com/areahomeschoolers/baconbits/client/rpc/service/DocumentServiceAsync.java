@@ -9,12 +9,11 @@ import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface DocumentServiceAsync {
+	public void delete(int documentId, AsyncCallback<Void> callback);
 
-	void delete(int documentId, AsyncCallback<Void> callback);
+	public void getById(int documentId, AsyncCallback<Document> callback);
 
-	void getById(int documentId, AsyncCallback<Document> callback);
+	public void list(ArgMap<DocumentArg> args, AsyncCallback<ArrayList<Document>> callback);
 
-	void list(ArgMap<DocumentArg> args, AsyncCallback<ArrayList<Document>> callback);
-
-	void save(Document document, AsyncCallback<Document> callback);
+	public void save(Document document, AsyncCallback<Document> callback);
 }

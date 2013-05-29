@@ -16,4 +16,6 @@ public abstract class Constants {
 	public static final String[] DAYS_OF_WEEK = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
 
 	public static final String GENERATED_KEY_TOKEN = "GENERATED_KEY";
+
+	public static final int maxInterests = 50;
 }

@@ -19,6 +19,4 @@ public interface TagService extends RemoteService {
 	public void deleteMapping(Tag tag);
 
 	public ArrayList<Tag> list(ArgMap<TagArg> args);
-
-	public Tag save(Tag tag);
 }
