@@ -11,22 +11,27 @@ public class ApplicationData implements IsSerializable {
 	private Data userPreferences;
 	private LinkedHashMap<Integer, Date> userActivity;
 	private boolean isLive;
+	private int adultBirthYear;
 	private ArrayList<Tag> interests = new ArrayList<Tag>();
 
 	public ApplicationData() {
 
 	}
 
+	public int getAdultBirthYear() {
+		return adultBirthYear;
+	}
+
 	public User getCurrentUser() {
 		return currentUser;
 	}
 
-	public ArrayList<Tag> getUserInterests() {
-		return interests;
-	}
-
 	public LinkedHashMap<Integer, Date> getUserActivity() {
 		return userActivity;
+	}
+
+	public ArrayList<Tag> getUserInterests() {
+		return interests;
 	}
 
 	public Data getUserPreferences() {
@@ -35,6 +40,10 @@ public class ApplicationData implements IsSerializable {
 
 	public boolean isLive() {
 		return isLive;
+	}
+
+	public void setAdultBirthYear(int adultBirthYear) {
+		this.adultBirthYear = adultBirthYear;
 	}
 
 	public void setCurrentUser(User currentUser) {

@@ -7,9 +7,14 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class UserPageData implements IsSerializable {
 	private User user;
 	private ArrayList<Tag> interests;
+	private int firstBirthYear;
 
 	public UserPageData() {
 
+	}
+
+	public int getFirstBirthYear() {
+		return firstBirthYear;
 	}
 
 	public ArrayList<Tag> getInterests() {
@@ -18,6 +23,10 @@ public class UserPageData implements IsSerializable {
 
 	public User getUser() {
 		return user;
+	}
+
+	public void setFirstBirthYear(int firstBirthYear) {
+		this.firstBirthYear = firstBirthYear;
 	}
 
 	public void setInterests(ArrayList<Tag> interests) {

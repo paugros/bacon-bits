@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.server.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 
 		ApplicationData ap = new ApplicationData();
 		ap.setCurrentUser(user);
+		ap.setAdultBirthYear(Calendar.getInstance().get(Calendar.YEAR) - 18);
 
 		if (user != null) {
 			TagDao tagDao = ServerContext.getDaoImpl("tag");

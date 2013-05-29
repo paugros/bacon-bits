@@ -153,8 +153,8 @@ public class UserFieldTable extends FieldTable {
 
 		final MonthYearPicker birthDateInput = new MonthYearPicker();
 		birthDateInput.setRequired(true);
-		birthDateInput.setEarliestMonth(1995, 1);
-		birthDateInput.getYearPicker().getListBox().insertItem("Adult", "1994", 1);
+		birthDateInput.setEarliestMonth(Application.getApplicationData().getAdultBirthYear(), 1);
+		birthDateInput.getYearPicker().getListBox().insertItem("Adult", Integer.toString(Application.getApplicationData().getAdultBirthYear() - 1), 1);
 
 		final Label birthDateDisplay = new Label();
 		final FormField birthDateField = form.createFormField("Birth month / year:", birthDateInput, birthDateDisplay);
