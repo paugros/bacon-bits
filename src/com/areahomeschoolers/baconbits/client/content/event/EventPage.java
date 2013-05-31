@@ -571,6 +571,7 @@ public class EventPage implements Page {
 					return new GroupListBox(calendarEvent.getGroupId());
 				}
 			};
+
 			final FormField groupField = form.createFormField("Group:", groupCreator, groupDisplay);
 			groupField.setInitializer(new Command() {
 				@Override
