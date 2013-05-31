@@ -581,6 +581,7 @@ public class EventPage implements Page {
 					}
 				}
 			});
+
 			groupField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
