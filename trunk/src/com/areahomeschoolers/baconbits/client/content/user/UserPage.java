@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCell
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerCellTable;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.content.user.UserCellTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -36,7 +37,6 @@ import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
-import com.areahomeschoolers.baconbits.client.widgets.TagSection;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
@@ -82,7 +82,7 @@ public class UserPage implements Page {
 			return true;
 		}
 
-		if (user.isChild() && Application.getCurrentUserId() != user.getParentId()) {
+		if (user.childOf(Application.getCurrentUser())) {
 			return true;
 		}
 
@@ -91,8 +91,13 @@ public class UserPage implements Page {
 
 	private final Form form = new Form(new FormSubmitHandler() {
 		@Override
-		public void onFormSubmit(FormField formField) {
-			save(formField);
+		public void onFormSubmit(final FormField formField) {
+			UserFieldTable.validateUserAddress(user, new Command() {
+				@Override
+				public void execute() {
+					save(formField);
+				}
+			});
 		}
 	});
 	private VerticalPanel page;
@@ -347,8 +352,8 @@ public class UserPage implements Page {
 							}
 						});
 						table.getTitleBar().addLink(addChild);
-						table.removeColumn(UserColumn.HOME_PHONE);
-						table.removeColumn(UserColumn.MOBILE_PHONE);
+						table.removeColumn(UserColumn.PHONE);
+						table.removeColumn(UserColumn.STATUS);
 						table.setTitle("Family Members");
 						table.disablePaging();
 						table.populate();

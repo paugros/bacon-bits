@@ -1,9 +1,10 @@
-package com.areahomeschoolers.baconbits.client.widgets;
+package com.areahomeschoolers.baconbits.client.content.tag;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.EntitySuggestBox;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
@@ -11,10 +12,15 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagService;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
+import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.shared.Constants;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -76,14 +82,16 @@ public class TagSection extends Composite {
 	private int entityId;
 	private final List<Character> allowedChars = new ArrayList<Character>();
 	private boolean editingEnabled;
-	private final static String MAX_MESSAGE = "You already have the maximum number of interests (" + Constants.maxInterests + ").";
+	private final static String MAX_MESSAGE = "You already have the maximum number of interests (" + Constants.MAXIMUM_TAG_COUNT + ").";
+
+	public TagSection(TagMappingType user, int id) {
+		this(user, id, null);
+	}
 
 	public TagSection(TagMappingType mappingType, int entityId, ArrayList<Tag> t) {
 		this.tags = t;
 		this.mappingType = mappingType;
 		this.entityId = entityId;
-
-		// populate();
 
 		initWidget(vp);
 	}
@@ -93,6 +101,19 @@ public class TagSection extends Composite {
 	}
 
 	public void populate() {
+		if (tags == null) {
+			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.ENTITY_ID, entityId);
+			args.put(TagArg.MAPPING_TYPE, mappingType.toString());
+			tagService.list(args, new Callback<ArrayList<Tag>>() {
+				@Override
+				protected void doOnSuccess(ArrayList<Tag> result) {
+					tags = result;
+					populate();
+				}
+			});
+
+			return;
+		}
 		suggestBox = new EntitySuggestBox("Tag");
 		suggestBox.getTextBox().setWidth("150px");
 		suggestBox.getTextBox().getElement().setAttribute("maxlength", "25");
@@ -154,6 +175,20 @@ public class TagSection extends Composite {
 		hp.add(add);
 		hp.setCellVerticalAlignment(add, HasVerticalAlignment.ALIGN_MIDDLE);
 
+		String item = "tags";
+		if (mappingType == TagMappingType.USER) {
+			item = "interests";
+		}
+		ClickLabel link = new ClickLabel("Click here to view all " + item, new MouseDownHandler() {
+			@Override
+			public void onMouseDown(MouseDownEvent event) {
+				new TagListPage(mappingType, entityId);
+				HistoryToken.append("t=1", false);
+			}
+		});
+		link.getElement().getStyle().setMarginLeft(15, Unit.PX);
+		hp.add(link);
+
 		if (editingEnabled) {
 			vp.add(hp);
 		}
@@ -170,7 +205,7 @@ public class TagSection extends Composite {
 	}
 
 	private void addNewTag() {
-		if (tags.size() >= Constants.maxInterests) {
+		if (tags.size() >= Constants.MAXIMUM_TAG_COUNT) {
 			AlertDialog.alert(MAX_MESSAGE);
 			return;
 		}
@@ -184,7 +219,7 @@ public class TagSection extends Composite {
 	}
 
 	private void saveTagMapping(Tag tag) {
-		if (tags.size() >= Constants.maxInterests) {
+		if (tags.size() >= Constants.MAXIMUM_TAG_COUNT) {
 			AlertDialog.alert(MAX_MESSAGE);
 			return;
 		}

@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
+import java.util.Date;
+
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -7,8 +9,10 @@ import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
+import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
@@ -18,6 +22,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
@@ -36,19 +41,31 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 		form.addFormSubmitHandler(new FormSubmitHandler() {
 			@Override
 			public void onFormSubmit(FormField formField) {
-				userService.save(entity, new Callback<ServerResponseData<User>>() {
-					@Override
-					protected void doOnSuccess(ServerResponseData<User> result) {
-						if (result.hasErrors()) {
-							new ServerResponseDialog(result).center();
-							form.getSubmitButton().setEnabled(true);
-							return;
-						}
+				// verify age
+				if ((ClientDateUtils.daysBetween(new Date(), entity.getBirthDate()) / 365) < 13) {
+					AlertDialog.alert("Children under the age of 13 must have their account created by a parent or guardian.");
+					form.getSubmitButton().setEnabled(true);
+					return;
+				}
 
-						loginService.login(entity.getUserName(), entity.getPassword(), new Callback<Boolean>() {
+				UserFieldTable.validateUserAddress(entity, new Command() {
+					@Override
+					public void execute() {
+						userService.save(entity, new Callback<ServerResponseData<User>>() {
 							@Override
-							protected void doOnSuccess(Boolean result) {
-								Window.Location.reload();
+							protected void doOnSuccess(ServerResponseData<User> result) {
+								if (result.hasErrors()) {
+									new ServerResponseDialog(result).center();
+									form.getSubmitButton().setEnabled(true);
+									return;
+								}
+
+								loginService.login(entity.getUserName(), entity.getPassword(), new Callback<Boolean>() {
+									@Override
+									protected void doOnSuccess(Boolean result) {
+										Window.Location.reload();
+									}
+								});
 							}
 						});
 					}

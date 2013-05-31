@@ -78,7 +78,9 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 
 		ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_ID, ServerUtils.getIdFromKeys(keys));
 		args.put(TagArg.MAPPING_TYPE, tag.getMappingType().toString());
-		return list(args).get(0);
+		Tag mapped = list(args).get(0);
+		mapped.setEntityId(tag.getEntityId());
+		return mapped;
 	}
 
 	@Override
@@ -108,7 +110,11 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		int mappingId = args.getInt(TagArg.MAPPING_ID);
 
 		// tags
-		String sql = "select t.name, t.addedDate, t.addedById, tm.id, tm.tagId, tm.addedDate as mappingAddedDate from tags t ";
+		String sql = "select t.id, t.name, t.addedDate, t.addedById ";
+		if (mappingType != null) {
+			sql += ", tm.id as mappingId, tm.addedDate as mappingAddedDate ";
+		}
+		sql += "from tags t ";
 		if (mappingType != null) {
 			sql += "join tag" + Common.ucWords(mappingType.toString()) + "Mapping tm on tm.tagId = t.id ";
 			if (entityId > 0) {
@@ -122,20 +128,26 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			}
 
 			sql += "order by tm.id";
+		} else {
+			sql += "order by t.name";
 		}
 
 		return query(sql, new RowMapper<Tag>() {
 			@Override
 			public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Tag t = new Tag();
-				t.setId(rs.getInt("tagId"));
-				t.setMappingId(rs.getInt("id"));
+				t.setId(rs.getInt("id"));
 				t.setName(rs.getString("name"));
 				t.setAddedDate(rs.getTimestamp("addedDate"));
-				t.setMappingAddedDate(rs.getTimestamp("mappingAddedDate"));
 				t.setAddedById(rs.getInt("addedById"));
-				t.setEntityId(entityId);
-				t.setMappingType(mappingType);
+				if (entityId > 0) {
+					t.setEntityId(entityId);
+				}
+				if (mappingType != null) {
+					t.setMappingType(mappingType);
+					t.setMappingId(rs.getInt("mappingId"));
+					t.setMappingAddedDate(rs.getTimestamp("mappingAddedDate"));
+				}
 				return t;
 			}
 		}, sqlArgs.toArray());

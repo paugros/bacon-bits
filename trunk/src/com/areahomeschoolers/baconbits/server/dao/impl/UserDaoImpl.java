@@ -100,16 +100,22 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			user.setBirthDate(rs.getTimestamp("birthDate"));
 			user.setParentId(rs.getInt("parentId"));
 			user.setAddress(rs.getString("address"));
+			user.setCity(rs.getString("city"));
+			user.setStreet(rs.getString("street"));
+			user.setState(rs.getString("state"));
+			user.setZip(rs.getString("zip"));
 			user.setParentFirstName(rs.getString("parentFirstName"));
 			user.setParentLastName(rs.getString("parentLastName"));
 			user.setGroupsText(rs.getString("groupsText"));
 			user.setSex(rs.getString("sex"));
 			user.setChild(rs.getBoolean("isChild"));
+			user.setCommonInterestCount(rs.getInt("commonInterests"));
+			user.setAge(rs.getInt("age"));
+			user.setLat(rs.getDouble("lat"));
+			user.setLng(rs.getDouble("lng"));
 			return user;
 		}
 	}
-
-	private static String SELECT;
 
 	public static MessageResolver resolver = null;
 
@@ -136,16 +142,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	@Autowired
 	public UserDaoImpl(DataSource dataSource) {
 		super(dataSource);
-		SELECT = "select isActive(u.startDate, u.endDate) as isEnabled, u.*, uu.firstName as parentFirstName, uu.lastName as parentLastName, ";
-		SELECT += "case when u.birthDate < date_add(now(), interval -18 year) then 0 else 1 end as isChild, ";
-		SELECT += "(select group_concat(g.groupName separator '\n') from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id) as groupsText ";
-		SELECT += "from users u \n";
-		SELECT += "left join users uu on uu.id = u.parentId \n";
 	}
 
 	@Override
 	public User getById(int userId) {
-		User u = queryForObject(SELECT + "where u.id = ?", new UserMapper(), userId);
+		User u = queryForObject(createSqlBase() + "where u.id = ?", new UserMapper(), userId);
 
 		u.setGroups(populateSecurityGroups(u));
 
@@ -197,16 +198,12 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			throw new UsernameNotFoundException("Username null not found");
 		}
 
-		User user = queryForObject(SELECT + "where u.email = ?", new UserMapper(), username.toLowerCase());
+		User user = queryForObject(createSqlBase() + "where u.email = ?", new UserMapper(), username.toLowerCase());
 		if (user == null) {
 			throw new UsernameNotFoundException("Username not found or duplicate: " + username);
 		}
 
 		user.setGroups(populateSecurityGroups(user));
-
-		// ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
-		// args.put(UserArg.PARENT_ID, user.getId());
-		// user.setChildren(list(args));
 
 		return user;
 	}
@@ -219,9 +216,25 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int parentId = args.getInt(UserArg.PARENT_ID);
 		int registrationId = args.getInt(UserArg.NOT_ON_REGISTRATION_ID);
 		int groupId = args.getInt(UserArg.GROUP_ID);
-		boolean hideKids = args.getBoolean(UserArg.HIDE_KIDS);
+		boolean onlyParents = args.getBoolean(UserArg.PARENTS);
+		boolean onlyChildren = args.getBoolean(UserArg.CHILDREN);
+		boolean parentsOfBoys = args.getBoolean(UserArg.PARENTS_OF_BOYS);
+		boolean parentsOfGirls = args.getBoolean(UserArg.PARENTS_OF_GIRLS);
+		boolean onlyCommonInterests = args.getBoolean(UserArg.ONLY_COMMON_INTERESTS);
+		List<Integer> ages = args.getIntList(UserArg.PARENTS_OF_AGES);
+		String addressSearch = args.getString(UserArg.ADDRESS_SEARCH);
+		int withinMiles = args.getInt(UserArg.WITHIN_MILES);
+		String withinLat = args.getString(UserArg.WITHIN_LAT);
+		String withinLng = args.getString(UserArg.WITHIN_LNG);
+		String distanceCol = null;
 
-		String sql = SELECT;
+		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+			distanceCol = "(3959 * acos( cos( radians(" + withinLat + ") ) * cos( radians( u.lat ) ) * cos( radians( u.lng ) - radians(" + withinLng + ") )";
+			distanceCol += "+ sin( radians(" + withinLat + ") ) * sin( radians( u.lat ) ) ) ) as distance, ";
+		}
+
+		String sql = createSqlBase(distanceCol);
+
 		if (groupId > 0) {
 			sql += "join userGroupMembers ugm on ugm.userId = u.id and ugm.groupId = ? \n";
 			sqlArgs.add(groupId);
@@ -232,6 +245,30 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sqlArgs.add(registrationId);
 		}
 		sql += "where 1 = 1 ";
+
+		if (parentsOfBoys) {
+			sql += "and (select count(id) from users where parentId = u.id and sex = 'm') > 0 ";
+		}
+
+		if (parentsOfGirls) {
+			sql += "and (select count(id) from users where parentId = u.id and sex = 'f') > 0 ";
+		}
+
+		if (ages.size() > 1) {
+			int min = ages.get(0);
+			int max = ages.get(1);
+			sql += "and (select count(id) from users where parentId = u.id ";
+			sql += "and (datediff(now(), birthDate) / 365.25) between " + min + " and " + max + " ) > 0 ";
+		}
+
+		if (onlyCommonInterests) {
+			sql += "and i.commonInterests > 0 ";
+		}
+
+		if (!Common.isNullOrBlank(addressSearch)) {
+			sql += "and u.address like ? ";
+			sqlArgs.add("%" + addressSearch + "%");
+		}
 
 		if (args.getStatus() != Status.ALL) {
 			sql += "and isActive(u.startDate, u.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
@@ -247,13 +284,21 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sqlArgs.add(parentIdPlusSelf);
 		}
 
-		if (hideKids) {
+		if (onlyParents) {
 			sql += "and u.birthDate < date_add(now(), interval -18 year) ";
+		}
+
+		if (onlyChildren) {
+			sql += "and u.birthDate > date_add(now(), interval -18 year) ";
 		}
 
 		if (parentId > 0) {
 			sql += "and u.parentId = ? ";
 			sqlArgs.add(parentId);
+		}
+
+		if (distanceCol != null) {
+			sql += "having distance < " + withinMiles + " ";
 		}
 
 		sql += "order by u.lastName, u.firstName";
@@ -361,16 +406,20 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (user.isSaved()) {
 			sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, email = :email, ";
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
-			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex where id = :id";
+			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex, ";
+			sql += "street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng ";
+			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (user.getStartDate() == null) {
 				user.setStartDate(new Date());
 			}
 			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
-			sql += "address, isSystemAdministrator, resetPassword, birthDate, parentId, sex) values ";
+			sql += "address, isSystemAdministrator, resetPassword, birthDate, parentId, sex, ";
+			sql += "street, city, state, zip, lat, lng) values ";
 			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
-			sql += ":address, :systemAdministrator, :resetPassword, :birthDate, :parentId, :sex)";
+			sql += ":address, :systemAdministrator, :resetPassword, :birthDate, :parentId, :sex, ";
+			sql += ":street, :city, :state, :zip, :lat, :lng)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -575,6 +624,30 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			return validator.getMessages(result);
 		}
 		return new ArrayList<String>();
+	}
+
+	private String createSqlBase() {
+		return createSqlBase(null);
+	}
+
+	private String createSqlBase(String specialCols) {
+		int currentUserId = ServerContext.getCurrentUserId();
+		String sql = "select isActive(u.startDate, u.endDate) as isEnabled, u.*, uu.firstName as parentFirstName, uu.lastName as parentLastName, ";
+		sql += "case when u.birthDate < date_add(now(), interval -18 year) then 0 else 1 end as isChild, i.commonInterests, ";
+		sql += "floor(datediff(now(), u.birthDate) / 365.25) as age, ";
+		if (specialCols != null) {
+			sql += specialCols;
+		}
+		sql += "(select group_concat(g.groupName separator '\n') from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id) as groupsText ";
+		sql += "from users u \n";
+		sql += "left join users uu on uu.id = u.parentId \n";
+		sql += "left join ( \n";
+		sql += "select userId, count(id) as commonInterests from tagUserMapping where tagId in( \n";
+		sql += "select tagId from tagUserMapping where userId = " + currentUserId + ") and userId != " + currentUserId + " \n";
+		sql += "group by userId \n";
+		sql += ") as i on i.userId = u.id \n";
+
+		return sql;
 	}
 
 	private UserGroup createUserGroup(ResultSet rs) throws SQLException {

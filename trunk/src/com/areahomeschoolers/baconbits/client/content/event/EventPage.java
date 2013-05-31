@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.event.EventCellTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -58,6 +59,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -591,6 +593,13 @@ public class EventPage implements Page {
 				fieldTable.addField("Added by:", calendarEvent.getAddedByFullName());
 				fieldTable.addField("Added date:", Formatter.formatDateTime(calendarEvent.getAddedDate()));
 			}
+		}
+
+		if (calendarEvent.isSaved() && (calendarEvent.hasTags() || Application.administratorOf(calendarEvent.getGroupId()))) {
+			TagSection ts = new TagSection(TagMappingType.EVENT, calendarEvent.getId());
+			ts.setEditingEnabled(Application.administratorOf(calendarEvent.getGroupId()));
+			fieldTable.addField("Tags:", ts);
+			ts.populate();
 		}
 
 		final HTML descriptionDisplay = new HTML();

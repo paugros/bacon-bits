@@ -19,7 +19,14 @@ public final class User extends EntityDto<User> {
 	private String passwordDigest;
 	private String homePhone;
 	private String address;
-	// only for setting
+	private String street;
+	private String city;
+	private String state;
+	private String zip;
+	private double lat;
+	private double lng;
+
+	// password is only for setting
 	private String password;
 
 	private String mobilePhone;
@@ -33,15 +40,17 @@ public final class User extends EntityDto<User> {
 	private Integer parentId;
 	private boolean canSwitch;
 	private String sex;
-
 	// aux
 	// these two keep track of your original user when switching
+	private int commonInterestCount;
 	private int originalUserId;
 	private String originalEmail;
 	private String groupsText;
 	private boolean generatePassword;
 	private HashSet<AccessLevel> accessLevels;
 	private boolean isChild;
+	private int age;
+	private boolean addressChanged;
 
 	public User() {
 
@@ -59,6 +68,10 @@ public final class User extends EntityDto<User> {
 		return canSwitch;
 	}
 
+	public boolean childOf(User parent) {
+		return parentId != null && parentId == parent.getId();
+	}
+
 	public HashSet<AccessLevel> getAccessLevels() {
 		return accessLevels;
 	}
@@ -71,8 +84,24 @@ public final class User extends EntityDto<User> {
 		return address;
 	}
 
+	public boolean getAddressChanged() {
+		return addressChanged;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
 	public Date getBirthDate() {
 		return birthDate;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public int getCommonInterestCount() {
+		return commonInterestCount;
 	}
 
 	public String getEmail() {
@@ -113,6 +142,14 @@ public final class User extends EntityDto<User> {
 
 	public String getLastName() {
 		return lastName;
+	}
+
+	public double getLat() {
+		return lat;
+	}
+
+	public double getLng() {
+		return lng;
 	}
 
 	public String getMobilePhone() {
@@ -172,6 +209,14 @@ public final class User extends EntityDto<User> {
 		return startDate;
 	}
 
+	public String getState() {
+		return state;
+	}
+
+	public String getStreet() {
+		return street;
+	}
+
 	public boolean getSystemAdministrator() {
 		return systemAdministrator;
 	}
@@ -180,12 +225,20 @@ public final class User extends EntityDto<User> {
 		return email;
 	}
 
+	public String getZip() {
+		return zip;
+	}
+
 	public boolean hasRole(AccessLevel level) {
 		return accessLevels != null && accessLevels.contains(level);
 	}
 
 	public boolean isActive() {
 		return active;
+	}
+
+	public boolean isCanSwitch() {
+		return canSwitch;
 	}
 
 	public boolean isChild() {
@@ -212,6 +265,10 @@ public final class User extends EntityDto<User> {
 		return false;
 	}
 
+	public boolean parentOf(User child) {
+		return child.getParentId() != null && child.getParentId() == getId();
+	}
+
 	public void setAccessLevels(HashSet<AccessLevel> accessLevels) {
 		this.accessLevels = accessLevels;
 	}
@@ -228,6 +285,14 @@ public final class User extends EntityDto<User> {
 		this.address = address;
 	}
 
+	public void setAddressChanged(boolean addressChanged) {
+		this.addressChanged = addressChanged;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
 	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
 	}
@@ -238,6 +303,14 @@ public final class User extends EntityDto<User> {
 
 	public void setChild(boolean isChild) {
 		this.isChild = isChild;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public void setCommonInterestCount(int commonInterestCount) {
+		this.commonInterestCount = commonInterestCount;
 	}
 
 	public void setEmail(String email) {
@@ -277,6 +350,14 @@ public final class User extends EntityDto<User> {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	public void setLng(double lng) {
+		this.lng = lng;
 	}
 
 	public void setMobilePhone(String mobilePhone) {
@@ -323,9 +404,21 @@ public final class User extends EntityDto<User> {
 		this.startDate = startDate;
 	}
 
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public void setStreet(String street) {
+		this.street = street;
+	}
+
 	public void setSystemAdministrator(boolean systemAdministrator) {
 		this.systemAdministrator = systemAdministrator;
 		canSwitch = systemAdministrator;
+	}
+
+	public void setZip(String zip) {
+		this.zip = zip;
 	}
 
 }

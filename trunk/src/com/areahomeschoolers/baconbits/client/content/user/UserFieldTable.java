@@ -19,8 +19,10 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldDisplayLink;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
-import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
+import com.areahomeschoolers.baconbits.client.widgets.GoogleMap;
 import com.areahomeschoolers.baconbits.client.widgets.MonthYearPicker;
+import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
@@ -31,19 +33,69 @@ import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.maps.client.geocode.LocationCallback;
+import com.google.gwt.maps.client.geocode.Placemark;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class UserFieldTable extends FieldTable {
+	public static void validateUserAddress(final User u, final Command saveCommand) {
+		if (!u.getAddressChanged()) {
+			saveCommand.execute();
+			return;
+		}
+
+		u.setAddressChanged(false);
+
+		if (Common.isNullOrBlank(u.getAddress()) && Common.isNullOrBlank(u.getStreet()) && Common.isNullOrBlank(u.getZip())) {
+			saveCommand.execute();
+			return;
+		}
+
+		GoogleMap.runMapsCommand(new Command() {
+			@Override
+			public void execute() {
+				String address = u.getAddress();
+				if (!Common.isNullOrBlank(u.getStreet()) || !Common.isNullOrBlank(u.getZip())) {
+					address = u.getStreet() + " " + u.getZip();
+				}
+
+				GoogleMap.getGeoCoder().getLocations(address, new LocationCallback() {
+					@Override
+					public void onFailure(int statusCode) {
+						saveCommand.execute();
+					}
+
+					@Override
+					public void onSuccess(JsArray<Placemark> locations) {
+						Placemark location = locations.get(0);
+						u.setAddress(location.getAddress());
+						u.setStreet(location.getStreet());
+						u.setCity(location.getCity());
+						u.setState(location.getState());
+						u.setZip(location.getPostalCode());
+						u.setLat(location.getPoint().getLatitude());
+						u.setLng(location.getPoint().getLongitude());
+						saveCommand.execute();
+					}
+				});
+			}
+		});
+	}
+
 	private User user;
 	private final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private final Label passwordLabel = new Label();
+
 	private final Form form;
 
 	public UserFieldTable(Form f, User u) {
@@ -346,22 +398,45 @@ public class UserFieldTable extends FieldTable {
 
 		final FieldDisplayLink addressDisplay = new FieldDisplayLink();
 		addressDisplay.setTarget("_blank");
-		final MaxLengthTextArea addressInput = new MaxLengthTextArea(200);
-		addressInput.setVisibleLines(2);
-		addressInput.setCharacterWidth(50);
+		PaddedPanel addressInput = new PaddedPanel();
+		// street input
+		final TextBox street = new TextBox();
+		street.setMaxLength(100);
+		Label streetLabel = new Label("Number and street");
+		streetLabel.addStyleName("smallText");
+		VerticalPanel streetPanel = new VerticalPanel();
+		streetPanel.add(streetLabel);
+		streetPanel.add(street);
+
+		// zip input
+		final NumericTextBox zip = new NumericTextBox();
+		zip.setMaxLength(5);
+		zip.setVisibleLength(5);
+		Label zipLabel = new Label("Zip");
+		zipLabel.addStyleName("smallText");
+		VerticalPanel zipPanel = new VerticalPanel();
+		zipPanel.add(zipLabel);
+		zipPanel.add(zip);
+
+		addressInput.add(streetPanel);
+		addressInput.add(zipPanel);
+
 		FormField addressField = form.createFormField("Address:", addressInput, addressDisplay);
 		addressField.setInitializer(new Command() {
 			@Override
 			public void execute() {
 				addressDisplay.setText(Common.getDefaultIfNull(user.getAddress()));
 				addressDisplay.setHref("http://maps.google.com/maps?q=" + user.getAddress());
-				addressInput.setText(user.getAddress());
+				street.setText(user.getStreet());
+				zip.setText(user.getZip());
 			}
 		});
 		addressField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				user.setAddress(addressInput.getText());
+				user.setStreet(street.getText());
+				user.setZip(zip.getText());
+				user.setAddressChanged(true);
 			}
 		});
 		addField(addressField);
