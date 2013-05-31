@@ -35,18 +35,43 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  * Composite widget composed of a {@link Grid} containing a {@link MapWidget} and a {@link VerticalPanel} (for errors).
  */
 public class GoogleMap extends Composite {
-	public static void loadMapsApi(Runnable runnable) {
-		Maps.loadMapsApi("AIzaSyBPxbeFCFBNAUxprA4_FSRcJ6AOVAQJr9A", "2", false, runnable);
+	private static Geocoder geocoder;
+
+	private static boolean apiIsLoaded = false;
+
+	public static boolean apiIsloaded() {
+		return apiIsLoaded;
+	}
+
+	public static Geocoder getGeoCoder() {
+		return geocoder;
+	}
+
+	public static void runMapsCommand(final Command cmd) {
+		if (apiIsLoaded) {
+			cmd.execute();
+			return;
+		}
+
+		Maps.loadMapsApi("AIzaSyBPxbeFCFBNAUxprA4_FSRcJ6AOVAQJr9A", "2", false, new Runnable() {
+			@Override
+			public void run() {
+				apiIsLoaded = true;
+				geocoder = new Geocoder();
+				cmd.execute();
+			}
+		});
 	}
 
 	private MapWidget map;
 	private LatLngBounds bounds;
-	private Geocoder geocoder;
 	private List<String> failed = new ArrayList<String>();
 	private List<String> succeeded = new ArrayList<String>();
 	private List<String> addresses = new ArrayList<String>();
 	private Grid grid = new Grid(2, 1);
+
 	private VerticalPanel errorPanel = new VerticalPanel();
+
 	private List<Command> queueCommands = new ArrayList<Command>();
 
 	public GoogleMap() {
@@ -55,9 +80,9 @@ public class GoogleMap extends Composite {
 		grid.setWidth("100%");
 		grid.getCellFormatter().setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_CENTER);
 
-		loadMapsApi(new Runnable() {
+		runMapsCommand(new Command() {
 			@Override
-			public void run() {
+			public void execute() {
 				map = new MapWidget();
 				map.setHeight("500px");
 				map.setWidth("99%");
@@ -66,7 +91,6 @@ public class GoogleMap extends Composite {
 				map.addControl(new MapTypeControl());
 				// map.addControl(new OverviewMapControl());
 				map.setStyleName("mapWidget");
-				geocoder = new Geocoder();
 
 				if (!queueCommands.isEmpty()) {
 					for (Command command : queueCommands) {

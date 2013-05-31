@@ -44,6 +44,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private String agePrices;
 	private String ageRanges;
 	private int documentCount;
+	private int tagCount;
 	private String category;
 	private String groupName;
 	private String accessLevel;
@@ -240,6 +241,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		return startDate;
 	}
 
+	public int getTagCount() {
+		return tagCount;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -251,6 +256,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	@Override
 	public boolean hasDocuments() {
 		return documentCount > 0;
+	}
+
+	public boolean hasTags() {
+		return tagCount > 0;
 	}
 
 	public boolean isSeriesChild() {
@@ -403,6 +412,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
+	}
+
+	public void setTagCount(int tagCount) {
+		this.tagCount = tagCount;
 	}
 
 	public void setTitle(String title) {

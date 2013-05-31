@@ -32,17 +32,22 @@ public class CreateFamilyMemberDialog extends EntityEditDialog<User> {
 		form.addFormSubmitHandler(new FormSubmitHandler() {
 			@Override
 			public void onFormSubmit(FormField formField) {
-				userService.save(entity, new Callback<ServerResponseData<User>>() {
+				UserFieldTable.validateUserAddress(entity, new Command() {
 					@Override
-					protected void doOnSuccess(ServerResponseData<User> result) {
-						if (result.hasErrors()) {
-							new ServerResponseDialog(result).center();
-							form.getSubmitButton().setEnabled(true);
-							return;
-						}
+					public void execute() {
+						userService.save(entity, new Callback<ServerResponseData<User>>() {
+							@Override
+							protected void doOnSuccess(ServerResponseData<User> result) {
+								if (result.hasErrors()) {
+									new ServerResponseDialog(result).center();
+									form.getSubmitButton().setEnabled(true);
+									return;
+								}
 
-						saveCommand.execute();
-						hide();
+								saveCommand.execute();
+								hide();
+							}
+						});
 					}
 				});
 			}
@@ -54,6 +59,8 @@ public class CreateFamilyMemberDialog extends EntityEditDialog<User> {
 		entity.setParentId(parent.getId());
 		entity.setLastName(parent.getLastName());
 		entity.setAddress(parent.getAddress());
+		entity.setStreet(parent.getStreet());
+		entity.setZip(parent.getZip());
 		entity.setHomePhone(parent.getHomePhone());
 
 		VerticalPanel vp = new VerticalPanel();

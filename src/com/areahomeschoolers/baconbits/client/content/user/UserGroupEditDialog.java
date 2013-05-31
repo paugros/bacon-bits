@@ -133,7 +133,7 @@ public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 			final UserCellTable userTable = new UserCellTable(args);
 			userTable.setPagerPageSize(PageSize.P_010);
 			userTable.getTitleBar().getPager().setPageResizingEnabled(false);
-			userTable.setDisplayColumns(UserColumn.NAME, UserColumn.EMAIL, UserColumn.HOME_PHONE);
+			userTable.setDisplayColumns(UserColumn.NAME, UserColumn.EMAIL, UserColumn.PHONE);
 			userTable.setTitle("Members");
 			userTable.getTitleBar().addExcelControl();
 			userTable.getTitleBar().addSearchControl();

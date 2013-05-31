@@ -41,6 +41,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			article.setArticle(rs.getString("article"));
 			article.setGroupName(rs.getString("groupName"));
 			article.setDocumentCount(rs.getInt("documentCount"));
+			article.setTagCount(rs.getInt("tagCount"));
 			article.setAccessLevel(rs.getString("accessLevel"));
 			article.setAccessLevelId(rs.getInt("accessLevelId"));
 			return article;
@@ -54,7 +55,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 
 	public String createSqlBase() {
 		String sql = "select a.*, g.groupName, l.accessLevel, \n";
-		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount \n";
+		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
+		sql += "(select count(id) from tagArticleMapping where articleId = a.id) as tagCount \n";
 		sql += "from articles a \n";
 		sql += "left join groups g on g.id = a.groupId \n";
 		sql += "join userAccessLevels l on l.id = a.accessLevelId \n";

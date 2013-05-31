@@ -22,6 +22,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 	private String accessLevel;
 	private String groupName;
 	private int documentCount;
+	private int tagCount;
 
 	public Article() {
 
@@ -76,6 +77,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 		return startDate;
 	}
 
+	public int getTagCount() {
+		return tagCount;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -83,6 +88,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 	@Override
 	public boolean hasDocuments() {
 		return documentCount > 0;
+	}
+
+	public boolean hasTags() {
+		return tagCount > 0;
 	}
 
 	public void setAccessLevel(String accessLevel) {
@@ -123,6 +132,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
+	}
+
+	public void setTagCount(int tagCount) {
+		this.tagCount = tagCount;
 	}
 
 	public void setTitle(String title) {

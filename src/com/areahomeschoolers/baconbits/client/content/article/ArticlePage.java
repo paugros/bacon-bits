@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -26,6 +27,7 @@ import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
@@ -151,6 +153,13 @@ public class ArticlePage implements Page {
 				}
 			});
 			fieldTable.addField(groupField);
+		}
+
+		if (article.isSaved() && (article.hasTags() || Application.administratorOf(article.getGroupId()))) {
+			TagSection ts = new TagSection(TagMappingType.ARTICLE, article.getId());
+			ts.setEditingEnabled(Application.administratorOf(article.getGroupId()));
+			fieldTable.addField("Tags:", ts);
+			ts.populate();
 		}
 
 		final ControlledRichTextArea dataInput = new ControlledRichTextArea();
