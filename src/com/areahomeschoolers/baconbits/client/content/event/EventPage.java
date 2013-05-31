@@ -589,6 +589,7 @@ public class EventPage implements Page {
 					calendarEvent.setGroupId(((GroupListBox) groupField.getInputWidget()).getIntValue());
 				}
 			});
+
 			fieldTable.addField(groupField);
 
 			if (calendarEvent.isSaved()) {

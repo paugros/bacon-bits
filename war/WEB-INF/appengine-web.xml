@@ -27,6 +27,7 @@
   </system-properties>
 
   <sessions-enabled>true</sessions-enabled>
+  <precompilation-enabled>false</precompilation-enabled>
   <async-session-persistence enabled="true" />
     
   <!--
