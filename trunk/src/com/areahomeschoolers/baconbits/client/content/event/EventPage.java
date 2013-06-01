@@ -598,8 +598,8 @@ public class EventPage implements Page {
 			}
 		}
 
-		if (calendarEvent.isSaved() && (calendarEvent.hasTags() || Application.administratorOf(calendarEvent.getGroupId()))) {
-			TagSection ts = new TagSection(TagMappingType.EVENT, calendarEvent.getId());
+		if (calendarEvent.isSaved() && (!pageData.getTags().isEmpty() || Application.administratorOf(calendarEvent.getGroupId()))) {
+			TagSection ts = new TagSection(TagMappingType.EVENT, calendarEvent.getId(), pageData.getTags());
 			ts.setEditingEnabled(Application.administratorOf(calendarEvent.getGroupId()));
 			fieldTable.addField("Tags:", ts);
 			ts.populate();
