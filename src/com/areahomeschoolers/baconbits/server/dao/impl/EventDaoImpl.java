@@ -24,6 +24,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.server.dao.ArticleDao;
 import com.areahomeschoolers.baconbits.server.dao.EventDao;
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
+import com.areahomeschoolers.baconbits.server.dao.TagDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.util.Mailer;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
@@ -31,6 +32,7 @@ import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
@@ -46,6 +48,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Pair;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 @Repository
@@ -84,7 +87,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setPhone(rs.getString("phone"));
 			event.setWebsite(rs.getString("website"));
 			event.setDocumentCount(rs.getInt("documentCount"));
-			event.setTagCount(rs.getInt("tagCount"));
 			event.setAccessLevel(rs.getString("accessLevel"));
 			event.setAccessLevelId(rs.getInt("accessLevelId"));
 			event.setCurrentUserParticipantCount(rs.getInt("currentUserParticipantCount"));
@@ -258,6 +260,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			if (pd.getEvent() == null) {
 				return null;
 			}
+			// tags
+			TagDao tagDao = ServerContext.getDaoImpl("tag");
+			ArgMap<TagArg> tagArgs = new ArgMap<TagArg>(TagArg.ENTITY_ID, pd.getEvent().getId());
+			tagArgs.put(TagArg.MAPPING_TYPE, TagMappingType.EVENT.toString());
+			pd.setTags(tagDao.list(tagArgs));
 
 			// other events in same series
 			if (pd.getEvent().getSeriesId() != null) {
@@ -906,7 +913,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "0 as currentUserParticipantCount, ";
 		}
 		sql += "(select count(id) from documentEventMapping where eventId = e.id) as documentCount, \n";
-		sql += "(select count(id) from tagEventMapping where eventId = e.id) as tagCount, \n";
 		sql += "(e.endDate < now()) as finished, isActive(e.registrationStartDate, e.registrationEndDate) as registrationOpen \n";
 		sql += "from events e \n";
 		sql += "left join groups g on g.id = e.groupId \n";
