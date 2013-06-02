@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 public final class UserCellTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
 		ACTIVITY("Last activity"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS(
-				"Common interests"), AGE("Age - birth month");
+				"Same interests"), AGE("Age");
 
 		private String title;
 
