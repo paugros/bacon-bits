@@ -1,6 +1,5 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
@@ -41,6 +40,7 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.S
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -281,43 +281,39 @@ public class UserPage implements Page {
 			tabPanel.add("Groups", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					ArgMap<UserArg> userArgs = new ArgMap<UserArg>();
-					userArgs.put(UserArg.USER_ID, user.getId());
+					ArgMap<UserGroupArg> userArgs = new ArgMap<UserGroupArg>();
+					userArgs.put(UserGroupArg.USER_ID, user.getId());
 					final UserGroupCellTable groupsTable = new UserGroupCellTable(userArgs);
 					groupsTable.setUser(user);
 					groupsTable.setTitle("Group Membership");
 					groupsTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
 					groupsTable.getTitleBar().addExcelControl();
-					if (Application.isSystemAdministrator()) {
+					if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 						groupsTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
 							@Override
 							public void onMouseDown(MouseDownEvent event) {
-								final UserGroupSelector selector = new UserGroupSelector(new ArgMap<UserArg>());
+								ArgMap<UserGroupArg> grpArgs = new ArgMap<UserGroupArg>(Status.ACTIVE);
+								grpArgs.put(UserGroupArg.USER_NOT_MEMBER_OF, user.getId());
+								if (!Application.isSystemAdministrator()) {
+									grpArgs.put(UserGroupArg.USER_IS_ADMIN_OF, Application.getCurrentUserId());
+								}
+								final UserGroupSelector selector = new UserGroupSelector(grpArgs);
 								selector.addSubmitCommand(new Command() {
 									@Override
 									public void execute() {
-										final ArrayList<UserGroup> groups = new ArrayList<UserGroup>(selector.getSelectedItems());
-										groups.removeAll(groupsTable.getFullList());
-										if (groups.isEmpty()) {
-											return;
-										}
+										final UserGroup group = selector.getSelectedItem();
 
-										for (UserGroup g : groups) {
-											if (!groupsTable.getFullList().contains(g)) {
-												groupsTable.addItem(g);
-											}
-										}
-										userService.updateUserGroupRelation(user, groups, true, new Callback<Void>() {
+										userService.updateUserGroupRelation(user, group, true, new Callback<Void>() {
 											@Override
 											protected void doOnSuccess(Void item) {
-												groups.removeAll(groupsTable.getFullList());
+												groupsTable.addItem(group);
+												selector.getCellTable().removeItem(group);
 											}
 										});
 										selector.clearSelection();
 									}
 								});
 
-								selector.setMultiSelect(true);
 								selector.setSelectedItems(groupsTable.getFullList());
 								selector.center();
 							}

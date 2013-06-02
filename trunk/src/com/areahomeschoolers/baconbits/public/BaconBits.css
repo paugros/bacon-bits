@@ -20,6 +20,10 @@ h1 {
   width: 400px;
 }
 
+.gwt-Label {
+	font-size: small;
+}
+
 .dialogVPanel {
   margin: 5px;
 }
@@ -39,7 +43,7 @@ h1 {
 	overflow: hidden;
 }
 
-body,table td,select {
+body, table td, select, span, div, label {
 	font-family: Arial Unicode MS, Arial, sans-serif;
 	font-size: small;
 }

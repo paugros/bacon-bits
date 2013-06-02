@@ -9,7 +9,7 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -25,7 +25,7 @@ public final class UserGroupListPage implements Page {
 			return;
 		}
 
-		ArgMap<UserArg> args = new ArgMap<UserArg>();
+		ArgMap<UserGroupArg> args = new ArgMap<UserGroupArg>();
 		final String title = "Groups";
 		final UserGroupCellTable table = new UserGroupCellTable(args);
 		table.setTitle(title);

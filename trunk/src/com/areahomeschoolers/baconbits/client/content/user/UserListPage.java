@@ -66,7 +66,6 @@ public final class UserListPage implements Page {
 			table.getTitleBar().addLink(addLink);
 			table.addStatusFilterBox();
 		} else {
-			table.removeColumn(UserColumn.STATUS);
 			table.removeColumn(UserColumn.GROUP);
 		}
 
@@ -143,9 +142,11 @@ public final class UserListPage implements Page {
 
 		final DefaultListBox milesInput = new DefaultListBox();
 		final TextBox locationInput = new TextBox();
+		locationInput.setVisibleLength(30);
 		milesInput.addItem("5", 5);
 		milesInput.addItem("10", 10);
 		milesInput.addItem("25", 25);
+		milesInput.addItem("50", 50);
 		milesInput.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
