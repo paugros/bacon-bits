@@ -1,5 +1,8 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
+import java.util.Date;
+import java.util.HashMap;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.UserCellTable.UserColumn;
@@ -28,8 +31,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class UserCellTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
-		NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS("Common interests"), AGE(
-				"Age - birth month");
+		ACTIVITY("Last activity"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS(
+				"Common interests"), AGE("Age - birth month");
 
 		private String title;
 
@@ -44,6 +47,7 @@ public final class UserCellTable extends EntityCellTable<User, UserArg, UserColu
 	}
 
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
+	private HashMap<Integer, UserStatusIndicator> userIndicators = new HashMap<Integer, UserStatusIndicator>();
 
 	public UserCellTable(ArgMap<UserArg> args) {
 		this();
@@ -93,9 +97,23 @@ public final class UserCellTable extends EntityCellTable<User, UserArg, UserColu
 	protected void setColumns() {
 		for (UserColumn col : getDisplayColumns()) {
 			switch (col) {
+			case ACTIVITY:
+				addCompositeWidgetColumn(col, new WidgetCellCreator<User>() {
+					@Override
+					protected Widget createWidget(User user) {
+						UserStatusIndicator indicator = new UserStatusIndicator(user.getId());
+						userIndicators.put(user.getId(), indicator);
+						return indicator;
+					}
+				}, new ValueGetter<Date, User>() {
+					@Override
+					public Date get(User user) {
+						return Application.getUserActivity().get(user.getId());
+					}
+				});
+				break;
 			case AGE:
 				addTextColumn(col, new ValueGetter<String, User>() {
-
 					@Override
 					public String get(User item) {
 						String age = "";

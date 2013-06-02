@@ -4,15 +4,20 @@ import java.io.FileInputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -38,6 +43,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
@@ -118,6 +124,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 	}
 
+	private static Map<Integer, Date> userActivity;
+
 	public static MessageResolver resolver = null;
 
 	public final static String generatePassword() {
@@ -134,15 +142,77 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		return generator.generatePassword(8, rules);
 	}
 
+	public static LinkedHashMap<Integer, Date> getAllUserActivity() {
+		synchronized (userActivity) {
+			return new LinkedHashMap<Integer, Date>(userActivity);
+		}
+	}
+
 	public final static String getSha1Hash(String input, String saltText) {
 		ShaPasswordEncoder encoder = new ShaPasswordEncoder(512);
 
 		return encoder.encodePassword(input, saltText);
 	}
 
+	public static LinkedHashMap<Integer, Date> getUserActivitySinceLastPoll(int userId) {
+		LinkedHashMap<Integer, Date> map = new LinkedHashMap<Integer, Date>();
+		boolean beginRecording = false;
+		if (userId == 0) {
+			beginRecording = true;
+		}
+
+		Set<Integer> keySet = userActivity.keySet();
+		synchronized (userActivity) {
+			for (Integer i : keySet) {
+				if (beginRecording) {
+					map.put(i, userActivity.get(i));
+				}
+
+				if (i == userId) {
+					beginRecording = true;
+				}
+			}
+		}
+
+		if (userId > 0 && !ServerContext.getCurrentUser().isSwitched()) {
+			map.put(userId, new Date());
+		}
+		return map;
+	}
+
+	public static void updateUserActivity(int userId) {
+		ApplicationContext ctx = ServerContext.getApplicationContext();
+		UserDao userDao = (UserDao) ctx.getBean("userDaoImpl");
+		userDao.doUpdateUserActivity(userId);
+	}
+
 	@Autowired
 	public UserDaoImpl(DataSource dataSource) {
 		super(dataSource);
+
+		// initialize user activity data
+		userActivity = Collections.synchronizedMap(new LinkedHashMap<Integer, Date>());
+		String sql = "select u.id, u.lastActivityDate ";
+		sql += "from users u ";
+		sql += "where isActive(u.startDate, u.endDate) = 1 ";
+		sql += "and u.lastActivityDate is not null order by u.lastActivityDate";
+		query(sql, new RowMapper<Void>() {
+			@Override
+			public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+				userActivity.put(rs.getInt("id"), rs.getTimestamp("lastActivityDate"));
+				return null;
+			}
+		});
+	}
+
+	@Override
+	public synchronized void doUpdateUserActivity(int userId) {
+		// we remove first so that the new entry goes to the bottom
+		userActivity.remove(userId);
+		userActivity.put(userId, new Date());
+
+		String sql = "update users set lastActivityDate = now() where id = ?";
+		update(sql, userId);
 	}
 
 	@Override
@@ -178,6 +248,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		return pd;
+	}
+
+	@Override
+	public PollResponseData getPollData() {
+		PollResponseData data = new PollResponseData();
+		data.setUserActivity(getUserActivitySinceLastPoll(ServerContext.getCurrentUserId()));
+
+		return data;
 	}
 
 	@Override

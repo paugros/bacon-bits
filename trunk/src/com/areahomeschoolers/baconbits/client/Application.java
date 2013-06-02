@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.content.Layout;
@@ -21,12 +22,15 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserPage;
+import com.areahomeschoolers.baconbits.client.content.user.UserStatusIndicator;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -35,8 +39,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.Window.ClosingHandler;
@@ -52,7 +58,23 @@ public final class Application implements ValueChangeHandler<String> {
 	private static Command rpcFailureCommand;
 	public static final String APPLICATION_NAME = "WHE";
 	private static boolean confirmNavigation = false;
+	private static List<ParameterHandler<PollResponseData>> pollReturnHandlers = new ArrayList<ParameterHandler<PollResponseData>>();
+	private static Timer pollTimer;
+	private static final int pollInterval = 60 * 1000;
+	private static final int inactivityInterval = pollInterval * 2 + 1;
+	private static InactivityManager inactivityManager = new InactivityManager(inactivityInterval);
 	private static UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
+
+	public static HandlerRegistration addPollReturnHandler(final ParameterHandler<PollResponseData> handler) {
+		pollReturnHandlers.add(handler);
+
+		return new HandlerRegistration() {
+			@Override
+			public void removeHandler() {
+				pollReturnHandlers.remove(handler);
+			}
+		};
+	}
 
 	public static boolean administratorOf(Integer groupId) {
 		return isAuthenticated() && applicationData.getCurrentUser().administratorOf(groupId);
@@ -73,6 +95,10 @@ public final class Application implements ValueChangeHandler<String> {
 		}
 
 		return u.getId();
+	}
+
+	public static InactivityManager getInactivityManager() {
+		return inactivityManager;
 	}
 
 	public static Layout getLayout() {
@@ -101,6 +127,10 @@ public final class Application implements ValueChangeHandler<String> {
 
 	public static boolean isAuthenticated() {
 		return applicationData.getCurrentUser() != null;
+	}
+
+	public static boolean isIdle() {
+		return inactivityManager.isIdle();
 	}
 
 	public static boolean isLive() {
@@ -209,6 +239,41 @@ public final class Application implements ValueChangeHandler<String> {
 			});
 		}
 
+		if (isAuthenticated()) {
+			pollTimer = new Timer() {
+				@Override
+				public void run() {
+					pollForData();
+				}
+			};
+			pollTimer.scheduleRepeating(pollInterval);
+
+			inactivityManager.addWakeUpCommand(new Command() {
+				@Override
+				public void execute() {
+					pollForData();
+					pollTimer.scheduleRepeating(pollInterval);
+				}
+			});
+
+			inactivityManager.addOnSleepCommand(new Command() {
+				@Override
+				public void execute() {
+					pollTimer.cancel();
+				}
+			});
+
+			addPollReturnHandler(new ParameterHandler<PollResponseData>() {
+				@Override
+				public void execute(PollResponseData item) {
+					getApplicationData().updateUserActivityFromMap(item.getUserActivity());
+					UserStatusIndicator.updateAllStatusIndicators();
+				}
+			});
+
+			pollForData();
+		}
+
 		Window.addWindowClosingHandler(new ClosingHandler() {
 			@Override
 			public void onWindowClosing(ClosingEvent event) {
@@ -226,6 +291,17 @@ public final class Application implements ValueChangeHandler<String> {
 		final String page = HistoryToken.getElement("page") == null ? "Home" : HistoryToken.getElement("page");
 
 		createNewPage(page);
+	}
+
+	private void pollForData() {
+		userService.getPollData(new Callback<PollResponseData>(false) {
+			@Override
+			protected void doOnSuccess(PollResponseData summary) {
+				for (ParameterHandler<PollResponseData> handler : pollReturnHandlers) {
+					handler.execute(summary);
+				}
+			}
+		});
 	}
 
 }

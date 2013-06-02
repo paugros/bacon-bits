@@ -15,6 +15,14 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource checkMark();
 
+	ImageResource circleGray();
+
+	ImageResource circleGreen();
+
+	ImageResource circleOrange();
+
+	ImageResource circleRed();
+
 	ImageResource collapse();
 
 	ImageResource edit();

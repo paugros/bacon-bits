@@ -9,15 +9,20 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 public interface UserDao {
+	public void doUpdateUserActivity(int userId);
+
 	public User getById(int userId);
 
 	public UserPageData getPageData(int userId);
+
+	public PollResponseData getPollData();
 
 	public User getUserByUsername(String username);
 

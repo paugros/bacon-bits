@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.server.dao.TagDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
+import com.areahomeschoolers.baconbits.server.dao.impl.UserDaoImpl;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
@@ -49,8 +50,11 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		ApplicationData ap = new ApplicationData();
 		ap.setCurrentUser(user);
 		ap.setAdultBirthYear(Calendar.getInstance().get(Calendar.YEAR) - 18);
+		ap.setUserActivity(UserDaoImpl.getAllUserActivity());
 
 		if (user != null) {
+			UserDaoImpl.updateUserActivity(user.getId());
+
 			TagDao tagDao = ServerContext.getDaoImpl("tag");
 			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_TYPE, TagMappingType.USER.toString());
 			args.put(TagArg.ENTITY_ID, user.getId());
