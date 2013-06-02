@@ -183,6 +183,12 @@ public class UserFieldTable extends FieldTable {
 		});
 		addField(emailField);
 
+		if (user.isSaved()) {
+			UserStatusIndicator st = new UserStatusIndicator();
+			st.setUserId(user.getId());
+			addField("Last activity:", st);
+		}
+
 		final Label sexDisplay = new Label();
 		final RequiredListBox sexInput = new RequiredListBox();
 		sexInput.addItem("Female", "f");
