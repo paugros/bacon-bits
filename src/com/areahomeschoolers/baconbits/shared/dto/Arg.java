@@ -56,4 +56,12 @@ public interface Arg {
 		}
 	}
 
+	public enum UserGroupArg implements Arg, IsSerializable {
+		USER_ID, USER_IS_ADMIN_OF, USER_NOT_MEMBER_OF;
+
+		private UserGroupArg() {
+
+		}
+	}
+
 }

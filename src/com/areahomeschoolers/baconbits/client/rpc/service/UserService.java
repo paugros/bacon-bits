@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
@@ -27,7 +28,7 @@ public interface UserService extends RemoteService {
 
 	public ArrayList<User> list(ArgMap<UserArg> args);
 
-	public ArrayList<UserGroup> listGroups(ArgMap<UserArg> args);
+	public ArrayList<UserGroup> listGroups(ArgMap<UserGroupArg> args);
 
 	public HashMap<Integer, Boolean> refreshSecurityGroups();
 

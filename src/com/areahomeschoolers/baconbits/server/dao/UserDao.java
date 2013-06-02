@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -22,7 +23,7 @@ public interface UserDao {
 
 	public ArrayList<User> list(ArgMap<UserArg> args);
 
-	public ArrayList<UserGroup> listGroups(ArgMap<UserArg> args);
+	public ArrayList<UserGroup> listGroups(ArgMap<UserGroupArg> args);
 
 	public void recordLogin(String username);
 

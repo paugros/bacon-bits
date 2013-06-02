@@ -16,7 +16,7 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableCo
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -27,7 +27,7 @@ import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
-public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg, UserGroupColumn> {
+public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserGroupArg, UserGroupColumn> {
 	public enum UserGroupColumn implements EntityCellTableColumn<UserGroupColumn> {
 		NAME("Name"), DESCRIPTION("Description"), START_DATE("Start"), END_DATE("End"), ADMINISTRATOR("Administrator");
 
@@ -46,7 +46,7 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserArg
 	private User user;
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
-	public UserGroupCellTable(ArgMap<UserArg> args) {
+	public UserGroupCellTable(ArgMap<UserGroupArg> args) {
 		this();
 		setArgMap(args);
 	}

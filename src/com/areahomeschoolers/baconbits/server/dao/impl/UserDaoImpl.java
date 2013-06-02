@@ -34,6 +34,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
@@ -227,6 +228,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String withinLat = args.getString(UserArg.WITHIN_LAT);
 		String withinLng = args.getString(UserArg.WITHIN_LNG);
 		String distanceCol = null;
+		int minAge = 0;
+		int maxAge = 0;
+
+		if (ages.size() > 1) {
+			minAge = ages.get(0);
+			maxAge = ages.get(1);
+		}
 
 		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
 			distanceCol = "(3959 * acos( cos( radians(" + withinLat + ") ) * cos( radians( u.lat ) ) * cos( radians( u.lng ) - radians(" + withinLng + ") )";
@@ -246,20 +254,39 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 		sql += "where 1 = 1 ";
 
+		// start directory logic //
+		if (onlyParents) {
+			sql += "and u.birthDate < date_add(now(), interval -18 year) ";
+			if (ages.size() > 1) {
+				sql += "and (select count(id) from users where parentId = u.id ";
+				sql += "and (datediff(now(), birthDate) / 365.25) between " + minAge + " and " + maxAge + ") > 0 ";
+			}
+		}
+
 		if (parentsOfBoys) {
-			sql += "and (select count(id) from users where parentId = u.id and sex = 'm') > 0 ";
+			sql += "and (select count(id) from users where parentId = u.id and sex = 'm' ";
+			if (ages.size() > 1) {
+				sql += "and (datediff(now(), birthDate) / 365.25) between " + minAge + " and " + maxAge;
+			}
+			sql += ") > 0 ";
 		}
 
 		if (parentsOfGirls) {
-			sql += "and (select count(id) from users where parentId = u.id and sex = 'f') > 0 ";
+			sql += "and (select count(id) from users where parentId = u.id and sex = 'f' ";
+			if (ages.size() > 1) {
+				sql += "and (datediff(now(), birthDate) / 365.25) between " + minAge + " and " + maxAge;
+			}
+			sql += ") > 0 ";
 		}
 
-		if (ages.size() > 1) {
-			int min = ages.get(0);
-			int max = ages.get(1);
-			sql += "and (select count(id) from users where parentId = u.id ";
-			sql += "and (datediff(now(), birthDate) / 365.25) between " + min + " and " + max + " ) > 0 ";
+		if (onlyChildren) {
+			sql += "and u.birthDate > date_add(now(), interval -18 year) ";
+			if (ages.size() > 1) {
+				sql += "and (datediff(now(), u.birthDate) / 365.25) between " + minAge + " and " + maxAge + " ";
+			}
 		}
+
+		// end directory logic //
 
 		if (onlyCommonInterests) {
 			sql += "and i.commonInterests > 0 ";
@@ -284,14 +311,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sqlArgs.add(parentIdPlusSelf);
 		}
 
-		if (onlyParents) {
-			sql += "and u.birthDate < date_add(now(), interval -18 year) ";
-		}
-
-		if (onlyChildren) {
-			sql += "and u.birthDate > date_add(now(), interval -18 year) ";
-		}
-
 		if (parentId > 0) {
 			sql += "and u.parentId = ? ";
 			sqlArgs.add(parentId);
@@ -308,25 +327,35 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
-	public ArrayList<UserGroup> listGroups(ArgMap<UserArg> args) {
-		int userId = args.getInt(UserArg.USER_ID);
+	public ArrayList<UserGroup> listGroups(ArgMap<UserGroupArg> args) {
+		int userId = args.getInt(UserGroupArg.USER_ID);
+		int userNotMemberId = args.getInt(UserGroupArg.USER_NOT_MEMBER_OF);
+		int userAdminId = args.getInt(UserGroupArg.USER_IS_ADMIN_OF);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select * from groups g ";
 		if (userId > 0) {
-			sql += "join userGroupMembers ugm on ugm.groupId = g.id ";
+			sql += "join userGroupMembers uugm on uugm.groupId = g.id and uugm.userId = ? ";
+			sqlArgs.add(userId);
+		}
+		if (userAdminId > 0) {
+			sql += "join userGroupMembers augm on augm.groupId = g.id and augm.isAdministrator = 1 and augm.userId = ? ";
+			sqlArgs.add(userAdminId);
+		}
+		if (userNotMemberId > 0) {
+			sql += "left join userGroupMembers nugm on nugm.groupId = g.id and nugm.userId = ? ";
+			sqlArgs.add(userNotMemberId);
 		}
 		sql += "where 1 = 1 ";
 		if (args.getStatus() != Status.ALL) {
 			sql += "and isActive(g.startDate, g.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
 		}
-		if (userId > 0) {
-			sql += "and ugm.userId = ? ";
-			sqlArgs.add(userId);
+		if (userNotMemberId > 0) {
+			sql += "and nugm.id is null ";
 		}
 		sql += "order by groupName asc";
 
-		if (userId > 0) {
+		if (userId > 0 || userAdminId > 0 || userNotMemberId > 0) {
 			return query(sql, new GroupMemberMapper(), sqlArgs.toArray());
 		}
 
@@ -638,7 +667,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (specialCols != null) {
 			sql += specialCols;
 		}
-		sql += "(select group_concat(g.groupName separator '\n') from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id) as groupsText ";
+		sql += "(select group_concat(g.groupName separator '\n') from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id ";
+		sql += "and isActive(g.startDate, g.endDate) = 1) as groupsText ";
 		sql += "from users u \n";
 		sql += "left join users uu on uu.id = u.parentId \n";
 		sql += "left join ( \n";
