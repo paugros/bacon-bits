@@ -54,6 +54,10 @@
       </auth-constraint>
   </security-constraint>
   
+  <session-config>
+	<session-timeout>-1</session-timeout>
+  </session-config>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>BaconBits.html</welcome-file>

@@ -102,7 +102,7 @@ public class UserStatusIndicator extends Composite {
 		String titlePrefix = "";
 		if (idleMinutes < 5) {
 			icon.setResource(MainImageBundle.INSTANCE.circleGreen());
-		} else if (idleMinutes < (60 * 4)) {
+		} else if (idleMinutes < (60 * 12)) {
 			titlePrefix = "Idle ";
 			icon.setResource(MainImageBundle.INSTANCE.circleOrange());
 		} else {
