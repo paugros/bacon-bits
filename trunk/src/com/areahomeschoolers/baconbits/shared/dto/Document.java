@@ -12,7 +12,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public final class Document extends EntityDto<Document> {
 	public enum DocumentLinkType implements IsSerializable {
-		ARTICLE("article"), EVENT("event"), HTML_IMAGE_INSERT(""), BOOK("book");
+		ARTICLE("article"), EVENT("event"), HTML_IMAGE_INSERT(""), BOOK("book"), PROFILE("users");
 
 		private String entityType;
 		private static final Map<String, DocumentLinkType> lookup = new HashMap<String, DocumentLinkType>();

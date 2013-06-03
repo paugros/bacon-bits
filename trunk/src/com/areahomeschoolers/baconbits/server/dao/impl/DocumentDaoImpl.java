@@ -110,6 +110,9 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 					scaleImageToMaximumSize(document, 600, 2000);
 				} else if (document.getLinkType() == DocumentLinkType.BOOK) {
 					scaleImageToMaximumSize(document, 300, 300);
+				} else if (document.getLinkType() == DocumentLinkType.PROFILE) {
+					cropToSquare(document);
+					scaleImageToMaximumSize(document, 200, 200);
 				}
 			}
 
@@ -149,7 +152,15 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 
 					sql = "update books set smallImageId = ? where id = ?";
 					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
+				} else if (document.getLinkType() == DocumentLinkType.PROFILE) {
+					String newsql = "update users set imageId = ? where id = ?";
+					update(newsql, document.getId(), document.getLinkId());
 
+					scaleImageToMaximumSize(document, 80, 80);
+					update(sql, namedParams, keys);
+
+					sql = "update users set smallImageId = ? where id = ?";
+					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
 				} else {
 					link(document);
 				}
@@ -157,6 +168,70 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		}
 
 		return getById(document.getId());
+	}
+
+	public void scaleImageToMaximumSize(int docId, int maxWidth, int maxHeight) {
+		Document d = getById(docId);
+		d = scaleImageToMaximumSize(d, maxWidth, maxHeight);
+		save(d);
+	}
+
+	private Document createDocument(ResultSet rs) throws SQLException {
+		Document document = new Document();
+		document.setId(rs.getInt("id"));
+		document.setAddedById(rs.getInt("addedById"));
+		document.setFileExtension(rs.getString("fileExtension"));
+		document.setFileType(rs.getString("fileType"));
+		document.setFileName(rs.getString("fileName"));
+		document.setStartDate(rs.getTimestamp("startDate"));
+		document.setEndDate(rs.getTimestamp("endDate"));
+		document.setAddedDate(rs.getTimestamp("addedDate"));
+		document.setDescription(rs.getString("description"));
+		return document;
+	}
+
+	private Document cropToSquare(Document d) {
+		ImagesService imagesService = ImagesServiceFactory.getImagesService();
+		Image image = ImagesServiceFactory.makeImage(d.getData());
+
+		int width = image.getWidth();
+		int height = image.getHeight();
+		if (width == height) {
+			return d;
+		}
+
+		float leftX = 0;
+		float topY = 0;
+		float rightX = 1;
+		float bottomY = 1;
+		if (height > width) {
+			// we need to change the Y coordinates
+			float ratio = ((height - width) / 2) / height;
+			topY = ratio;
+			bottomY = 1 - ratio;
+		} else {
+			// we need to change the X coordinates
+			float ratio = ((width - height) / 2) / width;
+			leftX = ratio;
+			rightX = 1 - ratio;
+		}
+
+		Transform crop = ImagesServiceFactory.makeCrop(leftX, topY, rightX, bottomY);
+
+		Image newImage = imagesService.applyTransform(crop, image);
+
+		d.setData(newImage.getImageData());
+
+		return d;
+	}
+
+	private Document link(Document document) {
+		String entityType = document.getLinkType().getEntityType();
+
+		String sql = "insert into document" + Common.ucWords(entityType) + "Mapping (documentId, " + entityType + "Id) values (?, ?)";
+		update(sql, document.getId(), document.getLinkId());
+
+		return document;
 	}
 
 	/**
@@ -167,7 +242,7 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 	 * @param response
 	 * @return
 	 */
-	public Document scaleImageToMaximumSize(Document d, int maxWidth, int maxHeight) {
+	private Document scaleImageToMaximumSize(Document d, int maxWidth, int maxHeight) {
 		ImagesService imagesService = ImagesServiceFactory.getImagesService();
 		Image image = ImagesServiceFactory.makeImage(d.getData());
 
@@ -191,35 +266,6 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		}
 
 		return d;
-	}
-
-	public void scaleImageToMaximumSize(int docId, int maxWidth, int maxHeight) {
-		Document d = getById(docId);
-		d = scaleImageToMaximumSize(d, maxWidth, maxHeight);
-		save(d);
-	}
-
-	private Document createDocument(ResultSet rs) throws SQLException {
-		Document document = new Document();
-		document.setId(rs.getInt("id"));
-		document.setAddedById(rs.getInt("addedById"));
-		document.setFileExtension(rs.getString("fileExtension"));
-		document.setFileType(rs.getString("fileType"));
-		document.setFileName(rs.getString("fileName"));
-		document.setStartDate(rs.getTimestamp("startDate"));
-		document.setEndDate(rs.getTimestamp("endDate"));
-		document.setAddedDate(rs.getTimestamp("addedDate"));
-		document.setDescription(rs.getString("description"));
-		return document;
-	}
-
-	private Document link(Document document) {
-		String entityType = document.getLinkType().getEntityType();
-
-		String sql = "insert into document" + Common.ucWords(entityType) + "Mapping (documentId, " + entityType + "Id) values (?, ?)";
-		update(sql, document.getId(), document.getLinkId());
-
-		return document;
 	}
 
 }
