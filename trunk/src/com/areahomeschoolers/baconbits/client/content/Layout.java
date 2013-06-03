@@ -30,6 +30,7 @@ import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -176,21 +177,21 @@ public final class Layout {
 				public void onMouseDown(MouseDownEvent event) {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
 
-					// if (!GWT.isProdMode()) {
-					// // loginService.loginAndGetApplicationData("kaugros@gmail.com", "Redball1", new AsyncCallback<ApplicationData>() {
-					// // loginService.loginAndGetApplicationData("kristin@wearehomeeducators.com", "Redball1", new AsyncCallback<ApplicationData>() {
-					// loginService.loginAndGetApplicationData("paul.augros@gmail.com", "L33nfiatna", new AsyncCallback<ApplicationData>() {
-					// @Override
-					// public void onFailure(Throwable caught) {
-					// }
-					//
-					// @Override
-					// public void onSuccess(ApplicationData result) {
-					// Window.Location.reload();
-					// }
-					// });
-					// return;
-					// }
+					if (!GWT.isProdMode()) {
+						// loginService.loginAndGetApplicationData("kaugros@gmail.com", "Redball1", new AsyncCallback<ApplicationData>() {
+						// loginService.loginAndGetApplicationData("kristin@wearehomeeducators.com", "Redball1", new AsyncCallback<ApplicationData>() {
+						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "L33nfiatna", new AsyncCallback<ApplicationData>() {
+							@Override
+							public void onFailure(Throwable caught) {
+							}
+
+							@Override
+							public void onSuccess(ApplicationData result) {
+								Window.Location.reload();
+							}
+						});
+						return;
+					}
 
 					final LoginDialog ld = new LoginDialog(loginService);
 					ld.setLoginHandler(new LoginHandler() {
