@@ -4,6 +4,7 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.CreateUserDialog;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -79,8 +80,11 @@ public class LoginDialog extends DialogBox {
 
 		setText(TITLE);
 		setAnimationEnabled(true);
-		setModal(false);
-		// setGlassEnabled(true);
+		if (ClientUtils.isMobileBrowser()) {
+			setModal(false);
+		} else {
+			setGlassEnabled(true);
+		}
 
 		vp.setWidth("360px");
 		vp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
