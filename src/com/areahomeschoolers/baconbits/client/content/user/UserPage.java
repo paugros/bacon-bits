@@ -1,6 +1,9 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
@@ -21,6 +24,8 @@ import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
+import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
@@ -28,6 +33,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
+import com.areahomeschoolers.baconbits.client.widgets.CalendarPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.FixedWidthLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
@@ -44,18 +50,22 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
+import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
+import com.bradrydzewski.gwt.calendar.client.Appointment;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.logical.shared.OpenEvent;
+import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -106,6 +116,7 @@ public class UserPage implements Page {
 	private UserFieldTable fieldTable;
 	private TabPage tabPanel;
 	private UserPageData pageData;
+	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 
 	private BookDialog bookDialog;
 
@@ -433,6 +444,57 @@ public class UserPage implements Page {
 			} else {
 				tabPanel.addSkipIndex();
 			}
+
+			tabPanel.add("Calendar", new TabPageCommand() {
+				@Override
+				public void execute(final VerticalPanel tabBody) {
+					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
+					args.setStatus(Status.ACTIVE);
+					args.put(EventArg.NOT_STATUS_ID, 5);
+					eventService.getParticipants(args, new Callback<ArrayList<EventParticipant>>() {
+						@Override
+						protected void doOnSuccess(ArrayList<EventParticipant> result) {
+							CalendarPanel cp = new CalendarPanel();
+							// cp.getCalendar().addSelectionHandler(new SelectionHandler<Appointment>() {
+							// @Override
+							// public void onSelection(SelectionEvent<Appointment> event) {
+							// HistoryToken.set(PageUrl.event(Integer.parseInt(event.getSelectedItem().getId())));
+							// }
+							// });
+							cp.getCalendar().addOpenHandler(new OpenHandler<Appointment>() {
+								@Override
+								public void onOpen(OpenEvent<Appointment> event) {
+									HistoryToken.set(PageUrl.event(Integer.parseInt(event.getTarget().getId())));
+								}
+							});
+							tabBody.add(cp);
+
+							Map<Integer, Appointment> appMap = new HashMap<Integer, Appointment>();
+							for (EventParticipant p : result) {
+								Appointment a = appMap.get(p.getEventId());
+								if (a == null) {
+									a = new Appointment();
+									appMap.put(p.getEventId(), a);
+									a.setReadOnly(true);
+									a.setStart(p.getEventStartDate());
+									a.setEnd(p.getEventEndDate());
+									a.setTitle(p.getEventTitle());
+									a.setId(Integer.toString(p.getEventId()));
+									a.setDescription(p.getFirstName());
+								} else {
+									a.setDescription(a.getDescription() + ", " + p.getFirstName());
+								}
+							}
+
+							cp.getCalendar().suspendLayout();
+							cp.getCalendar().addAppointments(new ArrayList<Appointment>(appMap.values()));
+							cp.getCalendar().resumeLayout();
+
+							tabPanel.selectTabNow(tabBody);
+						}
+					});
+				}
+			});
 
 			if (!canEditUser(user)) {
 				form.setEnabled(false);

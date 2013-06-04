@@ -12,6 +12,10 @@
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
   
+  <!-- Other module inherits                                      -->
+  <inherits name='com.bradrydzewski.gwt.calendar.Calendar' />
+  <inherits name='com.bradrydzewski.gwt.calendar.theme.google.Google' />
+  
   <extend-property name="locale" values="en_US"/>
   <set-property name="locale" value="en_US"/>
   
@@ -19,8 +23,6 @@
   <extend-configuration-property name="rpc.blacklist"	value="com.google.gwt.user.client.ui.ClickListenerCollection" />
   <extend-configuration-property name="rpc.blacklist"	value="com.google.gwt.user.client.ui.FocusListenerCollection" />
   <extend-configuration-property name="rpc.blacklist"	value="com.google.gwt.user.client.ui.KeyboardListenerCollection" />
-
-  <!-- Other module inherits                                      -->
 
   <stylesheet src="BaconBits.css" />
   <script src="jquery-1.3.2.js" />
