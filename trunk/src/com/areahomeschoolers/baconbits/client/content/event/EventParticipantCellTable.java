@@ -189,7 +189,7 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 				setColumnWidth(addDateTimeColumn(col, new ValueGetter<Date, EventParticipant>() {
 					@Override
 					public Date get(EventParticipant item) {
-						return item.getEventDate();
+						return item.getEventStartDate();
 					}
 				}), "140px");
 				break;
