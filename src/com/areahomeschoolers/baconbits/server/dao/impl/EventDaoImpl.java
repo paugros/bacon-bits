@@ -231,10 +231,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 		pd.setUpcomingEvents(list(args));
 
-		args.put(EventArg.SHOW_COMMUNITY);
+		args.put(EventArg.ONLY_COMMUNITY);
 		pd.setCommunityEvents(list(args));
 
-		args.remove(EventArg.SHOW_COMMUNITY);
+		args.remove(EventArg.ONLY_COMMUNITY);
 		args.put(EventArg.NEWLY_ADDED);
 		pd.setNewlyAddedEvents(list(args));
 
@@ -579,7 +579,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	public ArrayList<Event> list(ArgMap<EventArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int upcoming = args.getInt(EventArg.UPCOMING_NUMBER);
-		boolean showCommunity = args.getBoolean(EventArg.SHOW_COMMUNITY);
+		boolean showCommunity = args.getBoolean(EventArg.ONLY_COMMUNITY);
+		boolean includeCommunity = args.getBoolean(EventArg.INCLUDE_COMMUNITY);
 		int seriesId = args.getInt(EventArg.SERIES_ID);
 		boolean newlyAdded = args.getBoolean(EventArg.NEWLY_ADDED);
 		int registeredByOrAddedForId = args.getInt(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID);
@@ -601,7 +602,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		if (!(seriesId > 0)) {
 			if (showCommunity) {
 				sql += "and e.categoryId = 6 ";
-			} else {
+			} else if (!includeCommunity) {
 				sql += "and e.categoryId != 6 ";
 			}
 		}

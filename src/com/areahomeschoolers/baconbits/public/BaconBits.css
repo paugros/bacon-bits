@@ -80,13 +80,8 @@ img {
 /* -------------------------- CLASS/INSTANCE/PARTICULAR STYLES ---------------------------------- */
 /* styles in this section should be strongly associated with particular classes, instance */
 /* objects or use cases */
-.calendarToday {
-	background-color: #FFF7D7;
-	border: 1px solid #FFF7D7;
-}
-
-.calendarToday-selected {
-	border: 1px solid #FAD163;
+.calendarSelection {
+	background-color: #d7dfe8;
 }
 
 .clickBox {

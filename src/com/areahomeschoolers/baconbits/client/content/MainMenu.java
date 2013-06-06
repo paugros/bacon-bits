@@ -155,6 +155,7 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getEventsMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Events", PageUrl.eventList());
+		addLinkToMenu(menu, "Calendar", PageUrl.eventCalendar());
 
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
@@ -192,6 +193,7 @@ public final class MainMenu extends MenuBar {
 		if (!Application.getCurrentUser().isChild()) {
 			addLinkToMenu(menu, "Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
 		}
+		addLinkToMenu(menu, "Calendar", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
 
 		return menu;
 	}
