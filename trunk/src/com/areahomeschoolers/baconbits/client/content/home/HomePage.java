@@ -81,7 +81,7 @@ public class HomePage implements Page {
 
 				HTML h = new HTML();
 				h.setHTML(e.getDescription().replaceAll("<br>", " "));
-				String text = h.getText();
+				String text = h.getText().trim();
 				if (text.length() > 100) {
 					text = text.substring(0, 101) + "...";
 				}
@@ -326,6 +326,7 @@ public class HomePage implements Page {
 					if (!Application.getCurrentUser().isChild()) {
 						links.add(new Pair<String, String>("Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6"));
 					}
+					links.add(new Pair<String, String>("Calendar", PageUrl.user(Application.getCurrentUserId()) + "&tab=7"));
 
 					VerticalPanel lp = new VerticalPanel();
 					Label linkLabel = new Label("Links");

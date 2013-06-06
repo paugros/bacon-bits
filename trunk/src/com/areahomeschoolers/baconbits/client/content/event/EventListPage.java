@@ -44,7 +44,7 @@ public final class EventListPage implements Page {
 	public EventListPage(final VerticalPanel page) {
 		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 		if (showCommunity) {
-			args.put(EventArg.SHOW_COMMUNITY);
+			args.put(EventArg.ONLY_COMMUNITY);
 		}
 		if (newlyAdded) {
 			args.put(EventArg.NEWLY_ADDED);
