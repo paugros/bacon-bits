@@ -208,7 +208,7 @@ public abstract class Common {
 		if (value.contains(",")) {
 			value = "\"" + value + "\"";
 		}
-		return value;
+		return value.replaceAll("\n", " ");
 	}
 
 	/**
