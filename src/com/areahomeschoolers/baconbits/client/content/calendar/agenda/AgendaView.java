@@ -1,16 +1,34 @@
-package com.areahomeschoolers.baconbits.client.widgets;
+/*
+ * This file is part of gwt-cal
+ * Copyright (C) 2009  Scottsdale Software LLC
+ * 
+ * gwt-cal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/
+ */
+
+package com.areahomeschoolers.baconbits.client.content.calendar.agenda;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.areahomeschoolers.baconbits.client.content.calendar.Appointment;
+import com.areahomeschoolers.baconbits.client.content.calendar.CalendarView;
+import com.areahomeschoolers.baconbits.client.content.calendar.CalendarWidget;
+import com.areahomeschoolers.baconbits.client.content.calendar.DateUtils;
+import com.areahomeschoolers.baconbits.client.content.calendar.util.AppointmentUtil;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.bradrydzewski.gwt.calendar.client.Appointment;
-import com.bradrydzewski.gwt.calendar.client.CalendarView;
-import com.bradrydzewski.gwt.calendar.client.CalendarWidget;
-import com.bradrydzewski.gwt.calendar.client.DateUtils;
-import com.bradrydzewski.gwt.calendar.client.util.AppointmentUtil;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
@@ -23,7 +41,7 @@ import com.google.gwt.user.client.ui.InlineHyperlink;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class CalendarAgendaView extends CalendarView {
+public class AgendaView extends CalendarView {
 
 	/**
 	 * Adapter class that maps an Appointment to the widgets (DIV's, etc) that represent it on the screen. This is necessary because a single appointment is

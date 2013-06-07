@@ -13,8 +13,7 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
   
   <!-- Other module inherits                                      -->
-  <inherits name='com.bradrydzewski.gwt.calendar.Calendar' />
-  <inherits name='com.bradrydzewski.gwt.calendar.theme.google.Google' />
+  <inherits name='com.allen_sauer.gwt.dnd.gwt-dnd'/>
   
   <extend-property name="locale" values="en_US"/>
   <set-property name="locale" value="en_US"/>
@@ -25,6 +24,7 @@
   <extend-configuration-property name="rpc.blacklist"	value="com.google.gwt.user.client.ui.KeyboardListenerCollection" />
 
   <stylesheet src="BaconBits.css" />
+  <stylesheet src="gwt-cal-google.css" />
   <script src="jquery-1.3.2.js" />
   <script src="jquery.barcode.0.3.js" />
   <!-- Specify the app entry point class.                         -->

@@ -11,6 +11,8 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.book.BookDialog;
+import com.areahomeschoolers.baconbits.client.content.calendar.Appointment;
+import com.areahomeschoolers.baconbits.client.content.calendar.AppointmentStyle;
 import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
@@ -57,16 +59,12 @@ import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
-import com.bradrydzewski.gwt.calendar.client.Appointment;
-import com.bradrydzewski.gwt.calendar.client.AppointmentStyle;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -456,12 +454,6 @@ public class UserPage implements Page {
 						@Override
 						protected void doOnSuccess(ArrayList<EventParticipant> result) {
 							CalendarPanel cp = new CalendarPanel();
-							cp.getCalendar().addSelectionHandler(new SelectionHandler<Appointment>() {
-								@Override
-								public void onSelection(SelectionEvent<Appointment> event) {
-									HistoryToken.set(PageUrl.event(Integer.parseInt(event.getSelectedItem().getId())));
-								}
-							});
 							tabBody.add(cp);
 
 							Map<Integer, Appointment> appMap = new HashMap<Integer, Appointment>();

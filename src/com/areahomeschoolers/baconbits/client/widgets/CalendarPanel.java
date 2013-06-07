@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.areahomeschoolers.baconbits.client.content.calendar.Calendar;
+import com.areahomeschoolers.baconbits.client.content.calendar.CalendarSettings;
+import com.areahomeschoolers.baconbits.client.content.calendar.CalendarViews;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
-import com.bradrydzewski.gwt.calendar.client.Calendar;
-import com.bradrydzewski.gwt.calendar.client.CalendarSettings;
-import com.bradrydzewski.gwt.calendar.client.CalendarViews;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -27,18 +27,22 @@ import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DatePicker;
 
 public class CalendarPanel extends FlowPanel {
 	private Calendar calendar = null;
 	private DatePicker datePicker = new DatePicker();
 	private FlexTable layoutTable = new FlexTable();
-	private AbsolutePanel leftPanel = new AbsolutePanel();
+	private VerticalPanel leftPanel = new VerticalPanel();
 	private AbsolutePanel topPanel = new AbsolutePanel();
 	private DecoratorPanel dayViewDecorator = new DecoratorPanel();
 	private DecoratorPanel datePickerDecorator = new DecoratorPanel();
 	private DecoratedTabBar calendarViewsTabBar = new DecoratedTabBar();
 	private List<Date> selectedDates = new ArrayList<Date>();
+	private SimplePanel legendPanel = new SimplePanel();
 
 	private CalendarSettings settings = new CalendarSettings();
 
@@ -64,6 +68,9 @@ public class CalendarPanel extends FlowPanel {
 		topPanel.setStyleName("daysTabBar");
 		leftPanel.setStyleName("leftPanel");
 		leftPanel.add(datePickerDecorator);
+
+		legendPanel.getElement().getStyle().setPadding(15, Unit.PX);
+		leftPanel.add(legendPanel);
 
 		datePickerDecorator.add(datePicker);
 		dayViewDecorator.add(calendar);
@@ -106,6 +113,10 @@ public class CalendarPanel extends FlowPanel {
 		return calendar;
 	}
 
+	public void setLegend(Widget legend) {
+		legendPanel.setWidget(legend);
+	}
+
 	private void configureCalendar() {
 		settings.setOffsetHourLabels(false);
 
@@ -132,15 +143,19 @@ public class CalendarPanel extends FlowPanel {
 				if (tabIndex == 0) {
 					calendar.setView(CalendarViews.DAY, 1);
 					calendar.setDate(new Date());
+					calendar.scrollToHour(8);
 					datePicker.setCurrentMonth(new Date());
 				} else if (tabIndex == 1) {
 					calendar.setView(CalendarViews.DAY, 1);
+					calendar.scrollToHour(8);
 				} else if (tabIndex == 2) {
 					calendar.setView(CalendarViews.DAY, 5);
+					calendar.scrollToHour(8);
 				} else if (tabIndex == 3) {
 					calendar.setView(CalendarViews.DAY, 7);
+					calendar.scrollToHour(8);
 				} else if (tabIndex == 4) {
-					calendar.setView(new CalendarAgendaView());
+					calendar.setView(CalendarViews.AGENDA);
 					calendar.setDays(7);
 				} else if (tabIndex == 5) {
 					calendar.setView(CalendarViews.MONTH);
@@ -173,8 +188,6 @@ public class CalendarPanel extends FlowPanel {
 			for (int i = 1; i < days; i++) {
 				dates.add(ClientDateUtils.addDays(date, i));
 			}
-
-			calendar.scrollToHour(8);
 
 			datePicker.addStyleToDates("calendarSelection", dates);
 			selectedDates = dates;

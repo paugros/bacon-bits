@@ -138,7 +138,7 @@ public class EmailDialog extends DefaultDialog {
 						body += hiddenBelowText;
 					}
 
-					body += "NOTE: DO NOT REPLY TO THIS EMAIL.</font><br><br>";
+					body += "<br><br>NOTE: DO NOT REPLY TO THIS EMAIL.</font><br><br>";
 
 					email.setBody(body);
 

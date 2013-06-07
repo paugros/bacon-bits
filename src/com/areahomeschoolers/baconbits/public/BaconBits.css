@@ -84,6 +84,21 @@ img {
 	background-color: #d7dfe8;
 }
 
+.calendarLegendItem {
+	-webkit-border-radius: 6px; 
+	-moz-border-radius: 6px;
+	height:20px; 
+	overflow:hidden; 
+	border-style:solid;
+	border-width:1px; 
+	display:block; 
+}
+
+.roundedCorners {
+	-webkit-border-radius: 6px; 
+	-moz-border-radius: 6px;
+}
+
 .clickBox {
 	cursor: pointer;
 	padding: 1px 3px;
@@ -467,6 +482,8 @@ img {
 	background-color: #c5eabf;
 	border: 2px solid #439b33;
 	padding: 18px;
+	-webkit-border-radius: 6px; 
+	-moz-border-radius: 6px;
 }
 
 .tabPanel {
