@@ -42,6 +42,10 @@ public class EmailDialog extends DefaultDialog {
 		email.addBcc(bccEmail);
 	}
 
+	public void addCc(String ccEmail) {
+		email.addCc(ccEmail);
+	}
+
 	public void addTo(String toEmail) {
 		email.addTo(toEmail);
 	}

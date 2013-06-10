@@ -141,10 +141,10 @@ public class CalendarPanel extends FlowPanel {
 			public void onSelection(SelectionEvent<Integer> event) {
 				int tabIndex = event.getSelectedItem();
 				if (tabIndex == 0) {
-					calendar.setView(CalendarViews.DAY, 1);
-					calendar.setDate(new Date());
-					calendar.scrollToHour(8);
 					datePicker.setCurrentMonth(new Date());
+					calendar.setDate(new Date());
+					calendar.setView(CalendarViews.DAY, 1);
+					calendar.scrollToHour(8);
 				} else if (tabIndex == 1) {
 					calendar.setView(CalendarViews.DAY, 1);
 					calendar.scrollToHour(8);
@@ -164,6 +164,7 @@ public class CalendarPanel extends FlowPanel {
 				setDatePickerSelection(calendar.getDate());
 
 				datePickerDecorator.setVisible(tabIndex > 0);
+				legendPanel.setVisible(tabIndex > 0);
 			}
 		});
 
