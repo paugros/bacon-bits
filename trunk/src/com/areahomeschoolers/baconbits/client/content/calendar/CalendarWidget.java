@@ -38,6 +38,7 @@ import com.areahomeschoolers.baconbits.client.content.calendar.event.TimeBlockCl
 import com.areahomeschoolers.baconbits.client.content.calendar.event.TimeBlockClickHandler;
 import com.areahomeschoolers.baconbits.client.content.calendar.event.UpdateEvent;
 import com.areahomeschoolers.baconbits.client.content.calendar.event.UpdateHandler;
+import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -150,9 +151,8 @@ public class CalendarWidget extends InteractiveWidget implements HasSelectionHan
 	 * @param numOfDays
 	 *            The number of days to change the calendar date forward (positive number) or backwards.
 	 */
-	@SuppressWarnings("deprecation")
 	public void addDaysToDate(int numOfDays) {
-		this.date.setDate(this.date.getDate() + numOfDays);
+		ClientDateUtils.addDays(date, numOfDays);
 	}
 
 	@Override
