@@ -21,8 +21,8 @@ public abstract class Constants {
 
 	public static final String DOCUMENT_URL_PREFIX = "/baconbits/service/file?id=";
 
-	public static final int BLANK_PROFILE_MALE_LARGE = 956;
-	public static final int BLANK_PROFILE_MALE_SMALL = 957;
-	public static final int BLANK_PROFILE_FEMALE_LARGE = 958;
-	public static final int BLANK_PROFILE_FEMALE_SMALL = 959;
+	public static final int BLANK_PROFILE_MALE_LARGE = 961;
+	public static final int BLANK_PROFILE_MALE_SMALL = 963;
+	public static final int BLANK_PROFILE_FEMALE_LARGE = 960;
+	public static final int BLANK_PROFILE_FEMALE_SMALL = 962;
 }
