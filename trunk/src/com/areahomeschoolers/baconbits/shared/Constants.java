@@ -18,4 +18,11 @@ public abstract class Constants {
 	public static final String GENERATED_KEY_TOKEN = "GENERATED_KEY";
 
 	public static final int MAXIMUM_TAG_COUNT = 50;
+
+	public static final String DOCUMENT_URL_PREFIX = "/baconbits/service/file?id=";
+
+	public static final int BLANK_PROFILE_MALE_LARGE = 956;
+	public static final int BLANK_PROFILE_MALE_SMALL = 957;
+	public static final int BLANK_PROFILE_FEMALE_LARGE = 958;
+	public static final int BLANK_PROFILE_FEMALE_SMALL = 959;
 }

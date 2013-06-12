@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableCo
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -27,11 +28,12 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class UserCellTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
-		ACTIVITY("Last activity"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS(
+		PICTURE(""), ACTIVITY("Last activity"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS(
 				"Same interests"), AGE("Age");
 
 		private String title;
@@ -97,6 +99,14 @@ public final class UserCellTable extends EntityCellTable<User, UserArg, UserColu
 	protected void setColumns() {
 		for (UserColumn col : getDisplayColumns()) {
 			switch (col) {
+			case PICTURE:
+				addWidgetColumn(col, new WidgetCellCreator<User>() {
+					@Override
+					protected Widget createWidget(User item) {
+						return new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
+					}
+				});
+				break;
 			case ACTIVITY:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<User>() {
 					@Override

@@ -37,6 +37,7 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.CalendarPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.FixedWidthLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
@@ -52,6 +53,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
+import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
@@ -187,11 +189,22 @@ public class UserPage implements Page {
 		} else {
 			tabPanel = new TabPage();
 			form.emancipate();
-
 			tabPanel.add("Profile", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					tabBody.add(WidgetFactory.newSection("Basic Information", fieldTable, ContentWidth.MAXWIDTH1100PX));
+					HorizontalPanel hp = new HorizontalPanel();
+					hp.setWidth("100%");
+
+					boolean editable = Application.getCurrentUserId() == user.getId();
+					EditableImage image = new EditableImage(DocumentLinkType.PROFILE, user.getId(), user.getImageId(), editable);
+					image.addStyleName("profilePic");
+					fieldTable.removeStyleName("sectionContent");
+					hp.addStyleName("sectionContent");
+					hp.add(image);
+					hp.add(fieldTable);
+					hp.setCellWidth(image, "220px");
+
+					tabBody.add(WidgetFactory.newSection("Basic Information", hp, ContentWidth.MAXWIDTH1100PX));
 					// interests
 					if (Application.getCurrentUser().getSystemAdministrator()) {
 						if (!pageData.getInterests().isEmpty() || viewingSelf()) {
