@@ -120,6 +120,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			user.setAge(rs.getInt("age"));
 			user.setLat(rs.getDouble("lat"));
 			user.setLng(rs.getDouble("lng"));
+			user.setImageId(rs.getInt("imageId"));
+			user.setSmallImageId(rs.getInt("smallImageId"));
 			return user;
 		}
 	}
@@ -315,7 +317,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
-			distanceCol = "(3959 * acos( cos( radians(" + withinLat + ") ) * cos( radians( u.lat ) ) * cos( radians( u.lng ) - radians(" + withinLng + ") )";
+			distanceCol = "(3959 * acos( cos( radians(" + withinLat + ") ) * cos( radians( u.lat ) ) * cos( radians( u.lng ) - radians(" + withinLng + ") ) ";
 			distanceCol += "+ sin( radians(" + withinLat + ") ) * sin( radians( u.lat ) ) ) ) as distance, ";
 		}
 
@@ -521,12 +523,20 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			if (user.getStartDate() == null) {
 				user.setStartDate(new Date());
 			}
+
+			if ("m".equals(user.getSex())) {
+				user.setSmallImageId(Constants.BLANK_PROFILE_MALE_SMALL);
+				user.setImageId(Constants.BLANK_PROFILE_MALE_LARGE);
+			} else {
+				user.setSmallImageId(Constants.BLANK_PROFILE_FEMALE_SMALL);
+				user.setImageId(Constants.BLANK_PROFILE_FEMALE_LARGE);
+			}
 			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
 			sql += "address, isSystemAdministrator, resetPassword, birthDate, parentId, sex, ";
-			sql += "street, city, state, zip, lat, lng) values ";
+			sql += "street, city, state, zip, lat, lng, imageId, smallImageId) values ";
 			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
 			sql += ":address, :systemAdministrator, :resetPassword, :birthDate, :parentId, :sex, ";
-			sql += ":street, :city, :state, :zip, :lat, :lng)";
+			sql += ":street, :city, :state, :zip, :lat, :lng, :imageId, :smallImageId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

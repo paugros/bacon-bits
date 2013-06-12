@@ -40,6 +40,8 @@ public final class User extends EntityDto<User> {
 	private Integer parentId;
 	private boolean canSwitch;
 	private String sex;
+	private int imageId;
+	private int smallImageId;
 	// aux
 	// these two keep track of your original user when switching
 	private int commonInterestCount;
@@ -136,6 +138,10 @@ public final class User extends EntityDto<User> {
 		return homePhone;
 	}
 
+	public int getImageId() {
+		return imageId;
+	}
+
 	public Date getLastLoginDate() {
 		return lastLoginDate;
 	}
@@ -203,6 +209,10 @@ public final class User extends EntityDto<User> {
 		}
 
 		return "";
+	}
+
+	public int getSmallImageId() {
+		return smallImageId;
 	}
 
 	public Date getStartDate() {
@@ -344,6 +354,10 @@ public final class User extends EntityDto<User> {
 		this.homePhone = homePhone;
 	}
 
+	public void setImageId(int imageId) {
+		this.imageId = imageId;
+	}
+
 	public void setLastLoginDate(Date lastLoginDate) {
 		this.lastLoginDate = lastLoginDate;
 	}
@@ -398,6 +412,10 @@ public final class User extends EntityDto<User> {
 
 	public void setSex(String sex) {
 		this.sex = sex;
+	}
+
+	public void setSmallImageId(int smallImageId) {
+		this.smallImageId = smallImageId;
 	}
 
 	public void setStartDate(Date startDate) {

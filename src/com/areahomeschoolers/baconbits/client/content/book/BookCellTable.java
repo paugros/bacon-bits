@@ -3,7 +3,6 @@ package com.areahomeschoolers.baconbits.client.content.book;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
-import com.areahomeschoolers.baconbits.client.content.document.FileUploadDialog;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
@@ -14,23 +13,20 @@ import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.client.validation.Validator;
-import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.EmailDialog;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
-import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
-import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
@@ -43,7 +39,6 @@ import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColumn> {
@@ -208,45 +203,15 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
 					protected Widget createWidget(final Book item) {
-						final Image image = new Image("/baconbits/service/file?id=" + item.getSmallImageId());
-
-						if (Application.getCurrentUserId() != item.getUserId()) {
-							return image;
-						}
-
-						image.addStyleName("pointer");
-
-						image.addMouseDownHandler(new MouseDownHandler() {
+						boolean editable = Application.getCurrentUserId() == item.getUserId();
+						EditableImage image = new EditableImage(DocumentLinkType.BOOK, item.getId(), item.getSmallImageId(), editable);
+						image.setUploadCompleteHandler(new UploadCompleteHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
-								final FileUploadDialog uploadDialog = new FileUploadDialog(DocumentLinkType.BOOK, item.getId(), false,
-										new UploadCompleteHandler() {
-											@Override
-											public void onUploadComplete(int documentId) {
-												populate();
-											}
-										});
-
-								uploadDialog.getForm().addFormValidatorCommand(new ValidatorCommand() {
-									@Override
-									public void validate(Validator validator) {
-										String fileName = uploadDialog.getFileName();
-										if (Common.isNullOrBlank(fileName)) {
-											validator.setError(true);
-										}
-
-										if (!Document.hasImageExtension(fileName)) {
-											validator.setError(true);
-											validator.setErrorMessage("Invalid image file.");
-										}
-									}
-								});
-
-								uploadDialog.center();
+							public void onUploadComplete(int documentId) {
+								populate();
 							}
 						});
-
-						return image;
+						return image.getImage();
 					}
 				});
 				break;
