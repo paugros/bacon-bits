@@ -9,8 +9,8 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
 
@@ -35,9 +35,9 @@ public class EditableImage extends Composite {
 
 		image.addStyleName("pointer");
 
-		image.addMouseDownHandler(new MouseDownHandler() {
+		image.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				final FileUploadDialog uploadDialog = new FileUploadDialog(linkType, entId, false, new UploadCompleteHandler() {
 					@Override
 					public void onUploadComplete(int documentId) {
@@ -67,6 +67,12 @@ public class EditableImage extends Composite {
 				uploadDialog.center();
 			}
 		});
+		// image.addMouseDownHandler(new MouseDownHandler() {
+		// @Override
+		// public void onMouseDown(MouseDownEvent event) {
+		//
+		// }
+		// });
 	}
 
 	public Image getImage() {

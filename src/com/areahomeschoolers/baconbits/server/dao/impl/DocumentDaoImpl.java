@@ -206,12 +206,12 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		float bottomY = 1;
 		if (height > width) {
 			// we need to change the Y coordinates
-			float ratio = ((height - width) / 2) / height;
+			float ratio = ((height - width) / 2.000f) / height;
 			topY = ratio;
 			bottomY = 1 - ratio;
 		} else {
 			// we need to change the X coordinates
-			float ratio = ((width - height) / 2) / width;
+			float ratio = ((width - height) / 2.000f) / width;
 			leftX = ratio;
 			rightX = 1 - ratio;
 		}
@@ -260,7 +260,9 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 
 			Transform resize = ImagesServiceFactory.makeResize(newWidth, newHeight);
 
-			Image newImage = imagesService.applyTransform(resize, image);
+			Transform lucky = ImagesServiceFactory.makeImFeelingLucky();
+
+			Image newImage = imagesService.applyTransform(lucky, imagesService.applyTransform(resize, image));
 
 			d.setData(newImage.getImageData());
 		}
