@@ -195,8 +195,7 @@ public class UserPage implements Page {
 					HorizontalPanel hp = new HorizontalPanel();
 					hp.setWidth("100%");
 
-					boolean editable = Application.getCurrentUserId() == user.getId();
-					EditableImage image = new EditableImage(DocumentLinkType.PROFILE, user.getId(), user.getImageId(), editable);
+					EditableImage image = new EditableImage(DocumentLinkType.PROFILE, user.getId(), user.getImageId(), canEditUser(user));
 					image.addStyleName("profilePic");
 					fieldTable.removeStyleName("sectionContent");
 					hp.addStyleName("sectionContent");

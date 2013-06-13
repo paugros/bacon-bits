@@ -5,6 +5,8 @@ import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
 import com.areahomeschoolers.baconbits.client.widgets.ServerSuggestOracle;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
@@ -38,7 +40,6 @@ public class EntitySuggestBox extends Composite {
 		suggestBox.setWidth("170px");
 
 		final ValueBoxBase<String> textBox = suggestBox.getValueBox();
-		// textBox.getElement().getStyle().setPadding(3, Unit.PX);
 		suggestBox.addSelectionHandler(new SelectionHandler<Suggestion>() {
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {
@@ -48,6 +49,13 @@ public class EntitySuggestBox extends Composite {
 				if (selectionHandler != null) {
 					selectionHandler.execute(suggestion.getEntityId());
 				}
+
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+					@Override
+					public void execute() {
+						selecting = false;
+					}
+				});
 			}
 		});
 
@@ -84,6 +92,9 @@ public class EntitySuggestBox extends Composite {
 					if (!selecting) {
 						submitWithoutSelectionCommand.execute();
 					}
+
+					// reset selecting status
+					selecting = false;
 				case KeyCodes.KEY_ESCAPE:
 					reset();
 					break;
@@ -107,6 +118,7 @@ public class EntitySuggestBox extends Composite {
 	public void reset() {
 		DefaultSuggestionDisplay display = (DefaultSuggestionDisplay) suggestBox.getSuggestionDisplay();
 		display.hideSuggestions();
+		suggestBox.getValueBox().setText("");
 
 		if (resetHandler != null) {
 			resetHandler.execute(suggestBox);

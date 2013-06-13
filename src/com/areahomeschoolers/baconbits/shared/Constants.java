@@ -25,4 +25,6 @@ public abstract class Constants {
 	public static final int BLANK_PROFILE_MALE_SMALL = 963;
 	public static final int BLANK_PROFILE_FEMALE_LARGE = 960;
 	public static final int BLANK_PROFILE_FEMALE_SMALL = 962;
+	public static final int BLANK_BOOK_IMAGE_SMALL = 34;
+	public static final int BLANK_BOOK_IMAGE = 32;
 }
