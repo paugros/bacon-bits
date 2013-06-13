@@ -24,6 +24,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
+import com.google.gwt.dom.client.Style.BorderStyle;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.HTML;
@@ -103,7 +105,12 @@ public final class UserCellTable extends EntityCellTable<User, UserArg, UserColu
 				addWidgetColumn(col, new WidgetCellCreator<User>() {
 					@Override
 					protected Widget createWidget(User item) {
-						return new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
+						Image i = new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
+						i.getElement().getStyle().setBorderColor("#c7c7c7");
+						i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+						i.getElement().getStyle().setBorderWidth(1, Unit.PX);
+						Hyperlink l = new Hyperlink(i.toString(), true, PageUrl.user(item.getId()));
+						return l;
 					}
 				});
 				break;

@@ -205,7 +205,7 @@ public class UserPage implements Page {
 
 					tabBody.add(WidgetFactory.newSection("Basic Information", hp, ContentWidth.MAXWIDTH1100PX));
 					// interests
-					if (!pageData.getInterests().isEmpty() || viewingSelf()) {
+					if (!pageData.getInterests().isEmpty() || canEditUser(user)) {
 						VerticalPanel tp = new VerticalPanel();
 						Label heading = new Label("Interests");
 						heading.addStyleName("hugeText");
@@ -223,7 +223,7 @@ public class UserPage implements Page {
 						tabBody.add(tp);
 					}
 					TagSection ts = new TagSection(TagMappingType.USER, user.getId(), pageData.getInterests());
-					ts.setEditingEnabled(viewingSelf());
+					ts.setEditingEnabled(canEditUser(user));
 					ts.populate();
 					tabBody.add(ts);
 

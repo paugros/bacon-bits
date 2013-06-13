@@ -67,12 +67,6 @@ public class EditableImage extends Composite {
 				uploadDialog.center();
 			}
 		});
-		// image.addMouseDownHandler(new MouseDownHandler() {
-		// @Override
-		// public void onMouseDown(MouseDownEvent event) {
-		//
-		// }
-		// });
 	}
 
 	public Image getImage() {
