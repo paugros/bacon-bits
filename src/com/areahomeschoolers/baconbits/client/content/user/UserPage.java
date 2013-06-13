@@ -206,29 +206,27 @@ public class UserPage implements Page {
 
 					tabBody.add(WidgetFactory.newSection("Basic Information", hp, ContentWidth.MAXWIDTH1100PX));
 					// interests
-					if (Application.getCurrentUser().getSystemAdministrator()) {
-						if (!pageData.getInterests().isEmpty() || viewingSelf()) {
-							VerticalPanel tp = new VerticalPanel();
-							Label heading = new Label("Interests");
-							heading.addStyleName("hugeText");
-							tp.add(heading);
-							String txt = "Interests can be anything: hobbies, academic topics, religions, curriculum publishers, teaching styles, recreational activities, sports, or whatever else. ";
-							txt += "We'll use these interests to help you find other homeschoolers with similar interests, and to show you events, articles and books relating to your interests. ";
-							txt += "The most useful interests are neither too general nor too specific.";
-							Label sub = new Label(txt);
-							sub.getElement().getStyle().setColor("#666666");
-							if (viewingSelf()) {
-								tp.add(sub);
-							}
-							tp.setWidth("600px");
-
-							tabBody.add(tp);
+					if (!pageData.getInterests().isEmpty() || viewingSelf()) {
+						VerticalPanel tp = new VerticalPanel();
+						Label heading = new Label("Interests");
+						heading.addStyleName("hugeText");
+						tp.add(heading);
+						String txt = "Interests can be anything: hobbies, academic topics, religions, curriculum publishers, teaching styles, recreational activities, sports, or whatever else. ";
+						txt += "We'll use these interests to help you find other homeschoolers with similar interests, and to show you events, articles and books relating to your interests. ";
+						txt += "The most useful interests are neither too general nor too specific.";
+						Label sub = new Label(txt);
+						sub.getElement().getStyle().setColor("#666666");
+						if (viewingSelf()) {
+							tp.add(sub);
 						}
-						TagSection ts = new TagSection(TagMappingType.USER, user.getId(), pageData.getInterests());
-						ts.setEditingEnabled(viewingSelf());
-						ts.populate();
-						tabBody.add(ts);
+						tp.setWidth("600px");
+
+						tabBody.add(tp);
 					}
+					TagSection ts = new TagSection(TagMappingType.USER, user.getId(), pageData.getInterests());
+					ts.setEditingEnabled(viewingSelf());
+					ts.populate();
+					tabBody.add(ts);
 
 					tabPanel.selectTabNow(tabBody);
 				}
