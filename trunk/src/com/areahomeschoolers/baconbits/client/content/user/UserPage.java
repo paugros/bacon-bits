@@ -374,7 +374,7 @@ public class UserPage implements Page {
 						table.disablePaging();
 						table.populate();
 
-						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
 						tabPanel.selectTabNow(tabBody);
 					}
 				});
