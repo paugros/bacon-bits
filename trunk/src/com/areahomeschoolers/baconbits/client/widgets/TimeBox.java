@@ -16,8 +16,6 @@ import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -84,9 +82,9 @@ public class TimeBox extends Composite implements HasValue<Date>, HasValidator, 
 	public TimeBox(TimeIncrement timeIncrement) {
 		validator.setRequired(true);
 		textBox.setVisibleLength(7);
-		textBox.addMouseDownHandler(new MouseDownHandler() {
+		textBox.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				initializePopup();
 			}
 		});

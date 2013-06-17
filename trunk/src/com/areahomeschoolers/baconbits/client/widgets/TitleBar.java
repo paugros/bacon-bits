@@ -13,8 +13,8 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -157,9 +157,9 @@ public class TitleBar extends Composite {
 
 		visibilityControl = new Image();
 		setVisibilityControlResource();
-		visibilityControl.addMouseDownHandler(new MouseDownHandler() {
+		visibilityControl.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				contents.setVisible(!contents.isVisible());
 				setVisibilityControlResource();
 				if (onToggleCmd != null) {

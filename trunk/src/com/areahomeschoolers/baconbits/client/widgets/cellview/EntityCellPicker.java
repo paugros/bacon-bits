@@ -13,6 +13,7 @@ import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.CustomFocusWidget;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg;
 import com.areahomeschoolers.baconbits.shared.dto.EntityDto;
@@ -20,8 +21,8 @@ import com.areahomeschoolers.baconbits.shared.dto.HasId;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -48,9 +49,9 @@ public abstract class EntityCellPicker<T extends EntityDto<T>, U extends Arg, C 
 	private Button changeButton = new Button("Change...");
 
 	protected EntityCellPicker() {
-		MouseDownHandler clickHandler = new MouseDownHandler() {
+		ClickHandler clickHandler = new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent e) {
+			public void onClick(ClickEvent e) {
 				if (entitySelector != null) {
 					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 						@Override
@@ -65,11 +66,11 @@ public abstract class EntityCellPicker<T extends EntityDto<T>, U extends Arg, C 
 		};
 
 		textBox.setReadOnly(true);
-		textBox.addMouseDownHandler(clickHandler);
+		textBox.addClickHandler(clickHandler);
 		pickerPanel.add(textBox);
 		pickerPanel.add(changeButton);
 		pickerPanel.setCellVerticalAlignment(changeButton, HasVerticalAlignment.ALIGN_MIDDLE);
-		changeButton.addMouseDownHandler(clickHandler);
+		changeButton.addClickHandler(clickHandler);
 
 		focusPanel.setWidget(pickerPanel);
 		initWidget(focusPanel);
