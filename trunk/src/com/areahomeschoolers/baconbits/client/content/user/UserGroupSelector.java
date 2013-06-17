@@ -1,17 +1,17 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
-import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
+import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellSelector;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 public final class UserGroupSelector extends EntityCellSelector<UserGroup, UserGroupArg, UserGroupColumn> {
-	private UserGroupCellTable userGroupTable;
+	private UserGroupTable userGroupTable;
 
 	public UserGroupSelector(ArgMap<UserGroupArg> args) {
 		this();
-		userGroupTable = new UserGroupCellTable(args);
+		userGroupTable = new UserGroupTable(args);
 		userGroupTable.setTitle("User Groups");
 		setEntityCellTable(userGroupTable);
 		userGroupTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION);
@@ -23,7 +23,7 @@ public final class UserGroupSelector extends EntityCellSelector<UserGroup, UserG
 	}
 
 	@Override
-	public UserGroupCellTable getCellTable() {
+	public UserGroupTable getCellTable() {
 		return userGroupTable;
 	}
 

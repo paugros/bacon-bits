@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.event.EventCellTable.EventColumn;
+import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
-public final class EventCellTable extends EntityCellTable<Event, EventArg, EventColumn> {
+public final class EventTable extends EntityCellTable<Event, EventArg, EventColumn> {
 	public enum EventColumn implements EntityCellTableColumn<EventColumn> {
 		REGISTERED(""), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), PRICE("Price"), AGES("Ages"), CATEGORY("Category"), REGISTER(
 				"Register");
@@ -51,12 +51,12 @@ public final class EventCellTable extends EntityCellTable<Event, EventArg, Event
 
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 
-	public EventCellTable(ArgMap<EventArg> args) {
+	public EventTable(ArgMap<EventArg> args) {
 		this();
 		setArgMap(args);
 	}
 
-	private EventCellTable() {
+	private EventTable() {
 		setDefaultSortColumn(EventColumn.START_DATE, SortDirection.SORT_ASC);
 		setDisplayColumns(EventColumn.REGISTERED, EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.PRICE, EventColumn.AGES,
 				EventColumn.REGISTER);

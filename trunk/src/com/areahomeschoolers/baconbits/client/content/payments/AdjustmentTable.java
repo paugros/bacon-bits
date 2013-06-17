@@ -3,7 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.payments;
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentCellTable.AdjustmentColumn;
+import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentTable.AdjustmentColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.PaymentService;
@@ -23,7 +23,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
-public final class AdjustmentCellTable extends EntityCellTable<Adjustment, PaymentArg, AdjustmentColumn> {
+public final class AdjustmentTable extends EntityCellTable<Adjustment, PaymentArg, AdjustmentColumn> {
 	public enum AdjustmentColumn implements EntityCellTableColumn<AdjustmentColumn> {
 		TYPE("Adjustment type"), USER("User"), STATUS("Status"), ADDED_DATE("Added date"), DESCRIPTION("Description"), AMOUNT("Amount"), TOTALED_AMOUNT(
 				"Amount");
@@ -43,12 +43,12 @@ public final class AdjustmentCellTable extends EntityCellTable<Adjustment, Payme
 	private PaymentServiceAsync paymentService = (PaymentServiceAsync) ServiceCache.getService(PaymentService.class);
 	private AdjustmentDialog dialog;
 
-	public AdjustmentCellTable(ArgMap<PaymentArg> args) {
+	public AdjustmentTable(ArgMap<PaymentArg> args) {
 		this();
 		setArgMap(args);
 	}
 
-	private AdjustmentCellTable() {
+	private AdjustmentTable() {
 		setDefaultSortColumn(AdjustmentColumn.ADDED_DATE, SortDirection.SORT_DESC);
 		setDisplayColumns(AdjustmentColumn.ADDED_DATE, AdjustmentColumn.TOTALED_AMOUNT, AdjustmentColumn.STATUS, AdjustmentColumn.TYPE, AdjustmentColumn.USER,
 				AdjustmentColumn.DESCRIPTION);

@@ -3,7 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.user;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
-import com.areahomeschoolers.baconbits.client.content.user.UserCellTable.UserColumn;
+import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
@@ -41,7 +41,7 @@ public final class UserListPage implements Page {
 	private VerticalPanel optionsPanel = new VerticalPanel();
 	private VerticalPanel page;
 	private ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
-	private UserCellTable table;
+	private UserTable table;
 	private String lastLocationText;
 
 	public UserListPage(final VerticalPanel page) {
@@ -56,7 +56,7 @@ public final class UserListPage implements Page {
 		populateOptionsPanel();
 
 		args.put(UserArg.PARENTS);
-		table = new UserCellTable(args);
+		table = new UserTable(args);
 		table.removeColumn(UserColumn.STATUS);
 		table.removeColumn(UserColumn.SEX);
 

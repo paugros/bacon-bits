@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.user.UserCellTable.UserColumn;
+import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
@@ -33,7 +33,7 @@ import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
-public final class UserCellTable extends EntityCellTable<User, UserArg, UserColumn> {
+public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
 		PICTURE(""), ACTIVITY("Last activity"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS(
 				"Same interests"), AGE("Age");
@@ -53,12 +53,12 @@ public final class UserCellTable extends EntityCellTable<User, UserArg, UserColu
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private HashMap<Integer, UserStatusIndicator> userIndicators = new HashMap<Integer, UserStatusIndicator>();
 
-	public UserCellTable(ArgMap<UserArg> args) {
+	public UserTable(ArgMap<UserArg> args) {
 		this();
 		setArgMap(args);
 	}
 
-	private UserCellTable() {
+	private UserTable() {
 		setDefaultSortColumn(UserColumn.NAME, SortDirection.SORT_ASC);
 		setDisplayColumns(UserColumn.values());
 	}

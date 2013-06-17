@@ -7,7 +7,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
-import com.areahomeschoolers.baconbits.client.content.event.EventCellTable.EventColumn;
+import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
@@ -711,7 +711,7 @@ public class EventPage implements Page {
 					public void execute(final VerticalPanel tabBody) {
 						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.SERIES_ID, calendarEvent.getSeriesId());
 						args.setStatus(Status.ALL);
-						EventCellTable table = new EventCellTable(args);
+						EventTable table = new EventTable(args);
 						table.removeColumn(EventColumn.REGISTER);
 
 						table.setTitle("Event Series");
@@ -821,7 +821,7 @@ public class EventPage implements Page {
 						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
 						args.put(EventArg.NOT_STATUS_ID, 5);
 						args.put(EventArg.INCLUDE_FIELDS);
-						final EventParticipantCellTable table = new EventParticipantCellTable(args);
+						final EventParticipantTable table = new EventParticipantTable(args);
 
 						table.addStatusFilterBox();
 						table.getTitleBar().addExcelControl();

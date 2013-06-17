@@ -3,7 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.user;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
-import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
+import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
@@ -27,7 +27,7 @@ public final class UserGroupListPage implements Page {
 
 		ArgMap<UserGroupArg> args = new ArgMap<UserGroupArg>();
 		final String title = "Groups";
-		final UserGroupCellTable table = new UserGroupCellTable(args);
+		final UserGroupTable table = new UserGroupTable(args);
 		table.setTitle(title);
 		table.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.START_DATE, UserGroupColumn.END_DATE);
 		if (Application.isSystemAdministrator()) {

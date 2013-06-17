@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
+import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -121,7 +121,7 @@ public class RegistrationManagementPage implements Page {
 			public void execute(final VerticalPanel tabBody) {
 				ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.INCLUDE_FIELDS);
 				args.setStatus(Status.ACTIVE);
-				final EventParticipantCellTable table = new EventParticipantCellTable(args);
+				final EventParticipantTable table = new EventParticipantTable(args);
 				table.setDisplayColumns(ParticipantColumn.ATTENDED, ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.REGISTRANT_NAME,
 						ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.ADDED_DATE, ParticipantColumn.AGE, ParticipantColumn.PRICE,
 						ParticipantColumn.FIELDS, ParticipantColumn.STATUS, ParticipantColumn.EDIT_STATUS);
@@ -150,7 +150,7 @@ public class RegistrationManagementPage implements Page {
 				final ArgMap<EventArg> args = new ArgMap<EventArg>();
 				args.setStatus(Status.ACTIVE);
 
-				EventVolunteerCellTable vt = new EventVolunteerCellTable(args);
+				EventVolunteerTable vt = new EventVolunteerTable(args);
 				vt.getTitleBar().addSearchControl();
 
 				vt.addDataReturnHandler(new DataReturnHandler() {

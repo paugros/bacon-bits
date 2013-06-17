@@ -21,11 +21,11 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
-public class EventVolunteerCellTable extends GenericCellTable {
+public class EventVolunteerTable extends GenericCellTable {
 	private ArgMap<EventArg> args;
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 
-	public EventVolunteerCellTable(ArgMap<EventArg> args) {
+	public EventVolunteerTable(ArgMap<EventArg> args) {
 		this.args = args;
 
 		setDefaultSortColumn(1, SortDirection.SORT_ASC);
