@@ -18,8 +18,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
@@ -75,9 +75,9 @@ public class TagListPage {
 		}
 		Label sub = new Label(txt);
 		sub.getElement().getStyle().setMarginLeft(10, Unit.PX);
-		ClickLabel back = new ClickLabel("Return to previous page", new MouseDownHandler() {
+		ClickLabel back = new ClickLabel("Return to previous page", new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				History.back();
 			}
 		});

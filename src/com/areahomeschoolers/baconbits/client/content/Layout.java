@@ -25,10 +25,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
@@ -96,9 +96,9 @@ public final class Layout {
 		Image logo = new Image(MainImageBundle.INSTANCE.logo());
 
 		HTML logoDiv = new HTML("<a href=\"#" + PageUrl.home() + "\">" + logo + "</a>");
-		logoDiv.addMouseDownHandler(new MouseDownHandler() {
+		logoDiv.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				if ("Home".equals(HistoryToken.getElement("page"))) {
 					Application.reloadPage();
 				} else {
@@ -158,9 +158,9 @@ public final class Layout {
 			}
 
 			logInOrOut.setText("Log out");
-			logInOrOut.addMouseDownHandler(new MouseDownHandler() {
+			logInOrOut.addClickHandler(new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
 					loginService.logout(new Callback<Void>(false) {
 						@Override
@@ -172,9 +172,9 @@ public final class Layout {
 			});
 		} else {
 			logInOrOut.setText("Log in / Create account");
-			logInOrOut.addMouseDownHandler(new MouseDownHandler() {
+			logInOrOut.addClickHandler(new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
 
 					if (!GWT.isProdMode()) {
@@ -208,9 +208,9 @@ public final class Layout {
 		sessionPanel.add(logInOrOut);
 
 		if (Application.isAuthenticated()) {
-			ClickLabel resetLabel = new ClickLabel("Change password", new MouseDownHandler() {
+			ClickLabel resetLabel = new ClickLabel("Change password", new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					GWT.runAsync(new RunAsyncCallback() {
 						@Override
 						public void onFailure(Throwable caught) {

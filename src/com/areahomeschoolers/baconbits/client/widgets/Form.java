@@ -20,8 +20,6 @@ import com.areahomeschoolers.baconbits.shared.dto.EntityDto;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
@@ -605,9 +603,9 @@ public class Form {
 		useConfirmation = true;
 		submitButtonHandler.removeHandler();
 
-		submitButtonHandler = submitButton.addMouseDownHandler(new MouseDownHandler() {
+		submitButtonHandler = submitButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				if (useConfirmation && validate()) {
 					ConfirmDialog.confirm(message, new ConfirmHandler() {
 						@Override
@@ -664,9 +662,9 @@ public class Form {
 	}
 
 	private void createEditLabel() {
-		editLabel = new ClickLabel("Edit", new MouseDownHandler() {
+		editLabel = new ClickLabel("Edit", new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				toggleInputVisibility();
 			}
 		});

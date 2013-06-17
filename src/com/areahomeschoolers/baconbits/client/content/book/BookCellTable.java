@@ -34,8 +34,6 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -174,9 +172,9 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
 					protected Widget createWidget(final Book item) {
-						ClickLabel cl = new ClickLabel("Contact", new MouseDownHandler() {
+						ClickLabel cl = new ClickLabel("Contact", new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								if (!agreed && tc != null) {
 									HTML h = new HTML(tc.getArticle());
 									h.setWidth("400px");
@@ -278,17 +276,17 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 					@Override
 					protected Widget createWidget(final Book item) {
 						if (Application.getCurrentUserId() != item.getUserId() || dialog == null) {
-							return new ClickLabel(item.getTitle(), new MouseDownHandler() {
+							return new ClickLabel(item.getTitle(), new ClickHandler() {
 								@Override
-								public void onMouseDown(MouseDownEvent event) {
+								public void onClick(ClickEvent event) {
 									new BookDetailsDialog(item).center();
 								}
 							});
 						}
 
-						return new ClickLabel(item.getTitle(), new MouseDownHandler() {
+						return new ClickLabel(item.getTitle(), new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								dialog.center(item);
 							}
 						});
@@ -301,9 +299,9 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 					addCompositeWidgetColumn("", new WidgetCellCreator<Book>() {
 						@Override
 						protected Widget createWidget(final Book item) {
-							return new ClickLabel("X", new MouseDownHandler() {
+							return new ClickLabel("X", new ClickHandler() {
 								@Override
-								public void onMouseDown(MouseDownEvent event) {
+								public void onClick(ClickEvent event) {
 									ConfirmDialog.confirm("Confirm deletion of: " + item.getTitle(), new ConfirmHandler() {
 										@Override
 										public void onConfirm() {
@@ -329,9 +327,9 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 				addCompositeWidgetColumn("", new WidgetCellCreator<Book>() {
 					@Override
 					protected Widget createWidget(final Book item) {
-						return new ClickLabel("X", new MouseDownHandler() {
+						return new ClickLabel("X", new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								removeItem(item);
 								totalPrice -= item.getPrice();
 								if (onDelete != null) {

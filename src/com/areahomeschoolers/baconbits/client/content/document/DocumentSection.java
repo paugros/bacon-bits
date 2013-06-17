@@ -16,8 +16,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -58,9 +58,9 @@ public class DocumentSection extends Composite {
 		documentTable.removeAllRows();
 
 		if (isAdmin) {
-			ClickLabel cl = new ClickLabel("Add document", new MouseDownHandler() {
+			ClickLabel cl = new ClickLabel("Add document", new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					FileUploadDialog dialog = new FileUploadDialog(linkType, entityId, new UploadCompleteHandler() {
 						@Override
 						public void onUploadComplete(int documentId) {
@@ -93,9 +93,9 @@ public class DocumentSection extends Composite {
 					documentTable.setWidget(row, 0, hp);
 
 					if (isAdmin) {
-						documentTable.setWidget(row, 1, new ClickLabel("X", new MouseDownHandler() {
+						documentTable.setWidget(row, 1, new ClickLabel("X", new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								ConfirmDialog.confirm("Really delete \"" + d.getDescription() + "\"?", new ConfirmHandler() {
 									@Override
 									public void onConfirm() {

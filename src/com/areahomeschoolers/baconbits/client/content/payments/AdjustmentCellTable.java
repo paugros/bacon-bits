@@ -18,8 +18,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Adjustment;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -121,9 +121,9 @@ public final class AdjustmentCellTable extends EntityCellTable<Adjustment, Payme
 							if (item.getAdjustmentTypeId() != 1 || item.getStatusId() != 1) {
 								return new Label(item.getAdjustmentType());
 							}
-							return new ClickLabel(item.getAdjustmentType(), new MouseDownHandler() {
+							return new ClickLabel(item.getAdjustmentType(), new ClickHandler() {
 								@Override
-								public void onMouseDown(MouseDownEvent event) {
+								public void onClick(ClickEvent event) {
 									dialog.center(item);
 								}
 							});
@@ -154,9 +154,9 @@ public final class AdjustmentCellTable extends EntityCellTable<Adjustment, Payme
 						return new Label("");
 					}
 
-					return new ClickLabel("X", new MouseDownHandler() {
+					return new ClickLabel("X", new ClickHandler() {
 						@Override
-						public void onMouseDown(MouseDownEvent event) {
+						public void onClick(ClickEvent event) {
 							ConfirmDialog.confirm("Really delete this adjustment?", new ConfirmHandler() {
 								@Override
 								public void onConfirm() {

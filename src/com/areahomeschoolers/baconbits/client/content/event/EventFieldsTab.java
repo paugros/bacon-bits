@@ -28,8 +28,8 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -74,9 +74,9 @@ public class EventFieldsTab extends Composite {
 		}
 
 		TitleBar tb = new TitleBar("Fields", TitleBarStyle.SECTION);
-		tb.addLink(new ClickLabel("Add", new MouseDownHandler() {
+		tb.addLink(new ClickLabel("Add", new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				EventField e = new EventField();
 				e.setEventAgeGroupId(ageGroupListBox.getIntValue());
 				e.setEventId(pageData.getEvent().getId());
@@ -118,15 +118,15 @@ public class EventFieldsTab extends Composite {
 					hp.setWidth("400px");
 					hp.add(previewWidget);
 					LinkPanel lp = new LinkPanel();
-					lp.add(new ClickLabel("Edit", new MouseDownHandler() {
+					lp.add(new ClickLabel("Edit", new ClickHandler() {
 						@Override
-						public void onMouseDown(MouseDownEvent event) {
+						public void onClick(ClickEvent event) {
 							dialog.center(f);
 						}
 					}));
-					lp.add(new ClickLabel("X", new MouseDownHandler() {
+					lp.add(new ClickLabel("X", new ClickHandler() {
 						@Override
-						public void onMouseDown(MouseDownEvent event) {
+						public void onClick(ClickEvent event) {
 							ConfirmDialog.confirm("Delete " + f.getName() + "? Any filled-out values for this field will also be deleted.",
 									new ConfirmHandler() {
 										@Override

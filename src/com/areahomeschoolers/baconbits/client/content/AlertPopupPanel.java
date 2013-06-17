@@ -6,8 +6,8 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.FontWeight;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -24,9 +24,9 @@ public class AlertPopupPanel {
 		alertPanel.setStyleName("notificationAlertPanel");
 		alertPanel.setAnimationEnabled(true);
 		VerticalPanel vp = new VerticalPanel();
-		ClickLabel delete = new ClickLabel("X", new MouseDownHandler() {
+		ClickLabel delete = new ClickLabel("X", new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				alertPanel.hide();
 			}
 		});
@@ -36,9 +36,9 @@ public class AlertPopupPanel {
 
 		SimplePanel innerPanel = new SimplePanel();
 		innerPanel.setStyleName("notificationAlertContent");
-		ClickLabel alertLabel = new ClickLabel(text, new MouseDownHandler() {
+		ClickLabel alertLabel = new ClickLabel(text, new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				onClick.execute();
 			}
 		});

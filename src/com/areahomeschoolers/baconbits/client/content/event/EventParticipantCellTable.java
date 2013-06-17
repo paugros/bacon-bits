@@ -37,8 +37,8 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -291,9 +291,9 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 							return new Label(item.getStatus());
 						}
 
-						ClickLabel cl = new ClickLabel(item.getStatus(), new MouseDownHandler() {
+						ClickLabel cl = new ClickLabel(item.getStatus(), new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								EntityEditDialog<EventParticipant> dialog = new EntityEditDialog<EventParticipant>() {
 									@Override
 									protected Widget createContent() {
@@ -403,9 +403,9 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 							editText = "X";
 						}
 
-						ClickLabel cl = new ClickLabel(editText, new MouseDownHandler() {
+						ClickLabel cl = new ClickLabel(editText, new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								String confirmText = "";
 								if (item.isCanceled()) {
 									confirmText = "Restore registration for " + item.getFirstName() + "?";

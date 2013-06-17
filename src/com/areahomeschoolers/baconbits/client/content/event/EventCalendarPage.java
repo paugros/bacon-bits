@@ -20,8 +20,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -44,9 +44,9 @@ public class EventCalendarPage implements Page {
 			protected void doOnSuccess(ArrayList<Event> result) {
 				PaddedPanel pp = new PaddedPanel();
 				String title = "Event Calendar";
-				ClickLabel download = new ClickLabel("Click here", new MouseDownHandler() {
+				ClickLabel download = new ClickLabel("Click here", new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						cp.getCalendar().exportToExcel();
 					}
 				});

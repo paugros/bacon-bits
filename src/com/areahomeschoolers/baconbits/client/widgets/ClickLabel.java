@@ -5,14 +5,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Label;
 
 public class ClickLabel extends Label {
 	private List<HandlerRegistration> registrations = new ArrayList<HandlerRegistration>();
-	private Set<MouseDownHandler> handlers = new LinkedHashSet<MouseDownHandler>();
+	private Set<ClickHandler> handlers = new LinkedHashSet<ClickHandler>();
 
 	private boolean enabled = true;
 	private String titleText = "";
@@ -22,8 +22,8 @@ public class ClickLabel extends Label {
 		this("");
 	}
 
-	public ClickLabel(MouseDownHandler mouseDownHandler) {
-		this("", mouseDownHandler);
+	public ClickLabel(ClickHandler clickHandler) {
+		this("", clickHandler);
 	}
 
 	public ClickLabel(String label) {
@@ -31,16 +31,16 @@ public class ClickLabel extends Label {
 		addStyleName(style);
 	}
 
-	public ClickLabel(String label, MouseDownHandler mouseDownHandler) {
+	public ClickLabel(String label, ClickHandler clickHandler) {
 		this(label);
-		addMouseDownHandler(mouseDownHandler);
+		addClickHandler(clickHandler);
 	}
 
 	@Override
-	public HandlerRegistration addMouseDownHandler(MouseDownHandler handler) {
+	public HandlerRegistration addClickHandler(ClickHandler handler) {
 		HandlerRegistration reg = null;
 		if (enabled) {
-			reg = super.addMouseDownHandler(handler);
+			reg = super.addClickHandler(handler);
 			registrations.add(reg);
 		}
 
@@ -50,11 +50,11 @@ public class ClickLabel extends Label {
 	}
 
 	public void click() {
-		fireEvent(new MouseDownEvent() {
+		fireEvent(new ClickEvent() {
 		});
 	}
 
-	public Set<MouseDownHandler> getMouseDownHandlers() {
+	public Set<ClickHandler> getClickHandlers() {
 		return handlers;
 	}
 
@@ -76,8 +76,8 @@ public class ClickLabel extends Label {
 			super.setTitle("");
 		} else {
 			registrations.clear();
-			for (MouseDownHandler handler : handlers) {
-				addMouseDownHandler(handler);
+			for (ClickHandler handler : handlers) {
+				addClickHandler(handler);
 			}
 			addStyleName(style);
 			if (getTitle().isEmpty() && !titleText.isEmpty()) {
