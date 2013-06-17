@@ -463,6 +463,9 @@ img {
 }
 
 .StatusPanel {
+	-webkit-border-radius: 4px; 
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 	background-color: #FEF0A7;
 	border: 1px solid #FFCC35;
 	font-weight: bold;
