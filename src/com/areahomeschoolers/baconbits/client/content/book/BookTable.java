@@ -2,7 +2,7 @@ package com.areahomeschoolers.baconbits.client.content.book;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
+import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
-public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColumn> {
+public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
 		IMAGE("Image"), USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE(
 				"Price"), PRICE("Price"), CONTACT("Contact seller"), DELETE(""), DELETE_PURCHASE("");
@@ -64,12 +64,12 @@ public final class BookCellTable extends EntityCellTable<Book, BookArg, BookColu
 	private double totalPrice;
 	private Command onDelete;
 
-	public BookCellTable(ArgMap<BookArg> args) {
+	public BookTable(ArgMap<BookArg> args) {
 		this();
 		setArgMap(args);
 	}
 
-	private BookCellTable() {
+	private BookTable() {
 		addDataReturnHandler(new DataReturnHandler() {
 			@Override
 			public void onDataReturn() {

@@ -2,7 +2,7 @@ package com.areahomeschoolers.baconbits.client.content.book;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
+import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -30,7 +30,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public final class BookSearchPage implements Page {
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
-	private BookCellTable table = new BookCellTable(args);
+	private BookTable table = new BookTable(args);
 	private PaddedPanel optionsPanel = new PaddedPanel(15);
 
 	public BookSearchPage(final VerticalPanel page) {

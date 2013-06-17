@@ -1,7 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.user.UserCellTable.UserColumn;
+import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -29,9 +29,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
-	private UserGroupCellTable table;
+	private UserGroupTable table;
 
-	public UserGroupEditDialog(UserGroupCellTable groupTable) {
+	public UserGroupEditDialog(UserGroupTable groupTable) {
 		this.table = groupTable;
 
 		addFormSubmitHandler(new FormSubmitHandler() {
@@ -130,7 +130,7 @@ public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 		if (entity.isSaved()) {
 			ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 			args.put(UserArg.GROUP_ID, entity.getId());
-			final UserCellTable userTable = new UserCellTable(args);
+			final UserTable userTable = new UserTable(args);
 			userTable.setPagerPageSize(PageSize.P_010);
 			userTable.getTitleBar().getPager().setPageResizingEnabled(false);
 			userTable.setDisplayColumns(UserColumn.NAME, UserColumn.EMAIL, UserColumn.PHONE);

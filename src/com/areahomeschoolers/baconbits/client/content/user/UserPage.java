@@ -8,20 +8,20 @@ import java.util.Map;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.book.BookCellTable;
-import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
+import com.areahomeschoolers.baconbits.client.content.book.BookTable;
+import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.book.BookDialog;
 import com.areahomeschoolers.baconbits.client.content.calendar.Appointment;
 import com.areahomeschoolers.baconbits.client.content.calendar.AppointmentStyle;
 import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
-import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable;
-import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
-import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerCellTable;
+import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTable;
+import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTable.ParticipantColumn;
+import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerTable;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
-import com.areahomeschoolers.baconbits.client.content.user.UserCellTable.UserColumn;
-import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
+import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
+import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -259,7 +259,7 @@ public class UserPage implements Page {
 					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
 					args.setStatus(Status.ACTIVE);
 					args.put(EventArg.NOT_STATUS_ID, 5);
-					EventParticipantCellTable table = new EventParticipantCellTable(args);
+					EventParticipantTable table = new EventParticipantTable(args);
 					table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
 							ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE, ParticipantColumn.STATUS);
 					table.setTitle("Event Registrations");
@@ -281,7 +281,7 @@ public class UserPage implements Page {
 					final ArgMap<EventArg> args = new ArgMap<EventArg>();
 					args.put(EventArg.USER_ID, user.getId());
 
-					final EventVolunteerCellTable vt = new EventVolunteerCellTable(args);
+					final EventVolunteerTable vt = new EventVolunteerTable(args);
 
 					vt.addDataReturnHandler(new DataReturnHandler() {
 						@Override
@@ -303,7 +303,7 @@ public class UserPage implements Page {
 				public void execute(VerticalPanel tabBody) {
 					ArgMap<UserGroupArg> userArgs = new ArgMap<UserGroupArg>();
 					userArgs.put(UserGroupArg.USER_ID, user.getId());
-					final UserGroupCellTable groupsTable = new UserGroupCellTable(userArgs);
+					final UserGroupTable groupsTable = new UserGroupTable(userArgs);
 					groupsTable.setUser(user);
 					groupsTable.setTitle("Group Membership");
 					groupsTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
@@ -354,7 +354,7 @@ public class UserPage implements Page {
 						ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 						args.put(UserArg.PARENT_ID, user.getId());
 
-						final UserCellTable table = new UserCellTable(args);
+						final UserTable table = new UserTable(args);
 						ClickLabel addChild = new ClickLabel("Add Family Member", new ClickHandler() {
 							@Override
 							public void onClick(ClickEvent event) {
@@ -393,7 +393,7 @@ public class UserPage implements Page {
 						ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 						args.put(BookArg.USER_ID, user.getId());
 
-						final BookCellTable table = new BookCellTable(args);
+						final BookTable table = new BookTable(args);
 						table.getTitleBar().addExcelControl();
 						table.getTitleBar().addSearchControl();
 

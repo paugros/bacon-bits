@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.client.content.event.EventCellTable.EventColumn;
+import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
@@ -37,7 +37,7 @@ public final class EventListPage implements Page {
 	private MonthPicker monthBox;
 	private DefaultListBox ageBox;
 	private DefaultListBox categoryBox;
-	private EventCellTable table;
+	private EventTable table;
 	private boolean showCommunity = Url.getBooleanParameter("showCommunity");
 	private boolean newlyAdded = Url.getBooleanParameter("newlyAdded");
 
@@ -50,7 +50,7 @@ public final class EventListPage implements Page {
 			args.put(EventArg.NEWLY_ADDED);
 		}
 		final String title = showCommunity ? "Community Events" : "Events";
-		table = new EventCellTable(args);
+		table = new EventTable(args);
 
 		if (!showCommunity) {
 			VerticalPanel vp = new VerticalPanel();

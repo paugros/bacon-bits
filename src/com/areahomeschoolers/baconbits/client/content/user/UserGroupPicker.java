@@ -1,6 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
-import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
+import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellPicker;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;

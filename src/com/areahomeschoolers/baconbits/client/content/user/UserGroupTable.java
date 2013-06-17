@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.user.UserGroupCellTable.UserGroupColumn;
+import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
@@ -27,7 +27,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
-public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserGroupArg, UserGroupColumn> {
+public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupArg, UserGroupColumn> {
 	public enum UserGroupColumn implements EntityCellTableColumn<UserGroupColumn> {
 		NAME("Name"), DESCRIPTION("Description"), START_DATE("Start"), END_DATE("End"), ADMINISTRATOR("Administrator");
 
@@ -46,12 +46,12 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserGro
 	private User user;
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
-	public UserGroupCellTable(ArgMap<UserGroupArg> args) {
+	public UserGroupTable(ArgMap<UserGroupArg> args) {
 		this();
 		setArgMap(args);
 	}
 
-	private UserGroupCellTable() {
+	private UserGroupTable() {
 		setDefaultSortColumn(UserGroupColumn.NAME, SortDirection.SORT_ASC);
 		setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION);
 
@@ -83,7 +83,7 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserGro
 							return new ClickLabel(item.getGroupName(), new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {
-									UserGroupEditDialog dialog = new UserGroupEditDialog(UserGroupCellTable.this);
+									UserGroupEditDialog dialog = new UserGroupEditDialog(UserGroupTable.this);
 									dialog.setText("Edit Group");
 									dialog.center(item);
 								}

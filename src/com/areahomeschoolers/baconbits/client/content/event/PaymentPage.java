@@ -7,9 +7,9 @@ import java.util.Map;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
-import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentCellTable;
-import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentCellTable.AdjustmentColumn;
+import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTable.ParticipantColumn;
+import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentTable;
+import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentTable.AdjustmentColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -48,12 +48,12 @@ import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 public final class PaymentPage implements Page {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
-	private EventParticipantCellTable table;
+	private EventParticipantTable table;
 	private Label total;
 	private SimplePanel payContainer = new SimplePanel();
 	// used to prevent double pay
 	private boolean paying;
-	private AdjustmentCellTable adjustments;
+	private AdjustmentTable adjustments;
 
 	public PaymentPage(final VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
@@ -65,7 +65,7 @@ public final class PaymentPage implements Page {
 		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTRATION_ADDED_BY_ID, Application.getCurrentUser().getId());
 		args.put(EventArg.STATUS_ID, 1);
 
-		table = new EventParticipantCellTable(args);
+		table = new EventParticipantTable(args);
 		table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.TOTALED_PRICE,
 				ParticipantColumn.EDIT_STATUS);
 		table.disablePaging();
@@ -193,7 +193,7 @@ public final class PaymentPage implements Page {
 
 		ArgMap<PaymentArg> adjustmentArgs = new ArgMap<PaymentArg>(PaymentArg.USER_ID, Application.getCurrentUserId());
 		adjustmentArgs.put(PaymentArg.STATUS_ID, 1);
-		adjustments = new AdjustmentCellTable(adjustmentArgs);
+		adjustments = new AdjustmentTable(adjustmentArgs);
 		adjustments.setDisplayColumns(AdjustmentColumn.TYPE, AdjustmentColumn.TOTALED_AMOUNT);
 		adjustments.setWidth("400px");
 

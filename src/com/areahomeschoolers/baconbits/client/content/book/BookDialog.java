@@ -34,7 +34,7 @@ public class BookDialog extends EntityEditDialog<Book> {
 	private BookPageData pageData;
 	private boolean closeAfterSubmit = true;
 
-	public BookDialog(final BookCellTable cellTable) {
+	public BookDialog(final BookTable cellTable) {
 		setAutoHide(false);
 		addFormSubmitHandler(new FormSubmitHandler() {
 			@Override

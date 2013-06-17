@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.event.EventParticipantCellTable.ParticipantColumn;
+import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
@@ -45,7 +45,7 @@ import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
-public final class EventParticipantCellTable extends EntityCellTable<EventParticipant, EventArg, ParticipantColumn> {
+public final class EventParticipantTable extends EntityCellTable<EventParticipant, EventArg, ParticipantColumn> {
 	public enum ParticipantColumn implements EntityCellTableColumn<ParticipantColumn> {
 		ATTENDED("Attended"), EVENT("Event"), EVENT_DATE("Event date"), REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE(
 				"Age"), PRICE("Price"), TOTALED_PRICE("Price"), FIELDS("Fields"), STATUS("Status"), EDIT_STATUS("");
@@ -68,11 +68,11 @@ public final class EventParticipantCellTable extends EntityCellTable<EventPartic
 
 	private ParameterHandler<EventParticipant> cancelHandler;
 
-	public EventParticipantCellTable() {
+	public EventParticipantTable() {
 		init();
 	}
 
-	public EventParticipantCellTable(ArgMap<EventArg> args) {
+	public EventParticipantTable(ArgMap<EventArg> args) {
 		this();
 		setArgMap(args);
 	}

@@ -3,7 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.payments;
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.payments.PaymentCellTable.PaymentColumn;
+import com.areahomeschoolers.baconbits.client.content.payments.PaymentTable.PaymentColumn;
 import com.areahomeschoolers.baconbits.client.rpc.service.PaymentService;
 import com.areahomeschoolers.baconbits.client.rpc.service.PaymentServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
@@ -13,7 +13,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 
-public final class PaymentCellTable extends EntityCellTable<Payment, PaymentArg, PaymentColumn> {
+public final class PaymentTable extends EntityCellTable<Payment, PaymentArg, PaymentColumn> {
 	public enum PaymentColumn implements EntityCellTableColumn<PaymentColumn> {
 		TYPE("Payment type"), USER("User"), STATUS("Status"), PAYMENT_DATE("Added date"), AMOUNT("Amount"), TOTALED_AMOUNT("Amount");
 
@@ -31,12 +31,12 @@ public final class PaymentCellTable extends EntityCellTable<Payment, PaymentArg,
 
 	private PaymentServiceAsync paymentService = (PaymentServiceAsync) ServiceCache.getService(PaymentService.class);
 
-	public PaymentCellTable(ArgMap<PaymentArg> args) {
+	public PaymentTable(ArgMap<PaymentArg> args) {
 		this();
 		setArgMap(args);
 	}
 
-	private PaymentCellTable() {
+	private PaymentTable() {
 		setDefaultSortColumn(PaymentColumn.PAYMENT_DATE, SortDirection.SORT_DESC);
 		setDisplayColumns(PaymentColumn.PAYMENT_DATE, PaymentColumn.TOTALED_AMOUNT, PaymentColumn.STATUS, PaymentColumn.TYPE, PaymentColumn.USER);
 

@@ -2,11 +2,11 @@ package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentCellTable;
-import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentCellTable.AdjustmentColumn;
+import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentTable;
+import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentTable.AdjustmentColumn;
 import com.areahomeschoolers.baconbits.client.content.payments.AdjustmentDialog;
-import com.areahomeschoolers.baconbits.client.content.payments.PaymentCellTable;
-import com.areahomeschoolers.baconbits.client.content.payments.PaymentCellTable.PaymentColumn;
+import com.areahomeschoolers.baconbits.client.content.payments.PaymentTable;
+import com.areahomeschoolers.baconbits.client.content.payments.PaymentTable.PaymentColumn;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.PaymentService;
@@ -30,8 +30,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class UserPaymentSection {
 	private User user;
-	private AdjustmentCellTable adjustmentTable;
-	private PaymentCellTable paymentTable;
+	private AdjustmentTable adjustmentTable;
+	private PaymentTable paymentTable;
 	private AdjustmentDialog dialog = new AdjustmentDialog();
 	private PaymentServiceAsync paymentService = (PaymentServiceAsync) ServiceCache.getService(PaymentService.class);
 
@@ -48,7 +48,7 @@ public class UserPaymentSection {
 		});
 
 		ArgMap<PaymentArg> adjustmentArgs = new ArgMap<PaymentArg>(PaymentArg.USER_ID, user.getId());
-		adjustmentTable = new AdjustmentCellTable(adjustmentArgs);
+		adjustmentTable = new AdjustmentTable(adjustmentArgs);
 		adjustmentTable.setTitle("Adjustments");
 		adjustmentTable.removeColumn(AdjustmentColumn.USER);
 
@@ -82,7 +82,7 @@ public class UserPaymentSection {
 		}
 
 		ArgMap<PaymentArg> paymentArgs = new ArgMap<PaymentArg>(PaymentArg.USER_ID, user.getId());
-		paymentTable = new PaymentCellTable(paymentArgs);
+		paymentTable = new PaymentTable(paymentArgs);
 		paymentTable.setTitle("Payments");
 		paymentTable.removeColumn(PaymentColumn.USER);
 

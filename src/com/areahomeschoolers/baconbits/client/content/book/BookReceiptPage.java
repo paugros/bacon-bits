@@ -2,7 +2,7 @@ package com.areahomeschoolers.baconbits.client.content.book;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.book.BookCellTable.BookColumn;
+import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -37,7 +37,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public final class BookReceiptPage implements Page {
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private VerticalPanel page;
-	private BookCellTable table;
+	private BookTable table;
 	private PaddedPanel totalPanel = new PaddedPanel();
 
 	public BookReceiptPage(final VerticalPanel p) {
@@ -88,7 +88,7 @@ public final class BookReceiptPage implements Page {
 				PaddedPanel pp = new PaddedPanel();
 				if (table == null) {
 					ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
-					table = new BookCellTable(args);
+					table = new BookTable(args);
 					table.setOnDelete(new Command() {
 						@Override
 						public void execute() {
