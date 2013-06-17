@@ -25,8 +25,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -49,9 +47,9 @@ public class TagSection extends Composite {
 			}
 
 			Label label = new Label(tag.getName());
-			ClickLabel x = new ClickLabel("x", new MouseDownHandler() {
+			ClickLabel x = new ClickLabel("x", new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					TagWidget.this.removeFromParent();
 					tagService.deleteMapping(tag, new Callback<Void>(false) {
 						@Override
@@ -179,9 +177,9 @@ public class TagSection extends Composite {
 		if (mappingType == TagMappingType.USER) {
 			item = "interests";
 		}
-		ClickLabel link = new ClickLabel("Click here to view all " + item, new MouseDownHandler() {
+		ClickLabel link = new ClickLabel("Click here to view all " + item, new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				new TagListPage(mappingType, entityId);
 				HistoryToken.append("t=1", false);
 			}

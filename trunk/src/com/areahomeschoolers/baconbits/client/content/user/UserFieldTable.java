@@ -36,8 +36,8 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.maps.client.geocode.LocationCallback;
 import com.google.gwt.maps.client.geocode.Placemark;
 import com.google.gwt.user.client.Command;
@@ -276,9 +276,9 @@ public class UserFieldTable extends FieldTable {
 			passwordField.getLinkPanel().clear();
 			passwordField.setEnabled(false);
 			if (UserPage.canEditUser(user)) {
-				passwordField.getLinkPanel().add(new ClickLabel("Reset password", new MouseDownHandler() {
+				passwordField.getLinkPanel().add(new ClickLabel("Reset password", new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						if (user.getEmail() == null) {
 							AlertDialog.alert("Please specify an email address before resetting the password.");
 							return;

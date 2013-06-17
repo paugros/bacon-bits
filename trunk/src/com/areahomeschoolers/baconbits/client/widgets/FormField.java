@@ -17,12 +17,12 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidt
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
@@ -48,8 +48,8 @@ import com.google.gwt.user.client.ui.Widget;
  * They have their own toggle and submission widgets.<br>
  * They capture the enter and escape keys to trigger submission and visibility toggling respectively.<br>
  * They place cursor focus on the input widget when it is shown, if it can receive focus.<br>
- * They perform validation independently. The submit button has a default {@link MouseDownHandler}, which ensures that if an error is present upon submission,
- * the following occurs:<br>
+ * They perform validation independently. The submit button has a default {@link ClickHandler}, which ensures that if an error is present upon submission, the
+ * following occurs:<br>
  * <br>
  * a) it will be displayed below the field<br>
  * b) the visibility state will not be altered<br>
@@ -95,9 +95,9 @@ public class FormField extends Composite {
 	private final Button submitButton = new Button("Save");
 	private Validator validator;
 	private String editLabelText = "Edit";
-	private final ClickLabel editLabel = new ClickLabel(editLabelText, new MouseDownHandler() {
+	private final ClickLabel editLabel = new ClickLabel(editLabelText, new ClickHandler() {
 		@Override
-		public void onMouseDown(MouseDownEvent e) {
+		public void onClick(ClickEvent e) {
 			toggleInputVisibility();
 			if (!inputWidget.isVisible()) {
 				fireCancelHandlers();
@@ -681,7 +681,7 @@ public class FormField extends Composite {
 						break;
 					case KeyCodes.KEY_ENTER:
 						if (!(inputWidget instanceof TextArea) && !(inputWidget instanceof MaxLengthTextArea)) {
-							submitButton.fireEvent(new MouseDownEvent() {
+							submitButton.fireEvent(new ClickEvent() {
 							});
 						}
 						break;
@@ -796,9 +796,9 @@ public class FormField extends Composite {
 		useConfirmation = true;
 		submitButtonHandler.removeHandler();
 
-		submitButtonHandler = submitButton.addMouseDownHandler(new MouseDownHandler() {
+		submitButtonHandler = submitButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 
 				if (useConfirmation && validate()) {
 					ConfirmDialog.confirm(message, new ConfirmHandler() {
@@ -876,9 +876,9 @@ public class FormField extends Composite {
 		fieldGrid.setWidget(0, 0, vPanel);
 		setInputVisibility(!hasDisplayWidget, false);
 
-		submitButtonHandler = submitButton.addMouseDownHandler(new MouseDownHandler() {
+		submitButtonHandler = submitButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				submit();
 			}
 		});

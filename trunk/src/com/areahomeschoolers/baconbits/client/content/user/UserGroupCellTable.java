@@ -22,8 +22,8 @@ import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -80,9 +80,9 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserGro
 					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
 						@Override
 						protected Widget createWidget(final UserGroup item) {
-							return new ClickLabel(item.getGroupName(), new MouseDownHandler() {
+							return new ClickLabel(item.getGroupName(), new ClickHandler() {
 								@Override
-								public void onMouseDown(MouseDownEvent event) {
+								public void onClick(ClickEvent event) {
 									UserGroupEditDialog dialog = new UserGroupEditDialog(UserGroupCellTable.this);
 									dialog.setText("Edit Group");
 									dialog.center(item);
@@ -115,9 +115,9 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserGro
 							if (!Application.administratorOf(item.getId())) {
 								return new Label(Common.yesNo(item.getAdministrator()));
 							}
-							return new ClickLabel(Common.yesNo(item.getAdministrator()), new MouseDownHandler() {
+							return new ClickLabel(Common.yesNo(item.getAdministrator()), new ClickHandler() {
 								@Override
-								public void onMouseDown(MouseDownEvent event) {
+								public void onClick(ClickEvent event) {
 									String action = item.getAdministrator() ? "Revoke" : "Grant";
 									String confirm = action + " administrator access for " + user.getFullName() + " in the " + item.getGroupName() + " group?";
 									ConfirmDialog.confirm(confirm, new ConfirmHandler() {
@@ -180,9 +180,9 @@ public final class UserGroupCellTable extends EntityCellTable<UserGroup, UserGro
 						return new Label("");
 					}
 
-					return new ClickLabel("X", new MouseDownHandler() {
+					return new ClickLabel("X", new ClickHandler() {
 						@Override
-						public void onMouseDown(MouseDownEvent event) {
+						public void onClick(ClickEvent event) {
 							String confirm = "Remove " + user.getFullName() + " from the " + group.getGroupName() + " group?";
 							ConfirmDialog.confirm(confirm, new ConfirmHandler() {
 								@Override

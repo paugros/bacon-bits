@@ -12,8 +12,6 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -113,9 +111,9 @@ public class LoginDialog extends DialogBox {
 		password.add(passwordInput);
 
 		PaddedPanel createPanel = new PaddedPanel();
-		ClickLabel create = new ClickLabel("Create a new one", new MouseDownHandler() {
+		ClickLabel create = new ClickLabel("Create a new one", new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				createDialog.center(new User());
 				hide();
 			}
@@ -130,9 +128,9 @@ public class LoginDialog extends DialogBox {
 
 		VerticalPanel pp = new VerticalPanel();
 		pp.add(new Label("Did you forget your password?"));
-		ClickLabel forgot = new ClickLabel("Click here", new MouseDownHandler() {
+		ClickLabel forgot = new ClickLabel("Click here", new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				hide();
 				ForgotPasswordDialog dialog = new ForgotPasswordDialog(loginService, new Command() {
 					@Override

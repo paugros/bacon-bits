@@ -14,8 +14,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class UserGroupListPage implements Page {
@@ -31,9 +31,9 @@ public final class UserGroupListPage implements Page {
 		table.setTitle(title);
 		table.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.START_DATE, UserGroupColumn.END_DATE);
 		if (Application.isSystemAdministrator()) {
-			table.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
+			table.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					UserGroupEditDialog dialog = new UserGroupEditDialog(table);
 					dialog.setText("Add Group");
 					dialog.center(new UserGroup());

@@ -8,8 +8,8 @@ import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
-import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class BasicWidgetCell<T extends EntityDto<T>> extends WidgetCell<T> {
 
-	public abstract class CellMouseDownEvent extends MouseDownEvent {
+	public abstract class CellClickEvent extends ClickEvent {
 		@Override
 		public abstract T getSource();
 
@@ -43,7 +43,7 @@ public class BasicWidgetCell<T extends EntityDto<T>> extends WidgetCell<T> {
 		if ("click".equals(event.getType())) {
 			if (widgets.containsKey(value)) {
 				Widget widget = widgets.get(value);
-				CellMouseDownEvent cmde = new CellMouseDownEvent() {
+				CellClickEvent cmde = new CellClickEvent() {
 					@Override
 					public ValueUpdater<T> getCellUpdater() {
 						return valueUpdater;

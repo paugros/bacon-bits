@@ -32,8 +32,6 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -79,9 +77,9 @@ public class EventRegistrationSection extends Composite {
 		TitleBar tb = new TitleBar("Registered Participants", TitleBarStyle.SUBSECTION);
 
 		if (pageData.getEvent().allowRegistrations() && (pageData.getEvent().getGroupId() == null || Application.memberOf(pageData.getEvent().getGroupId()))) {
-			tb.addLink(new ClickLabel("Add participant", new MouseDownHandler() {
+			tb.addLink(new ClickLabel("Add participant", new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					if (!Application.isAuthenticated()) {
 						LoginDialog.showLogin();
 						return;
@@ -95,9 +93,9 @@ public class EventRegistrationSection extends Composite {
 
 			if (registration.isSaved()) {
 				final ClickLabel cancel = new ClickLabel(getCancelRegistrationLabelText());
-				cancel.addMouseDownHandler(new MouseDownHandler() {
+				cancel.addClickHandler(new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						String text = "";
 						if (registration.getCanceled()) {
 							text = "Restore registration?";
@@ -267,9 +265,9 @@ public class EventRegistrationSection extends Composite {
 		for (int i = 0; i < registration.getParticipants().size(); i++) {
 			final EventParticipant p = registration.getParticipants().get(i);
 			String text = p.getFirstName() + " " + p.getLastName();
-			ClickLabel editLabel = new ClickLabel(text, new MouseDownHandler() {
+			ClickLabel editLabel = new ClickLabel(text, new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					new ParticipantEditDialog(pageData, refreshParticipants).center(p);
 				}
 			});
@@ -295,9 +293,9 @@ public class EventRegistrationSection extends Composite {
 			participantTable.setText(i, 2, p.getStatus());
 
 			if (!registration.getCanceled() && pageData.getEvent().allowRegistrations()) {
-				ClickLabel cl = new ClickLabel(editText, new MouseDownHandler() {
+				ClickLabel cl = new ClickLabel(editText, new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						String confirmText = "";
 						if (p.isCanceled()) {
 							confirmText = "Restore registration for " + p.getFirstName() + "?";
@@ -391,9 +389,9 @@ public class EventRegistrationSection extends Composite {
 			positionTable.setWidget(i, 0, new Label(p.getJobTitle()));
 
 			if (pageData.getEvent().allowRegistrations()) {
-				ClickLabel cl = new ClickLabel("X", new MouseDownHandler() {
+				ClickLabel cl = new ClickLabel("X", new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						ConfirmDialog.confirm("Don't want to volunteer for this role?", new ConfirmHandler() {
 							@Override
 							public void onConfirm() {

@@ -20,6 +20,8 @@ import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -367,9 +369,9 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 
 		totalPanel.add(new HTML(cellTable.getList().size() + "&nbsp;of&nbsp;"));
 		if (clearFilter == null) {
-			clearFilter = new ClickLabel(Integer.toString(cellTable.getFullList().size()), new MouseDownHandler() {
+			clearFilter = new ClickLabel(Integer.toString(cellTable.getFullList().size()), new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					if (cellTable != null) {
 						clearFilter();
 					}

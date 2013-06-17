@@ -19,8 +19,6 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -68,9 +66,9 @@ public class EventSeriesDialog extends DefaultDialog {
 
 				final int row = dateTable.getRowCount();
 
-				ClickLabel ex = new ClickLabel("X", new MouseDownHandler() {
+				ClickLabel ex = new ClickLabel("X", new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						r.removeHandler();
 						dateTable.removeRow(row);
 					}

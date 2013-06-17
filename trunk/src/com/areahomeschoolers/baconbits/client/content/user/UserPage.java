@@ -65,8 +65,8 @@ import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.VerticalAlign;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -309,9 +309,9 @@ public class UserPage implements Page {
 					groupsTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
 					groupsTable.getTitleBar().addExcelControl();
 					if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
-						groupsTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
+						groupsTable.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								ArgMap<UserGroupArg> grpArgs = new ArgMap<UserGroupArg>(Status.ACTIVE);
 								grpArgs.put(UserGroupArg.USER_NOT_MEMBER_OF, user.getId());
 								if (!Application.isSystemAdministrator()) {
@@ -355,9 +355,9 @@ public class UserPage implements Page {
 						args.put(UserArg.PARENT_ID, user.getId());
 
 						final UserCellTable table = new UserCellTable(args);
-						ClickLabel addChild = new ClickLabel("Add Family Member", new MouseDownHandler() {
+						ClickLabel addChild = new ClickLabel("Add Family Member", new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								CreateFamilyMemberDialog dialog = new CreateFamilyMemberDialog(user, new Command() {
 									@Override
 									public void execute() {
@@ -408,24 +408,24 @@ public class UserPage implements Page {
 						table.addStatusFilterBox();
 
 						if (viewingSelf()) {
-							table.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
+							table.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
 								@Override
-								public void onMouseDown(MouseDownEvent event) {
+								public void onClick(ClickEvent event) {
 									bookDialog.center(new Book());
 								}
 							}));
 						}
 
-						table.getTitleBar().addLink(new ClickLabel("Print labels - all", new MouseDownHandler() {
+						table.getTitleBar().addLink(new ClickLabel("Print labels - all", new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								printLabels(table.getFullList());
 							}
 						}));
 
-						table.getTitleBar().addLink(new ClickLabel("Print labels - selected", new MouseDownHandler() {
+						table.getTitleBar().addLink(new ClickLabel("Print labels - selected", new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								printLabels(table.getSelectedItems());
 							}
 						}));

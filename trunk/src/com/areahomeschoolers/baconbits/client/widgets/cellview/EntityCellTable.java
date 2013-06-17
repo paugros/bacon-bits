@@ -44,8 +44,8 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.TableCellElement;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -1826,9 +1826,9 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	protected Widget createSubRowCollapseControl(final T entity, final List<T> children) {
 		final Image toggle = new Image(MainImageBundle.INSTANCE.expand());
 		toggle.setTitle("Show contents");
-		toggle.addMouseDownHandler(new MouseDownHandler() {
+		toggle.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				T firstSavedChild = null;
 				for (T child : children) {
 					if (child.isSaved()) {

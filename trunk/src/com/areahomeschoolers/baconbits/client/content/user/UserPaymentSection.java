@@ -23,8 +23,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -54,9 +54,9 @@ public class UserPaymentSection {
 
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			adjustmentTable.setDialog(dialog);
-			adjustmentTable.getTitleBar().addLink(new ClickLabel("Add", new MouseDownHandler() {
+			adjustmentTable.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					dialog.center(new Adjustment());
 				}
 			}));

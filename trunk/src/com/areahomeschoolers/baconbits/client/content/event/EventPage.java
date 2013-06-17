@@ -62,8 +62,8 @@ import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
@@ -649,9 +649,9 @@ public class EventPage implements Page {
 				public void execute(VerticalPanel tabBody) {
 					TitleBar tb = new TitleBar(title, TitleBarStyle.SECTION);
 					if (Application.administratorOf(calendarEvent.getGroupId())) {
-						tb.addLink(new ClickLabel("Clone", new MouseDownHandler() {
+						tb.addLink(new ClickLabel("Clone", new ClickHandler() {
 							@Override
-							public void onMouseDown(MouseDownEvent event) {
+							public void onClick(ClickEvent event) {
 								ConfirmDialog.confirm("Clone this event?", new ConfirmHandler() {
 									@Override
 									public void onConfirm() {
@@ -664,9 +664,9 @@ public class EventPage implements Page {
 						}));
 
 						if (calendarEvent.getSeriesId() == null) {
-							tb.addLink(new ClickLabel("Create series", new MouseDownHandler() {
+							tb.addLink(new ClickLabel("Create series", new ClickHandler() {
 								@Override
-								public void onMouseDown(MouseDownEvent event) {
+								public void onClick(ClickEvent event) {
 									new EventSeriesDialog(calendarEvent).center();
 								}
 							}));
@@ -781,9 +781,9 @@ public class EventPage implements Page {
 										title.getElement().getStyle().setMarginRight(20, Unit.PX);
 										ft.setWidget(row, 2, title);
 										if (Application.administratorOf(calendarEvent.getGroupId()) && !item.getBoolean("adjustmentApplied")) {
-											ClickLabel cl = new ClickLabel("X", new MouseDownHandler() {
+											ClickLabel cl = new ClickLabel("X", new ClickHandler() {
 												@Override
-												public void onMouseDown(MouseDownEvent event) {
+												public void onClick(ClickEvent event) {
 													ConfirmDialog.confirm("Remove this volunteer?", new ConfirmHandler() {
 														@Override
 														public void onConfirm() {
@@ -835,9 +835,9 @@ public class EventPage implements Page {
 									return;
 								}
 
-								table.getTitleBar().addLink(new ClickLabel("Email Registrants", new MouseDownHandler() {
+								table.getTitleBar().addLink(new ClickLabel("Email Registrants", new ClickHandler() {
 									@Override
-									public void onMouseDown(MouseDownEvent event) {
+									public void onClick(ClickEvent event) {
 										emailDialog = new EmailDialog();
 										String subject = calendarEvent.getTitle() + " - " + Formatter.formatDateTime(calendarEvent.getStartDate());
 										emailDialog.setSubject(subject);
@@ -880,9 +880,9 @@ public class EventPage implements Page {
 	private void populateAgeGroups() {
 		ageTable.removeAllRows();
 		if (Application.administratorOf(calendarEvent.getGroupId())) {
-			ageTable.setWidget(0, 0, new ClickLabel("Add", new MouseDownHandler() {
+			ageTable.setWidget(0, 0, new ClickLabel("Add", new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					ageDialog.setText("Add Age Group");
 					EventAgeGroup a = new EventAgeGroup();
 					a.setEventId(calendarEvent.getId());
@@ -896,9 +896,9 @@ public class EventPage implements Page {
 			int row = ageTable.getRowCount();
 			String ageText = "Ages " + Formatter.formatNumberRange(g.getMinimumAge(), g.getMaximumAge());
 			if (Application.administratorOf(calendarEvent.getGroupId())) {
-				ageTable.setWidget(row, 0, new ClickLabel(ageText, new MouseDownHandler() {
+				ageTable.setWidget(row, 0, new ClickLabel(ageText, new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						ageDialog.setText("Edit Age Group");
 						ageDialog.center(g);
 					}
@@ -910,9 +910,9 @@ public class EventPage implements Page {
 			ageTable.setText(row, 1, Formatter.formatCurrency(g.getPrice()));
 
 			if (Application.administratorOf(calendarEvent.getGroupId()) && (g.getRegisterCount() + g.getFieldCount()) == 0) {
-				ageTable.setWidget(row, 2, new ClickLabel("X", new MouseDownHandler() {
+				ageTable.setWidget(row, 2, new ClickLabel("X", new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						ConfirmDialog.confirm("Really delete this age group?", new ConfirmHandler() {
 							@Override
 							public void onConfirm() {
@@ -936,9 +936,9 @@ public class EventPage implements Page {
 		volunteerTable.removeAllRows();
 
 		if (Application.administratorOf(calendarEvent.getGroupId())) {
-			volunteerTable.setWidget(0, 0, new ClickLabel("Add", new MouseDownHandler() {
+			volunteerTable.setWidget(0, 0, new ClickLabel("Add", new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					volunteerDialog.setText("Add Volunteer Position");
 					EventVolunteerPosition v = new EventVolunteerPosition();
 					v.setEventId(calendarEvent.getId());
@@ -952,9 +952,9 @@ public class EventPage implements Page {
 			int row = volunteerTable.getRowCount();
 			VerticalPanel vp = new VerticalPanel();
 			if (Application.administratorOf(calendarEvent.getGroupId())) {
-				vp.add(new ClickLabel(v.getJobTitle(), new MouseDownHandler() {
+				vp.add(new ClickLabel(v.getJobTitle(), new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						volunteerDialog.setText("Edit Volunteer Position");
 						volunteerDialog.center(v);
 					}
@@ -968,9 +968,9 @@ public class EventPage implements Page {
 			volunteerTable.setWidget(row, 0, vp);
 
 			if (Application.administratorOf(calendarEvent.getGroupId()) && v.getOpenPositionCount() == v.getPositionCount()) {
-				volunteerTable.setWidget(row, 1, new ClickLabel("X", new MouseDownHandler() {
+				volunteerTable.setWidget(row, 1, new ClickLabel("X", new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						ConfirmDialog.confirm("Really delete this volunteer position?", new ConfirmHandler() {
 							@Override
 							public void onConfirm() {
