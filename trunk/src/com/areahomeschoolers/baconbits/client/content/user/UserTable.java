@@ -35,7 +35,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
-		PICTURE(""), ACTIVITY("Last activity"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS(
+		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS(
 				"Same interests"), AGE("Age");
 
 		private String title;
