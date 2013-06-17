@@ -208,6 +208,10 @@ public class TagSection extends Composite {
 			return;
 		}
 
+		if (suggestBox.getValue().trim().isEmpty()) {
+			return;
+		}
+
 		Tag tag = new Tag();
 		tag.setName(suggestBox.getValue());
 		tag.setMappingType(mappingType);

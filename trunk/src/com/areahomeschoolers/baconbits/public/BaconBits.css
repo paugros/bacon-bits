@@ -176,6 +176,11 @@ img {
 	background-color: #77B4E8;
 }
 
+.cellLabel {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
 .totalCell {
 	background-color: #EDFFED;
 	border-top: 1px solid #9EE699;
