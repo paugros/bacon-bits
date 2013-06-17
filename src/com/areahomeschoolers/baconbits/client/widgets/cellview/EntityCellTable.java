@@ -197,8 +197,12 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		super(DEFAULT_PAGE_SIZE, r);
 		setSelectionPolicy(selectionPolicy);
 		setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
-		setLoadingIndicator(new Label("Loading..."));
-		setEmptyTableWidget(new Label("No results"));
+		Label loading = new Label("Loading...");
+		loading.addStyleName("cellLabel");
+		Label empty = new Label("No results");
+		empty.addStyleName("cellLabel");
+		setLoadingIndicator(loading);
+		setEmptyTableWidget(empty);
 		setPageStart(0);
 		registerTitleBar(titleBar);
 		getTitleBar().addPagingControl();
