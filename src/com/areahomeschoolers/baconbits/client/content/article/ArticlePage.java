@@ -29,8 +29,8 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
@@ -187,10 +187,9 @@ public class ArticlePage implements Page {
 			fieldTable.addField("Documents:", ds);
 		}
 
-		Button cancelButton = new Button("Cancel");
-		cancelButton.addMouseDownHandler(new MouseDownHandler() {
+		Button cancelButton = new Button("Cancel", new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				History.back();
 			}
 		});

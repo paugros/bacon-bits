@@ -27,8 +27,6 @@ import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.HTML;
@@ -99,9 +97,9 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 
 		excelControl = new Image(MainImageBundle.INSTANCE.fileIconExcel());
 		excelControl.setTitle("Export to Excel");
-		excelControl.addMouseDownHandler(new MouseDownHandler() {
+		excelControl.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				String data = "";
 				if (cellTable != null) {
 					data = cellTable.getExcelData();
@@ -149,9 +147,9 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 		refreshControl = new Image(MainImageBundle.INSTANCE.refresh());
 		refreshControl.setTitle("Refresh");
 
-		refreshControl.addMouseDownHandler(new MouseDownHandler() {
+		refreshControl.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				if (hasFilter()) {
 					clearFilter();
 				}

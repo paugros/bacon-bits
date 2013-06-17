@@ -23,8 +23,6 @@ import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
@@ -174,18 +172,16 @@ public class ControlledRichTextArea extends Composite {
 				vp.add(textArea);
 				vp.add(bp);
 
-				Button submit = new Button("Update");
-				submit.addMouseDownHandler(new MouseDownHandler() {
+				Button submit = new Button("Update", new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						richText.setHTML(textArea.getText());
 					}
 				});
 				bp.addRightButton(submit);
-				Button submitAndClose = new Button("Update and Close");
-				submitAndClose.addMouseDownHandler(new MouseDownHandler() {
+				Button submitAndClose = new Button("Update and Close", new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						richText.setHTML(textArea.getText());
 						hide();
 					}
@@ -218,10 +214,9 @@ public class ControlledRichTextArea extends Composite {
 				vp.add(textArea);
 				vp.add(bp);
 
-				Button submit = new Button("Insert");
-				submit.addMouseDownHandler(new MouseDownHandler() {
+				Button submit = new Button("Insert", new ClickHandler() {
 					@Override
-					public void onMouseDown(MouseDownEvent event) {
+					public void onClick(ClickEvent event) {
 						richText.getFormatter().insertHTML(textArea.getText());
 						hide();
 					}

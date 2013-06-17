@@ -16,8 +16,8 @@ import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
@@ -119,10 +119,9 @@ public class FileUploadDialog extends DefaultDialog {
 		vp.add(table);
 		vp.add(form.getBottomPanel());
 		form.getSubmitButton().setText("Upload");
-		Button cancelButton = new Button("Cancel");
-		cancelButton.addMouseDownHandler(new MouseDownHandler() {
+		Button cancelButton = new Button("Cancel", new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				hide();
 			}
 		});

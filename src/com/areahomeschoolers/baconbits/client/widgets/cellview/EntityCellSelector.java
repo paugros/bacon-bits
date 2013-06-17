@@ -27,8 +27,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
@@ -73,9 +71,9 @@ public abstract class EntityCellSelector<T extends EntityDto<T>, U extends Arg, 
 
 		if (submitButton == null) {
 			submitButton = new Button("Submit");
-			submitButton.addMouseDownHandler(new MouseDownHandler() {
+			submitButton.addClickHandler(new ClickHandler() {
 				@Override
-				public void onMouseDown(MouseDownEvent event) {
+				public void onClick(ClickEvent event) {
 					submit();
 				}
 			});
@@ -101,9 +99,9 @@ public abstract class EntityCellSelector<T extends EntityDto<T>, U extends Arg, 
 		});
 
 		clearButton = new Button("Clear");
-		clearButton.addMouseDownHandler(new MouseDownHandler() {
+		clearButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onMouseDown(MouseDownEvent event) {
+			public void onClick(ClickEvent event) {
 				entityCellTable.clearSelection();
 			}
 		});
