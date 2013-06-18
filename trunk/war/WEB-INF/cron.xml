@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
   <cron>
-    <url>/cron/cleanup</url>
+    <url>/baconbits/service/cron/cleanup</url>
     <description>Auto-delete stale payments and cancel registrations</description>
     <schedule>every 24 hours</schedule>
   </cron>

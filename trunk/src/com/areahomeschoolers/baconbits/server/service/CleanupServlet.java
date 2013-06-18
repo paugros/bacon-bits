@@ -60,7 +60,7 @@ public class CleanupServlet extends HttpServlet implements ServletContextAware, 
 		template.update(sql);
 
 		// auto-cancel pending registrations older than 24 hours
-		sql = "update eventRegistrationParticipants  set statusId = 5 where statusId = 1 and addedDate < date_add(now(), interval -24 hour)";
+		// sql = "update eventRegistrationParticipants  set statusId = 5 where statusId = 1 and addedDate < date_add(now(), interval -24 hour)";
 		// TODO need to: 1) update the wait list 2) email the user
 		// template.update(sql);
 	}
