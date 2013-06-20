@@ -272,8 +272,10 @@ public class HomePage implements Page {
 						nvp.add(h);
 					}
 
-					String url = PageUrl.eventList() + "&newlyAdded=1";
-					nvp.add(new Hyperlink("See more...", url));
+					if (pageData.getNewlyAddedEvents().size() == 5) {
+						String url = PageUrl.eventList() + "&newlyAdded=true";
+						nvp.add(new Hyperlink("See more...", url));
+					}
 
 					centerPanel.add(nvp);
 				}

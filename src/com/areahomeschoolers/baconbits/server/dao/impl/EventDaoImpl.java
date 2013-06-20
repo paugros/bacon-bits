@@ -95,6 +95,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setRegistrationInstructions(rs.getString("registrationInstructions"));
 			event.setSeriesId(rs.getInt("seriesId"));
 			event.setRequiredInSeries(rs.getBoolean("requiredInSeries"));
+			event.setNewlyAdded(rs.getBoolean("newlyAdded"));
 			return event;
 		}
 	}
@@ -620,7 +621,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		if (newlyAdded) {
-			sql += "and e.startDate <= date_add(now(), interval -2 week) and (e.seriesId = e.id or e.seriesId is null) \n";
+			sql += "and (e.addedDate >= date_add(now(), interval -2 week) and (e.seriesId = e.id or e.seriesId is null)) \n";
 		}
 
 		sql += "order by e.startDate ";
@@ -915,6 +916,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "0 as currentUserParticipantCount, ";
 		}
 		sql += "(select count(id) from documentEventMapping where eventId = e.id) as documentCount, \n";
+		sql += "(e.addedDate >= date_add(now(), interval -2 week) and (e.seriesId = e.id or e.seriesId is null)) as newlyAdded, \n";
 		sql += "(e.endDate < now()) as finished, isActive(e.registrationStartDate, e.registrationEndDate) as registrationOpen \n";
 		sql += "from events e \n";
 		sql += "left join groups g on g.id = e.groupId \n";

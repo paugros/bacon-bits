@@ -8,7 +8,6 @@ import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColu
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
-import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -193,7 +192,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 						Hyperlink h = new Hyperlink(item.getTitle(), PageUrl.event(item.getId()));
 						h.addStyleName("bold");
 
-						if (ClientDateUtils.daysBetween(item.getAddedDate(), new Date()) > 14) {
+						if (!item.isNewlyAdded()) {
 							return h;
 						}
 
@@ -225,7 +224,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 					public Date get(Event item) {
 						return item.getEndDate();
 					}
-				}), "120px");
+				}), "130px");
 				break;
 			case START_DATE:
 				setColumnWidth(addDateTimeColumn(col, new ValueGetter<Date, Event>() {
@@ -233,7 +232,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 					public Date get(Event item) {
 						return item.getStartDate();
 					}
-				}), "120px");
+				}), "130px");
 				break;
 			case REGISTER:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Event>() {

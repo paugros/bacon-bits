@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -24,7 +25,10 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -38,11 +42,12 @@ public final class EventListPage implements Page {
 	private DefaultListBox ageBox;
 	private DefaultListBox categoryBox;
 	private EventTable table;
+	private static final String NEWLY_ADDED_TOKEN = "newlyAdded";
 	private boolean showCommunity = Url.getBooleanParameter("showCommunity");
-	private boolean newlyAdded = Url.getBooleanParameter("newlyAdded");
+	private boolean newlyAdded = Url.getBooleanParameter(NEWLY_ADDED_TOKEN);
 
 	public EventListPage(final VerticalPanel page) {
-		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
+		final ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 		if (showCommunity) {
 			args.put(EventArg.ONLY_COMMUNITY);
 		}
@@ -59,8 +64,9 @@ public final class EventListPage implements Page {
 			hp.setWidth("100%");
 
 			PaddedPanel pp = new PaddedPanel(10);
-			pp.setHeight("51px");
-			vp.add(pp);
+			VerticalPanel vpp = new VerticalPanel();
+			vpp.add(pp);
+			vp.add(vpp);
 			pp.addStyleName("mediumPadding");
 			categoryBox = new DefaultListBox();
 			categoryBox.addItem("all", 0);
@@ -102,7 +108,26 @@ public final class EventListPage implements Page {
 			Label in = new Label("in");
 			pp.add(in);
 			pp.add(monthBox);
-			pp.addStyleName("boxedBlurb");
+
+			CheckBox cb = new CheckBox("Only show recently added events");
+			cb.setValue(newlyAdded, false);
+
+			cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+				@Override
+				public void onValueChange(ValueChangeEvent<Boolean> event) {
+					if (event.getValue()) {
+						args.put(EventArg.NEWLY_ADDED);
+						HistoryToken.append(NEWLY_ADDED_TOKEN + "=true", false);
+					} else {
+						args.remove(EventArg.NEWLY_ADDED);
+						HistoryToken.removeToken(NEWLY_ADDED_TOKEN, false);
+					}
+					table.populate();
+				}
+			});
+			vpp.add(cb);
+
+			vpp.addStyleName("boxedBlurb");
 
 			for (int i = 0; i < pp.getWidgetCount(); i++) {
 				pp.setCellVerticalAlignment(pp.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
@@ -130,6 +155,9 @@ public final class EventListPage implements Page {
 			table.addDataReturnHandler(new DataReturnHandler() {
 				@Override
 				public void onDataReturn() {
+					if (table.returnHandlersHaveRun()) {
+						return;
+					}
 					// add in categories
 					Map<Integer, String> categories = new HashMap<Integer, String>();
 					for (Event item : table.getFullList()) {
@@ -146,6 +174,9 @@ public final class EventListPage implements Page {
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
 			public void onDataReturn() {
+				if (table.returnHandlersHaveRun()) {
+					return;
+				}
 				Application.getLayout().setPage(title, page);
 			}
 		});

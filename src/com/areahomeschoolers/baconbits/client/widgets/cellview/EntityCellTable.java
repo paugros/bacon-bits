@@ -178,6 +178,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	private boolean linksOpenNewTab;
 	private boolean defaultByIndex = true;
 	private boolean hasBeenPopulated;
+	private boolean returnHandlersHaveRun;
 	protected boolean maintainHidden = false;
 	// UI Components
 	private MaxHeightScrollPanel scrollPanel;
@@ -969,6 +970,10 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		onRowDataUpdate(true, null);
 	}
 
+	public boolean returnHandlersHaveRun() {
+		return returnHandlersHaveRun;
+	}
+
 	public void revertSelectedItems() {
 		clearSelection();
 		if (getList() == null) {
@@ -1541,6 +1546,13 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 				}
 			});
 		}
+
+		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+			@Override
+			public void execute() {
+				returnHandlersHaveRun = true;
+			}
+		});
 	}
 
 	private <W extends Widget> ValueGetter<?, T> getDefaultValueGetter(final WidgetCellCreator<T> widgetCreator) {

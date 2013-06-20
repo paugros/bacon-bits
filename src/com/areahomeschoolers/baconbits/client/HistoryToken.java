@@ -89,6 +89,11 @@ public class HistoryToken {
 		return tokenMap.get(key);
 	}
 
+	public static void removeToken(String token, boolean issueEvent) {
+		tokenMap.remove(token);
+		updateHistoryFromMap(issueEvent, false);
+	}
+
 	/**
 	 * Replaces the entire current token map and URL with a new one.
 	 * 
