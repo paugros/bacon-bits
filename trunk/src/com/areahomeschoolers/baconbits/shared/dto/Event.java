@@ -38,6 +38,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private boolean requiredInSeries;
 
 	// auxilliary
+	private boolean newlyAdded;
 	private boolean saveAllInSeries;
 	private int cloneFromId;
 	private int currentUserParticipantCount;
@@ -253,6 +254,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		return documentCount > 0;
 	}
 
+	public boolean isNewlyAdded() {
+		return newlyAdded;
+	}
+
 	public boolean isSeriesChild() {
 		return seriesId != null && seriesId != getId();
 	}
@@ -347,6 +352,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public void setMinimumParticipants(int minimumParticipants) {
 		this.minimumParticipants = minimumParticipants;
+	}
+
+	public void setNewlyAdded(boolean newlyAdded) {
+		this.newlyAdded = newlyAdded;
 	}
 
 	public void setNotificationEmail(String notificationEmail) {
