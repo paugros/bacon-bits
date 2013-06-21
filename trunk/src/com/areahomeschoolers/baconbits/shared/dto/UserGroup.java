@@ -11,8 +11,8 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class UserGroup extends EntityDto<UserGroup> {
 
 	public enum AccessLevel implements IsSerializable, Serializable {
-		PUBLIC(1, "Public"), SITE_MEMBERS(2, "Site members"), GROUP_MEMBERS(3, "Group members"), GROUP_ADMINISTRATORS(4, "Group administrators"), SYSTEM_ADMINISTRATORS(
-				5, "System administrators");
+		PUBLIC(1, "Public"), SITE_MEMBERS(2, "Site members"), GROUP_MEMBERS(3, "Group members"), GROUP_ADMINISTRATORS(4, "Group administrators"), ORGANIZATION_MEMBERS(
+				5, "Organization members"), ORGANIZATION_ADMINISTRATORS(6, "Organization administrators"), SYSTEM_ADMINISTRATORS(7, "System administrators");
 
 		private static final Map<Integer, AccessLevel> lookup = new HashMap<Integer, AccessLevel>();
 
@@ -53,6 +53,8 @@ public class UserGroup extends EntityDto<UserGroup> {
 	private String groupName;
 	private String description;
 	private Date startDate, endDate;
+	private boolean isOrganization;
+	private int organizationId;
 
 	// for membership records
 	private boolean isAdministrator;
@@ -77,6 +79,14 @@ public class UserGroup extends EntityDto<UserGroup> {
 		return groupName;
 	}
 
+	public boolean getOrganization() {
+		return isOrganization;
+	}
+
+	public int getOrganizationId() {
+		return organizationId;
+	}
+
 	public Date getStartDate() {
 		return startDate;
 	}
@@ -95,6 +105,14 @@ public class UserGroup extends EntityDto<UserGroup> {
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	public void setOrganization(boolean isOrganization) {
+		this.isOrganization = isOrganization;
+	}
+
+	public void setOrganizationId(int organizationId) {
+		this.organizationId = organizationId;
 	}
 
 	public void setStartDate(Date startDate) {

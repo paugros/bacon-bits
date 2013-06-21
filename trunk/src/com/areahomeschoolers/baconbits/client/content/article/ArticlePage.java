@@ -7,7 +7,6 @@ import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
-import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -18,14 +17,11 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
-import com.areahomeschoolers.baconbits.client.widgets.GroupListBox;
+import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
-import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
-import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -37,7 +33,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 public class ArticlePage implements Page {
 	private Form form = new Form(new FormSubmitHandler() {
@@ -112,47 +107,28 @@ public class ArticlePage implements Page {
 
 		if (Application.isAuthenticated()) {
 			final Label accessDisplay = new Label();
-			final DefaultListBox accessInput = new AccessLevelListBox(article.getGroupId());
+			final ItemVisibilityWidget accessInput = new ItemVisibilityWidget();
 			FormField accessField = form.createFormField("Visible to:", accessInput, accessDisplay);
 			accessField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					accessDisplay.setText(article.getAccessLevel());
-					accessInput.setValue(article.getAccessLevelId());
+					String text = article.getAccessLevel();
+					if (article.getGroupId() != null && article.getGroupId() > 0) {
+						text += " - " + article.getGroupName();
+					}
+					accessDisplay.setText(text);
+					accessInput.setAccessLevelId(article.getAccessLevelId());
+					accessInput.setGroupId(article.getGroupId());
 				}
 			});
 			accessField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					article.setAccessLevelId(accessInput.getIntValue());
+					article.setAccessLevelId(accessInput.getAccessLevelId());
+					article.setGroupId(accessInput.getGroupId());
 				}
 			});
 			fieldTable.addField(accessField);
-
-			final Label groupDisplay = new Label();
-			WidgetCreator groupCreator = new WidgetCreator() {
-				@Override
-				public Widget createWidget() {
-					return new GroupListBox(article.getGroupId());
-				}
-			};
-			final FormField groupField = form.createFormField("Group:", groupCreator, groupDisplay);
-			groupField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					groupDisplay.setText(Common.getDefaultIfNull(article.getGroupName(), "None"));
-					if (groupField.inputIsCreated()) {
-						((GroupListBox) groupField.getInputWidget()).setValue(article.getGroupId());
-					}
-				}
-			});
-			groupField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					article.setGroupId(((GroupListBox) groupField.getInputWidget()).getIntValue());
-				}
-			});
-			fieldTable.addField(groupField);
 		}
 
 		if (article.isSaved() && (article.hasTags() || Application.administratorOf(article.getGroupId()))) {

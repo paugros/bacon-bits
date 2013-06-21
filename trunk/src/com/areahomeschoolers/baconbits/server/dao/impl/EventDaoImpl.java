@@ -96,6 +96,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setSeriesId(rs.getInt("seriesId"));
 			event.setRequiredInSeries(rs.getBoolean("requiredInSeries"));
 			event.setNewlyAdded(rs.getBoolean("newlyAdded"));
+			event.setOrganizationId(rs.getInt("organizationId"));
 			return event;
 		}
 	}
@@ -173,6 +174,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	@Override
 	public Event getById(int id) {
 		String sql = createSqlBase() + "and e.id = ?";
+
 		return queryForObject(sql, new EventMapper(), id);
 	}
 
@@ -906,7 +908,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	private String createSqlBase() {
 		int userId = ServerContext.getCurrentUserId();
-		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.accessLevel, \n";
+		String sql = "select e.*, g.groupName, g.organizationId, c.category, u.firstName, u.lastName, l.accessLevel, \n";
 		sql += "(select group_concat(price) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {
@@ -925,11 +927,14 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "join userAccessLevels l on l.id = e.accessLevelId \n";
 
 		sql += "left join userGroupMembers ugm on ugm.groupId = e.groupId and ugm.userId = " + userId + " \n";
+		sql += "left join userGroupMembers org on org.groupId = g.organizationId and org.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
 
 		if (!ServerContext.isSystemAdministrator()) {
 			int auth = ServerContext.isAuthenticated() ? 1 : 0;
-			sql += "and case e.accessLevelId when 1 then 1 when 2 then " + auth + " when 3 then ugm.id when 4 then ugm.isAdministrator else 0 end > 0 \n";
+			sql += "and case e.accessLevelId when 1 then 1 when 2 then " + auth + " ";
+			sql += "when 3 then (ugm.id > 0 or org.isAdministrator) when 4 then (ugm.isAdministrator or org.isAdministrator) ";
+			sql += "when 5 then org.id when 6 then org.isAdministrator else 0 end > 0 \n";
 		}
 
 		return sql;

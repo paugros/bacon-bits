@@ -11,7 +11,6 @@ import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColu
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
-import com.areahomeschoolers.baconbits.client.content.user.AccessLevelListBox;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
@@ -37,7 +36,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.GoogleMap;
-import com.areahomeschoolers.baconbits.client.widgets.GroupListBox;
+import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
@@ -48,7 +47,6 @@ import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
-import com.areahomeschoolers.baconbits.client.widgets.WidgetCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -77,7 +75,6 @@ import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 public class EventPage implements Page {
 	private final Form form = new Form(new FormSubmitHandler() {
@@ -547,50 +544,28 @@ public class EventPage implements Page {
 			fieldTable.addField(registerField);
 
 			final Label accessDisplay = new Label();
-			final DefaultListBox accessInput = new AccessLevelListBox(calendarEvent.getGroupId());
+			final ItemVisibilityWidget accessInput = new ItemVisibilityWidget();
 			FormField accessField = form.createFormField("Visible to:", accessInput, accessDisplay);
 			accessField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					accessDisplay.setText(calendarEvent.getAccessLevel());
-					accessInput.setValue(calendarEvent.getAccessLevelId());
+					String text = calendarEvent.getAccessLevel();
+					if (calendarEvent.getGroupId() != null && calendarEvent.getGroupId() > 0) {
+						text += " - " + calendarEvent.getGroupName();
+					}
+					accessDisplay.setText(text);
+					accessInput.setAccessLevelId(calendarEvent.getAccessLevelId());
+					accessInput.setGroupId(calendarEvent.getGroupId());
 				}
 			});
 			accessField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					calendarEvent.setAccessLevelId(accessInput.getIntValue());
+					calendarEvent.setAccessLevelId(accessInput.getAccessLevelId());
+					calendarEvent.setGroupId(accessInput.getGroupId());
 				}
 			});
 			fieldTable.addField(accessField);
-
-			final Label groupDisplay = new Label();
-			WidgetCreator groupCreator = new WidgetCreator() {
-				@Override
-				public Widget createWidget() {
-					return new GroupListBox(calendarEvent.getGroupId());
-				}
-			};
-
-			final FormField groupField = form.createFormField("Group:", groupCreator, groupDisplay);
-			groupField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					groupDisplay.setText(Common.getDefaultIfNull(calendarEvent.getGroupName(), "None"));
-					if (groupField.inputIsCreated()) {
-						((GroupListBox) groupField.getInputWidget()).setValue(calendarEvent.getGroupId());
-					}
-				}
-			});
-
-			groupField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setGroupId(((GroupListBox) groupField.getInputWidget()).getIntValue());
-				}
-			});
-
-			fieldTable.addField(groupField);
 
 			if (calendarEvent.isSaved()) {
 				fieldTable.addField("Added by:", calendarEvent.getAddedByFullName());

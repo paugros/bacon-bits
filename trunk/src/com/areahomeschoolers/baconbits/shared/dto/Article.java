@@ -23,6 +23,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 	private String groupName;
 	private int documentCount;
 	private int tagCount;
+	private Integer organizationId;
 
 	public Article() {
 
@@ -71,6 +72,13 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 
 	public String getGroupName() {
 		return groupName;
+	}
+
+	public Integer getOrganizationId() {
+		if (organizationId == null || organizationId == 0) {
+			return null;
+		}
+		return organizationId;
 	}
 
 	public Date getStartDate() {
@@ -128,6 +136,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	public void setOrganizationId(Integer organizationId) {
+		this.organizationId = organizationId;
 	}
 
 	public void setStartDate(Date startDate) {
