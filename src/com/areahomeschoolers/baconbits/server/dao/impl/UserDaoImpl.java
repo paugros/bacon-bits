@@ -560,7 +560,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			if (group.getStartDate() == null) {
 				group.setStartDate(new Date());
 			}
-			String sql = "insert into groups (groupName, description, startDate, endDate) values(:groupName, :description, :startDate, :endDate)";
+			String sql = "insert into groups (groupName, description, organizationId, startDate, endDate) values(:groupName, :description, :organizationId, :startDate, :endDate)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
