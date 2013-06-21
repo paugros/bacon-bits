@@ -414,6 +414,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select * from groups g ";
+		sql += "join groups o on o.id = g.organizationId ";
 		if (userId > 0) {
 			sql += "join userGroupMembers uugm on uugm.groupId = g.id and uugm.userId = ? ";
 			sqlArgs.add(userId);
@@ -433,7 +434,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (userNotMemberId > 0) {
 			sql += "and nugm.id is null ";
 		}
-		sql += "order by groupName asc";
+		sql += "order by o.groupName, g.isOrganization desc, g.groupName";
 
 		if (userId > 0 || userAdminId > 0 || userNotMemberId > 0) {
 			return query(sql, new GroupMemberMapper(), sqlArgs.toArray());
@@ -650,8 +651,23 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 			sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, ?, ?)";
 			update(sql, u.getId(), g.getId(), g.getAdministrator());
+
+			// associate to org if needed
+			if (!g.getOrganization()) {
+				sql = "select count(*) from userGroupMembers where userId = ? and groupId = ?";
+				if (queryForInt(sql, u.getId(), g.getOrganizationId()) == 0) {
+					sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, ?, ?)";
+					update(sql, u.getId(), g.getOrganizationId(), false);
+				}
+			}
 		} else {
-			String sql = "delete from userGroupMembers where userId = ? and groupId = ?";
+			String sql = "delete from userGroupMembers where userId = ? ";
+			// when deleting from org, cascade
+			if (g.getOrganization()) {
+				sql += "and organizationId = ? ";
+			} else {
+				sql += "and groupId = ? ";
+			}
 			update(sql, u.getId(), g.getId());
 		}
 	}
@@ -775,39 +791,42 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setDescription(rs.getString("description"));
 		group.setStartDate(rs.getTimestamp("startDate"));
 		group.setEndDate(rs.getTimestamp("endDate"));
+		group.setOrganization(rs.getBoolean("isOrganization"));
+		group.setOrganizationId(rs.getInt("organizationId"));
 		return group;
 	}
 
 	private HashMap<Integer, Boolean> populateSecurityGroups(User user) {
-		String sql = "select groupId, isAdministrator from userGroupMembers where userId = ?";
+		String sql = "select ugm.groupId, ugm.isAdministrator, g.isOrganization ";
+		sql += "from userGroupMembers ugm ";
+		sql += "join groups g on g.id = ugm.groupId ";
+		sql += "where ugm.userId = ?";
 		final HashMap<Integer, Boolean> groups = new HashMap<Integer, Boolean>();
+
+		final HashSet<AccessLevel> levels = new HashSet<AccessLevel>();
 
 		query(sql, new RowMapper<Void>() {
 			@Override
 			public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+				levels.add(AccessLevel.GROUP_MEMBERS);
+				if (rs.getBoolean("isAdministrator")) {
+					levels.add(AccessLevel.GROUP_ADMINISTRATORS);
+					if (rs.getBoolean("isOrganization")) {
+						levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
+					}
+				}
 				groups.put(rs.getInt("groupId"), rs.getBoolean("isAdministrator"));
 				return null;
 			}
 		}, user.getId());
 
-		user.setGroups(groups);
-
-		HashSet<AccessLevel> levels = new HashSet<AccessLevel>();
-
 		// this logic duplicated from CustomUserDetailsService - not auto-synced
 		levels.add(AccessLevel.SITE_MEMBERS);
 		if (user.getSystemAdministrator()) {
 			levels.add(AccessLevel.SYSTEM_ADMINISTRATORS);
+			levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
 			levels.add(AccessLevel.GROUP_ADMINISTRATORS);
 			levels.add(AccessLevel.GROUP_MEMBERS);
-		} else {
-			if (!groups.isEmpty()) {
-				levels.add(AccessLevel.GROUP_MEMBERS);
-			}
-
-			if (groups.containsValue(true)) {
-				levels.add(AccessLevel.GROUP_ADMINISTRATORS);
-			}
 		}
 
 		user.setAccessLevels(levels);

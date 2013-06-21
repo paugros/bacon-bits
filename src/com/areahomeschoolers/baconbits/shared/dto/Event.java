@@ -46,6 +46,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 	private String ageRanges;
 	private int documentCount;
 	private String category;
+	private Integer organizationId;
 	private String groupName;
 	private String accessLevel;
 	private String addedByFullName;
@@ -180,6 +181,13 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public String getNotificationEmail() {
 		return notificationEmail;
+	}
+
+	public Integer getOrganizationId() {
+		if (organizationId == null || organizationId == 0) {
+			return null;
+		}
+		return organizationId;
 	}
 
 	public String getPhone() {
@@ -360,6 +368,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 
 	public void setNotificationEmail(String notificationEmail) {
 		this.notificationEmail = notificationEmail;
+	}
+
+	public void setOrganizationId(Integer organizationId) {
+		this.organizationId = organizationId;
 	}
 
 	public void setPhone(String phone) {

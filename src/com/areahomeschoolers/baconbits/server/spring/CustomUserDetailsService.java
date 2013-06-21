@@ -37,11 +37,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 		User user;
 
-		String sql = "select u.id, u.email, u.passwordDigest, u.isSystemAdministrator, ugm.isAdministrator, ugm.id as isGroupMember, ";
+		String sql = "select u.id, u.email, u.passwordDigest, u.isSystemAdministrator, ugm.isAdministrator, g.isOrganization, ugm.id as isGroupMember, ";
 		sql += "isActive(u.StartDate, u.EndDate) as isEnabled from users u ";
 		sql += "left join userGroupMembers ugm on ugm.userId = u.id ";
+		sql += "left join groups g on g.id = ugm.groupId ";
 		sql += "where u.email = ? and u.passwordDigest is not null ";
-		sql += "order by ugm.isAdministrator desc limit 1";
+		sql += "order by ugm.isAdministrator desc, g.isOrganization desc limit 1";
 
 		try {
 			user = sjt.queryForObject(sql, mapper, username);
@@ -62,14 +63,18 @@ public class CustomUserDetailsService implements UserDetailsService {
 		authList.add(new SimpleGrantedAuthority("SITE_MEMBERS"));
 		if (rs.getBoolean("isSystemAdministrator")) {
 			authList.add(new SimpleGrantedAuthority("SYSTEM_ADMINISTRATORS"));
-			authList.add(new SimpleGrantedAuthority("GROUP_MEMBERS"));
+			authList.add(new SimpleGrantedAuthority("ORGANIZATION_ADMINISTRATORS"));
 			authList.add(new SimpleGrantedAuthority("GROUP_ADMINISTRATORS"));
+			authList.add(new SimpleGrantedAuthority("GROUP_MEMBERS"));
 		} else {
 			if (rs.getInt("isGroupMember") > 0) {
 				authList.add(new SimpleGrantedAuthority("GROUP_MEMBERS"));
 			}
 			if (rs.getBoolean("isAdministrator")) {
 				authList.add(new SimpleGrantedAuthority("GROUP_ADMINISTRATORS"));
+				if (rs.getBoolean("isOrganization")) {
+					authList.add(new SimpleGrantedAuthority("ORGANIZATION_ADMINISTRATORS"));
+				}
 			}
 		}
 
