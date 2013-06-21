@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.GroupListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.VariableSizePager.PageSize;
@@ -56,6 +57,25 @@ public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 		FieldTable ft = new FieldTable();
 		ft.setLabelColumnWidth(LabelColumnWidth.NARROW);
 		ft.setWidth("600px");
+
+		if (!entity.isSaved()) {
+			final GroupListBox orgInput = new GroupListBox();
+			orgInput.showOnlyOrganizations();
+			FormField orgField = form.createFormField("Organization:", orgInput, null);
+			orgField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					orgInput.setValue(entity.getOrganizationId());
+				}
+			});
+			orgField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					entity.setOrganizationId(orgInput.getIntValue());
+				}
+			});
+			ft.addField(orgField);
+		}
 
 		final RequiredTextBox nameInput = new RequiredTextBox();
 		nameInput.setMaxLength(50);

@@ -16,8 +16,33 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 public class GroupListBox extends DefaultListBox {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private static List<UserGroup> groups;
+	private boolean onlyOrgs = false;
 
 	public GroupListBox() {
+		populate();
+	}
+
+	public void showOnlyOrganizations() {
+		onlyOrgs = true;
+		populate();
+	}
+
+	private void doPopulate() {
+		clear();
+
+		for (UserGroup g : groups) {
+			if (onlyOrgs && !g.getOrganization()) {
+				continue;
+			}
+			String text = g.getGroupName();
+			if (!g.getOrganization()) {
+				text = " - " + text;
+			}
+			addItem(text, g.getId());
+		}
+	}
+
+	private void populate() {
 		if (groups == null) {
 			ArgMap<UserGroupArg> args = new ArgMap<UserGroupArg>(Status.ACTIVE);
 			args.put(UserGroupArg.USER_ID, Application.getCurrentUser().getId());
@@ -26,27 +51,11 @@ public class GroupListBox extends DefaultListBox {
 				@Override
 				protected void doOnSuccess(ArrayList<UserGroup> result) {
 					groups = result;
-					populate();
+					doPopulate();
 				}
 			});
 		} else {
-			populate();
-		}
-	}
-
-	private void populate() {
-		clear();
-
-		for (UserGroup g : groups) {
-			String text = g.getGroupName();
-			if (!g.getOrganization()) {
-				text = " - " + text;
-			}
-			addItem(text, g.getId());
-		}
-
-		if (groups.size() == 1) {
-			setSelectedIndex(1);
+			doPopulate();
 		}
 	}
 }
