@@ -42,6 +42,9 @@ public class ItemVisibilityWidget extends Composite {
 	}
 
 	public Integer getGroupId() {
+		if (!glb.isVisible()) {
+			return null;
+		}
 		return glb.getIntValue();
 	}
 
