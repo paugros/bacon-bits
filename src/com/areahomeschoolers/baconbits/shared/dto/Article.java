@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.content.document.HasDocuments;
 
-public final class Article extends EntityDto<Article> implements HasDocuments {
+public final class Article extends EntityDto<Article> implements HasDocuments, HasGroupOwnership {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
@@ -63,6 +63,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 		return EntityType.ARTICLE;
 	}
 
+	@Override
 	public Integer getGroupId() {
 		if (groupId == null || groupId == 0) {
 			return null;
@@ -74,6 +75,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 		return groupName;
 	}
 
+	@Override
 	public Integer getOrganizationId() {
 		if (organizationId == null || organizationId == 0) {
 			return null;
@@ -130,6 +132,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 		this.endDate = endDate;
 	}
 
+	@Override
 	public void setGroupId(Integer groupId) {
 		this.groupId = groupId;
 	}
@@ -138,6 +141,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments {
 		this.groupName = groupName;
 	}
 
+	@Override
 	public void setOrganizationId(Integer organizationId) {
 		this.organizationId = organizationId;
 	}

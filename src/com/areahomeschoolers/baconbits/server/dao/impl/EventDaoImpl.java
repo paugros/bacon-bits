@@ -372,7 +372,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select r.eventId, e.title, e.startDate, e.endDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
 		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, up.email as registrantEmailAddress, \n";
-		sql += "r.addedById, e.groupId, e.seriesId, e.requiredInSeries, \n";
+		sql += "r.addedById, e.groupId, g.organizationId, e.seriesId, e.requiredInSeries, \n";
 		if (includeFields) {
 			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n";
 			sql += "from eventFieldValues v \n";
@@ -388,6 +388,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "join users up on up.id = r.addedById \n";
 		sql += "left join payments py on py.id = p.paymentId \n";
 		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
+		sql += "left join groups g on g.id = e.groupId \n";
 		sql += "where 1 = 1 \n";
 
 		if (args.getStatus() != Status.ALL) {
@@ -477,6 +478,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setEventStartDate(rs.getTimestamp("startDate"));
 				p.setEventEndDate(rs.getTimestamp("endDate"));
 				p.setEventGroupId(rs.getInt("groupId"));
+				p.setEventOrganizationId(rs.getInt("organizationId"));
 				p.setEventSeriesId(rs.getInt("seriesId"));
 				p.setRegistrantEmailAddress(rs.getString("registrantEmailAddress"));
 				p.setRequiredInSeries(rs.getBoolean("requiredInSeries"));

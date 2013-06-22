@@ -77,7 +77,7 @@ public class ArticlePage implements Page {
 		if (article.getGroupId() == null) {
 			return Application.isSystemAdministrator();
 		}
-		return Application.administratorOf(article.getGroupId());
+		return Application.administratorOf(article);
 	}
 
 	private void createFieldTable() {
@@ -131,9 +131,9 @@ public class ArticlePage implements Page {
 			fieldTable.addField(accessField);
 		}
 
-		if (article.isSaved() && (article.hasTags() || Application.administratorOf(article.getGroupId()))) {
+		if (article.isSaved() && (article.hasTags() || allowEdit())) {
 			TagSection ts = new TagSection(TagMappingType.ARTICLE, article.getId());
-			ts.setEditingEnabled(Application.administratorOf(article.getGroupId()));
+			ts.setEditingEnabled(allowEdit());
 			fieldTable.addField("Tags:", ts);
 			ts.populate();
 		}
@@ -157,8 +157,8 @@ public class ArticlePage implements Page {
 		});
 		fieldTable.addField(dataField);
 
-		if (article.isSaved() && (article.hasDocuments() || Application.administratorOf(article.getGroupId()))) {
-			DocumentSection ds = new DocumentSection(article, Application.administratorOf(article.getGroupId()));
+		if (article.isSaved() && (article.hasDocuments() || Application.administratorOf(article))) {
+			DocumentSection ds = new DocumentSection(article, Application.administratorOf(article));
 			ds.populate();
 			fieldTable.addField("Documents:", ds);
 		}

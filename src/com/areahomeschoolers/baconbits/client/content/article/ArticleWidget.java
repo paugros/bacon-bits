@@ -22,8 +22,8 @@ public class ArticleWidget extends Composite {
 		vp.add(title);
 		vp.add(new HTML(article.getArticle()));
 
-		if (article.isSaved() && (article.hasDocuments() || Application.administratorOf(article.getGroupId()))) {
-			DocumentSection ds = new DocumentSection(article, Application.administratorOf(article.getGroupId()));
+		if (article.isSaved() && (article.hasDocuments() || Application.administratorOf(article))) {
+			DocumentSection ds = new DocumentSection(article, Application.administratorOf(article));
 			ds.populate();
 			vp.add(ds);
 		}

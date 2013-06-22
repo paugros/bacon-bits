@@ -26,10 +26,11 @@ public final class UserGroupListPage implements Page {
 		}
 
 		ArgMap<UserGroupArg> args = new ArgMap<UserGroupArg>();
-		final String title = "Groups";
+		final String title = "Organizations and Groups";
 		final UserGroupTable table = new UserGroupTable(args);
 		table.setTitle(title);
-		table.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.START_DATE, UserGroupColumn.END_DATE);
+		table.setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.ORGANIZATION, UserGroupColumn.DESCRIPTION, UserGroupColumn.START_DATE,
+				UserGroupColumn.END_DATE);
 		if (Application.isSystemAdministrator()) {
 			table.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
 				@Override
@@ -43,7 +44,7 @@ public final class UserGroupListPage implements Page {
 
 		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addSearchControl();
-		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));
+		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH900PX));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override

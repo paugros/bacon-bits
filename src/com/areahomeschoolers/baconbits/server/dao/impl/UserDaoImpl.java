@@ -413,7 +413,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int userAdminId = args.getInt(UserGroupArg.USER_IS_ADMIN_OF);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
-		String sql = "select * from groups g ";
+		String sql = "select *, o.groupName as organizationName from groups g ";
 		sql += "join groups o on o.id = g.organizationId ";
 		if (userId > 0) {
 			sql += "join userGroupMembers uugm on uugm.groupId = g.id and uugm.userId = ? ";
@@ -560,12 +560,18 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			if (group.getStartDate() == null) {
 				group.setStartDate(new Date());
 			}
-			String sql = "insert into groups (groupName, description, organizationId, startDate, endDate) values(:groupName, :description, :organizationId, :startDate, :endDate)";
+
+			String sql = "insert into groups (groupName, description, isOrganization, organizationId, startDate, endDate) ";
+			sql += "values(:groupName, :description, :organization, :organizationId, :startDate, :endDate)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
 
 			group.setId(Integer.parseInt(keys.getKeys().get(Constants.GENERATED_KEY_TOKEN).toString()));
+			if (group.getOrganization()) {
+				update("update groups set organizationId = id where id = ?", group.getId());
+				group.setOrganizationName(group.getGroupName());
+			}
 		}
 
 		return group;
@@ -793,6 +799,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setEndDate(rs.getTimestamp("endDate"));
 		group.setOrganization(rs.getBoolean("isOrganization"));
 		group.setOrganizationId(rs.getInt("organizationId"));
+		group.setOrganizationName(rs.getString("organizationName"));
 		return group;
 	}
 
