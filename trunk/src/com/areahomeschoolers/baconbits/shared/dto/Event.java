@@ -7,7 +7,7 @@ import com.areahomeschoolers.baconbits.client.content.document.HasDocuments;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 
-public final class Event extends EntityDto<Event> implements HasDocuments {
+public final class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwnership {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
@@ -160,6 +160,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		return finished;
 	}
 
+	@Override
 	public Integer getGroupId() {
 		if (groupId == null || groupId == 0) {
 			return null;
@@ -183,6 +184,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		return notificationEmail;
 	}
 
+	@Override
 	public Integer getOrganizationId() {
 		if (organizationId == null || organizationId == 0) {
 			return null;
@@ -346,6 +348,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		this.finished = finished;
 	}
 
+	@Override
 	public void setGroupId(Integer groupId) {
 		this.groupId = groupId;
 	}
@@ -370,6 +373,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments {
 		this.notificationEmail = notificationEmail;
 	}
 
+	@Override
 	public void setOrganizationId(Integer organizationId) {
 		this.organizationId = organizationId;
 	}

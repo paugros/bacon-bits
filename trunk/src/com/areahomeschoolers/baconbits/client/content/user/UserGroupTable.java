@@ -24,12 +24,13 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.cellview.client.RowStyles;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupArg, UserGroupColumn> {
 	public enum UserGroupColumn implements EntityCellTableColumn<UserGroupColumn> {
-		NAME("Name"), DESCRIPTION("Description"), START_DATE("Start"), END_DATE("End"), ADMINISTRATOR("Administrator");
+		GROUP("Group"), ORGANIZATION("Organization"), DESCRIPTION("Description"), START_DATE("Start"), END_DATE("End"), ADMINISTRATOR("Administrator");
 
 		private String title;
 
@@ -52,8 +53,18 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 	}
 
 	private UserGroupTable() {
-		setDefaultSortColumn(UserGroupColumn.NAME, SortDirection.SORT_ASC);
-		setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION);
+		setRowStyles(new RowStyles<UserGroup>() {
+			@Override
+			public String getStyleNames(UserGroup row, int rowIndex) {
+				if (row.getOrganization()) {
+					return "bold";
+				}
+				return "";
+			}
+		});
+
+		setDefaultSortColumn(UserGroupColumn.GROUP, SortDirection.SORT_ASC);
+		setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.DESCRIPTION);
 
 		disablePaging();
 	}
@@ -75,7 +86,15 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 	protected void setColumns() {
 		for (UserGroupColumn col : getDisplayColumns()) {
 			switch (col) {
-			case NAME:
+			case ORGANIZATION:
+				addTextColumn(col, new ValueGetter<String, UserGroup>() {
+					@Override
+					public String get(UserGroup item) {
+						return item.getOrganizationName();
+					}
+				});
+				break;
+			case GROUP:
 				if (user == null && Application.isSystemAdministrator()) {
 					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
 						@Override
@@ -112,7 +131,7 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
 						@Override
 						protected Widget createWidget(final UserGroup item) {
-							if (!Application.administratorOf(item.getId())) {
+							if (!Application.administratorOf(item)) {
 								return new Label(Common.yesNo(item.getAdministrator()));
 							}
 							return new ClickLabel(Common.yesNo(item.getAdministrator()), new ClickHandler() {
@@ -176,7 +195,7 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 			addCompositeWidgetColumn("Delete", new WidgetCellCreator<UserGroup>() {
 				@Override
 				protected Widget createWidget(final UserGroup group) {
-					if (!Application.administratorOf(group.getId())) {
+					if (!Application.administratorOf(group)) {
 						return new Label("");
 					}
 

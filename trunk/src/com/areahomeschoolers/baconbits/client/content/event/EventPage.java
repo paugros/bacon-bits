@@ -235,7 +235,7 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(addressField);
 
-		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrBlank(calendarEvent.getWebsite())) {
+		if (Application.administratorOf(calendarEvent) || !Common.isNullOrBlank(calendarEvent.getWebsite())) {
 			final HTML websiteDisplay = new HTML();
 			final TextBox websiteInput = new TextBox();
 			websiteInput.setMaxLength(512);
@@ -260,7 +260,7 @@ public class EventPage implements Page {
 			fieldTable.addField(websiteField);
 		}
 
-		if (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrBlank(calendarEvent.getPhone())) {
+		if (Application.administratorOf(calendarEvent) || !Common.isNullOrBlank(calendarEvent.getPhone())) {
 			final Label phoneDisplay = new Label();
 			final PhoneTextBox phoneInput = new PhoneTextBox();
 			FormField phoneField = form.createFormField("Phone:", phoneInput, phoneDisplay);
@@ -281,7 +281,7 @@ public class EventPage implements Page {
 		}
 
 		if (calendarEvent.getRequiresRegistration()) {
-			if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
+			if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
 				ageTable.setWidth("150px");
 
 				populateAgeGroups();
@@ -315,7 +315,7 @@ public class EventPage implements Page {
 			}
 		}
 
-		if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent.getGroupId()) || !Common.isNullOrEmpty(pageData.getVolunteerPositions()))) {
+		if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent) || !Common.isNullOrEmpty(pageData.getVolunteerPositions()))) {
 			volunteerTable.setWidth("400px");
 
 			populateVolunteerPositions();
@@ -323,7 +323,7 @@ public class EventPage implements Page {
 			fieldTable.addField("Volunteer positions:", volunteerTable);
 		}
 
-		if (Application.administratorOf(calendarEvent.getGroupId())) {
+		if (Application.administratorOf(calendarEvent)) {
 			final Label categoryDisplay = new Label();
 			final RequiredListBox categoryInput = new RequiredListBox();
 			for (Data item : pageData.getCategories()) {
@@ -365,7 +365,7 @@ public class EventPage implements Page {
 			fieldTable.addField(instructionsField);
 		}
 
-		if (Application.administratorOf(calendarEvent.getGroupId())) {
+		if (Application.administratorOf(calendarEvent)) {
 			final Label registrationDatesDisplay = new Label();
 			final DateTimeRangeBox registrationDatesInput = new DateTimeRangeBox();
 			FormField registrationDatesField = form.createFormField("Registration open/close:", registrationDatesInput, registrationDatesDisplay);
@@ -500,8 +500,7 @@ public class EventPage implements Page {
 			});
 			fieldTable.addField(costField);
 
-			if ((Common.isNullOrEmpty(pageData.getAgeGroups()) || Application.administratorOf(calendarEvent.getGroupId()))
-					|| !calendarEvent.getRequiresRegistration()) {
+			if ((Common.isNullOrEmpty(pageData.getAgeGroups()) || Application.administratorOf(calendarEvent)) || !calendarEvent.getRequiresRegistration()) {
 				final NumericRangeBox participantInput = new NumericRangeBox();
 				final Label participantDisplay = new Label();
 				participantInput.setAllowZeroForNoLimit(true);
@@ -573,9 +572,9 @@ public class EventPage implements Page {
 			}
 		}
 
-		if (calendarEvent.isSaved() && (!pageData.getTags().isEmpty() || Application.administratorOf(calendarEvent.getGroupId()))) {
+		if (calendarEvent.isSaved() && (!pageData.getTags().isEmpty() || Application.administratorOf(calendarEvent))) {
 			TagSection ts = new TagSection(TagMappingType.EVENT, calendarEvent.getId(), pageData.getTags());
-			ts.setEditingEnabled(Application.administratorOf(calendarEvent.getGroupId()));
+			ts.setEditingEnabled(Application.administratorOf(calendarEvent));
 			fieldTable.addField("Tags:", ts);
 			ts.populate();
 		}
@@ -599,8 +598,8 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(descriptionField);
 
-		if (calendarEvent.isSaved() && (calendarEvent.hasDocuments() || Application.administratorOf(calendarEvent.getGroupId()))) {
-			DocumentSection ds = new DocumentSection(calendarEvent, Application.administratorOf(calendarEvent.getGroupId()));
+		if (calendarEvent.isSaved() && (calendarEvent.hasDocuments() || Application.administratorOf(calendarEvent))) {
+			DocumentSection ds = new DocumentSection(calendarEvent, Application.administratorOf(calendarEvent));
 			ds.populate();
 			fieldTable.addField("Documents:", ds);
 		}
@@ -623,7 +622,7 @@ public class EventPage implements Page {
 				@Override
 				public void execute(VerticalPanel tabBody) {
 					TitleBar tb = new TitleBar(title, TitleBarStyle.SECTION);
-					if (Application.administratorOf(calendarEvent.getGroupId())) {
+					if (Application.administratorOf(calendarEvent)) {
 						tb.addLink(new ClickLabel("Clone", new ClickHandler() {
 							@Override
 							public void onClick(ClickEvent event) {
@@ -700,7 +699,7 @@ public class EventPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			if (Application.administratorOf(calendarEvent.getGroupId())) {
+			if (Application.administratorOf(calendarEvent)) {
 				tabPanel.add("Fields", false, new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
@@ -713,7 +712,7 @@ public class EventPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			if (calendarEvent.getRequiresRegistration() && Application.administratorOf(calendarEvent.getGroupId())) {
+			if (calendarEvent.getRequiresRegistration() && Application.administratorOf(calendarEvent)) {
 				tabPanel.add("Participants", false, new TabPageCommand() {
 					@Override
 					public void execute(final VerticalPanel tabBody) {
@@ -755,7 +754,7 @@ public class EventPage implements Page {
 										Label title = new Label(item.get("jobTitle"));
 										title.getElement().getStyle().setMarginRight(20, Unit.PX);
 										ft.setWidget(row, 2, title);
-										if (Application.administratorOf(calendarEvent.getGroupId()) && !item.getBoolean("adjustmentApplied")) {
+										if (Application.administratorOf(calendarEvent) && !item.getBoolean("adjustmentApplied")) {
 											ClickLabel cl = new ClickLabel("X", new ClickHandler() {
 												@Override
 												public void onClick(ClickEvent event) {
@@ -842,7 +841,7 @@ public class EventPage implements Page {
 				}
 			});
 
-			if (!Application.administratorOf(calendarEvent.getGroupId())) {
+			if (!Application.administratorOf(calendarEvent)) {
 				form.setEnabled(false);
 			}
 
@@ -854,7 +853,7 @@ public class EventPage implements Page {
 
 	private void populateAgeGroups() {
 		ageTable.removeAllRows();
-		if (Application.administratorOf(calendarEvent.getGroupId())) {
+		if (Application.administratorOf(calendarEvent)) {
 			ageTable.setWidget(0, 0, new ClickLabel("Add", new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -870,7 +869,7 @@ public class EventPage implements Page {
 		for (final EventAgeGroup g : pageData.getAgeGroups()) {
 			int row = ageTable.getRowCount();
 			String ageText = "Ages " + Formatter.formatNumberRange(g.getMinimumAge(), g.getMaximumAge());
-			if (Application.administratorOf(calendarEvent.getGroupId())) {
+			if (Application.administratorOf(calendarEvent)) {
 				ageTable.setWidget(row, 0, new ClickLabel(ageText, new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
@@ -884,7 +883,7 @@ public class EventPage implements Page {
 
 			ageTable.setText(row, 1, Formatter.formatCurrency(g.getPrice()));
 
-			if (Application.administratorOf(calendarEvent.getGroupId()) && (g.getRegisterCount() + g.getFieldCount()) == 0) {
+			if (Application.administratorOf(calendarEvent) && (g.getRegisterCount() + g.getFieldCount()) == 0) {
 				ageTable.setWidget(row, 2, new ClickLabel("X", new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
@@ -910,7 +909,7 @@ public class EventPage implements Page {
 	private void populateVolunteerPositions() {
 		volunteerTable.removeAllRows();
 
-		if (Application.administratorOf(calendarEvent.getGroupId())) {
+		if (Application.administratorOf(calendarEvent)) {
 			volunteerTable.setWidget(0, 0, new ClickLabel("Add", new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -926,7 +925,7 @@ public class EventPage implements Page {
 		for (final EventVolunteerPosition v : pageData.getVolunteerPositions()) {
 			int row = volunteerTable.getRowCount();
 			VerticalPanel vp = new VerticalPanel();
-			if (Application.administratorOf(calendarEvent.getGroupId())) {
+			if (Application.administratorOf(calendarEvent)) {
 				vp.add(new ClickLabel(v.getJobTitle(), new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
@@ -942,7 +941,7 @@ public class EventPage implements Page {
 			vp.add(description);
 			volunteerTable.setWidget(row, 0, vp);
 
-			if (Application.administratorOf(calendarEvent.getGroupId()) && v.getOpenPositionCount() == v.getPositionCount()) {
+			if (Application.administratorOf(calendarEvent) && v.getOpenPositionCount() == v.getPositionCount()) {
 				volunteerTable.setWidget(row, 1, new ClickLabel("X", new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {

@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -23,7 +24,10 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -59,9 +63,24 @@ public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 		ft.setWidth("600px");
 
 		if (!entity.isSaved()) {
+			VerticalPanel ovp = new VerticalPanel();
+			ovp.setSpacing(2);
 			final GroupListBox orgInput = new GroupListBox();
+			if (Application.isSystemAdministrator()) {
+				CheckBox cb = new CheckBox("This group is an organization");
+				cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+					@Override
+					public void onValueChange(ValueChangeEvent<Boolean> event) {
+						entity.setOrganization(event.getValue());
+						orgInput.setEnabled(!event.getValue());
+						entity.setOrganizationId(null);
+					}
+				});
+				ovp.add(cb);
+			}
+			ovp.add(orgInput);
 			orgInput.showOnlyOrganizations();
-			FormField orgField = form.createFormField("Organization:", orgInput, null);
+			FormField orgField = form.createFormField("Organization:", ovp, null);
 			orgField.setInitializer(new Command() {
 				@Override
 				public void execute() {

@@ -31,6 +31,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.HasGroupOwnership;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -77,8 +78,16 @@ public final class Application implements ValueChangeHandler<String> {
 		};
 	}
 
+	public static boolean administratorOf(HasGroupOwnership item) {
+		return isAuthenticated() && applicationData.getCurrentUser().administratorOfAny(item.getGroupId(), item.getOrganizationId());
+	}
+
 	public static boolean administratorOf(Integer groupId) {
 		return isAuthenticated() && applicationData.getCurrentUser().administratorOf(groupId);
+	}
+
+	public static boolean administratorOfAny(Integer... groupIds) {
+		return isAuthenticated() && applicationData.getCurrentUser().administratorOfAny(groupIds);
 	}
 
 	public static ApplicationData getApplicationData() {

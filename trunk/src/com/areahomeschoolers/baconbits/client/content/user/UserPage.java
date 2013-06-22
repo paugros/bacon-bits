@@ -8,9 +8,9 @@ import java.util.Map;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.book.BookDialog;
 import com.areahomeschoolers.baconbits.client.content.book.BookTable;
 import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
-import com.areahomeschoolers.baconbits.client.content.book.BookDialog;
 import com.areahomeschoolers.baconbits.client.content.calendar.Appointment;
 import com.areahomeschoolers.baconbits.client.content.calendar.AppointmentStyle;
 import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
@@ -20,8 +20,8 @@ import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerTable;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
-import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
+import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -38,9 +38,11 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.CalendarPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
+import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FixedWidthLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
@@ -306,7 +308,7 @@ public class UserPage implements Page {
 					final UserGroupTable groupsTable = new UserGroupTable(userArgs);
 					groupsTable.setUser(user);
 					groupsTable.setTitle("Group Membership");
-					groupsTable.setDisplayColumns(UserGroupColumn.NAME, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
+					groupsTable.setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
 					groupsTable.getTitleBar().addExcelControl();
 					if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 						groupsTable.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
@@ -493,6 +495,33 @@ public class UserPage implements Page {
 					});
 				}
 			});
+
+			if (Application.getCurrentUserId() == 1) {
+				tabPanel.add("Privacy", new TabPageCommand() {
+					@Override
+					public void execute(VerticalPanel tabBody) {
+						FieldTable ft = new FieldTable();
+						tabBody.add(WidgetFactory.newSection("Privacy Settings", ft, ContentWidth.MAXWIDTH900PX));
+
+						ItemVisibilityWidget ew = new ItemVisibilityWidget();
+						ft.addField("Email address:", ew);
+
+						ItemVisibilityWidget pw = new ItemVisibilityWidget();
+						ft.addField("Phone number:", pw);
+
+						ItemVisibilityWidget aw = new ItemVisibilityWidget();
+						ft.addField("Address:", aw);
+
+						ItemVisibilityWidget vw = new ItemVisibilityWidget();
+						ft.addField("Event registrations:", vw);
+
+						ItemVisibilityWidget fw = new ItemVisibilityWidget();
+						ft.addField("Family members:", fw);
+
+						tabPanel.selectTabNow(tabBody);
+					}
+				});
+			}
 
 			if (!canEditUser(user)) {
 				form.setEnabled(false);

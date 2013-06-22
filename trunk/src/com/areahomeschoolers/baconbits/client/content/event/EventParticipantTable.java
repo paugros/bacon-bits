@@ -287,7 +287,7 @@ public final class EventParticipantTable extends EntityCellTable<EventParticipan
 				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
 					protected Widget createWidget(final EventParticipant item) {
-						if (!Application.administratorOf(item.getEventGroupId())) {
+						if (!Application.administratorOfAny(item.getEventGroupId(), item.getEventOrganizationId())) {
 							return new Label(item.getStatus());
 						}
 

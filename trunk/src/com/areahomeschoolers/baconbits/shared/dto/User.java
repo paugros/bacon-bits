@@ -66,6 +66,16 @@ public final class User extends EntityDto<User> {
 		return groups.get(groupId) == Boolean.TRUE;
 	}
 
+	public boolean administratorOfAny(Integer... groupIds) {
+		for (Integer i : groupIds) {
+			if (administratorOf(i)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public boolean canSwitch() {
 		return canSwitch;
 	}

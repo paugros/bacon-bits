@@ -15,9 +15,9 @@ public class ItemVisibilityWidget extends Composite {
 	public ItemVisibilityWidget() {
 		alb.addItem("Public", AccessLevel.PUBLIC.getId());
 		alb.addItem("All site members", AccessLevel.SITE_MEMBERS.getId());
-		alb.addItem("Group members...", AccessLevel.GROUP_MEMBERS.getId());
+		alb.addItem("Members of...", AccessLevel.GROUP_MEMBERS.getId());
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
-			alb.addItem("Group administrators...", AccessLevel.GROUP_ADMINISTRATORS.getId());
+			alb.addItem("Administrators of...", AccessLevel.GROUP_ADMINISTRATORS.getId());
 		}
 
 		if (Application.getCurrentUser().getSystemAdministrator()) {
@@ -33,6 +33,7 @@ public class ItemVisibilityWidget extends Composite {
 
 		pp.add(alb);
 		pp.add(glb);
+		toggleGroupListBox();
 
 		initWidget(pp);
 	}
