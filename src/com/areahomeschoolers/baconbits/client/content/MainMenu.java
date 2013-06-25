@@ -52,6 +52,7 @@ public final class MainMenu extends MenuBar {
 	private final User user = Application.getCurrentUser();
 
 	public MainMenu() {
+		setFocusOnHoverEnabled(false);
 		addStyleName("MainMenu");
 		addCloseHandler(new CloseHandler<PopupPanel>() {
 			@Override
