@@ -49,7 +49,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	}
 
 	public enum VisibilityLevel implements IsSerializable, Serializable {
-		PUBLIC(1, "Public"), SITE_MEMBERS(2, "Site members"), GROUP_MEMBERS(3, "Group members"), PRIVATE(4, "Private");
+		PUBLIC(1, "Public"), SITE_MEMBERS(2, "Site members"), MY_GROUPS(3, "All my groups"), GROUP_MEMBERS(4, "Group members"), PRIVATE(5, "Private");
 
 		private static final Map<Integer, VisibilityLevel> lookup = new HashMap<Integer, VisibilityLevel>();
 

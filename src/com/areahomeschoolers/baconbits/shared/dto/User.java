@@ -25,6 +25,7 @@ public final class User extends EntityDto<User> {
 	private String zip;
 	private double lat;
 	private double lng;
+	private boolean directoryOptOut;
 
 	// password is only for setting
 	private String password;
@@ -53,6 +54,8 @@ public final class User extends EntityDto<User> {
 	private boolean isChild;
 	private int age;
 	private boolean addressChanged;
+
+	// private HashMap<PrivacyPreferenceType, Pair<Integer, Integer>> privacyPreferences;
 
 	public User() {
 
@@ -114,6 +117,10 @@ public final class User extends EntityDto<User> {
 
 	public int getCommonInterestCount() {
 		return commonInterestCount;
+	}
+
+	public boolean getDirectoryOptOut() {
+		return directoryOptOut;
 	}
 
 	public String getEmail() {
@@ -331,6 +338,10 @@ public final class User extends EntityDto<User> {
 
 	public void setCommonInterestCount(int commonInterestCount) {
 		this.commonInterestCount = commonInterestCount;
+	}
+
+	public void setDirectoryOptOut(boolean directoryOptOut) {
+		this.directoryOptOut = directoryOptOut;
 	}
 
 	public void setEmail(String email) {

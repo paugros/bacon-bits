@@ -937,7 +937,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "and case e.visibilityLevelId ";
 			sql += "when 1 then 1 ";
 			sql += "when 2 then " + auth + " \n";
-			sql += "when 3 then (ugm.id > 0 or org.isAdministrator) \n";
+			sql += "when 4 then (ugm.id > 0 or org.isAdministrator) \n";
 			sql += "else 0 end > 0 \n";
 		}
 

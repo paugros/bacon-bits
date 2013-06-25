@@ -58,6 +58,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -544,6 +545,8 @@ public class EventPage implements Page {
 
 			final Label accessDisplay = new Label();
 			final ItemVisibilityWidget accessInput = new ItemVisibilityWidget();
+			accessInput.removeItem(VisibilityLevel.PRIVATE);
+			accessInput.removeItem(VisibilityLevel.MY_GROUPS);
 			FormField accessField = form.createFormField("Visible to:", accessInput, accessDisplay);
 			accessField.setInitializer(new Command() {
 				@Override

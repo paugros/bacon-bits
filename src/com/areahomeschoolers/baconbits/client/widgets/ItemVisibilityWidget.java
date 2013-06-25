@@ -14,6 +14,7 @@ public class ItemVisibilityWidget extends Composite {
 	public ItemVisibilityWidget() {
 		alb.addItem("Public", VisibilityLevel.PUBLIC.getId());
 		alb.addItem("All site members", VisibilityLevel.SITE_MEMBERS.getId());
+		alb.addItem("All my groups", VisibilityLevel.MY_GROUPS.getId());
 		alb.addItem("Members of...", VisibilityLevel.GROUP_MEMBERS.getId());
 		alb.addItem("Private", VisibilityLevel.PRIVATE.getId());
 
@@ -31,10 +32,6 @@ public class ItemVisibilityWidget extends Composite {
 		initWidget(pp);
 	}
 
-	public Integer getVisibilityLevelId() {
-		return alb.getIntValue();
-	}
-
 	public Integer getGroupId() {
 		if (!glb.isVisible()) {
 			return null;
@@ -42,13 +39,25 @@ public class ItemVisibilityWidget extends Composite {
 		return glb.getIntValue();
 	}
 
-	public void setVisibilityLevelId(Integer visibilityLevelId) {
-		alb.setValue(visibilityLevelId);
-		toggleGroupListBox();
+	public Integer getVisibilityLevelId() {
+		return alb.getIntValue();
+	}
+
+	public void removeItem(VisibilityLevel level) {
+		for (int i = 0; i < alb.getItemCount(); i++) {
+			if (alb.getIntValue(i) == level.getId()) {
+				alb.removeItem(i);
+			}
+		}
 	}
 
 	public void setGroupId(Integer groupId) {
 		glb.setValue(groupId);
+	}
+
+	public void setVisibilityLevelId(Integer visibilityLevelId) {
+		alb.setValue(visibilityLevelId);
+		toggleGroupListBox();
 	}
 
 	private void toggleGroupListBox() {

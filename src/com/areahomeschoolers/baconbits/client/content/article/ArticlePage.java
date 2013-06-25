@@ -24,6 +24,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -108,6 +109,8 @@ public class ArticlePage implements Page {
 		if (Application.isAuthenticated()) {
 			final Label accessDisplay = new Label();
 			final ItemVisibilityWidget accessInput = new ItemVisibilityWidget();
+			accessInput.removeItem(VisibilityLevel.PRIVATE);
+			accessInput.removeItem(VisibilityLevel.MY_GROUPS);
 			FormField accessField = form.createFormField("Visible to:", accessInput, accessDisplay);
 			accessField.setInitializer(new Command() {
 				@Override

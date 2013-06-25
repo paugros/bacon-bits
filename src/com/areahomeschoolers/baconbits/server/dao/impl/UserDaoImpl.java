@@ -122,6 +122,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			user.setLng(rs.getDouble("lng"));
 			user.setImageId(rs.getInt("imageId"));
 			user.setSmallImageId(rs.getInt("smallImageId"));
+			user.setDirectoryOptOut(rs.getBoolean("directoryOptOut"));
 			return user;
 		}
 	}
@@ -771,14 +772,17 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 	private String createSqlBase(String specialCols) {
 		int currentUserId = ServerContext.getCurrentUserId();
-		String sql = "select isActive(u.startDate, u.endDate) as isEnabled, u.*, uu.firstName as parentFirstName, uu.lastName as parentLastName, ";
-		sql += "case when u.birthDate < date_add(now(), interval -18 year) then 0 else 1 end as isChild, i.commonInterests, ";
-		sql += "floor(datediff(now(), u.birthDate) / 365.25) as age, ";
+		String sql = "select isActive(u.startDate, u.endDate) as isEnabled, u.*, uu.firstName as parentFirstName, uu.lastName as parentLastName, \n";
+		sql += "case when u.birthDate < date_add(now(), interval -18 year) then 0 else 1 end as isChild, i.commonInterests, \n";
+		sql += "floor(datediff(now(), u.birthDate) / 365.25) as age, \n";
 		if (specialCols != null) {
 			sql += specialCols;
 		}
-		sql += "(select group_concat(g.groupName separator '\n') from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id ";
-		sql += "and isActive(g.startDate, g.endDate) = 1) as groupsText ";
+		sql += "(select group_concat(g.groupName separator '\n') from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id \n";
+		sql += "and isActive(g.startDate, g.endDate) = 1) as groupsText, \n";
+		sql += "(select group_concat(concat(p.preferenceType, ':', p.visibilityLevelId, ':', ifnull(p.groupId, '0')) separator '\n') \n";
+		sql += "from userPrivacyPreferences p where p.userId = u.id \n";
+		sql += ") as privacyPrefs \n";
 		sql += "from users u \n";
 		sql += "left join users uu on uu.id = u.parentId \n";
 		sql += "left join ( \n";
