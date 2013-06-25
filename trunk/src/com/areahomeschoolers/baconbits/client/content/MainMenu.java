@@ -8,16 +8,19 @@ import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -194,6 +197,37 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
 		}
 		addLinkToMenu(menu, "Calendar", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
+
+		menu.addSeparator();
+
+		menu.addItem("Change password", new ScheduledCommand() {
+			@Override
+			public void execute() {
+				GWT.runAsync(new RunAsyncCallback() {
+					@Override
+					public void onFailure(Throwable caught) {
+					}
+
+					@Override
+					public void onSuccess() {
+						new ResetPasswordDialog(true).center();
+					}
+				});
+			}
+		});
+
+		menu.addItem("Log out", new ScheduledCommand() {
+			@Override
+			public void execute() {
+				LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
+				loginService.logout(new Callback<Void>(false) {
+					@Override
+					protected void doOnSuccess(Void result) {
+						Window.Location.reload();
+					}
+				});
+			}
+		});
 
 		return menu;
 	}

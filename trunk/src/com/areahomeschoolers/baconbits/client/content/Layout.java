@@ -17,12 +17,10 @@ import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
-import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -67,8 +65,9 @@ public final class Layout {
 		}
 	}
 
-	private static int HEADER_HEIGHT = 52;
-	private static int MENU_HEIGHT = 22;
+	private static final int HEADER_HEIGHT = 53;
+	private static final int MENU_HEIGHT = 35;
+	private static final int LOGO_DIV_WIDTH = 125;
 	private final MainLayoutDock dock = new MainLayoutDock(Unit.PX);
 	private final SearchBox searchBox;
 	private final SimplePanel mobileBodyPanel = new SimplePanel();
@@ -86,7 +85,8 @@ public final class Layout {
 	public Layout() {
 		isMobileBrowser = ClientUtils.isMobileBrowser();
 
-		headerPanel.setStyleName("headerPanel");
+		// headerPanel.setStyleName("headerPanel");
+		headerPanel.setHeight(HEADER_HEIGHT + "px");
 		headerPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		if (!isMobileBrowser) {
 			RootLayoutPanel.get().setStyleName("overflowHidden");
@@ -106,7 +106,7 @@ public final class Layout {
 				}
 			}
 		});
-		headerPanel.add(logoDiv);
+		// headerPanel.add(logoDiv);
 
 		SimplePanel spacer = new SimplePanel();
 		headerPanel.add(spacer);
@@ -207,26 +207,6 @@ public final class Layout {
 		logInOrOut.setWordWrap(false);
 		sessionPanel.add(logInOrOut);
 
-		if (Application.isAuthenticated()) {
-			ClickLabel resetLabel = new ClickLabel("Change password", new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					GWT.runAsync(new RunAsyncCallback() {
-						@Override
-						public void onFailure(Throwable caught) {
-						}
-
-						@Override
-						public void onSuccess() {
-							new ResetPasswordDialog(true).center();
-						}
-					});
-				}
-			});
-			resetLabel.setWordWrap(false);
-			sessionPanel.add(resetLabel);
-		}
-
 		if (!isMobileBrowser) {
 			ap.setHeight("100%");
 			ap.getElement().getStyle().setOverflow(Overflow.VISIBLE);
@@ -235,23 +215,32 @@ public final class Layout {
 		}
 
 		menu = new MainMenu();
+		menuPanel.setHeight(MENU_HEIGHT + "px");
 		menuPanel.setWidth("100%");
 		menuPanel.add(menu);
 		menuPanel.setCellWidth(menu, "100%");
+		HorizontalPanel hp = new HorizontalPanel();
+		hp.setWidth("100%");
+		hp.add(logoDiv);
+		hp.setCellWidth(logoDiv, LOGO_DIV_WIDTH + "px");
+		hp.setHeight(HEADER_HEIGHT + MENU_HEIGHT + "px");
 
+		VerticalPanel vp = new VerticalPanel();
+		vp.setWidth("100%");
+		vp.add(headerPanel);
+		vp.add(menuPanel);
+		hp.addStyleName("headerPanel");
+		hp.add(vp);
 		if (isMobileBrowser) {
 			mobileBodyPanel.addStyleName("bodyPanel");
-			VerticalPanel vp = new VerticalPanel();
-			vp.setWidth("100%");
-			vp.add(headerPanel);
-			vp.add(menuPanel);
 			mobileBodyPanel.setWidth("100%");
-			vp.add(mobileBodyPanel);
-			RootPanel.get().add(vp);
+			VerticalPanel vvp = new VerticalPanel();
+			vvp.add(hp);
+			vvp.add(mobileBodyPanel);
+			RootPanel.get().add(vvp);
 		} else {
 			dock.addStyleName("Dock");
-			dock.addNorth(headerPanel, HEADER_HEIGHT);
-			dock.addNorth(menuPanel, MENU_HEIGHT);
+			dock.addNorth(hp, HEADER_HEIGHT + MENU_HEIGHT);
 			dock.add(bodyPanel);
 			RootLayoutPanel.get().add(dock);
 		}
@@ -311,7 +300,7 @@ public final class Layout {
 	}
 
 	private void addPageToBodyPanel(String title, VerticalPanel page) {
-		HTML footer = new HTML("&copy; 2005-2012 WHE. All rights reserved. Proprietary & Confidential.");
+		HTML footer = new HTML("Copyright &copy; 2005-2013 WHE. All rights reserved.");
 		footer.setStylePrimaryName("footer");
 
 		VerticalPanel vp = new VerticalPanel();
