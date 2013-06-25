@@ -119,7 +119,7 @@ public final class Layout {
 		headerPanel.add(sessionPanel);
 		sessionPanel.addStyleName("sessionPanel");
 
-		ClickLabel logInOrOut = new ClickLabel();
+		final ClickLabel logInOrOut = new ClickLabel();
 		if (Application.isAuthenticated()) {
 			if (Application.getCurrentUser().canSwitch()) {
 				final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
@@ -200,7 +200,12 @@ public final class Layout {
 							Window.Location.reload();
 						}
 					});
-					ld.center();
+
+					if (isMobileBrowser) {
+						ld.showRelativeTo(logInOrOut);
+					} else {
+						ld.center();
+					}
 				}
 			});
 		}
@@ -235,6 +240,7 @@ public final class Layout {
 			mobileBodyPanel.addStyleName("bodyPanel");
 			mobileBodyPanel.setWidth("100%");
 			VerticalPanel vvp = new VerticalPanel();
+			vvp.setWidth("100%");
 			vvp.add(hp);
 			vvp.add(mobileBodyPanel);
 			RootPanel.get().add(vvp);
