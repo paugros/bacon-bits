@@ -16,10 +16,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	private int addedById;
 	private Date startDate, endDate, addedDate;
 	private Integer groupId;
-	private int accessLevelId;
+	private int visibilityLevelId;
 
 	// auxiliary
-	private String accessLevel;
+	private String visibilityLevel;
 	private String groupName;
 	private int documentCount;
 	private int tagCount;
@@ -29,12 +29,12 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 
 	}
 
-	public String getAccessLevel() {
-		return accessLevel;
+	public String getVisibilityLevel() {
+		return visibilityLevel;
 	}
 
-	public int getAccessLevelId() {
-		return accessLevelId;
+	public int getVisibilityLevelId() {
+		return visibilityLevelId;
 	}
 
 	public int getAddedById() {
@@ -104,12 +104,12 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return tagCount > 0;
 	}
 
-	public void setAccessLevel(String accessLevel) {
-		this.accessLevel = accessLevel;
+	public void setVisibilityLevel(String visibilityLevel) {
+		this.visibilityLevel = visibilityLevel;
 	}
 
-	public void setAccessLevelId(int accessLevelId) {
-		this.accessLevelId = accessLevelId;
+	public void setVisibilityLevelId(int visibilityLevelId) {
+		this.visibilityLevelId = visibilityLevelId;
 	}
 
 	public void setAddedById(int addedById) {

@@ -112,19 +112,19 @@ public class ArticlePage implements Page {
 			accessField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					String text = article.getAccessLevel();
+					String text = article.getVisibilityLevel();
 					if (article.getGroupId() != null && article.getGroupId() > 0) {
 						text += " - " + article.getGroupName();
 					}
 					accessDisplay.setText(text);
-					accessInput.setAccessLevelId(article.getAccessLevelId());
+					accessInput.setVisibilityLevelId(article.getVisibilityLevelId());
 					accessInput.setGroupId(article.getGroupId());
 				}
 			});
 			accessField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					article.setAccessLevelId(accessInput.getAccessLevelId());
+					article.setVisibilityLevelId(accessInput.getVisibilityLevelId());
 					article.setGroupId(accessInput.getGroupId());
 				}
 			});

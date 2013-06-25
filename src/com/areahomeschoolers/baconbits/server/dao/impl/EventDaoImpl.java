@@ -87,8 +87,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setPhone(rs.getString("phone"));
 			event.setWebsite(rs.getString("website"));
 			event.setDocumentCount(rs.getInt("documentCount"));
-			event.setAccessLevel(rs.getString("accessLevel"));
-			event.setAccessLevelId(rs.getInt("accessLevelId"));
+			event.setVisibilityLevel(rs.getString("visibilityLevel"));
+			event.setVisibilityLevelId(rs.getInt("visibilityLevelId"));
 			event.setCurrentUserParticipantCount(rs.getInt("currentUserParticipantCount"));
 			event.setAgePrices(rs.getString("agePrices"));
 			event.setAgeRanges(rs.getString("ageRanges"));
@@ -686,7 +686,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(event);
 
 		if (event.isSaved()) {
-			String sql = "update events set title = :title, description = :description, startDate = :startDate, endDate = :endDate, accessLevelId = :accessLevelId, ";
+			String sql = "update events set title = :title, description = :description, startDate = :startDate, endDate = :endDate, visibilityLevelId = :visibilityLevelId, ";
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, requiresRegistration = :requiresRegistration, ";
@@ -699,10 +699,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, ";
-			sql += "publishDate, active, price, requiresRegistration, phone, website, accessLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
+			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, ";
-			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :accessLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
+			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -910,7 +910,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	private String createSqlBase() {
 		int userId = ServerContext.getCurrentUserId();
-		String sql = "select e.*, g.groupName, g.organizationId, c.category, u.firstName, u.lastName, l.accessLevel, \n";
+		String sql = "select e.*, g.groupName, g.organizationId, c.category, u.firstName, u.lastName, l.visibilityLevel, \n";
 		sql += "(select group_concat(price) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {
@@ -926,17 +926,19 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "left join groups g on g.id = e.groupId \n";
 		sql += "join eventCategories c on c.id = e.categoryId \n";
 		sql += "join users u on u.id = e.addedById \n";
-		sql += "join userAccessLevels l on l.id = e.accessLevelId \n";
+		sql += "join itemVisibilityLevels l on l.id = e.visibilityLevelId \n";
 
 		sql += "left join userGroupMembers ugm on ugm.groupId = e.groupId and ugm.userId = " + userId + " \n";
 		sql += "left join userGroupMembers org on org.groupId = g.organizationId and org.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
 
+		int auth = ServerContext.isAuthenticated() ? 1 : 0;
 		if (!ServerContext.isSystemAdministrator()) {
-			int auth = ServerContext.isAuthenticated() ? 1 : 0;
-			sql += "and case e.accessLevelId when 1 then 1 when 2 then " + auth + " ";
-			sql += "when 3 then (ugm.id > 0 or org.isAdministrator) when 4 then (ugm.isAdministrator or org.isAdministrator) ";
-			sql += "when 5 then org.id when 6 then org.isAdministrator else 0 end > 0 \n";
+			sql += "and case e.visibilityLevelId ";
+			sql += "when 1 then 1 ";
+			sql += "when 2 then " + auth + " \n";
+			sql += "when 3 then (ugm.id > 0 or org.isAdministrator) \n";
+			sql += "else 0 end > 0 \n";
 		}
 
 		return sql;
