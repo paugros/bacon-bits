@@ -20,13 +20,13 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Pair;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -43,6 +43,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class HomePage implements Page {
 	private class EventModulePanel extends Composite {
@@ -56,7 +57,7 @@ public class HomePage implements Page {
 			vp.setSpacing(8);
 
 			Label label = new Label(title);
-			label.addStyleName("hugeText");
+			label.addStyleName("homePageModuleTitle");
 			vp.add(label);
 
 			for (Event e : events) {
@@ -101,6 +102,32 @@ public class HomePage implements Page {
 		}
 	}
 
+	private class HomeContentPanel extends Composite {
+		private HorizontalPanel hp = new HorizontalPanel();
+		private VerticalPanel lp = new VerticalPanel();
+		private VerticalPanel rp = new VerticalPanel();
+
+		public HomeContentPanel() {
+			hp.add(lp);
+			hp.add(rp);
+			initWidget(hp);
+		}
+
+		public void add(Widget w) {
+			Style style = w.getElement().getStyle();
+
+			if (lp.getOffsetHeight() > rp.getOffsetHeight()) {
+				rp.add(w);
+			} else {
+				lp.add(w);
+				style.setMarginRight(10, Unit.PX);
+			}
+
+			style.setMarginBottom(10, Unit.PX);
+			style.setWidth(250, Unit.PX);
+		}
+	}
+
 	private final BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private VerticalPanel page = new VerticalPanel();
@@ -141,56 +168,6 @@ public class HomePage implements Page {
 
 		VerticalPanel rightPanel = new VerticalPanel();
 		rightPanel.setSpacing(0);
-		if (!Application.memberOf(16)) {
-			VerticalPanel vp = new VerticalPanel();
-			vp.setWidth("100%");
-			vp.setSpacing(8);
-
-			Label label = new Label("Sell Your Books");
-			label.addStyleName("hugeText");
-			vp.add(label);
-			Image payButton = new Image(MainImageBundle.INSTANCE.paypalButton());
-			payButton.getElement().getStyle().setCursor(Cursor.POINTER);
-			payButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					if (!Application.isAuthenticated()) {
-						LoginDialog.showLogin();
-						return;
-					}
-
-					if (paying) {
-						return;
-					}
-
-					paying = true;
-
-					bookService.signUpToSell(new Callback<PaypalData>() {
-						@Override
-						protected void doOnFailure(Throwable caught) {
-							super.doOnFailure(caught);
-							paying = false;
-						}
-
-						@Override
-						protected void doOnSuccess(PaypalData result) {
-							if (result.getAuthorizationUrl() != null) {
-								Window.Location.replace(result.getAuthorizationUrl());
-							} else {
-								HistoryToken.set(PageUrl.home() + "&ps=return");
-							}
-						}
-					});
-				}
-			});
-
-			String text = "You can sell your used homeschool curriculum with us. Click the payment button ($5.00) to sign up as a book seller and begin listing your items.";
-			vp.add(new Label(text));
-			vp.add(payButton);
-
-			rightPanel.add(vp);
-		}
-
 		rightPanel.add(eventPanel);
 		centerPanel.setSpacing(10);
 		grid.setWidget(0, 0, communityPanel);
@@ -212,9 +189,8 @@ public class HomePage implements Page {
 
 				// upcoming
 				VerticalPanel uvp = new VerticalPanel();
-				uvp.add(new EventModulePanel("Upcoming Events", pageData.getUpcomingEvents(), null));
-				uvp.getElement().getStyle().setBackgroundColor("#ddf3da");
-				uvp.addStyleName("roundedCorners");
+				uvp.add(new EventModulePanel("UPCOMING EVENTS", pageData.getUpcomingEvents(), null));
+				uvp.addStyleName("homePageModule");
 
 				VerticalPanel vvp = new VerticalPanel();
 				vvp.setSpacing(8);
@@ -233,9 +209,8 @@ public class HomePage implements Page {
 
 				// community
 				VerticalPanel cvp = new VerticalPanel();
-				cvp.add(new EventModulePanel("Community Events", pageData.getCommunityEvents(), "&showCommunity=true"));
-				cvp.getElement().getStyle().setBackgroundColor("#d8e6f7");
-				cvp.addStyleName("roundedCorners");
+				cvp.add(new EventModulePanel("COMMUNITY EVENTS", pageData.getCommunityEvents(), "&showCommunity=true"));
+				cvp.addStyleName("homePageModule");
 
 				String ftext = "<iframe src=\"http://wms.assoc-amazon.com/20070822/US/html/searchbox_20.html?t=httpwhediment-20\" width=\"120\" height=\"90\" frameborder=\"0\" scrolling=\"no\"></iframe>";
 				SimplePanel sp = new SimplePanel(new HTML(ftext));
@@ -243,33 +218,34 @@ public class HomePage implements Page {
 				cvp.add(sp);
 				communityPanel.setWidget(cvp);
 
+				HomeContentPanel hcp = new HomeContentPanel();
+				centerPanel.add(hcp);
+				Application.getLayout().setPage("Home", page);
+
 				// new
 				if (!Common.isNullOrEmpty(pageData.getNewlyAddedEvents())) {
 					VerticalPanel nvp = new VerticalPanel();
-					nvp.getElement().getStyle().setBackgroundColor("#ffe8eb");
-					nvp.addStyleName("roundedCorners");
+					nvp.addStyleName("homePageModule");
 					nvp.setSpacing(8);
 
-					Label label = new Label("Newly Added Events");
-					label.addStyleName("largeText");
+					Label label = new Label("NEWLY ADDED EVENTS");
+					label.addStyleName("homePageModuleTitle");
 					nvp.add(label);
 
 					for (Event e : pageData.getNewlyAddedEvents()) {
-						HTML h = new HTML();
+						VerticalPanel mhp = new VerticalPanel();
+
 						Hyperlink link = new Hyperlink(e.getTitle(), PageUrl.event(e.getId()));
+						link.addStyleName("mediumText");
+						mhp.add(link);
 
-						String ntext = link.toString() + "&nbsp;-&nbsp;";
-						ntext += "<i>" + Formatter.formatDateTime(e.getStartDate()) + "</i><br>";
+						HTML date = new HTML(Formatter.formatDateTime(e.getStartDate()));
+						date.setWordWrap(false);
+						// date.getElement().getStyle().setColor("#555555");
+						date.addStyleName("italic");
+						mhp.add(date);
 
-						h.setHTML(e.getDescription().replaceAll("<br>", " "));
-						String d = h.getText();
-						if (d.length() > 100) {
-							d = d.substring(0, 101) + "...";
-						}
-						ntext += d;
-
-						h.setHTML(ntext);
-						nvp.add(h);
+						nvp.add(mhp);
 					}
 
 					if (pageData.getNewlyAddedEvents().size() == 5) {
@@ -277,23 +253,72 @@ public class HomePage implements Page {
 						nvp.add(new Hyperlink("See more...", url));
 					}
 
-					centerPanel.add(nvp);
+					hcp.add(nvp);
+				}
+
+				if (!Application.memberOf(16)) {
+					VerticalPanel vp = new VerticalPanel();
+					vp.setWidth("100%");
+					vp.setSpacing(8);
+
+					Label label = new Label("Sell Your Books");
+					label.addStyleName("homePageModuleTitle");
+					vp.add(label);
+					Image payButton = new Image(MainImageBundle.INSTANCE.paypalButton());
+					payButton.getElement().getStyle().setCursor(Cursor.POINTER);
+					payButton.addClickHandler(new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							if (!Application.isAuthenticated()) {
+								LoginDialog.showLogin();
+								return;
+							}
+
+							if (paying) {
+								return;
+							}
+
+							paying = true;
+
+							bookService.signUpToSell(new Callback<PaypalData>() {
+								@Override
+								protected void doOnFailure(Throwable caught) {
+									super.doOnFailure(caught);
+									paying = false;
+								}
+
+								@Override
+								protected void doOnSuccess(PaypalData result) {
+									if (result.getAuthorizationUrl() != null) {
+										Window.Location.replace(result.getAuthorizationUrl());
+									} else {
+										HistoryToken.set(PageUrl.home() + "&ps=return");
+									}
+								}
+							});
+						}
+					});
+
+					String sellText = "You can sell your used homeschool curriculum with us. Click the payment button ($5.00) to sign up as a book seller and begin listing your items.";
+					vp.add(new Label(sellText));
+					vp.add(payButton);
+
+					hcp.add(vp);
 				}
 
 				if (Application.isAuthenticated()) {
-					HorizontalPanel hp = new PaddedPanel(10);
+					// HorizontalPanel hp = new PaddedPanel(10);
 
 					// my events
 					if (!Common.isNullOrEmpty(pageData.getMyUpcomingEvents())) {
 						VerticalPanel vp = new VerticalPanel();
 						vp.setWidth("250px");
-						vp.addStyleName("dottedBorder");
-						vp.getElement().getStyle().setBackgroundColor("#EEEEEE");
+						vp.addStyleName("homePageModule");
 						vp.setSpacing(8);
 
-						Hyperlink titleLink = new Hyperlink(".:: My Upcoming Events ::.", PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
-						titleLink.addStyleName("largeText nowrap");
-						vp.add(titleLink);
+						Label title = new Label("MY UPCOMING EVENTS");
+						title.addStyleName("homePageModuleTitle");
+						vp.add(title);
 
 						for (Event e : pageData.getMyUpcomingEvents()) {
 							VerticalPanel mhp = new VerticalPanel();
@@ -311,7 +336,8 @@ public class HomePage implements Page {
 							vp.add(mhp);
 						}
 
-						hp.add(vp);
+						vp.add(new Hyperlink("See more...", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
+						hcp.add(vp);
 					}
 
 					// links
@@ -335,8 +361,8 @@ public class HomePage implements Page {
 					links.add(new Pair<String, String>("Calendar", PageUrl.user(Application.getCurrentUserId()) + "&tab=7"));
 
 					VerticalPanel lp = new VerticalPanel();
-					Label linkLabel = new Label("Links");
-					linkLabel.addStyleName("largeText");
+					Label linkLabel = new Label("LINKS");
+					linkLabel.addStyleName("homePageModuleTitle");
 					linkLabel.getElement().getStyle().setMarginBottom(4, Unit.PX);
 					lp.add(linkLabel);
 
@@ -355,14 +381,10 @@ public class HomePage implements Page {
 					rp.add(bb);
 					rp.setCellVerticalAlignment(bb, HasVerticalAlignment.ALIGN_BOTTOM);
 
-					hp.add(rp);
-
-					centerPanel.add(hp);
+					hcp.add(rp);
 				}
 				// introduction
 				centerPanel.add(new ArticleWidget(pageData.getIntro()));
-
-				Application.getLayout().setPage("Home", page);
 			}
 		});
 
