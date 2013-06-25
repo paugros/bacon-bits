@@ -1,7 +1,6 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
-import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -13,16 +12,10 @@ public class ItemVisibilityWidget extends Composite {
 	private DefaultListBox alb = new DefaultListBox();
 
 	public ItemVisibilityWidget() {
-		alb.addItem("Public", AccessLevel.PUBLIC.getId());
-		alb.addItem("All site members", AccessLevel.SITE_MEMBERS.getId());
-		alb.addItem("Members of...", AccessLevel.GROUP_MEMBERS.getId());
-		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
-			alb.addItem("Administrators of...", AccessLevel.GROUP_ADMINISTRATORS.getId());
-		}
-
-		if (Application.getCurrentUser().getSystemAdministrator()) {
-			alb.addItem("System administrators", AccessLevel.SYSTEM_ADMINISTRATORS.getId());
-		}
+		alb.addItem("Public", VisibilityLevel.PUBLIC.getId());
+		alb.addItem("All site members", VisibilityLevel.SITE_MEMBERS.getId());
+		alb.addItem("Members of...", VisibilityLevel.GROUP_MEMBERS.getId());
+		alb.addItem("Private", VisibilityLevel.PRIVATE.getId());
 
 		alb.addChangeHandler(new ChangeHandler() {
 			@Override
@@ -38,7 +31,7 @@ public class ItemVisibilityWidget extends Composite {
 		initWidget(pp);
 	}
 
-	public Integer getAccessLevelId() {
+	public Integer getVisibilityLevelId() {
 		return alb.getIntValue();
 	}
 
@@ -49,8 +42,8 @@ public class ItemVisibilityWidget extends Composite {
 		return glb.getIntValue();
 	}
 
-	public void setAccessLevelId(Integer accessLevelId) {
-		alb.setValue(accessLevelId);
+	public void setVisibilityLevelId(Integer visibilityLevelId) {
+		alb.setValue(visibilityLevelId);
 		toggleGroupListBox();
 	}
 
@@ -61,6 +54,6 @@ public class ItemVisibilityWidget extends Composite {
 	private void toggleGroupListBox() {
 		int levelId = alb.getIntValue();
 
-		glb.setVisible(levelId == AccessLevel.GROUP_ADMINISTRATORS.getId() || levelId == AccessLevel.GROUP_MEMBERS.getId());
+		glb.setVisible(levelId == VisibilityLevel.GROUP_MEMBERS.getId());
 	}
 }

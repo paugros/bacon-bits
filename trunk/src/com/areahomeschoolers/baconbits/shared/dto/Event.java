@@ -33,7 +33,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private String website;
 	private String phone;
 	private String registrationInstructions;
-	private int accessLevelId;
+	private int visibilityLevelId;
 	private Integer seriesId;
 	private boolean requiredInSeries;
 
@@ -48,7 +48,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private String category;
 	private Integer organizationId;
 	private String groupName;
-	private String accessLevel;
+	private String visibilityLevel;
 	private String addedByFullName;
 
 	// used to create a series
@@ -78,12 +78,12 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return active && !finished && registrationOpen;
 	}
 
-	public String getAccessLevel() {
-		return accessLevel;
+	public String getVisibilityLevel() {
+		return visibilityLevel;
 	}
 
-	public int getAccessLevelId() {
-		return accessLevelId;
+	public int getVisibilityLevelId() {
+		return visibilityLevelId;
 	}
 
 	public boolean getActive() {
@@ -272,12 +272,12 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return seriesId != null && seriesId != getId();
 	}
 
-	public void setAccessLevel(String accessLevel) {
-		this.accessLevel = accessLevel;
+	public void setVisibilityLevel(String visibilityLevel) {
+		this.visibilityLevel = visibilityLevel;
 	}
 
-	public void setAccessLevelId(int accessLevelId) {
-		this.accessLevelId = accessLevelId;
+	public void setVisibilityLevelId(int visibilityLevelId) {
+		this.visibilityLevelId = visibilityLevelId;
 	}
 
 	public void setActive(boolean active) {

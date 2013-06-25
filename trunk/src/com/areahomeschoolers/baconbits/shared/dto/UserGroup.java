@@ -48,6 +48,43 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		}
 	}
 
+	public enum VisibilityLevel implements IsSerializable, Serializable {
+		PUBLIC(1, "Public"), SITE_MEMBERS(2, "Site members"), GROUP_MEMBERS(3, "Group members"), PRIVATE(4, "Private");
+
+		private static final Map<Integer, VisibilityLevel> lookup = new HashMap<Integer, VisibilityLevel>();
+
+		static {
+			for (VisibilityLevel s : EnumSet.allOf(VisibilityLevel.class)) {
+				lookup.put(s.getId(), s);
+			}
+		}
+
+		public static VisibilityLevel getById(int id) {
+			return lookup.get(id);
+		}
+
+		private int id;
+
+		private final String displayName;
+
+		private VisibilityLevel() {
+			this.displayName = null;
+		}
+
+		private VisibilityLevel(int id, String displayName) {
+			this.id = id;
+			this.displayName = displayName;
+		}
+
+		public String getDisplayName() {
+			return displayName;
+		}
+
+		public int getId() {
+			return id;
+		}
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	private String groupName;

@@ -548,19 +548,19 @@ public class EventPage implements Page {
 			accessField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					String text = calendarEvent.getAccessLevel();
+					String text = calendarEvent.getVisibilityLevel();
 					if (calendarEvent.getGroupId() != null && calendarEvent.getGroupId() > 0) {
 						text += " - " + calendarEvent.getGroupName();
 					}
 					accessDisplay.setText(text);
-					accessInput.setAccessLevelId(calendarEvent.getAccessLevelId());
+					accessInput.setVisibilityLevelId(calendarEvent.getVisibilityLevelId());
 					accessInput.setGroupId(calendarEvent.getGroupId());
 				}
 			});
 			accessField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					calendarEvent.setAccessLevelId(accessInput.getAccessLevelId());
+					calendarEvent.setVisibilityLevelId(accessInput.getVisibilityLevelId());
 					calendarEvent.setGroupId(accessInput.getGroupId());
 				}
 			});

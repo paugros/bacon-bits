@@ -42,8 +42,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			article.setGroupName(rs.getString("groupName"));
 			article.setDocumentCount(rs.getInt("documentCount"));
 			article.setTagCount(rs.getInt("tagCount"));
-			article.setAccessLevel(rs.getString("accessLevel"));
-			article.setAccessLevelId(rs.getInt("accessLevelId"));
+			article.setVisibilityLevel(rs.getString("visibilityLevel"));
+			article.setVisibilityLevelId(rs.getInt("visibilityLevelId"));
 			article.setOrganizationId(rs.getInt("organizationId"));
 			return article;
 		}
@@ -55,23 +55,25 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 	}
 
 	public String createSqlBase() {
-		String sql = "select a.*, g.groupName, l.accessLevel, g.organizationId, \n";
+		String sql = "select a.*, g.groupName, l.visibilityLevel, g.organizationId, \n";
 		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
 		sql += "(select count(id) from tagArticleMapping where articleId = a.id) as tagCount \n";
 		sql += "from articles a \n";
 		sql += "left join groups g on g.id = a.groupId \n";
-		sql += "join userAccessLevels l on l.id = a.accessLevelId \n";
+		sql += "join itemVisibilityLevels l on l.id = a.visibilityLevelId \n";
 
 		int userId = ServerContext.getCurrentUserId();
 		sql += "left join userGroupMembers ugm on ugm.groupId = a.groupId and ugm.userId = " + userId + " \n";
 		sql += "left join userGroupMembers org on org.groupId = g.organizationId and org.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
 
+		int auth = ServerContext.isAuthenticated() ? 1 : 0;
 		if (!ServerContext.isSystemAdministrator()) {
-			int auth = ServerContext.isAuthenticated() ? 1 : 0;
-			sql += "and case a.accessLevelId when 1 then 1 when 2 then " + auth + " ";
-			sql += "when 3 then (ugm.id > 0 or org.isAdministrator) when 4 then (ugm.isAdministrator or org.isAdministrator) ";
-			sql += "when 5 then org.id when 6 then org.isAdministrator else 0 end > 0 \n";
+			sql += "and case a.visibilityLevelId ";
+			sql += "when 1 then 1 ";
+			sql += "when 2 then " + auth + " \n";
+			sql += "when 3 then (ugm.id > 0 or org.isAdministrator) \n";
+			sql += "else 0 end > 0 \n";
 		}
 
 		return sql;
@@ -120,7 +122,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 
 		if (article.isSaved()) {
 			String sql = "update articles set title = :title, article = :article, startDate = :startDate, endDate = :endDate, ";
-			sql += "groupId = :groupId, accessLevelId = :accessLevelId ";
+			sql += "groupId = :groupId, visibilityLevelId = :visibilityLevelId ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -129,8 +131,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			}
 			article.setAddedById(ServerContext.getCurrentUser().getId());
 
-			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId, accessLevelId) values ";
-			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId, :accessLevelId)";
+			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId, visibilityLevelId) values ";
+			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId, :visibilityLevelId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
