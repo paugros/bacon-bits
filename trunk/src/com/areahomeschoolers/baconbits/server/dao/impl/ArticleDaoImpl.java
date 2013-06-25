@@ -72,7 +72,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			sql += "and case a.visibilityLevelId ";
 			sql += "when 1 then 1 ";
 			sql += "when 2 then " + auth + " \n";
-			sql += "when 3 then (ugm.id > 0 or org.isAdministrator) \n";
+			sql += "when 4 then (ugm.id > 0 or org.isAdministrator) \n";
 			sql += "else 0 end > 0 \n";
 		}
 

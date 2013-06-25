@@ -38,6 +38,13 @@ public class DefaultListBox extends ListBox {
 		return Integer.parseInt(getValue());
 	}
 
+	public int getIntValue(int index) {
+		if (getValue(index) == null) {
+			return 0;
+		}
+		return Integer.parseInt(getValue(index));
+	}
+
 	public String getSelectedText() {
 		return getItemText(getSelectedIndex());
 	}
