@@ -9,7 +9,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -32,9 +34,11 @@ public interface UserDao {
 
 	public void recordLogin(String username);
 
-	public HashMap<Integer, Boolean> refreshSecurityGroups();
+	public HashMap<Integer, GroupData> refreshSecurityGroups();
 
 	public ServerResponseData<User> save(User user);
+
+	public PrivacyPreference savePrivacyPreference(PrivacyPreference privacyPreference);
 
 	@PreAuthorize("hasRole('SYSTEM_ADMINISTRATORS')")
 	public UserGroup saveUserGroup(UserGroup group);

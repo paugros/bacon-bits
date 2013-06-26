@@ -20,6 +20,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
@@ -222,6 +223,30 @@ public class HomePage implements Page {
 				centerPanel.add(hcp);
 				Application.getLayout().setPage("Home", page);
 
+				if (Application.isAuthenticated()) {
+					VerticalPanel vp = new VerticalPanel();
+					vp.setWidth("100%");
+					vp.setSpacing(8);
+					Hyperlink h = new Hyperlink("Find People", PageUrl.userList());
+					h.addStyleName("homePageModuleTitle");
+
+					PaddedPanel pp = new PaddedPanel();
+					pp.add(h);
+					Label l = new Label("NEW!");
+					l.addStyleName("errorText bold smallText");
+					pp.add(l);
+
+					vp.add(pp);
+					Hyperlink priv = new Hyperlink("privacy preferences", PageUrl.user(Application.getCurrentUserId()) + "&tab=" + 8);
+					Hyperlink prof = new Hyperlink("profile page", PageUrl.user(Application.getCurrentUserId()));
+					String t = "Click above to search our directory of homeschoolers. Find people in your area, with kids the same age as your own, who share your interests.<br><br>";
+					t += "Visit your " + prof.toString() + " to add your interests.<br><br>";
+					t += "Visit your " + priv.toString() + " to adjust what information you share with other people.";
+					vp.add(new HTML(t));
+
+					hcp.add(vp);
+				}
+
 				// new
 				if (!Common.isNullOrEmpty(pageData.getNewlyAddedEvents())) {
 					VerticalPanel nvp = new VerticalPanel();
@@ -389,5 +414,4 @@ public class HomePage implements Page {
 		});
 
 	}
-
 }

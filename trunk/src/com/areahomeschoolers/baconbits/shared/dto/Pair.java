@@ -1,8 +1,11 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import java.io.Serializable;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class Pair<A, B> implements IsSerializable {
+public class Pair<A, B> implements IsSerializable, Serializable {
+	private static final long serialVersionUID = 1L;
 	private A left;
 	private B right;
 

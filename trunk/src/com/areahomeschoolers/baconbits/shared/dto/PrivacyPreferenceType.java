@@ -1,20 +1,23 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public enum PrivacyPreferenceType implements IsSerializable {
-	EMAIL(4), PHONE(4), ADDRESS(4), EVENTS(2), FAMILY(2);
+	EMAIL(VisibilityLevel.PRIVATE), HOME_PHONE(VisibilityLevel.PRIVATE), MOBILE_PHONE(VisibilityLevel.PRIVATE), ADDRESS(VisibilityLevel.PRIVATE), EVENTS(
+			VisibilityLevel.SITE_MEMBERS), FAMILY(VisibilityLevel.SITE_MEMBERS);
 
-	private int defaultVisibilityLevelId;
+	private VisibilityLevel defaultVisibilityLevel;
 
 	private PrivacyPreferenceType() {
 	}
 
-	private PrivacyPreferenceType(int defaultVisibilityLevelId) {
-		this.defaultVisibilityLevelId = defaultVisibilityLevelId;
+	private PrivacyPreferenceType(VisibilityLevel defaultVisibilityLevel) {
+		this.defaultVisibilityLevel = defaultVisibilityLevel;
 	}
 
 	public int getDefaultVisibilityLevelId() {
-		return defaultVisibilityLevelId;
+		return defaultVisibilityLevel.getId();
 	}
 }

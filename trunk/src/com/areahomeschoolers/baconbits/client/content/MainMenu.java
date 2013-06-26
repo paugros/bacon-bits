@@ -73,11 +73,15 @@ public final class MainMenu extends MenuBar {
 		addItem("Book Store", getBooksMenu());
 		addItem("Resources", getResourcesMenu());
 		if (Application.isAuthenticated()) {
+			addItem("People", getPeopleMenu());
+		}
+		if (Application.isAuthenticated()) {
 			addItem("My Items", getMyItemsMenu());
 		}
 		if (Application.isSystemAdministrator()) {
 			addItem("Admin", getAdminMenu());
 		}
+
 	}
 
 	private MenuBar getAdminMenu() {
@@ -230,6 +234,17 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
+		return menu;
+	}
+
+	private MenuBar getPeopleMenu() {
+		MenuBar menu = new MenuBar(true);
+		addLinkToMenu(menu, "Find People", PageUrl.userList());
+		menu.addSeparator();
+		addLinkToMenu(menu, "My Profile", PageUrl.user(Application.getCurrentUserId()));
+		if (!Application.getCurrentUser().isChild()) {
+			addLinkToMenu(menu, "My Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
+		}
 		return menu;
 	}
 

@@ -53,6 +53,9 @@ public final class UserListPage implements Page {
 		final String title = "Directory";
 		this.page = page;
 
+		Label heading = new Label("Find People");
+		heading.addStyleName("hugeText");
+		page.add(heading);
 		populateOptionsPanel();
 
 		args.put(UserArg.PARENTS);
@@ -61,17 +64,22 @@ public final class UserListPage implements Page {
 		table.removeColumn(UserColumn.SEX);
 
 		table.setTitle(title);
+		table.getTitleBar().addExcelControl();
+		table.getTitleBar().addSearchControl();
+		ContentWidth cw = null;
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			Hyperlink addLink = new Hyperlink("Add", PageUrl.user(0));
 			table.getTitleBar().addLink(addLink);
 			table.addStatusFilterBox();
+			cw = ContentWidth.MAXWIDTH1200PX;
 		} else {
 			table.removeColumn(UserColumn.GROUP);
+			table.removeColumn(UserColumn.EMAIL);
+			table.removeColumn(UserColumn.PHONE);
+			cw = ContentWidth.MAXWIDTH1000PX;
 		}
 
-		table.getTitleBar().addExcelControl();
-		table.getTitleBar().addSearchControl();
-		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1200PX));
+		page.add(WidgetFactory.newSection(table, cw));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
