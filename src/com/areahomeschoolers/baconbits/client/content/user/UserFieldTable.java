@@ -29,9 +29,9 @@ import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
-import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.Scheduler;
@@ -159,29 +159,31 @@ public class UserFieldTable extends FieldTable {
 		});
 		addField(lastNameField);
 
-		final FieldDisplayLink emailDisplay = new FieldDisplayLink();
-		final EmailTextBox emailInput = new EmailTextBox();
-		if (user.getParentId() == null || user.getEmail() != null) {
-			emailInput.setRequired(true);
+		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.HOME_PHONE)) {
+			final FieldDisplayLink emailDisplay = new FieldDisplayLink();
+			final EmailTextBox emailInput = new EmailTextBox();
+			if (user.getParentId() == null || user.getEmail() != null) {
+				emailInput.setRequired(true);
+			}
+			emailInput.setMaxLength(100);
+			emailInput.setVisibleLength(40);
+			FormField emailField = form.createFormField("Email:", emailInput, emailDisplay);
+			emailField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					emailDisplay.setText(Common.getDefaultIfNull(user.getEmail()));
+					emailDisplay.setHref("mailto:" + user.getEmail());
+					emailInput.setText(user.getEmail());
+				}
+			});
+			emailField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					user.setEmail(emailInput.getText().toLowerCase().trim());
+				}
+			});
+			addField(emailField);
 		}
-		emailInput.setMaxLength(100);
-		emailInput.setVisibleLength(40);
-		FormField emailField = form.createFormField("Email:", emailInput, emailDisplay);
-		emailField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				emailDisplay.setText(Common.getDefaultIfNull(user.getEmail()));
-				emailDisplay.setHref("mailto:" + user.getEmail());
-				emailInput.setText(user.getEmail());
-			}
-		});
-		emailField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				user.setEmail(emailInput.getText().toLowerCase().trim());
-			}
-		});
-		addField(emailField);
 
 		if (user.isSaved()) {
 			UserStatusIndicator st = new UserStatusIndicator();
@@ -263,7 +265,7 @@ public class UserFieldTable extends FieldTable {
 			addField(adminField);
 		}
 
-		if (user.isSaved()) {
+		if (user.isSaved() && Application.administratorOf(user)) {
 			FormField passwordField = new FormField("Password:", passwordLabel, passwordLabel);
 			passwordField.setInitializer(new Command() {
 				@Override
@@ -366,92 +368,104 @@ public class UserFieldTable extends FieldTable {
 			confirmField.setRequired(true);
 		}
 
-		final Label homePhoneDisplay = new Label();
-		final PhoneTextBox homePhoneInput = new PhoneTextBox();
-		FormField homePhoneField = form.createFormField("Home phone:", homePhoneInput, homePhoneDisplay);
-		homePhoneField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				homePhoneDisplay.setText(Common.getDefaultIfNull(user.getHomePhone()));
-				homePhoneInput.setText(user.getHomePhone());
-			}
-		});
-		homePhoneField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				user.setHomePhone(homePhoneInput.getText());
-			}
-		});
-		addField(homePhoneField);
+		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.HOME_PHONE)) {
+			final Label homePhoneDisplay = new Label();
+			final PhoneTextBox homePhoneInput = new PhoneTextBox();
+			FormField homePhoneField = form.createFormField("Home phone:", homePhoneInput, homePhoneDisplay);
+			homePhoneField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					homePhoneDisplay.setText(Common.getDefaultIfNull(user.getHomePhone()));
+					homePhoneInput.setText(user.getHomePhone());
+				}
+			});
+			homePhoneField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					user.setHomePhone(homePhoneInput.getText());
+				}
+			});
+			addField(homePhoneField);
+		}
 
-		final Label mobilePhoneDisplay = new Label();
-		final PhoneTextBox mobilePhoneInput = new PhoneTextBox();
-		FormField mobilePhoneField = form.createFormField("Mobile phone:", mobilePhoneInput, mobilePhoneDisplay);
-		mobilePhoneField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				mobilePhoneDisplay.setText(Common.getDefaultIfNull(user.getMobilePhone()));
-				mobilePhoneInput.setText(user.getMobilePhone());
-			}
-		});
-		mobilePhoneField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				user.setMobilePhone(mobilePhoneInput.getText());
-			}
-		});
-		addField(mobilePhoneField);
+		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.MOBILE_PHONE)) {
+			final Label mobilePhoneDisplay = new Label();
+			final PhoneTextBox mobilePhoneInput = new PhoneTextBox();
+			FormField mobilePhoneField = form.createFormField("Mobile phone:", mobilePhoneInput, mobilePhoneDisplay);
+			mobilePhoneField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					mobilePhoneDisplay.setText(Common.getDefaultIfNull(user.getMobilePhone()));
+					mobilePhoneInput.setText(user.getMobilePhone());
+				}
+			});
+			mobilePhoneField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					user.setMobilePhone(mobilePhoneInput.getText());
+				}
+			});
+			addField(mobilePhoneField);
+		}
 
-		final FieldDisplayLink addressDisplay = new FieldDisplayLink();
-		addressDisplay.setTarget("_blank");
-		PaddedPanel addressInput = new PaddedPanel();
-		// street input
-		final TextBox street = new TextBox();
-		street.setMaxLength(100);
-		Label streetLabel = new Label("Number and street");
-		streetLabel.addStyleName("smallText");
-		VerticalPanel streetPanel = new VerticalPanel();
-		streetPanel.add(streetLabel);
-		streetPanel.add(street);
+		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.ADDRESS)) {
+			final FieldDisplayLink addressDisplay = new FieldDisplayLink();
+			addressDisplay.setTarget("_blank");
+			PaddedPanel addressInput = new PaddedPanel();
+			// street input
+			final TextBox street = new TextBox();
+			street.setMaxLength(100);
+			Label streetLabel = new Label("Number and street");
+			streetLabel.addStyleName("smallText");
+			VerticalPanel streetPanel = new VerticalPanel();
+			streetPanel.add(streetLabel);
+			streetPanel.add(street);
 
-		// zip input
-		final NumericTextBox zip = new NumericTextBox();
-		zip.setMaxLength(5);
-		zip.setVisibleLength(5);
-		Label zipLabel = new Label("Zip");
-		zipLabel.addStyleName("smallText");
-		VerticalPanel zipPanel = new VerticalPanel();
-		zipPanel.add(zipLabel);
-		zipPanel.add(zip);
+			// zip input
+			final NumericTextBox zip = new NumericTextBox();
+			zip.setMaxLength(5);
+			zip.setVisibleLength(5);
+			Label zipLabel = new Label("Zip");
+			zipLabel.addStyleName("smallText");
+			VerticalPanel zipPanel = new VerticalPanel();
+			zipPanel.add(zipLabel);
+			zipPanel.add(zip);
 
-		addressInput.add(streetPanel);
-		addressInput.add(zipPanel);
+			addressInput.add(streetPanel);
+			addressInput.add(zipPanel);
 
-		FormField addressField = form.createFormField("Address:", addressInput, addressDisplay);
-		addressField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				addressDisplay.setText(Common.getDefaultIfNull(user.getAddress()));
-				addressDisplay.setHref("http://maps.google.com/maps?q=" + user.getAddress());
-				street.setText(user.getStreet());
-				zip.setText(user.getZip());
+			FormField addressField = form.createFormField("Address:", addressInput, addressDisplay);
+			addressField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					addressDisplay.setText(Common.getDefaultIfNull(user.getAddress()));
+					addressDisplay.setHref("http://maps.google.com/maps?q=" + user.getAddress());
+					street.setText(user.getStreet());
+					zip.setText(user.getZip());
+				}
+			});
+			addressField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					user.setStreet(street.getText());
+					user.setZip(zip.getText());
+					user.setAddressChanged(true);
+				}
+			});
+			addField(addressField);
+		} else if (!Common.isNullOrBlank(user.getCity())) {
+			String address = user.getCity();
+			if (!Common.isNullOrBlank(user.getState())) {
+				address += ", " + user.getState();
 			}
-		});
-		addressField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				user.setStreet(street.getText());
-				user.setZip(zip.getText());
-				user.setAddressChanged(true);
-			}
-		});
-		addField(addressField);
+			addField("Address:", address);
+		}
 
 		if (user.isSaved() && user.getParentId() != null && user.getParentId() > 0) {
 			addField("Parent:", new Hyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId())));
 		}
 
-		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+		if (Application.administratorOf(user)) {
 			final Label startDateDisplay = new Label();
 			final ValidatorDateBox startDateInput = new ValidatorDateBox();
 			FormField startDateField = form.createFormField("Start date:", startDateInput, startDateDisplay);

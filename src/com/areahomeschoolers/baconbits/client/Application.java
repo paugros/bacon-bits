@@ -31,6 +31,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.HasGroupOwnership;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
@@ -84,6 +85,10 @@ public final class Application implements ValueChangeHandler<String> {
 
 	public static boolean administratorOf(Integer groupId) {
 		return isAuthenticated() && applicationData.getCurrentUser().administratorOf(groupId);
+	}
+
+	public static boolean administratorOf(User u) {
+		return isAuthenticated() && applicationData.getCurrentUser().administratorOf(u);
 	}
 
 	public static boolean administratorOfAny(Integer... groupIds) {
@@ -156,9 +161,9 @@ public final class Application implements ValueChangeHandler<String> {
 	}
 
 	public static void refreshSecurityGroups(final Command command) {
-		userService.refreshSecurityGroups(new Callback<HashMap<Integer, Boolean>>() {
+		userService.refreshSecurityGroups(new Callback<HashMap<Integer, GroupData>>() {
 			@Override
-			protected void doOnSuccess(HashMap<Integer, Boolean> result) {
+			protected void doOnSuccess(HashMap<Integer, GroupData> result) {
 				applicationData.getCurrentUser().setGroups(result);
 				command.execute();
 			}

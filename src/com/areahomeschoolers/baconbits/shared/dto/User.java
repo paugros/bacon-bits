@@ -1,10 +1,12 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 public final class User extends EntityDto<User> {
 	private static final long serialVersionUID = 1L;
@@ -36,7 +38,6 @@ public final class User extends EntityDto<User> {
 	private boolean resetPassword;
 	private String parentFirstName;
 	private String parentLastName;
-	private HashMap<Integer, Boolean> groups;
 	private Date startDate, endDate, addedDate, lastLoginDate, birthDate;
 	private Integer parentId;
 	private boolean canSwitch;
@@ -45,9 +46,10 @@ public final class User extends EntityDto<User> {
 	private int smallImageId;
 	// aux
 	// these two keep track of your original user when switching
-	private int commonInterestCount;
 	private int originalUserId;
 	private String originalEmail;
+
+	private int commonInterestCount;
 	private String groupsText;
 	private boolean generatePassword;
 	private HashSet<AccessLevel> accessLevels;
@@ -55,7 +57,8 @@ public final class User extends EntityDto<User> {
 	private int age;
 	private boolean addressChanged;
 
-	// private HashMap<PrivacyPreferenceType, Pair<Integer, Integer>> privacyPreferences;
+	private HashMap<Integer, GroupData> groups;
+	private HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences;
 
 	public User() {
 
@@ -66,7 +69,21 @@ public final class User extends EntityDto<User> {
 			return true;
 		}
 
-		return groups.get(groupId) == Boolean.TRUE;
+		GroupData d = groups.get(groupId);
+		if (d == null) {
+			return false;
+		}
+		return d.isAdministrator();
+	}
+
+	public boolean administratorOf(User u) {
+		for (GroupData gd : u.getGroups().values()) {
+			if (administratorOf(gd.getOrganizationId())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public boolean administratorOfAny(Integer... groupIds) {
@@ -143,7 +160,7 @@ public final class User extends EntityDto<User> {
 		return generatePassword;
 	}
 
-	public HashMap<Integer, Boolean> getGroups() {
+	public HashMap<Integer, GroupData> getGroups() {
 		return groups;
 	}
 
@@ -208,6 +225,19 @@ public final class User extends EntityDto<User> {
 
 	public String getPasswordDigest() {
 		return passwordDigest;
+	}
+
+	public PrivacyPreference getPrivacyPreference(PrivacyPreferenceType type) {
+		PrivacyPreference pp = privacyPreferences.get(type);
+
+		if (pp == null) {
+			pp = new PrivacyPreference();
+			pp.setVisibilityLevelId(type.getDefaultVisibilityLevelId());
+			pp.setUserId(getId());
+			pp.setPreferenceType(type.toString());
+		}
+
+		return pp;
 	}
 
 	public boolean getResetPassword() {
@@ -363,7 +393,7 @@ public final class User extends EntityDto<User> {
 		}
 	}
 
-	public void setGroups(HashMap<Integer, Boolean> groups) {
+	public void setGroups(HashMap<Integer, GroupData> groups) {
 		this.groups = groups;
 	}
 
@@ -427,6 +457,10 @@ public final class User extends EntityDto<User> {
 		this.passwordDigest = passwordDigest;
 	}
 
+	public void setPrivacyPreferences(HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences) {
+		this.privacyPreferences = privacyPreferences;
+	}
+
 	public void setResetPassword(boolean resetPassword) {
 		this.resetPassword = resetPassword;
 	}
@@ -458,6 +492,57 @@ public final class User extends EntityDto<User> {
 
 	public void setZip(String zip) {
 		this.zip = zip;
+	}
+
+	public boolean userCanSee(User u, PrivacyPreferenceType type) {
+		PrivacyPreference p = getPrivacyPreference(type);
+
+		VisibilityLevel level = VisibilityLevel.getById(p.getVisibilityLevelId());
+
+		// user null, but public
+		if (u == null) {
+			return level == VisibilityLevel.PUBLIC;
+		}
+
+		// sys admin
+		if (u.getSystemAdministrator()) {
+			return true;
+		}
+
+		// self
+		if (u.getId() == getId()) {
+			return true;
+		}
+
+		switch (level) {
+		case PUBLIC:
+			// public
+			return true;
+		case SITE_MEMBERS:
+			// user not null, visible to all site members
+			return true;
+		case MY_GROUPS:
+			return !Collections.disjoint(groups.keySet(), u.getGroups().keySet());
+		case GROUP_MEMBERS:
+			if (p.getGroupId() == null || p.getOrganizationId() == null) {
+				return false;
+			}
+
+			if (u.memberOf(p.getGroupId()) || u.administratorOf(p.getOrganizationId())) {
+				return true;
+			}
+			break;
+		case PRIVATE:
+			// self and sys admin already taken care of
+			if (u.administratorOf(this)) {
+				return true;
+			}
+			break;
+		default:
+			return false;
+		}
+
+		return false;
 	}
 
 }

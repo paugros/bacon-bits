@@ -2,8 +2,10 @@ package com.areahomeschoolers.baconbits.client.content.user;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
@@ -42,7 +44,6 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FixedWidthLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
-import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
@@ -57,6 +58,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -69,8 +71,11 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -87,7 +92,7 @@ public class UserPage implements Page {
 			return false;
 		}
 
-		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+		if (Application.administratorOf(user)) {
 			return true;
 		}
 
@@ -120,7 +125,7 @@ public class UserPage implements Page {
 	private TabPage tabPanel;
 	private UserPageData pageData;
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
-
+	private Set<PrivacyPreferenceWidget> privacyPreferenceWidgets = new HashSet<PrivacyPreferenceWidget>();
 	private BookDialog bookDialog;
 
 	public UserPage(final VerticalPanel page) {
@@ -233,72 +238,80 @@ public class UserPage implements Page {
 				}
 			});
 
-			tabPanel.add("Events", new TabPageCommand() {
-				@Override
-				public void execute(VerticalPanel tabBody) {
-					String paymentAction = Url.getParameter("ps");
-					if (paymentAction != null) {
-						String text = null;
-						String subText = "";
-						if ("return".equals(paymentAction)) {
-							text = "Thank you for your purchase.";
-							subText = "Below are the events you've registered to attend. Payments may take a few minutes to be reflected here.";
-						} else if ("cancel".equals(paymentAction)) {
-							text = "We're sorry you canceled your purchase.";
-							subText += "You can change your mind at any time.";
+			if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.EVENTS)) {
+				tabPanel.add("Events", new TabPageCommand() {
+					@Override
+					public void execute(VerticalPanel tabBody) {
+						String paymentAction = Url.getParameter("ps");
+						if (paymentAction != null) {
+							String text = null;
+							String subText = "";
+							if ("return".equals(paymentAction)) {
+								text = "Thank you for your purchase.";
+								subText = "Below are the events you've registered to attend. Payments may take a few minutes to be reflected here.";
+							} else if ("cancel".equals(paymentAction)) {
+								text = "We're sorry you canceled your purchase.";
+								subText += "You can change your mind at any time.";
+							}
+
+							if (text != null) {
+								VerticalPanel vp = new VerticalPanel();
+								Label message = new Label(text);
+								message.addStyleName("largeText");
+								vp.add(message);
+								vp.add(new Label(subText));
+								tabBody.add(vp);
+							}
 						}
 
-						if (text != null) {
-							VerticalPanel vp = new VerticalPanel();
-							Label message = new Label(text);
-							message.addStyleName("largeText");
-							vp.add(message);
-							vp.add(new Label(subText));
-							tabBody.add(vp);
-						}
+						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
+						args.setStatus(Status.ACTIVE);
+						args.put(EventArg.NOT_STATUS_ID, 5);
+						EventParticipantTable table = new EventParticipantTable(args);
+						table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
+								ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE, ParticipantColumn.STATUS);
+						table.setTitle("Event Registrations");
+
+						table.addStatusFilterBox();
+
+						table.getTitleBar().addExcelControl();
+						table.getTitleBar().addSearchControl();
+						table.populate();
+
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
+						tabPanel.selectTabNow(tabBody);
 					}
+				});
+			} else {
+				tabPanel.addSkipIndex();
+			}
 
-					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
-					args.setStatus(Status.ACTIVE);
-					args.put(EventArg.NOT_STATUS_ID, 5);
-					EventParticipantTable table = new EventParticipantTable(args);
-					table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
-							ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE, ParticipantColumn.STATUS);
-					table.setTitle("Event Registrations");
+			if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.EVENTS)) {
+				tabPanel.add("Volunteer Positions", new TabPageCommand() {
+					@Override
+					public void execute(final VerticalPanel tabBody) {
+						final ArgMap<EventArg> args = new ArgMap<EventArg>();
+						args.put(EventArg.USER_ID, user.getId());
 
-					table.addStatusFilterBox();
+						final EventVolunteerTable vt = new EventVolunteerTable(args);
 
-					table.getTitleBar().addExcelControl();
-					table.getTitleBar().addSearchControl();
-					table.populate();
+						vt.addDataReturnHandler(new DataReturnHandler() {
+							@Override
+							public void onDataReturn() {
+								vt.removeColumn(4);
+								vt.removeColumn(3);
+								tabPanel.selectTabNow(tabBody);
+							}
+						});
 
-					tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
-					tabPanel.selectTabNow(tabBody);
-				}
-			});
+						tabBody.add(WidgetFactory.newSection(vt, ContentWidth.MAXWIDTH750PX));
 
-			tabPanel.add("Volunteer Positions", new TabPageCommand() {
-				@Override
-				public void execute(final VerticalPanel tabBody) {
-					final ArgMap<EventArg> args = new ArgMap<EventArg>();
-					args.put(EventArg.USER_ID, user.getId());
-
-					final EventVolunteerTable vt = new EventVolunteerTable(args);
-
-					vt.addDataReturnHandler(new DataReturnHandler() {
-						@Override
-						public void onDataReturn() {
-							vt.removeColumn(4);
-							vt.removeColumn(3);
-							tabPanel.selectTabNow(tabBody);
-						}
-					});
-
-					tabBody.add(WidgetFactory.newSection(vt, ContentWidth.MAXWIDTH750PX));
-
-					vt.populate();
-				}
-			});
+						vt.populate();
+					}
+				});
+			} else {
+				tabPanel.addSkipIndex();
+			}
 
 			tabPanel.add("Groups", new TabPageCommand() {
 				@Override
@@ -349,7 +362,7 @@ public class UserPage implements Page {
 				}
 			});
 
-			if (!user.isChild()) {
+			if (!user.isChild() && user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.FAMILY)) {
 				tabPanel.add("Family", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
@@ -409,28 +422,28 @@ public class UserPage implements Page {
 						table.setDialog(bookDialog);
 						table.addStatusFilterBox();
 
-						if (viewingSelf()) {
+						if (canEditUser(user)) {
 							table.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {
 									bookDialog.center(new Book());
 								}
 							}));
+
+							table.getTitleBar().addLink(new ClickLabel("Print labels - all", new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									printLabels(table.getFullList());
+								}
+							}));
+
+							table.getTitleBar().addLink(new ClickLabel("Print labels - selected", new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									printLabels(table.getSelectedItems());
+								}
+							}));
 						}
-
-						table.getTitleBar().addLink(new ClickLabel("Print labels - all", new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								printLabels(table.getFullList());
-							}
-						}));
-
-						table.getTitleBar().addLink(new ClickLabel("Print labels - selected", new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								printLabels(table.getSelectedItems());
-							}
-						}));
 
 						table.setTitle("Books");
 						table.removeColumn(BookColumn.USER);
@@ -440,9 +453,11 @@ public class UserPage implements Page {
 						tabPanel.selectTabNow(tabBody);
 					}
 				});
+			} else {
+				tabPanel.addSkipIndex();
 			}
 
-			if (!user.isChild()) {
+			if (!user.isChild() && canEditUser(user)) {
 				tabPanel.add("Payments", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
@@ -456,71 +471,92 @@ public class UserPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			tabPanel.add("Calendar", new TabPageCommand() {
-				@Override
-				public void execute(final VerticalPanel tabBody) {
-					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
-					args.setStatus(Status.ACTIVE);
-					args.put(EventArg.NOT_STATUS_ID, 5);
-					eventService.getParticipants(args, new Callback<ArrayList<EventParticipant>>() {
-						@Override
-						protected void doOnSuccess(ArrayList<EventParticipant> result) {
-							CalendarPanel cp = new CalendarPanel();
-							tabBody.add(cp);
+			if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.EVENTS)) {
+				tabPanel.add("Calendar", new TabPageCommand() {
+					@Override
+					public void execute(final VerticalPanel tabBody) {
+						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
+						args.setStatus(Status.ACTIVE);
+						args.put(EventArg.NOT_STATUS_ID, 5);
+						eventService.getParticipants(args, new Callback<ArrayList<EventParticipant>>() {
+							@Override
+							protected void doOnSuccess(ArrayList<EventParticipant> result) {
+								CalendarPanel cp = new CalendarPanel();
+								tabBody.add(cp);
 
-							Map<Integer, Appointment> appMap = new HashMap<Integer, Appointment>();
-							for (EventParticipant p : result) {
-								Appointment a = appMap.get(p.getEventId());
-								if (a == null) {
-									a = new Appointment();
-									a.setStyle(AppointmentStyle.GREEN);
-									appMap.put(p.getEventId(), a);
-									a.setReadOnly(true);
-									a.setStart(p.getEventStartDate());
-									a.setEnd(p.getEventEndDate());
-									a.setTitle(p.getEventTitle());
-									a.setId(Integer.toString(p.getEventId()));
-									a.setDescription(p.getFirstName());
-								} else {
-									a.setDescription(a.getDescription() + ", " + p.getFirstName());
+								Map<Integer, Appointment> appMap = new HashMap<Integer, Appointment>();
+								for (EventParticipant p : result) {
+									Appointment a = appMap.get(p.getEventId());
+									if (a == null) {
+										a = new Appointment();
+										a.setStyle(AppointmentStyle.GREEN);
+										appMap.put(p.getEventId(), a);
+										a.setReadOnly(true);
+										a.setStart(p.getEventStartDate());
+										a.setEnd(p.getEventEndDate());
+										a.setTitle(p.getEventTitle());
+										a.setId(Integer.toString(p.getEventId()));
+										a.setDescription(p.getFirstName());
+									} else {
+										a.setDescription(a.getDescription() + ", " + p.getFirstName());
+									}
 								}
+
+								cp.getCalendar().suspendLayout();
+								cp.getCalendar().addAppointments(new ArrayList<Appointment>(appMap.values()));
+								cp.getCalendar().resumeLayout();
+
+								tabPanel.selectTabNow(tabBody);
 							}
+						});
+					}
+				});
+			} else {
+				tabPanel.addSkipIndex();
+			}
 
-							cp.getCalendar().suspendLayout();
-							cp.getCalendar().addAppointments(new ArrayList<Appointment>(appMap.values()));
-							cp.getCalendar().resumeLayout();
-
-							tabPanel.selectTabNow(tabBody);
-						}
-					});
-				}
-			});
-
-			if (Application.getCurrentUserId() == 1) {
+			if (canEditUser(user)) {
 				tabPanel.add("Privacy", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
 						FieldTable ft = new FieldTable();
 						tabBody.add(WidgetFactory.newSection("Privacy Settings", ft, ContentWidth.MAXWIDTH900PX));
 
-						ItemVisibilityWidget ew = new ItemVisibilityWidget();
-						ft.addField("Email address:", ew);
+						CheckBox cb = new CheckBox("Exclude me from the directory entirely");
+						ft.addField("Directory:", cb);
 
-						ItemVisibilityWidget pw = new ItemVisibilityWidget();
-						ft.addField("Phone number:", pw);
+						ft.addField("Email address:", makePrivacyWidget(PrivacyPreferenceType.EMAIL));
 
-						ItemVisibilityWidget aw = new ItemVisibilityWidget();
-						ft.addField("Address:", aw);
+						ft.addField("Home phone:", makePrivacyWidget(PrivacyPreferenceType.HOME_PHONE));
 
-						ItemVisibilityWidget vw = new ItemVisibilityWidget();
-						ft.addField("Event registrations:", vw);
+						ft.addField("Mobile phone:", makePrivacyWidget(PrivacyPreferenceType.MOBILE_PHONE));
 
-						ItemVisibilityWidget fw = new ItemVisibilityWidget();
-						ft.addField("Family members:", fw);
+						ft.addField("Address:", makePrivacyWidget(PrivacyPreferenceType.ADDRESS));
+
+						ft.addField("Event registrations:", makePrivacyWidget(PrivacyPreferenceType.EVENTS));
+
+						ft.addField("Family members:", makePrivacyWidget(PrivacyPreferenceType.FAMILY));
+
+						cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+							@Override
+							public void onValueChange(ValueChangeEvent<Boolean> event) {
+								user.setDirectoryOptOut(event.getValue());
+								userService.save(user, new Callback<ServerResponseData<User>>() {
+									@Override
+									protected void doOnSuccess(ServerResponseData<User> result) {
+										for (PrivacyPreferenceWidget pw : privacyPreferenceWidgets) {
+											pw.setEnabled(!user.getDirectoryOptOut());
+										}
+									}
+								});
+							}
+						});
 
 						tabPanel.selectTabNow(tabBody);
 					}
 				});
+			} else {
+				tabPanel.addSkipIndex();
 			}
 
 			if (!canEditUser(user)) {
@@ -531,6 +567,13 @@ public class UserPage implements Page {
 		}
 
 		Application.getLayout().setPage(title, page);
+	}
+
+	private PrivacyPreferenceWidget makePrivacyWidget(PrivacyPreferenceType privacyType) {
+		PrivacyPreferenceWidget w = new PrivacyPreferenceWidget(user.getPrivacyPreference(privacyType));
+		privacyPreferenceWidgets.add(w);
+
+		return w;
 	}
 
 	private void printLabels(List<Book> books) {

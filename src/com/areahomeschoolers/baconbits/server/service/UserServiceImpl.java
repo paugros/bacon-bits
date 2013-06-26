@@ -18,7 +18,9 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
+import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -67,7 +69,7 @@ public class UserServiceImpl extends GwtController implements UserService {
 	}
 
 	@Override
-	public HashMap<Integer, Boolean> refreshSecurityGroups() {
+	public HashMap<Integer, GroupData> refreshSecurityGroups() {
 		return dao.refreshSecurityGroups();
 	}
 
@@ -102,6 +104,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 			response.getData().setGeneratePassword(false);
 		}
 		return response;
+	}
+
+	@Override
+	public PrivacyPreference savePrivacyPreference(PrivacyPreference privacyPreference) {
+		return dao.savePrivacyPreference(privacyPreference);
 	}
 
 	@Override

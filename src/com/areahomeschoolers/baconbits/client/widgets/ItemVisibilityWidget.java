@@ -1,15 +1,18 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 
 public class ItemVisibilityWidget extends Composite {
 	private PaddedPanel pp = new PaddedPanel();
 	private GroupListBox glb = new GroupListBox();
 	private DefaultListBox alb = new DefaultListBox();
+	private PrivacyPreference privacyPreference;
 
 	public ItemVisibilityWidget() {
 		alb.addItem("Public", VisibilityLevel.PUBLIC.getId());
@@ -18,10 +21,32 @@ public class ItemVisibilityWidget extends Composite {
 		alb.addItem("Members of...", VisibilityLevel.GROUP_MEMBERS.getId());
 		alb.addItem("Private", VisibilityLevel.PRIVATE.getId());
 
+		glb.setPopulateCommand(new Command() {
+			@Override
+			public void execute() {
+				if (glb.getItemCount() == 0) {
+					removeItem(VisibilityLevel.GROUP_MEMBERS);
+					removeItem(VisibilityLevel.MY_GROUPS);
+				}
+			}
+		});
+
 		alb.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
 				toggleGroupListBox();
+				if (privacyPreference != null) {
+					privacyPreference.setVisibilityLevelId(alb.getIntValue());
+				}
+			}
+		});
+
+		glb.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				if (privacyPreference != null) {
+					privacyPreference.setGroupId(glb.getIntValue());
+				}
 			}
 		});
 
@@ -32,11 +57,26 @@ public class ItemVisibilityWidget extends Composite {
 		initWidget(pp);
 	}
 
+	public ItemVisibilityWidget(PrivacyPreference privacyPreference) {
+		this();
+
+		setPrivacyPreference(privacyPreference);
+	}
+
+	public void addChangeHandler(ChangeHandler handler) {
+		alb.addChangeHandler(handler);
+		glb.addChangeHandler(handler);
+	}
+
 	public Integer getGroupId() {
 		if (!glb.isVisible()) {
 			return null;
 		}
 		return glb.getIntValue();
+	}
+
+	public PrivacyPreference getPrivacyPreference() {
+		return privacyPreference;
 	}
 
 	public Integer getVisibilityLevelId() {
@@ -51,8 +91,20 @@ public class ItemVisibilityWidget extends Composite {
 		}
 	}
 
+	public void setEnabled(boolean enabled) {
+		alb.setEnabled(enabled);
+		glb.setEnabled(enabled);
+	}
+
 	public void setGroupId(Integer groupId) {
 		glb.setValue(groupId);
+	}
+
+	public void setPrivacyPreference(PrivacyPreference privacyPreference) {
+		this.privacyPreference = privacyPreference;
+
+		setVisibilityLevelId(privacyPreference.getVisibilityLevelId());
+		setGroupId(privacyPreference.getGroupId());
 	}
 
 	public void setVisibilityLevelId(Integer visibilityLevelId) {
@@ -64,5 +116,8 @@ public class ItemVisibilityWidget extends Composite {
 		int levelId = alb.getIntValue();
 
 		glb.setVisible(levelId == VisibilityLevel.GROUP_MEMBERS.getId());
+		if (glb.isVisible() && privacyPreference != null) {
+			privacyPreference.setGroupId(glb.getIntValue());
+		}
 	}
 }

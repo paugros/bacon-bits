@@ -13,13 +13,24 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
+import com.google.gwt.user.client.Command;
+
 public class GroupListBox extends DefaultListBox {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private static List<UserGroup> groups;
 	private boolean onlyOrgs = false;
+	private Command populateCommand;
 
 	public GroupListBox() {
 		populate();
+	}
+
+	public void setPopulateCommand(Command command) {
+		populateCommand = command;
+
+		if (groups != null) {
+			populateCommand.execute();
+		}
 	}
 
 	public void showOnlyOrganizations() {
@@ -39,6 +50,10 @@ public class GroupListBox extends DefaultListBox {
 				text = " - " + text;
 			}
 			addItem(text, g.getId());
+		}
+
+		if (populateCommand != null) {
+			populateCommand.execute();
 		}
 	}
 

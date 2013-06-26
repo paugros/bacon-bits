@@ -43,7 +43,10 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
@@ -90,36 +93,107 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		@Override
 		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
 			User user = new User();
+			user.setSystemAdministrator(rs.getBoolean("isSystemAdministrator"));
 			user.setId(rs.getInt("id"));
-			user.setEmail(rs.getString("email"));
+			User cu = ServerContext.getCurrentUser();
+
+			String groupText = rs.getString("groups");
+			final HashMap<Integer, GroupData> groups = new HashMap<Integer, GroupData>();
+			final HashSet<AccessLevel> levels = new HashSet<AccessLevel>();
+			String gt = "";
+			if (!Common.isNullOrBlank(groupText)) {
+				String[] groupRows = groupText.split("\n");
+				for (int i = 0; i < groupRows.length; i++) {
+					String[] cells = groupRows[i].split(":");
+					int groupId = Integer.parseInt(cells[0]);
+					boolean isAdmin = cells[2].equals("1");
+					int orgId = Integer.parseInt(cells[2]);
+
+					// levels
+					levels.add(AccessLevel.GROUP_MEMBERS);
+					if (isAdmin) {
+						levels.add(AccessLevel.GROUP_ADMINISTRATORS);
+						if (groupId > 0 && groupId == orgId) {
+							levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
+						}
+					}
+
+					// groups
+					GroupData gd = new GroupData();
+					gd.setAdministrator(isAdmin);
+					gd.setOrganizationId(orgId);
+					gd.setOrganization(groupId > 0 && groupId == orgId);
+					groups.put(groupId, gd);
+					gt += cells[1] + "\n";
+				}
+				user.setGroupsText(gt);
+			}
+
+			levels.add(AccessLevel.SITE_MEMBERS);
+			if (user.getSystemAdministrator()) {
+				levels.add(AccessLevel.SYSTEM_ADMINISTRATORS);
+				levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
+				levels.add(AccessLevel.GROUP_ADMINISTRATORS);
+				levels.add(AccessLevel.GROUP_MEMBERS);
+			}
+
+			user.setGroups(groups);
+			user.setAccessLevels(levels);
+
+			String prefText = rs.getString("privacyPrefs");
+			final HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences = new HashMap<PrivacyPreferenceType, PrivacyPreference>();
+			if (!Common.isNullOrBlank(prefText)) {
+				String[] prefRows = prefText.split("\n");
+				for (int i = 0; i < prefRows.length; i++) {
+					String[] cells = prefRows[i].split(":");
+					PrivacyPreference p = new PrivacyPreference();
+					p.setId(Integer.parseInt(cells[0]));
+					p.setPreferenceType(cells[1]);
+					p.setUserId(user.getId());
+					p.setVisibilityLevelId(Integer.parseInt(cells[2]));
+					p.setGroupId(Integer.parseInt(cells[3]));
+					p.setOrganizationId(Integer.parseInt(cells[4]));
+					privacyPreferences.put(PrivacyPreferenceType.valueOf(cells[1]), p);
+				}
+			}
+
+			user.setPrivacyPreferences(privacyPreferences);
+
+			if (user.userCanSee(cu, PrivacyPreferenceType.EMAIL)) {
+				user.setEmail(rs.getString("email"));
+			}
 			user.setFirstName(rs.getString("firstName"));
 			user.setLastName(rs.getString("lastName"));
 			user.setPasswordDigest(rs.getString("passwordDigest"));
-			user.setHomePhone(rs.getString("homePhone"));
-			user.setMobilePhone(rs.getString("mobilePhone"));
+			if (user.userCanSee(cu, PrivacyPreferenceType.HOME_PHONE)) {
+				user.setHomePhone(rs.getString("homePhone"));
+			}
+			if (user.userCanSee(cu, PrivacyPreferenceType.MOBILE_PHONE)) {
+				user.setMobilePhone(rs.getString("mobilePhone"));
+			}
 			user.setStartDate(rs.getTimestamp("startDate"));
 			user.setEndDate(rs.getTimestamp("endDate"));
 			user.setResetPassword(rs.getBoolean("resetPassword"));
 			user.setAddedDate(rs.getTimestamp("addedDate"));
 			user.setLastLoginDate(rs.getTimestamp("lastLoginDate"));
 			user.setActive(rs.getBoolean("isEnabled"));
-			user.setSystemAdministrator(rs.getBoolean("isSystemAdministrator"));
 			user.setBirthDate(rs.getTimestamp("birthDate"));
 			user.setParentId(rs.getInt("parentId"));
-			user.setAddress(rs.getString("address"));
 			user.setCity(rs.getString("city"));
-			user.setStreet(rs.getString("street"));
-			user.setState(rs.getString("state"));
 			user.setZip(rs.getString("zip"));
+			user.setState(rs.getString("state"));
+			if (user.userCanSee(cu, PrivacyPreferenceType.ADDRESS)) {
+				user.setAddress(rs.getString("address"));
+				user.setStreet(rs.getString("street"));
+				user.setLat(rs.getDouble("lat"));
+				user.setLng(rs.getDouble("lng"));
+			}
 			user.setParentFirstName(rs.getString("parentFirstName"));
 			user.setParentLastName(rs.getString("parentLastName"));
-			user.setGroupsText(rs.getString("groupsText"));
 			user.setSex(rs.getString("sex"));
 			user.setChild(rs.getBoolean("isChild"));
 			user.setCommonInterestCount(rs.getInt("commonInterests"));
 			user.setAge(rs.getInt("age"));
-			user.setLat(rs.getDouble("lat"));
-			user.setLng(rs.getDouble("lng"));
 			user.setImageId(rs.getInt("imageId"));
 			user.setSmallImageId(rs.getInt("smallImageId"));
 			user.setDirectoryOptOut(rs.getBoolean("directoryOptOut"));
@@ -220,13 +294,17 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 	@Override
 	public User getById(int userId) {
-		User u = queryForObject(createSqlBase() + "where u.id = ?", new UserMapper(), userId);
+		User u = queryForObject(createSqlBase() + createSqlWhere() + "and u.id = ?", new UserMapper(), userId);
 
-		u.setGroups(populateSecurityGroups(u));
+		if (u == null) {
+			return null;
+		}
 
-		// ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
-		// args.put(UserArg.PARENT_ID, u.getId());
-		// u.setChildren(list(args));
+		if (!ServerContext.isSystemAdministrator() && u.getDirectoryOptOut() && !u.equals(ServerContext.getCurrentUser())) {
+			if (!ServerContext.isAuthenticated() || !ServerContext.getCurrentUser().administratorOf(u)) {
+				return null;
+			}
+		}
 
 		return u;
 	}
@@ -285,8 +363,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			throw new UsernameNotFoundException("Username not found or duplicate: " + username);
 		}
 
-		user.setGroups(populateSecurityGroups(user));
-
 		return user;
 	}
 
@@ -333,7 +409,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "left join eventRegistrationParticipants p on p.userId = u.id and p.eventRegistrationId = ? \n";
 			sqlArgs.add(registrationId);
 		}
-		sql += "where 1 = 1 ";
+		sql += createSqlWhere();
 
 		// start directory logic //
 		if (onlyParents) {
@@ -451,14 +527,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
-	public HashMap<Integer, Boolean> refreshSecurityGroups() {
+	public HashMap<Integer, GroupData> refreshSecurityGroups() {
 		if (ServerContext.getCurrentUser() == null) {
 			return null;
 		}
 
-		HashMap<Integer, Boolean> groups = populateSecurityGroups(ServerContext.getCurrentUser());
-
-		return groups;
+		User u = getById(ServerContext.getCurrentUserId());
+		return u.getGroups();
 	}
 
 	@Override
@@ -518,7 +593,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, email = :email, ";
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
 			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex, ";
-			sql += "street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng ";
+			sql += "street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, directoryOptOut = :directoryOptOut ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -535,10 +610,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			}
 			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
 			sql += "address, isSystemAdministrator, resetPassword, birthDate, parentId, sex, ";
-			sql += "street, city, state, zip, lat, lng, imageId, smallImageId) values ";
+			sql += "street, city, state, zip, lat, lng, imageId, smallImageId, directoryOptOut) values ";
 			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
 			sql += ":address, :systemAdministrator, :resetPassword, :birthDate, :parentId, :sex, ";
-			sql += ":street, :city, :state, :zip, :lat, :lng, :imageId, :smallImageId)";
+			sql += ":street, :city, :state, :zip, :lat, :lng, :imageId, :smallImageId, :directoryOptOut)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -548,6 +623,26 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 		retData.setData(getById(user.getId()));
 		return retData;
+	}
+
+	@Override
+	public PrivacyPreference savePrivacyPreference(PrivacyPreference privacyPreference) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(privacyPreference);
+
+		if (privacyPreference.isSaved()) {
+			String sql = "update userPrivacyPreferences set visibilityLevelId = :visibilityLevelId, groupId = :groupId where id = :id";
+			update(sql, namedParams);
+		} else {
+			String sql = "insert into userPrivacyPreferences (userId, preferenceType, visibilityLevelId, groupId) ";
+			sql += "values(:userId, :preferenceType, :visibilityLevelId, :groupId)";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			privacyPreference.setId(Integer.parseInt(keys.getKeys().get(Constants.GENERATED_KEY_TOKEN).toString()));
+		}
+
+		return privacyPreference;
 	}
 
 	@Override
@@ -778,18 +873,32 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (specialCols != null) {
 			sql += specialCols;
 		}
-		sql += "(select group_concat(g.groupName separator '\n') from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id \n";
-		sql += "and isActive(g.startDate, g.endDate) = 1) as groupsText, \n";
-		sql += "(select group_concat(concat(p.preferenceType, ':', p.visibilityLevelId, ':', ifnull(p.groupId, '0')) separator '\n') \n";
-		sql += "from userPrivacyPreferences p where p.userId = u.id \n";
-		sql += ") as privacyPrefs \n";
+		// groups
+		sql += "(select group_concat(concat(g.id, ':', g.groupName, ':', gm.isAdministrator, ':', g.organizationId) separator '\n') ";
+		sql += "from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id \n";
+		sql += "and isActive(g.startDate, g.endDate) = 1) as groups, \n";
+		// privacy prefs
+		sql += "(select group_concat(concat(p.id, ':', p.preferenceType, ':', p.visibilityLevelId, ':', ifnull(p.groupId, '0'), ':', ifnull(gg.organizationId, '0')) separator '\n') \n";
+		sql += "from userPrivacyPreferences p \n";
+		sql += "left join groups gg on gg.id = p.groupId \n";
+		sql += "where p.userId = u.id) as privacyPrefs \n";
 		sql += "from users u \n";
 		sql += "left join users uu on uu.id = u.parentId \n";
+		// common interests
 		sql += "left join ( \n";
 		sql += "select userId, count(id) as commonInterests from tagUserMapping where tagId in( \n";
 		sql += "select tagId from tagUserMapping where userId = " + currentUserId + ") and userId != " + currentUserId + " \n";
 		sql += "group by userId \n";
 		sql += ") as i on i.userId = u.id \n";
+
+		return sql;
+	}
+
+	private String createSqlWhere() {
+		String sql = "where 1 = 1 ";
+		if (!ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
+			sql += "and u.directoryOptOut = 0 \n";
+		}
 
 		return sql;
 	}
@@ -805,45 +914,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setOrganizationId(rs.getInt("organizationId"));
 		group.setOrganizationName(rs.getString("organizationName"));
 		return group;
-	}
-
-	private HashMap<Integer, Boolean> populateSecurityGroups(User user) {
-		String sql = "select ugm.groupId, ugm.isAdministrator, g.isOrganization ";
-		sql += "from userGroupMembers ugm ";
-		sql += "join groups g on g.id = ugm.groupId ";
-		sql += "where ugm.userId = ?";
-		final HashMap<Integer, Boolean> groups = new HashMap<Integer, Boolean>();
-
-		final HashSet<AccessLevel> levels = new HashSet<AccessLevel>();
-
-		query(sql, new RowMapper<Void>() {
-			@Override
-			public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-				levels.add(AccessLevel.GROUP_MEMBERS);
-				if (rs.getBoolean("isAdministrator")) {
-					levels.add(AccessLevel.GROUP_ADMINISTRATORS);
-					if (rs.getBoolean("isOrganization")) {
-						levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
-					}
-				}
-				groups.put(rs.getInt("groupId"), rs.getBoolean("isAdministrator"));
-				return null;
-			}
-		}, user.getId());
-
-		// this logic duplicated from CustomUserDetailsService - not auto-synced
-		levels.add(AccessLevel.SITE_MEMBERS);
-		if (user.getSystemAdministrator()) {
-			levels.add(AccessLevel.SYSTEM_ADMINISTRATORS);
-			levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
-			levels.add(AccessLevel.GROUP_ADMINISTRATORS);
-			levels.add(AccessLevel.GROUP_MEMBERS);
-		}
-
-		user.setAccessLevels(levels);
-		user.setGroups(groups);
-
-		return groups;
 	}
 
 }
