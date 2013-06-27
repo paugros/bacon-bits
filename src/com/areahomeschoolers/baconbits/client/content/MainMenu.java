@@ -246,6 +246,7 @@ public final class MainMenu extends MenuBar {
 		if (!Application.getCurrentUser().isChild()) {
 			addLinkToMenu(menu, "My Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
 		}
+		addLinkToMenu(menu, "Privacy Settings", PageUrl.user(Application.getCurrentUserId()) + "&tab=8");
 		return menu;
 	}
 
