@@ -1,13 +1,13 @@
 package com.areahomeschoolers.baconbits.client.content.home;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
 import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
+import com.areahomeschoolers.baconbits.client.content.user.CreateUserDialog;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -19,13 +19,14 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
-import com.areahomeschoolers.baconbits.shared.dto.Pair;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
+import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Cursor;
@@ -365,49 +366,55 @@ public class HomePage implements Page {
 						hcp.add(vp);
 					}
 
-					// links
-					List<Pair<String, String>> links = new ArrayList<Pair<String, String>>();
+				}
 
-					links.add(new Pair<String, String>("Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
+				// links
+				VerticalPanel lp = new VerticalPanel();
+				Label linkLabel = new Label("LINKS");
+				linkLabel.addStyleName("homePageModuleTitle");
+				linkLabel.getElement().getStyle().setMarginBottom(4, Unit.PX);
+				lp.add(linkLabel);
+
+				if (Application.isAuthenticated()) {
+					lp.add(new Hyperlink("Find People", PageUrl.userList()));
+				} else {
+					ClickLabel cl = new ClickLabel("Create an Account", new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							new CreateUserDialog().center(new User());
+						}
+					});
+					cl.addStyleName("bold");
+					lp.add(cl);
+				}
+				lp.add(new Hyperlink("Event Listing", PageUrl.eventList()));
+				lp.add(new Hyperlink("Event Calendar", PageUrl.eventCalendar()));
+				lp.add(new Hyperlink("Book Store", PageUrl.bookSearch()));
+
+				if (Application.isAuthenticated()) {
+					lp.add(new Hyperlink("My Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
 					if (Application.getCurrentUser().memberOfAny(16, 17)) {
-						links.add(new Pair<String, String>("Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5"));
+						lp.add(new Hyperlink("My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5"));
 					}
-					links.add(new Pair<String, String>("Profile", PageUrl.user(Application.getCurrentUserId())));
+					lp.add(new Hyperlink("My Profile", PageUrl.user(Application.getCurrentUserId())));
 					if (!Application.getCurrentUser().isChild()) {
-						links.add(new Pair<String, String>("Shopping Cart", PageUrl.payment()));
+						lp.add(new Hyperlink("My Shopping Cart", PageUrl.payment()));
 					}
-					if (!Application.getCurrentUser().isChild()) {
-						links.add(new Pair<String, String>("Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
-					}
-					links.add(new Pair<String, String>("Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=2"));
-					if (!Application.getCurrentUser().isChild()) {
-						links.add(new Pair<String, String>("Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6"));
-					}
-					links.add(new Pair<String, String>("Calendar", PageUrl.user(Application.getCurrentUserId()) + "&tab=7"));
+				}
 
-					VerticalPanel lp = new VerticalPanel();
-					Label linkLabel = new Label("LINKS");
-					linkLabel.addStyleName("homePageModuleTitle");
-					linkLabel.getElement().getStyle().setMarginBottom(4, Unit.PX);
-					lp.add(linkLabel);
+				VerticalPanel rp = new VerticalPanel();
+				rp.setSpacing(8);
 
-					for (Pair<String, String> item : links) {
-						Hyperlink link = new Hyperlink(item.getLeft(), item.getRight());
-						lp.add(link);
-					}
+				rp.add(lp);
 
-					VerticalPanel rp = new VerticalPanel();
-					rp.setSpacing(8);
-
-					rp.add(lp);
-
+				if (Application.isAuthenticated()) {
 					BalanceBox bb = new BalanceBox();
 					bb.populate();
 					rp.add(bb);
 					rp.setCellVerticalAlignment(bb, HasVerticalAlignment.ALIGN_BOTTOM);
-
-					hcp.add(rp);
 				}
+
+				hcp.add(rp);
 				// introduction
 				centerPanel.add(new ArticleWidget(pageData.getIntro()));
 			}
