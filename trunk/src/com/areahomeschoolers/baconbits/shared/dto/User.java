@@ -51,7 +51,7 @@ public final class User extends EntityDto<User> {
 
 	private int commonInterestCount;
 	private String groupsText;
-	private boolean generatePassword;
+	private Boolean generatePassword;
 	private HashSet<AccessLevel> accessLevels;
 	private boolean isChild;
 	private int age;
@@ -156,7 +156,7 @@ public final class User extends EntityDto<User> {
 		return firstName + " " + lastName;
 	}
 
-	public boolean getGeneratePassword() {
+	public Boolean getGeneratePassword() {
 		return generatePassword;
 	}
 
@@ -386,7 +386,7 @@ public final class User extends EntityDto<User> {
 		this.firstName = firstName;
 	}
 
-	public void setGeneratePassword(boolean generatePassword) {
+	public void setGeneratePassword(Boolean generatePassword) {
 		this.generatePassword = generatePassword;
 		if (generatePassword) {
 			resetPassword = true;
