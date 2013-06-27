@@ -67,9 +67,8 @@ public final class MainMenu extends MenuBar {
 		});
 
 		addItem("About", getHomeMenu());
-		addItem("Event Registration", getEventsMenu());
-		addItem("WHE Classes/Activities", getClassesMenu());
-		addItem("Support", getSupportMenu());
+		addItem("Events", getEventsMenu());
+		addItem("Classes", getClassesMenu());
 		addItem("Book Store", getBooksMenu());
 		addItem("Resources", getResourcesMenu());
 		if (Application.isAuthenticated()) {
@@ -162,7 +161,7 @@ public final class MainMenu extends MenuBar {
 
 	private MenuBar getEventsMenu() {
 		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Events", PageUrl.eventList());
+		addLinkToMenu(menu, "Event Listing", PageUrl.eventList());
 		addLinkToMenu(menu, "Calendar", PageUrl.eventCalendar());
 
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
@@ -253,11 +252,7 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "Homeschooling Books", PageUrl.articleGroup("43"));
 		addLinkToMenu(menu, "Local Sports League Info", PageUrl.articleGroup("34"));
 
-		return menu;
-	}
-
-	private MenuBar getSupportMenu() {
-		MenuBar menu = new MenuBar(true);
+		menu.addSeparator();
 
 		addLinkToMenu(menu, "Homeschooling Books", PageUrl.articleGroup("43"));
 		addLinkToMenu(menu, "Homeschool Stories", PageUrl.articleGroup("15,16,14,13,12,11,10,9,8"));
