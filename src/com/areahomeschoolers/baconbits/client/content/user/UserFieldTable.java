@@ -159,7 +159,7 @@ public class UserFieldTable extends FieldTable {
 		});
 		addField(lastNameField);
 
-		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.HOME_PHONE)) {
+		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.EMAIL)) {
 			final FieldDisplayLink emailDisplay = new FieldDisplayLink();
 			final EmailTextBox emailInput = new EmailTextBox();
 			if (user.getParentId() == null || user.getEmail() != null) {

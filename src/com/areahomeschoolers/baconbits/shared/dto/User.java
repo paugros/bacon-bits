@@ -58,7 +58,7 @@ public final class User extends EntityDto<User> {
 	private boolean addressChanged;
 
 	private HashMap<Integer, GroupData> groups;
-	private HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences;
+	private HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences = new HashMap<PrivacyPreferenceType, PrivacyPreference>();
 
 	public User() {
 
@@ -77,6 +77,10 @@ public final class User extends EntityDto<User> {
 	}
 
 	public boolean administratorOf(User u) {
+		if (u.getGroups() == null) {
+			return false;
+		}
+
 		for (GroupData gd : u.getGroups().values()) {
 			if (administratorOf(gd.getOrganizationId())) {
 				return true;
