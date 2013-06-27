@@ -80,7 +80,8 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 			}
 		});
 		setDefaultSortColumn(BookColumn.TITLE, SortDirection.SORT_ASC);
-		setDisplayColumns(BookColumn.values());
+		setDisplayColumns(BookColumn.IMAGE, BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.GRADE_LEVEL, BookColumn.STATUS, BookColumn.CONDITION,
+				BookColumn.CONTACT);
 
 		articleService.getById(66, new Callback<Article>() {
 			@Override
@@ -295,7 +296,7 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 				break;
 
 			case DELETE:
-				if (!(Application.isSystemAdministrator() || Application.getCurrentUser().isSwitched())) {
+				if (Application.isSystemAdministrator()) {
 					addCompositeWidgetColumn("", new WidgetCellCreator<Book>() {
 						@Override
 						protected Widget createWidget(final Book item) {

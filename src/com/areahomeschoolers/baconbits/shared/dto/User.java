@@ -77,6 +77,18 @@ public final class User extends EntityDto<User> {
 	}
 
 	public boolean administratorOf(User u) {
+		if (systemAdministrator) {
+			return true;
+		}
+
+		if (parentOf(u)) {
+			return true;
+		}
+
+		if (!u.isSaved()) {
+			return true;
+		}
+
 		if (u.getGroups() == null) {
 			return false;
 		}
@@ -499,6 +511,10 @@ public final class User extends EntityDto<User> {
 	}
 
 	public boolean userCanSee(User u, PrivacyPreferenceType type) {
+		if (!isSaved()) {
+			return true;
+		}
+
 		PrivacyPreference p = getPrivacyPreference(type);
 
 		VisibilityLevel level = VisibilityLevel.getById(p.getVisibilityLevelId());
@@ -506,6 +522,11 @@ public final class User extends EntityDto<User> {
 		// user null, but public
 		if (u == null) {
 			return level == VisibilityLevel.PUBLIC;
+		}
+
+		// parents
+		if (u.parentOf(this)) {
+			return true;
 		}
 
 		// sys admin

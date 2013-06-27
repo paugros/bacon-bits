@@ -370,19 +370,21 @@ public class UserPage implements Page {
 						args.put(UserArg.PARENT_ID, user.getId());
 
 						final UserTable table = new UserTable(args);
-						ClickLabel addChild = new ClickLabel("Add Family Member", new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								CreateFamilyMemberDialog dialog = new CreateFamilyMemberDialog(user, new Command() {
-									@Override
-									public void execute() {
-										table.populate();
-									}
-								});
-								dialog.center(new User());
-							}
-						});
-						table.getTitleBar().addLink(addChild);
+						if (canEditUser(user)) {
+							ClickLabel addChild = new ClickLabel("Add Family Member", new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									CreateFamilyMemberDialog dialog = new CreateFamilyMemberDialog(user, new Command() {
+										@Override
+										public void execute() {
+											table.populate();
+										}
+									});
+									dialog.center(new User());
+								}
+							});
+							table.getTitleBar().addLink(addChild);
+						}
 						table.removeColumn(UserColumn.PHONE);
 						table.removeColumn(UserColumn.STATUS);
 						table.setTitle("Family Members");
