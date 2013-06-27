@@ -7,7 +7,6 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -42,9 +41,7 @@ public final class ErrorPage {
 		pageTitles.put(PageError.INVALID_ACTION, "Invalid Action");
 		pageTitles.put(PageError.SYSTEM_ERROR, "System Error");
 
-		errorPanel.setWidth("100%");
-		errorPanel.setStyleName("hugeText");
-		errorPanel.addStyleName("heavyPadding");
+		errorPanel.setStyleName("largeText heavyPadding homePageModule");
 
 		if (customMessage != null) {
 			errorPanel.add(new Label(customMessage));
@@ -75,10 +72,11 @@ public final class ErrorPage {
 	}
 
 	private void notAuthorized() {
-		PaddedPanel pp = new PaddedPanel(10);
-		pp.add(new Image(MainImageBundle.INSTANCE.waggingFinger()));
-		pp.add(new Label("You are not authorized to view this page or perform the requested action."));
-		errorPanel.add(pp);
+		VerticalPanel vp = new VerticalPanel();
+		vp.setSpacing(8);
+		vp.add(new HTML("You are not authorized to view this page or perform the requested action.<br><br>"));
+		vp.add(new Image(MainImageBundle.INSTANCE.waggingFinger()));
+		errorPanel.add(vp);
 	}
 
 	private void pageNotFound() {
@@ -94,9 +92,9 @@ public final class ErrorPage {
 		hp.add(errorMessage);
 		errorPanel.add(hp);
 
-		String html = "<br>Suggestions:<br><ul>";
+		String html = "<b>Suggestions</b><ul>";
 		html += "<li>Check the spelling of the address you typed";
-		html += "<li>If you are still having problems, please contact the Help Desk";
+		html += "<li>Verify with an administrator that you have permission to view this page";
 		errorPanel.add(new HTML(html));
 	}
 

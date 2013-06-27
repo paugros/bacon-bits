@@ -902,8 +902,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 	private String createSqlWhere() {
 		String sql = "where 1 = 1 ";
-		if (!ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
+		if (!ServerContext.isAuthenticated()) {
 			sql += "and u.directoryOptOut = 0 \n";
+		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
+			int id = ServerContext.getCurrentUserId();
+			sql += "and (u.directoryOptOut = 0 or u.id = " + id + ") \n";
 		}
 
 		return sql;
