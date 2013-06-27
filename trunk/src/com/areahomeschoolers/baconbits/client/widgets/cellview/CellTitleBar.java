@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.EntityDto;
 
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -31,7 +32,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -178,6 +178,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 
 		if (searchControl == null) {
 			searchControl = new TextBox();
+			searchControl.getElement().getStyle().setCursor(Cursor.TEXT);
 			searchControl.setHeight("16px");
 			final String defaultColor = "rgb(153, 153, 153)";
 			final String defaultText = "Search...";
@@ -244,7 +245,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 
 		searchControl.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
 
-		addControl(new SimplePanel(searchControl));
+		addControl(searchControl);
 	}
 
 	public void addVisibilityControl() {
@@ -270,6 +271,15 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 			searchControl.fireEvent(new BlurEvent() {
 			});
 		}
+	}
+
+	public TextBox extractSearchControl() {
+		int index = controlPanel.getWidgetIndex(searchControl);
+		if (index > 0) {
+			controlPanel.remove(index);
+			controlPanel.remove(index - 1);
+		}
+		return searchControl;
 	}
 
 	/**

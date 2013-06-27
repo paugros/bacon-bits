@@ -185,22 +185,24 @@ public final class MainMenu extends MenuBar {
 
 	private MenuBar getMyItemsMenu() {
 		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
-		if (Application.getCurrentUser().memberOfAny(16, 17)) {
-			addLinkToMenu(menu, "Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5");
-		}
 		addLinkToMenu(menu, "Profile", PageUrl.user(Application.getCurrentUserId()));
-		if (!Application.getCurrentUser().isChild()) {
-			addLinkToMenu(menu, "Shopping Cart", PageUrl.payment());
-		}
+		addLinkToMenu(menu, "Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
+		addLinkToMenu(menu, "Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=2");
 		if (!Application.getCurrentUser().isChild()) {
 			addLinkToMenu(menu, "Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
 		}
-		addLinkToMenu(menu, "Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=2");
+		if (Application.getCurrentUser().memberOfAny(16, 17)) {
+			addLinkToMenu(menu, "Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5");
+		}
 		if (!Application.getCurrentUser().isChild()) {
 			addLinkToMenu(menu, "Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
 		}
 		addLinkToMenu(menu, "Calendar", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
+		addLinkToMenu(menu, "Privacy", PageUrl.user(Application.getCurrentUserId()) + "&tab=8");
+
+		if (!Application.getCurrentUser().isChild()) {
+			addLinkToMenu(menu, "Shopping Cart", PageUrl.payment());
+		}
 
 		menu.addSeparator();
 

@@ -483,7 +483,9 @@ public class UserFieldTable extends FieldTable {
 				}
 			});
 			addField(startDateField);
+		}
 
+		if (Application.isAuthenticated() && (Application.administratorOf(user) || user.childOf(Application.getCurrentUser()))) {
 			final Label endDateDisplay = new Label();
 			final ValidatorDateBox endDateInput = new ValidatorDateBox();
 			FormField endDateField = form.createFormField("End date:", endDateInput, endDateDisplay);

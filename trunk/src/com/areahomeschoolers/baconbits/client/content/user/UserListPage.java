@@ -22,6 +22,8 @@ import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -30,7 +32,9 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.maps.client.geocode.LocationCallback;
 import com.google.gwt.maps.client.geocode.Placemark;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
@@ -39,10 +43,10 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class UserListPage implements Page {
 	private VerticalPanel optionsPanel = new VerticalPanel();
-	private VerticalPanel page;
-	private ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
+	private ArgMap<UserArg> args = getDefaultArgs();
 	private UserTable table;
 	private String lastLocationText;
+	private TextBox searchControl;
 
 	public UserListPage(final VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
@@ -51,14 +55,11 @@ public final class UserListPage implements Page {
 		}
 
 		final String title = "Directory";
-		this.page = page;
 
 		Label heading = new Label("Find People");
 		heading.addStyleName("hugeText");
 		page.add(heading);
-		populateOptionsPanel();
 
-		args.put(UserArg.PARENTS);
 		table = new UserTable(args);
 		table.removeColumn(UserColumn.STATUS);
 		table.removeColumn(UserColumn.SEX);
@@ -66,6 +67,17 @@ public final class UserListPage implements Page {
 		table.setTitle(title);
 		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addSearchControl();
+
+		searchControl = table.getTitleBar().extractSearchControl();
+		searchControl.setVisibleLength(30);
+
+		// this is done after adding the search control, so we can move it into the options panel
+		optionsPanel.addStyleName("boxedBlurb");
+		optionsPanel.setSpacing(8);
+		page.add(optionsPanel);
+
+		populateOptionsPanel();
+
 		ContentWidth cw = null;
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			Hyperlink addLink = new Hyperlink("Add", PageUrl.user(0));
@@ -91,20 +103,27 @@ public final class UserListPage implements Page {
 		table.populate();
 	}
 
+	private ArgMap<UserArg> getDefaultArgs() {
+		ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
+		args.put(UserArg.PARENTS);
+		return args;
+	}
+
 	private void populateOptionsPanel() {
 		PaddedPanel top = new PaddedPanel(10);
 
-		optionsPanel.addStyleName("boxedBlurb");
 		Label label = new Label("Show");
 		top.add(label);
 
 		final DefaultListBox peopleInput = new DefaultListBox();
 		peopleInput.addItem("everyone");
 		peopleInput.addItem("children");
+		peopleInput.addItem("children (boys)");
+		peopleInput.addItem("children (girls)");
 		peopleInput.addItem("parents of boys or girls");
 		peopleInput.addItem("parents of boys");
 		peopleInput.addItem("parents of girls");
-		peopleInput.setSelectedIndex(2);
+		peopleInput.setSelectedIndex(4);
 		peopleInput.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
@@ -112,18 +131,27 @@ public final class UserListPage implements Page {
 				args.remove(UserArg.PARENTS_OF_BOYS);
 				args.remove(UserArg.PARENTS_OF_GIRLS);
 				args.remove(UserArg.CHILDREN);
+				args.remove(UserArg.SEX);
 
 				switch (peopleInput.getSelectedIndex()) {
 				case 1:
 					args.put(UserArg.CHILDREN);
 					break;
 				case 2:
-					args.put(UserArg.PARENTS);
+					args.put(UserArg.CHILDREN);
+					args.put(UserArg.SEX, "m");
 					break;
 				case 3:
-					args.put(UserArg.PARENTS_OF_BOYS);
+					args.put(UserArg.CHILDREN);
+					args.put(UserArg.SEX, "f");
 					break;
 				case 4:
+					args.put(UserArg.PARENTS);
+					break;
+				case 5:
+					args.put(UserArg.PARENTS_OF_BOYS);
+					break;
+				case 6:
 					args.put(UserArg.PARENTS_OF_GIRLS);
 					break;
 				}
@@ -143,7 +171,7 @@ public final class UserListPage implements Page {
 		ageInput.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				args.put(UserArg.PARENTS_OF_AGES, ageInput.getValue());
+				args.put(UserArg.AGES, ageInput.getValue());
 				table.populate();
 			}
 		});
@@ -227,6 +255,13 @@ public final class UserListPage implements Page {
 
 		optionsPanel.add(top);
 
+		PaddedPanel sp = new PaddedPanel();
+		sp.add(new Label("Search text"));
+
+		sp.add(searchControl);
+
+		optionsPanel.add(sp);
+
 		if (Application.isAuthenticated()) {
 			CheckBox cb = new CheckBox("Only show people with whom I have interests in common");
 			cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -244,6 +279,22 @@ public final class UserListPage implements Page {
 			optionsPanel.add(cb);
 		}
 
-		page.add(optionsPanel);
+		Button resetButton = new Button("Reset", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				resetFilter();
+			}
+		});
+
+		optionsPanel.add(resetButton);
+		optionsPanel.setCellHorizontalAlignment(resetButton, HasHorizontalAlignment.ALIGN_CENTER);
+	}
+
+	private void resetFilter() {
+		optionsPanel.clear();
+		populateOptionsPanel();
+		args = getDefaultArgs();
+		table.setArgMap(args);
+		table.populate();
 	}
 }

@@ -301,7 +301,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		if (!ServerContext.isSystemAdministrator() && u.getDirectoryOptOut() && !u.equals(ServerContext.getCurrentUser())) {
-			if (!ServerContext.isAuthenticated() || !ServerContext.getCurrentUser().administratorOf(u)) {
+			if (!ServerContext.isAuthenticated() || !ServerContext.getCurrentUser().administratorOf(u) || !ServerContext.getCurrentUser().parentOf(u)) {
 				return null;
 			}
 		}
@@ -379,7 +379,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		boolean parentsOfBoys = args.getBoolean(UserArg.PARENTS_OF_BOYS);
 		boolean parentsOfGirls = args.getBoolean(UserArg.PARENTS_OF_GIRLS);
 		boolean onlyCommonInterests = args.getBoolean(UserArg.ONLY_COMMON_INTERESTS);
-		List<Integer> ages = args.getIntList(UserArg.PARENTS_OF_AGES);
+		String sex = args.getString(UserArg.SEX);
+		List<Integer> ages = args.getIntList(UserArg.AGES);
 		String addressSearch = args.getString(UserArg.ADDRESS_SEARCH);
 		int withinMiles = args.getInt(UserArg.WITHIN_MILES);
 		String withinLat = args.getString(UserArg.WITHIN_LAT);
@@ -441,6 +442,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			if (ages.size() > 1) {
 				sql += "and (datediff(now(), u.birthDate) / 365.25) between " + minAge + " and " + maxAge + " ";
 			}
+		}
+
+		if (!Common.isNullOrBlank(sex)) {
+			sql += "and u.sex = ? ";
+			sqlArgs.add(sex);
 		}
 
 		// end directory logic //

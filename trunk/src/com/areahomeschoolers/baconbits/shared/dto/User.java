@@ -81,10 +81,6 @@ public final class User extends EntityDto<User> {
 			return true;
 		}
 
-		if (parentOf(u)) {
-			return true;
-		}
-
 		if (!u.isSaved()) {
 			return true;
 		}
@@ -559,7 +555,7 @@ public final class User extends EntityDto<User> {
 			break;
 		case PRIVATE:
 			// self and sys admin already taken care of
-			if (u.administratorOf(this)) {
+			if (u.administratorOf(this) || u.parentOf(this)) {
 				return true;
 			}
 			break;

@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTable;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerTable;
+import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerTable.VolunteerColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
@@ -85,6 +86,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class UserPage implements Page {
 	public static boolean canEditUser(User user) {
@@ -157,9 +159,7 @@ public class UserPage implements Page {
 				if (user.isSaved()) {
 					HorizontalPanel hp = new HorizontalPanel();
 					hp.setWidth("100%");
-					Label heading = new Label(user.getFullName());
-					heading.addStyleName("hugeText");
-					hp.add(heading);
+					hp.add(createBreadCrumb());
 					if (viewingSelf()) {
 						BalanceBox bb = new BalanceBox();
 						bb.populate();
@@ -179,6 +179,20 @@ public class UserPage implements Page {
 			code : 'code39'
 		});
 	}-*/;
+
+	private Widget createBreadCrumb() {
+		PaddedPanel pp = new PaddedPanel();
+		Label heading = new Label(user.getFullName());
+		pp.addStyleName("hugeText");
+
+		if (user.getParentId() != null && user.getParentId() > 0) {
+			Hyperlink parent = new Hyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId()));
+			pp.add(parent);
+			pp.add(new Label(">>"));
+		}
+		pp.add(heading);
+		return pp;
+	}
 
 	private void createFieldTable() {
 		fieldTable = new UserFieldTable(form, user);
@@ -266,13 +280,22 @@ public class UserPage implements Page {
 
 						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
 						args.setStatus(Status.ACTIVE);
-						args.put(EventArg.NOT_STATUS_ID, 5);
 						EventParticipantTable table = new EventParticipantTable(args);
 						table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
 								ParticipantColumn.ADDED_DATE, ParticipantColumn.PRICE, ParticipantColumn.STATUS);
 						table.setTitle("Event Registrations");
 
-						table.addStatusFilterBox();
+						if (!user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.FAMILY)) {
+							table.removeColumn(ParticipantColumn.PARTICIPANT_NAME);
+						}
+
+						if (canEditUser(user)) {
+							table.addStatusFilterBox();
+							args.put(EventArg.NOT_STATUS_ID, 5);
+						} else {
+							table.removeColumn(ParticipantColumn.PRICE);
+							args.put(EventArg.STATUS_ID, 2);
+						}
 
 						table.getTitleBar().addExcelControl();
 						table.getTitleBar().addSearchControl();
@@ -294,12 +317,15 @@ public class UserPage implements Page {
 						args.put(EventArg.USER_ID, user.getId());
 
 						final EventVolunteerTable vt = new EventVolunteerTable(args);
+						vt.removeColumn(VolunteerColumn.NAME);
+						if (!Application.administratorOf(user)) {
+							vt.removeColumn(VolunteerColumn.FULFILLED);
+							vt.addColumn(VolunteerColumn.FULFILLED_READ_ONLY);
+						}
 
 						vt.addDataReturnHandler(new DataReturnHandler() {
 							@Override
 							public void onDataReturn() {
-								vt.removeColumn(4);
-								vt.removeColumn(3);
 								tabPanel.selectTabNow(tabBody);
 							}
 						});
@@ -414,10 +440,13 @@ public class UserPage implements Page {
 						table.getTitleBar().addExcelControl();
 						table.getTitleBar().addSearchControl();
 
-						table.addColumn(BookColumn.DELETE);
-						table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
-						table.removeColumn(BookColumn.PRICE);
-						table.removeColumn(BookColumn.CONTACT);
+						if (Application.isSystemAdministrator()) {
+							table.addColumn(BookColumn.DELETE);
+						}
+						if (viewingSelf()) {
+							table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
+							table.removeColumn(BookColumn.CONTACT);
+						}
 						if (bookDialog == null) {
 							bookDialog = new BookDialog(table);
 						}
@@ -522,6 +551,7 @@ public class UserPage implements Page {
 					@Override
 					public void execute(VerticalPanel tabBody) {
 						FieldTable ft = new FieldTable();
+						ft.getFlexTable().setCellSpacing(8);
 						tabBody.add(WidgetFactory.newSection("Privacy Settings", ft, ContentWidth.MAXWIDTH900PX));
 
 						CheckBox cb = new CheckBox("Exclude me from the directory entirely");
@@ -533,7 +563,11 @@ public class UserPage implements Page {
 
 						ft.addField("Mobile phone:", makePrivacyWidget(PrivacyPreferenceType.MOBILE_PHONE));
 
-						ft.addField("Address:", makePrivacyWidget(PrivacyPreferenceType.ADDRESS));
+						VerticalPanel ap = new VerticalPanel();
+						PrivacyPreferenceWidget aw = makePrivacyWidget(PrivacyPreferenceType.ADDRESS);
+						ap.add(aw);
+						ap.add(new Label("NOTE: Your city will be displayed regardless of this setting."));
+						ft.addField("Address:", ap);
 
 						ft.addField("Event registrations:", makePrivacyWidget(PrivacyPreferenceType.EVENTS));
 
