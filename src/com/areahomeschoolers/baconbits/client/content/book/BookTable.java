@@ -80,8 +80,8 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 			}
 		});
 		setDefaultSortColumn(BookColumn.TITLE, SortDirection.SORT_ASC);
-		setDisplayColumns(BookColumn.IMAGE, BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.GRADE_LEVEL, BookColumn.STATUS, BookColumn.CONDITION,
-				BookColumn.CONTACT);
+		setDisplayColumns(BookColumn.IMAGE, BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.PRICE, BookColumn.GRADE_LEVEL, BookColumn.STATUS,
+				BookColumn.CONDITION, BookColumn.CONTACT);
 
 		articleService.getById(66, new Callback<Article>() {
 			@Override
