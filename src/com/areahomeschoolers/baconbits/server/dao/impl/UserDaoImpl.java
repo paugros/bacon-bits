@@ -302,7 +302,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 		if (!ServerContext.isSystemAdministrator() && u.getDirectoryOptOut() && !u.equals(ServerContext.getCurrentUser())) {
 			if (!ServerContext.isAuthenticated() || !ServerContext.getCurrentUser().administratorOf(u) || !ServerContext.getCurrentUser().parentOf(u)) {
-				return null;
+				if (!ServerContext.getCurrentUser().isSwitched()) {
+					return null;
+				}
 			}
 		}
 
@@ -904,7 +906,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String sql = "where 1 = 1 ";
 		if (!ServerContext.isAuthenticated()) {
 			sql += "and u.directoryOptOut = 0 \n";
-		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
+		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().isSwitched() || ServerContext.getCurrentUser().hasRole(
+				AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
 			int id = ServerContext.getCurrentUserId();
 			sql += "and (u.directoryOptOut = 0 or u.id = " + id + ") \n";
 		}

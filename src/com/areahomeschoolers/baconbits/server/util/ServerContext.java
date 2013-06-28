@@ -153,8 +153,13 @@ public class ServerContext implements ApplicationContextAware {
 		UserDao userDao = (UserDao) ctx.getBean("userDaoImpl");
 		User newCurrentUser = userDao.getById(userId);
 		newCurrentUser.setCanSwitch(true);
-		newCurrentUser.setOriginalUserId(currentUser.getOriginalUserId());
-		newCurrentUser.setOriginalEmail(currentUser.getOriginalEmail());
+		if (currentUser.isSwitched()) {
+			newCurrentUser.setOriginalUserId(currentUser.getOriginalUserId());
+			newCurrentUser.setOriginalEmail(currentUser.getOriginalEmail());
+		} else {
+			newCurrentUser.setOriginalUserId(currentUser.getId());
+			newCurrentUser.setOriginalEmail(currentUser.getEmail());
+		}
 
 		getSession().setAttribute("user", newCurrentUser);
 	}

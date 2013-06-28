@@ -71,7 +71,7 @@ public final class MainMenu extends MenuBar {
 		addItem("Classes", getClassesMenu());
 		addItem("Book Store", getBooksMenu());
 		addItem("Resources", getResourcesMenu());
-		if (Application.isAuthenticated()) {
+		if (Application.isAuthenticated() && Application.isSystemAdministrator()) {
 			addItem("People", getPeopleMenu());
 		}
 		if (Application.isAuthenticated()) {
@@ -239,6 +239,7 @@ public final class MainMenu extends MenuBar {
 
 	private MenuBar getPeopleMenu() {
 		MenuBar menu = new MenuBar(true);
+
 		addLinkToMenu(menu, "Find People", PageUrl.userList());
 		menu.addSeparator();
 		addLinkToMenu(menu, "My Profile", PageUrl.user(Application.getCurrentUserId()));
