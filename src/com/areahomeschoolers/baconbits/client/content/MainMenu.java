@@ -57,6 +57,7 @@ public final class MainMenu extends MenuBar {
 	private final User user = Application.getCurrentUser();
 
 	public MainMenu() {
+		// prevents auto-selection bug
 		setFocusOnHoverEnabled(false);
 		addStyleName("MainMenu");
 		addCloseHandler(new CloseHandler<PopupPanel>() {
