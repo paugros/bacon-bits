@@ -44,6 +44,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
+import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
@@ -309,6 +310,50 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		return u;
+	}
+
+	@Override
+	public ArrayList<MainMenuItem> getMenuItems(ArgMap<UserArg> args) {
+		List<Object> sqlArgs = new ArrayList<Object>();
+
+		int organizationId = args.getInt(UserArg.ORGANIZATION_ID);
+		String sql = "select * from menuItems m ";
+		sql += "where m.organizationId = ? ";
+		sqlArgs.add(organizationId);
+		sql += "order by m.parentNodeId, m.ordinal";
+
+		final HashMap<Integer, MainMenuItem> treeMap = new HashMap<Integer, MainMenuItem>();
+		final ArrayList<MainMenuItem> items = new ArrayList<MainMenuItem>();
+
+		query(sql, new RowMapper<MainMenuItem>() {
+			@Override
+			public MainMenuItem mapRow(ResultSet rs, int rowNum) throws SQLException {
+				MainMenuItem m = new MainMenuItem();
+				m.setId(rs.getInt("id"));
+				m.setAddedById(rs.getInt("addedById"));
+				m.setAddedDate(rs.getTimestamp("addedDate"));
+				m.setArticleIds(rs.getString("articleIds"));
+				m.setGroupId(rs.getInt("groupId"));
+				m.setName(rs.getString("name"));
+				m.setOrganizationId(rs.getInt("organizationId"));
+				m.setParentNodeId(rs.getInt("parentNodeId"));
+				m.setUrl(rs.getString("url"));
+				m.setVisibilityLevelId(rs.getInt("visibilityLevelId"));
+
+				treeMap.put(m.getId(), m);
+
+				// add item to list if it's a root node, otherwise to its parent
+				if (m.getParentNodeId() == null) {
+					items.add(m);
+				} else {
+					treeMap.get(m.getParentNodeId()).addItem(m);
+				}
+
+				return m;
+			}
+		}, sqlArgs.toArray());
+
+		return items;
 	}
 
 	@Override
@@ -631,6 +676,28 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 		retData.setData(getById(user.getId()));
 		return retData;
+	}
+
+	@Override
+	public MainMenuItem saveMenuItem(MainMenuItem item) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(item);
+
+		if (item.isSaved()) {
+			String sql = "update menuItems set name = :name, articleIds = :articleIds, url = :url, parentNodeId = :parentNodeId, ";
+			sql += "organizationId = :organizationId, visibilityLevelId = :visibilityLevelId, groupId = :groupId where id = :id";
+			update(sql, namedParams);
+		} else {
+			item.setAddedById(ServerContext.getCurrentUserId());
+			String sql = "insert into menuItems (name, articleIds, url, parentNodeId, organizationId, visibilityLevelId, groupId, addedById, ordinal) ";
+			sql += "values(:name, :articleIds, :url, :parentNodeId, :organizationId, :visibilityLevelId, :groupId, :addedById, :ordinal)";
+
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+
+			item.setId(Integer.parseInt(keys.getKeys().get(Constants.GENERATED_KEY_TOKEN).toString()));
+		}
+
+		return item;
 	}
 
 	@Override

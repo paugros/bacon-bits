@@ -219,6 +219,11 @@ public final class Layout {
 			bodyPanel.add(ap);
 		}
 
+		// status panel
+		StatusPanel sp = new StatusPanel();
+		Callback.setStatusPanel(sp);
+		RootPanel.get().add(sp);
+
 		menu = new MainMenu();
 		menuPanel.setHeight(MENU_HEIGHT + "px");
 		menuPanel.setWidth("100%");
@@ -250,11 +255,6 @@ public final class Layout {
 			dock.add(bodyPanel);
 			RootLayoutPanel.get().add(dock);
 		}
-
-		// status panel
-		StatusPanel sp = new StatusPanel();
-		Callback.setStatusPanel(sp);
-		RootPanel.get().add(sp);
 	}
 
 	/**

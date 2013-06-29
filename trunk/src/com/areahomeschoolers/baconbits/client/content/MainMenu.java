@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content;
 
+import java.util.List;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -9,6 +11,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
+import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
@@ -17,6 +20,8 @@ import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Command;
@@ -66,11 +71,9 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
-		addItem("About", getHomeMenu());
+		addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this);
 		addItem("Events", getEventsMenu());
-		addItem("Classes", getClassesMenu());
 		addItem("Book Store", getBooksMenu());
-		addItem("Resources", getResourcesMenu());
 		if (Application.isAuthenticated() && Application.isSystemAdministrator()) {
 			addItem("People", getPeopleMenu());
 		}
@@ -81,6 +84,35 @@ public final class MainMenu extends MenuBar {
 			addItem("Admin", getAdminMenu());
 		}
 
+	}
+
+	@Override
+	public MenuItem addItem(String text, final MenuBar popup) {
+		popup.addAttachHandler(new Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				popup.getParent().getParent().getElement().getStyle().setMarginTop(11, Unit.PX);
+			}
+		});
+		return super.addItem(text, popup);
+	}
+
+	private void addDynamicItems(List<MainMenuItem> items, MenuBar parent) {
+		for (MainMenuItem item : items) {
+			if (item.hasChildren()) {
+				final MenuBar menu = new MenuBar(true);
+				addDynamicItems(item.getItems(), menu);
+				parent.addItem(item.getName(), menu);
+			} else {
+				String url = "";
+				if (item.getArticleIds() != null) {
+					url = PageUrl.articleGroup(item.getArticleIds());
+				} else {
+					url = item.getUrl();
+				}
+				addLinkToMenu(parent, item.getName(), url);
+			}
+		}
 	}
 
 	private MenuBar getAdminMenu() {
@@ -138,26 +170,6 @@ public final class MainMenu extends MenuBar {
 		return menu;
 	}
 
-	private MenuBar getClassesMenu() {
-		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Co-op", PageUrl.articleGroup("37,38"));
-		addLinkToMenu(menu, "PE Activities", PageUrl.articleGroup("36"));
-		addLinkToMenu(menu, "The Youth Booth", PageUrl.articleGroup("63"));
-
-		return menu;
-	}
-
-	private MenuBar getEducationMenu() {
-		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Arts/Crafts", PageUrl.articleGroup("26,23"));
-		addLinkToMenu(menu, "Math", PageUrl.articleGroup("25"));
-		addLinkToMenu(menu, "Preschool", PageUrl.articleGroup("5,23"));
-		addLinkToMenu(menu, "Science", PageUrl.articleGroup("30"));
-		addLinkToMenu(menu, "Seasonal/Holiday", PageUrl.articleGroup("18,19,20,21,22,29"));
-
-		return menu;
-	}
-
 	private MenuBar getEventsMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Event Listing", PageUrl.eventList());
@@ -169,15 +181,6 @@ public final class MainMenu extends MenuBar {
 		}
 
 		addLinkToMenu(menu, "Policies", PageUrl.articleGroup("57,56,58"));
-
-		return menu;
-	}
-
-	private MenuBar getHomeMenu() {
-		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Home", PageUrl.home());
-		addLinkToMenu(menu, "Contact Us", PageUrl.articleGroup("48"));
-		addLinkToMenu(menu, "FAQ", PageUrl.articleGroup("7"));
 
 		return menu;
 	}
@@ -247,22 +250,6 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "My Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
 		}
 		addLinkToMenu(menu, "Privacy Settings", PageUrl.user(Application.getCurrentUserId()) + "&tab=8");
-		return menu;
-	}
-
-	private MenuBar getResourcesMenu() {
-		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Homeschooling Books", PageUrl.articleGroup("43"));
-		addLinkToMenu(menu, "Local Sports League Info", PageUrl.articleGroup("34"));
-
-		menu.addSeparator();
-
-		addLinkToMenu(menu, "Homeschooling Books", PageUrl.articleGroup("43"));
-		addLinkToMenu(menu, "Homeschool Stories", PageUrl.articleGroup("15,16,14,13,12,11,10,9,8"));
-		addLinkToMenu(menu, "Homeschooling Methods", PageUrl.articleGroup("40"));
-		addLinkToMenu(menu, "Curriculum Providers", PageUrl.articleGroup("41"));
-		addLinkToMenu(menu, "Parents' Support Meeting", PageUrl.articleGroup("33"));
-
 		return menu;
 	}
 

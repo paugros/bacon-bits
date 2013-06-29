@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
+import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
@@ -46,7 +47,11 @@ public interface UserServiceAsync {
 
 	public void validatePassword(String password, AsyncCallback<ServerResponseData<String>> callback);
 
+	void getMenuItems(ArgMap<UserArg> args, AsyncCallback<ArrayList<MainMenuItem>> callback);
+
 	void getPollData(AsyncCallback<PollResponseData> callback);
+
+	void saveMenuItem(MainMenuItem item, AsyncCallback<MainMenuItem> callback);
 
 	void savePrivacyPreference(PrivacyPreference privacyPreference, AsyncCallback<PrivacyPreference> callback);
 }
