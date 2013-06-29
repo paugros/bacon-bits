@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
+import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
@@ -41,6 +42,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 	@Override
 	public User getById(int userId) {
 		return dao.getById(userId);
+	}
+
+	@Override
+	public ArrayList<MainMenuItem> getMenuItems(ArgMap<UserArg> args) {
+		return dao.getMenuItems(args);
 	}
 
 	@Override
@@ -104,6 +110,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 			response.getData().setGeneratePassword(false);
 		}
 		return response;
+	}
+
+	@Override
+	public MainMenuItem saveMenuItem(MainMenuItem item) {
+		return dao.saveMenuItem(item);
 	}
 
 	@Override

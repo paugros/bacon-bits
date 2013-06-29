@@ -25,6 +25,7 @@ import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -51,6 +52,9 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		ap.setCurrentUser(user);
 		ap.setAdultBirthYear(Calendar.getInstance().get(Calendar.YEAR) - 18);
 		ap.setUserActivity(UserDaoImpl.getAllUserActivity());
+
+		UserDao userDao = ServerContext.getDaoImpl("user");
+		ap.setDynamicMenuItems(userDao.getMenuItems(new ArgMap<UserArg>(UserArg.ORGANIZATION_ID, 11)));
 
 		if (user != null) {
 			UserDaoImpl.updateUserActivity(user.getId());

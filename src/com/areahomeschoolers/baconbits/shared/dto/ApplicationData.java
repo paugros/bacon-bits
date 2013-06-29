@@ -13,6 +13,7 @@ public class ApplicationData implements IsSerializable {
 	private boolean isLive;
 	private int adultBirthYear;
 	private ArrayList<Tag> interests = new ArrayList<Tag>();
+	private ArrayList<MainMenuItem> dynamicMenuItems = new ArrayList<MainMenuItem>();
 
 	public ApplicationData() {
 
@@ -24,6 +25,10 @@ public class ApplicationData implements IsSerializable {
 
 	public User getCurrentUser() {
 		return currentUser;
+	}
+
+	public ArrayList<MainMenuItem> getDynamicMenuItems() {
+		return dynamicMenuItems;
 	}
 
 	public LinkedHashMap<Integer, Date> getUserActivity() {
@@ -48,6 +53,10 @@ public class ApplicationData implements IsSerializable {
 
 	public void setCurrentUser(User currentUser) {
 		this.currentUser = currentUser;
+	}
+
+	public void setDynamicMenuItems(ArrayList<MainMenuItem> dynamicMenuItems) {
+		this.dynamicMenuItems = dynamicMenuItems;
 	}
 
 	public void setInterests(ArrayList<Tag> interests) {

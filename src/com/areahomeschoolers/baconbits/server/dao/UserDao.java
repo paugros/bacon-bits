@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
+import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
@@ -21,6 +22,8 @@ public interface UserDao {
 	public void doUpdateUserActivity(int userId);
 
 	public User getById(int userId);
+
+	public ArrayList<MainMenuItem> getMenuItems(ArgMap<UserArg> args);
 
 	public UserPageData getPageData(int userId);
 
@@ -37,6 +40,8 @@ public interface UserDao {
 	public HashMap<Integer, GroupData> refreshSecurityGroups();
 
 	public ServerResponseData<User> save(User user);
+
+	public MainMenuItem saveMenuItem(MainMenuItem item);
 
 	public PrivacyPreference savePrivacyPreference(PrivacyPreference privacyPreference);
 
