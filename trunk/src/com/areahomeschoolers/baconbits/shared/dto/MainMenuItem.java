@@ -10,7 +10,7 @@ public class MainMenuItem extends EntityDto<MainMenuItem> implements HasGroupOwn
 	private String articleIds;
 	private String url;
 	private Integer parentNodeId;
-	private int owningOrgId = 11;
+	private int owningOrgId;
 	private int visibilityLevelId;
 	private Integer groupId;
 	private int addedById;

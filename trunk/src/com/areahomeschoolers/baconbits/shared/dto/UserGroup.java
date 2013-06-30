@@ -92,6 +92,9 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private Date startDate, endDate;
 	private boolean isOrganization;
 	private int organizationId;
+	private String shortName;
+	private String orgDomain;
+	private String orgSubDomain;
 
 	// aux
 	private String organizationName;
@@ -132,9 +135,21 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return organizationName;
 	}
 
+	public String getOrgDomain() {
+		return orgDomain;
+	}
+
+	public String getOrgSubDomain() {
+		return orgSubDomain;
+	}
+
 	@Override
 	public int getOwningOrgId() {
 		return organizationId;
+	}
+
+	public String getShortName() {
+		return shortName;
 	}
 
 	public Date getStartDate() {
@@ -170,9 +185,21 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		this.organizationName = organizationName;
 	}
 
+	public void setOrgDomain(String orgDomain) {
+		this.orgDomain = orgDomain;
+	}
+
+	public void setOrgSubDomain(String orgSubDomain) {
+		this.orgSubDomain = orgSubDomain;
+	}
+
 	@Override
 	public void setOwningOrgId(int organizationId) {
 		this.organizationId = organizationId;
+	}
+
+	public void setShortName(String shortName) {
+		this.shortName = shortName;
 	}
 
 	public void setStartDate(Date startDate) {

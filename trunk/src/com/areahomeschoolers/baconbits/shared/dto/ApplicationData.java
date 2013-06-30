@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class ApplicationData implements IsSerializable {
 	private User currentUser;
+	private UserGroup currentOrg;
 	private Data userPreferences;
 	private LinkedHashMap<Integer, Date> userActivity;
 	private boolean isLive;
@@ -21,6 +22,10 @@ public class ApplicationData implements IsSerializable {
 
 	public int getAdultBirthYear() {
 		return adultBirthYear;
+	}
+
+	public UserGroup getCurrentOrg() {
+		return currentOrg;
 	}
 
 	public User getCurrentUser() {
@@ -49,6 +54,10 @@ public class ApplicationData implements IsSerializable {
 
 	public void setAdultBirthYear(int adultBirthYear) {
 		this.adultBirthYear = adultBirthYear;
+	}
+
+	public void setCurrentOrg(UserGroup currentOrg) {
+		this.currentOrg = currentOrg;
 	}
 
 	public void setCurrentUser(User currentUser) {

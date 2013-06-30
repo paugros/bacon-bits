@@ -36,6 +36,7 @@ import com.areahomeschoolers.baconbits.shared.dto.HasGroupOwnership;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.core.client.GWT;
@@ -59,7 +60,7 @@ public final class Application implements ValueChangeHandler<String> {
 	private static final String DEFAULT_TOKEN = "page=Home";
 	private static ApplicationData applicationData;
 	private static Command rpcFailureCommand;
-	public static final String APPLICATION_NAME = "WHE";
+	public static String APPLICATION_NAME = "Citrus Groups";
 	private static boolean confirmNavigation = false;
 	private static List<ParameterHandler<PollResponseData>> pollReturnHandlers = new ArrayList<ParameterHandler<PollResponseData>>();
 	private static Timer pollTimer;
@@ -97,6 +98,19 @@ public final class Application implements ValueChangeHandler<String> {
 
 	public static ApplicationData getApplicationData() {
 		return applicationData;
+	}
+
+	public static UserGroup getCurrentOrg() {
+		return applicationData.getCurrentOrg();
+	}
+
+	public static int getCurrentOrgId() {
+		UserGroup ug = getCurrentOrg();
+		if (ug == null) {
+			return 0;
+		}
+
+		return ug.getId();
 	}
 
 	public static User getCurrentUser() {
@@ -228,6 +242,7 @@ public final class Application implements ValueChangeHandler<String> {
 	public Application(ApplicationData ap) {
 		// set session information
 		applicationData = ap;
+		APPLICATION_NAME = ap.getCurrentOrg().getShortName();
 
 		History.addValueChangeHandler(this);
 

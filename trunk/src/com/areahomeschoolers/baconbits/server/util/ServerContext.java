@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.appengine.api.utils.SystemProperty;
 
@@ -59,6 +60,24 @@ public class ServerContext implements ApplicationContextAware {
 		}
 
 		return url;
+	}
+
+	public static UserGroup getCurrentOrg() {
+		HttpSession session = ServerContext.getSession();
+		if (session == null) {
+			return null;
+		}
+
+		return (UserGroup) session.getAttribute("org");
+	}
+
+	public static int getCurrentOrgId() {
+		UserGroup ug = getCurrentOrg();
+		if (ug == null) {
+			return 0;
+		}
+
+		return ug.getId();
 	}
 
 	public static User getCurrentUser() {
@@ -127,6 +146,28 @@ public class ServerContext implements ApplicationContextAware {
 		sc.response = response;
 		sc.servletContext = servletContext;
 		tl.set(sc);
+	}
+
+	public static void setCurrentOrg() {
+		if (getCurrentOrg() != null) {
+			return;
+		}
+
+		// TODO change this default to citrus when we have it
+		String sd = "wearehomeeducators";
+
+		String cdn = tl.get().request.getServerName();
+		if (cdn != null) {
+			if (cdn.contains(".")) {
+				String[] parts = cdn.split("\\.");
+				sd = parts[0];
+			} else {
+				sd = cdn;
+			}
+		}
+
+		UserDao userDao = getDaoImpl("user");
+		getSession().setAttribute("org", userDao.getOrgBySubDomain(sd));
 	}
 
 	/**

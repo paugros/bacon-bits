@@ -2,6 +2,7 @@ package com.areahomeschoolers.baconbits.client.content.user;
 
 import java.util.Date;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -84,13 +85,15 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 		ft.setLabelColumnWidth(LabelColumnWidth.NARROW);
 
 		HTML terms = new HTML();
-		String text = "<p align=center><b>WHE Terms & Conditions</b></p><ul>";
+		String sn = Application.getCurrentOrg().getShortName();
+		String text = "<p align=center><b>" + sn + " Terms & Conditions</b></p><ul>";
 		text += "<li>Sign up for activities are on a first come, first serve basis, as some activities are limited to a certain number of children.";
 		text += "<li>Children are officially registered when payment is received.";
 		text += "<li>If payment is not received within 24 hours of registering, your registration will be canceled.";
-		text += "<li>Due to unexpected last minute changes, WHE reserves the right to substitute comparable programs without notification.";
-		text += "<li>Always check email the day of events for program updates or cancellation.  WHE will always attempt to notify you of a change, but it is up to you to check for emails.";
-		text += "<li>WHE will not be held responsible for direction inaccuracies from GPS devices or mapping websites.";
+		text += "<li>Due to unexpected last minute changes, " + sn + " reserves the right to substitute comparable programs without notification.";
+		text += "<li>Always check email the day of events for program updates or cancellation.  ";
+		text += sn + " will always attempt to notify you of a change, but it is up to you to check for emails.";
+		text += "<li>" + sn + " will not be held responsible for direction inaccuracies from GPS devices or mapping websites.";
 		text += "<li>Absolutely no refunds.";
 		text += "</ul>";
 

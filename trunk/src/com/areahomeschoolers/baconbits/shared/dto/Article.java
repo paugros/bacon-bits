@@ -17,7 +17,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	private Date startDate, endDate, addedDate;
 	private Integer groupId;
 	private int visibilityLevelId;
-	private int owningOrgId = 11;
+	private int owningOrgId;
 
 	// auxiliary
 	private String visibilityLevel;
