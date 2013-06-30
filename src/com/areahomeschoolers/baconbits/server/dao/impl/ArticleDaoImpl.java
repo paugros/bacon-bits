@@ -67,6 +67,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		sql += "left join userGroupMembers org on org.groupId = a.owningOrgId and org.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
 
+		sql += "and a.owningOrgId = " + ServerContext.getCurrentOrgId() + " \n";
+
 		int auth = ServerContext.isAuthenticated() ? 1 : 0;
 		if (!ServerContext.isSystemAdministrator()) {
 			sql += "and case a.visibilityLevelId ";
@@ -129,7 +131,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			if (article.getStartDate() == null) {
 				article.setStartDate(new Date());
 			}
-			article.setAddedById(ServerContext.getCurrentUser().getId());
+			article.setAddedById(ServerContext.getCurrentUserId());
+			article.setOwningOrgId(ServerContext.getCurrentOrgId());
 
 			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId, visibilityLevelId, owningOrgId) values ";
 			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId, :visibilityLevelId, :owningOrgId)";

@@ -46,15 +46,19 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 
 	@Override
 	public ApplicationData getApplicationData() {
+		// load the current organization (based on the host used to access) into the session
+		ServerContext.setCurrentOrg();
+
 		User user = ServerContext.getCurrentUser();
 
 		ApplicationData ap = new ApplicationData();
+		ap.setCurrentOrg(ServerContext.getCurrentOrg());
 		ap.setCurrentUser(user);
 		ap.setAdultBirthYear(Calendar.getInstance().get(Calendar.YEAR) - 18);
 		ap.setUserActivity(UserDaoImpl.getAllUserActivity());
 
 		UserDao userDao = ServerContext.getDaoImpl("user");
-		ap.setDynamicMenuItems(userDao.getMenuItems(new ArgMap<UserArg>(UserArg.ORGANIZATION_ID, 11)));
+		ap.setDynamicMenuItems(userDao.getMenuItems(new ArgMap<UserArg>(UserArg.ORGANIZATION_ID, ServerContext.getCurrentOrgId())));
 
 		if (user != null) {
 			UserDaoImpl.updateUserActivity(user.getId());

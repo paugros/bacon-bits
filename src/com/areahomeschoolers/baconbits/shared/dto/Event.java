@@ -36,7 +36,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private int visibilityLevelId;
 	private Integer seriesId;
 	private boolean requiredInSeries;
-	private int owningOrgId = 11;
+	private int owningOrgId;
 
 	// auxilliary
 	private boolean newlyAdded;

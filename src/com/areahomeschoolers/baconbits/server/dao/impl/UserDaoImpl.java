@@ -357,6 +357,22 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
+	public UserGroup getOrgBySubDomain(String subDomain) {
+		ArgMap<UserGroupArg> args = new ArgMap<UserGroupArg>();
+		args.put(UserGroupArg.ORG_SUB_DOMAIN, subDomain);
+
+		List<UserGroup> grps = listGroups(args);
+		if (!grps.isEmpty()) {
+			return grps.get(0);
+		}
+		args.remove(UserGroupArg.ORG_SUB_DOMAIN);
+		// TODO change this default
+		args.put(UserGroupArg.ID, 11);
+
+		return listGroups(args).get(0);
+	}
+
+	@Override
 	public UserPageData getPageData(final int userId) {
 		UserPageData pd = new UserPageData();
 		if (userId > 0) {
@@ -541,29 +557,48 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int userId = args.getInt(UserGroupArg.USER_ID);
 		int userNotMemberId = args.getInt(UserGroupArg.USER_NOT_MEMBER_OF);
 		int userAdminId = args.getInt(UserGroupArg.USER_IS_ADMIN_OF);
+		int id = args.getInt(UserGroupArg.ID);
+		String subDomain = args.getString(UserGroupArg.ORG_SUB_DOMAIN);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select *, o.groupName as organizationName from groups g ";
 		sql += "join groups o on o.id = g.organizationId ";
+
 		if (userId > 0) {
 			sql += "join userGroupMembers uugm on uugm.groupId = g.id and uugm.userId = ? ";
 			sqlArgs.add(userId);
 		}
+
 		if (userAdminId > 0) {
 			sql += "join userGroupMembers augm on augm.groupId = g.id and augm.isAdministrator = 1 and augm.userId = ? ";
 			sqlArgs.add(userAdminId);
 		}
+
 		if (userNotMemberId > 0) {
 			sql += "left join userGroupMembers nugm on nugm.groupId = g.id and nugm.userId = ? ";
 			sqlArgs.add(userNotMemberId);
 		}
+
 		sql += "where 1 = 1 ";
+
 		if (args.getStatus() != Status.ALL) {
 			sql += "and isActive(g.startDate, g.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
 		}
+
 		if (userNotMemberId > 0) {
 			sql += "and nugm.id is null ";
 		}
+
+		if (id > 0) {
+			sql += "and g.id = ? ";
+			sqlArgs.add(id);
+		}
+
+		if (!Common.isNullOrBlank(subDomain)) {
+			sql += "and g.orgSubDomain = ? ";
+			sqlArgs.add(subDomain);
+		}
+
 		sql += "order by o.groupName, g.isOrganization desc, g.groupName";
 
 		if (userId > 0 || userAdminId > 0 || userNotMemberId > 0) {
@@ -688,6 +723,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			update(sql, namedParams);
 		} else {
 			item.setAddedById(ServerContext.getCurrentUserId());
+			item.setOwningOrgId(ServerContext.getCurrentOrgId());
 			String sql = "insert into menuItems (name, articleIds, url, parentNodeId, organizationId, visibilityLevelId, groupId, addedById, ordinal) ";
 			sql += "values(:name, :articleIds, :url, :parentNodeId, :organizationId, :visibilityLevelId, :groupId, :addedById, :ordinal)";
 
@@ -725,15 +761,18 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(group);
 
 		if (group.isSaved()) {
-			String sql = "update groups set groupName = :groupName, description = :description, startDate = :startDate, endDate = :endDate where id = :id";
+			String sql = "update groups set groupName = :groupName, description = :description, startDate = :startDate, ";
+			sql += "shortName = :shortName, orgDomain = :orgDomain, orgSubDomain = :orgSubDomain, endDate = :endDate where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (group.getStartDate() == null) {
 				group.setStartDate(new Date());
 			}
 
-			String sql = "insert into groups (groupName, description, isOrganization, organizationId, startDate, endDate) ";
-			sql += "values(:groupName, :description, :organization, :organizationId, :startDate, :endDate)";
+			String sql = "insert into groups (groupName, description, isOrganization, organizationId, startDate, ";
+			sql += "shortName, orgDomain, orgSubDomain, endDate) ";
+			sql += "values(:groupName, :description, :organization, :organizationId, :startDate, ";
+			sql += ":shortName, :orgDomain, :orgSubDomain, :endDate)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -763,14 +802,15 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 			Mailer mailer = new Mailer();
 			mailer.addTo(username);
-			mailer.setSubject("WHE Password Assistance");
-			String body = "To initiate the password reset process for your " + username + " WHE account, click the link below: \n\n";
+			String sn = ServerContext.getCurrentOrg().getShortName();
+			mailer.setSubject(sn + " Password Assistance");
+			String body = "To initiate the password reset process for your " + username + " " + sn + " account, click the link below: \n\n";
 			body += ServerContext.getBaseUrlWithCodeServer() + "#rr=" + u.getPasswordDigest() + "&uu=" + u.getId() + "\n\n";
 			body += "If clicking the link above doesn't work, please copy and paste the URL in a new browser window instead.\n\n";
 			body += "If you've received this mail in error, it's likely that another user entered your email address by mistake while trying to reset a password. ";
 			body += "If you didn't initiate the request, you don't need to take any further action and can safely disregard this email.\n\n";
 			body += "If you have further difficulty or any questions, please contact Kristin Augros at kaugros@gmail.com.\n\n";
-			body += "Thank you for using WHE services.\n\n";
+			body += "Thank you for using " + sn + " services.\n\n";
 			body += "This is a post-only mailing.  Replies to this message are not monitored or answered.";
 			mailer.setBody(body);
 
@@ -992,6 +1032,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setOrganization(rs.getBoolean("isOrganization"));
 		group.setOwningOrgId(rs.getInt("organizationId"));
 		group.setOrganizationName(rs.getString("organizationName"));
+		group.setShortName(rs.getString("shortName"));
+		group.setOrgDomain(rs.getString("orgDomain"));
+		group.setOrgSubDomain(rs.getString("orgSubDomain"));
 		return group;
 	}
 
