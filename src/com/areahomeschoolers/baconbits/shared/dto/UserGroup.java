@@ -91,7 +91,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private String description;
 	private Date startDate, endDate;
 	private boolean isOrganization;
-	private Integer organizationId;
+	private int organizationId;
 
 	// aux
 	private String organizationName;
@@ -128,13 +128,13 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return isOrganization;
 	}
 
-	@Override
-	public Integer getOrganizationId() {
-		return organizationId;
-	}
-
 	public String getOrganizationName() {
 		return organizationName;
+	}
+
+	@Override
+	public int getOwningOrgId() {
+		return organizationId;
 	}
 
 	public Date getStartDate() {
@@ -166,13 +166,13 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		this.isOrganization = isOrganization;
 	}
 
-	@Override
-	public void setOrganizationId(Integer organizationId) {
-		this.organizationId = organizationId;
-	}
-
 	public void setOrganizationName(String organizationName) {
 		this.organizationName = organizationName;
+	}
+
+	@Override
+	public void setOwningOrgId(int organizationId) {
+		this.organizationId = organizationId;
 	}
 
 	public void setStartDate(Date startDate) {

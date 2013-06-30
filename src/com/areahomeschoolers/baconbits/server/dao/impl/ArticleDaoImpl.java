@@ -44,7 +44,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			article.setTagCount(rs.getInt("tagCount"));
 			article.setVisibilityLevel(rs.getString("visibilityLevel"));
 			article.setVisibilityLevelId(rs.getInt("visibilityLevelId"));
-			article.setOrganizationId(rs.getInt("organizationId"));
+			article.setOwningOrgId(rs.getInt("owningOrgId"));
 			return article;
 		}
 	}
@@ -55,7 +55,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 	}
 
 	public String createSqlBase() {
-		String sql = "select a.*, g.groupName, l.visibilityLevel, g.organizationId, \n";
+		String sql = "select a.*, g.groupName, l.visibilityLevel, \n";
 		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
 		sql += "(select count(id) from tagArticleMapping where articleId = a.id) as tagCount \n";
 		sql += "from articles a \n";
@@ -64,7 +64,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 
 		int userId = ServerContext.getCurrentUserId();
 		sql += "left join userGroupMembers ugm on ugm.groupId = a.groupId and ugm.userId = " + userId + " \n";
-		sql += "left join userGroupMembers org on org.groupId = g.organizationId and org.userId = " + userId + " \n";
+		sql += "left join userGroupMembers org on org.groupId = a.owningOrgId and org.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
 
 		int auth = ServerContext.isAuthenticated() ? 1 : 0;
@@ -131,8 +131,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			}
 			article.setAddedById(ServerContext.getCurrentUser().getId());
 
-			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId, visibilityLevelId) values ";
-			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId, :visibilityLevelId)";
+			String sql = "insert into articles (addedById, startDate, endDate, addedDate, title, article, groupId, visibilityLevelId, owningOrgId) values ";
+			sql += "(:addedById, :startDate, :endDate, now(), :title, :article, :groupId, :visibilityLevelId, :owningOrgId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

@@ -73,7 +73,7 @@ public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 					public void onValueChange(ValueChangeEvent<Boolean> event) {
 						entity.setOrganization(event.getValue());
 						orgInput.setEnabled(!event.getValue());
-						entity.setOrganizationId(null);
+						entity.setOwningOrgId(0);
 					}
 				});
 				ovp.add(cb);
@@ -84,13 +84,13 @@ public class UserGroupEditDialog extends EntityEditDialog<UserGroup> {
 			orgField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					orgInput.setValue(entity.getOrganizationId());
+					orgInput.setValue(entity.getOwningOrgId());
 				}
 			});
 			orgField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					entity.setOrganizationId(orgInput.getIntValue());
+					entity.setOwningOrgId(orgInput.getIntValue());
 				}
 			});
 			ft.addField(orgField);

@@ -17,24 +17,16 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	private Date startDate, endDate, addedDate;
 	private Integer groupId;
 	private int visibilityLevelId;
+	private int owningOrgId = 11;
 
 	// auxiliary
 	private String visibilityLevel;
 	private String groupName;
 	private int documentCount;
 	private int tagCount;
-	private Integer organizationId;
 
 	public Article() {
 
-	}
-
-	public String getVisibilityLevel() {
-		return visibilityLevel;
-	}
-
-	public int getVisibilityLevelId() {
-		return visibilityLevelId;
 	}
 
 	public int getAddedById() {
@@ -76,11 +68,8 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	}
 
 	@Override
-	public Integer getOrganizationId() {
-		if (organizationId == null || organizationId == 0) {
-			return null;
-		}
-		return organizationId;
+	public int getOwningOrgId() {
+		return owningOrgId;
 	}
 
 	public Date getStartDate() {
@@ -95,6 +84,14 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return title;
 	}
 
+	public String getVisibilityLevel() {
+		return visibilityLevel;
+	}
+
+	public int getVisibilityLevelId() {
+		return visibilityLevelId;
+	}
+
 	@Override
 	public boolean hasDocuments() {
 		return documentCount > 0;
@@ -102,14 +99,6 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 
 	public boolean hasTags() {
 		return tagCount > 0;
-	}
-
-	public void setVisibilityLevel(String visibilityLevel) {
-		this.visibilityLevel = visibilityLevel;
-	}
-
-	public void setVisibilityLevelId(int visibilityLevelId) {
-		this.visibilityLevelId = visibilityLevelId;
 	}
 
 	public void setAddedById(int addedById) {
@@ -142,8 +131,8 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	}
 
 	@Override
-	public void setOrganizationId(Integer organizationId) {
-		this.organizationId = organizationId;
+	public void setOwningOrgId(int organizationId) {
+		this.owningOrgId = organizationId;
 	}
 
 	public void setStartDate(Date startDate) {
@@ -156,6 +145,14 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public void setVisibilityLevel(String visibilityLevel) {
+		this.visibilityLevel = visibilityLevel;
+	}
+
+	public void setVisibilityLevelId(int visibilityLevelId) {
+		this.visibilityLevelId = visibilityLevelId;
 	}
 
 }

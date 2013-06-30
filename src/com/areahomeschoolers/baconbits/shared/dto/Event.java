@@ -36,6 +36,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private int visibilityLevelId;
 	private Integer seriesId;
 	private boolean requiredInSeries;
+	private int owningOrgId = 11;
 
 	// auxilliary
 	private boolean newlyAdded;
@@ -46,7 +47,6 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private String ageRanges;
 	private int documentCount;
 	private String category;
-	private Integer organizationId;
 	private String groupName;
 	private String visibilityLevel;
 	private String addedByFullName;
@@ -76,14 +76,6 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public boolean allowRegistrations() {
 		return active && !finished && registrationOpen;
-	}
-
-	public String getVisibilityLevel() {
-		return visibilityLevel;
-	}
-
-	public int getVisibilityLevelId() {
-		return visibilityLevelId;
 	}
 
 	public boolean getActive() {
@@ -185,11 +177,8 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	}
 
 	@Override
-	public Integer getOrganizationId() {
-		if (organizationId == null || organizationId == 0) {
-			return null;
-		}
-		return organizationId;
+	public int getOwningOrgId() {
+		return owningOrgId;
 	}
 
 	public String getPhone() {
@@ -255,6 +244,14 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return title;
 	}
 
+	public String getVisibilityLevel() {
+		return visibilityLevel;
+	}
+
+	public int getVisibilityLevelId() {
+		return visibilityLevelId;
+	}
+
 	public String getWebsite() {
 		return website;
 	}
@@ -270,14 +267,6 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public boolean isSeriesChild() {
 		return seriesId != null && seriesId != getId();
-	}
-
-	public void setVisibilityLevel(String visibilityLevel) {
-		this.visibilityLevel = visibilityLevel;
-	}
-
-	public void setVisibilityLevelId(int visibilityLevelId) {
-		this.visibilityLevelId = visibilityLevelId;
 	}
 
 	public void setActive(boolean active) {
@@ -374,8 +363,8 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	}
 
 	@Override
-	public void setOrganizationId(Integer organizationId) {
-		this.organizationId = organizationId;
+	public void setOwningOrgId(int organizationId) {
+		this.owningOrgId = organizationId;
 	}
 
 	public void setPhone(String phone) {
@@ -432,6 +421,14 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public void setVisibilityLevel(String visibilityLevel) {
+		this.visibilityLevel = visibilityLevel;
+	}
+
+	public void setVisibilityLevelId(int visibilityLevelId) {
+		this.visibilityLevelId = visibilityLevelId;
 	}
 
 	public void setWebsite(String website) {

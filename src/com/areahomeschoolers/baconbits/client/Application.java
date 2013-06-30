@@ -80,7 +80,7 @@ public final class Application implements ValueChangeHandler<String> {
 	}
 
 	public static boolean administratorOf(HasGroupOwnership item) {
-		return isAuthenticated() && applicationData.getCurrentUser().administratorOfAny(item.getGroupId(), item.getOrganizationId());
+		return isAuthenticated() && applicationData.getCurrentUser().administratorOfAny(item.getGroupId(), item.getOwningOrgId());
 	}
 
 	public static boolean administratorOf(Integer groupId) {

@@ -335,7 +335,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				m.setArticleIds(rs.getString("articleIds"));
 				m.setGroupId(rs.getInt("groupId"));
 				m.setName(rs.getString("name"));
-				m.setOrganizationId(rs.getInt("organizationId"));
+				m.setOwningOrgId(rs.getInt("organizationId"));
 				m.setParentNodeId(rs.getInt("parentNodeId"));
 				m.setUrl(rs.getString("url"));
 				m.setVisibilityLevelId(rs.getInt("visibilityLevelId"));
@@ -832,9 +832,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			// associate to org if needed
 			if (!g.getOrganization()) {
 				sql = "select count(*) from userGroupMembers where userId = ? and groupId = ?";
-				if (queryForInt(sql, u.getId(), g.getOrganizationId()) == 0) {
+				if (queryForInt(sql, u.getId(), g.getOwningOrgId()) == 0) {
 					sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, ?, ?)";
-					update(sql, u.getId(), g.getOrganizationId(), false);
+					update(sql, u.getId(), g.getOwningOrgId(), false);
 				}
 			}
 		} else {
@@ -990,7 +990,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setStartDate(rs.getTimestamp("startDate"));
 		group.setEndDate(rs.getTimestamp("endDate"));
 		group.setOrganization(rs.getBoolean("isOrganization"));
-		group.setOrganizationId(rs.getInt("organizationId"));
+		group.setOwningOrgId(rs.getInt("organizationId"));
 		group.setOrganizationName(rs.getString("organizationName"));
 		return group;
 	}

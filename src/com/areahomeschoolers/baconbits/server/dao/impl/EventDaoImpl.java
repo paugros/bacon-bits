@@ -96,7 +96,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setSeriesId(rs.getInt("seriesId"));
 			event.setRequiredInSeries(rs.getBoolean("requiredInSeries"));
 			event.setNewlyAdded(rs.getBoolean("newlyAdded"));
-			event.setOrganizationId(rs.getInt("organizationId"));
+			event.setOwningOrgId(rs.getInt("owningOrgId"));
 			return event;
 		}
 	}
@@ -372,7 +372,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select r.eventId, e.title, e.startDate, e.endDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
 		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, up.email as registrantEmailAddress, \n";
-		sql += "r.addedById, e.groupId, g.organizationId, e.seriesId, e.requiredInSeries, \n";
+		sql += "r.addedById, e.groupId, e.owningOrgId, e.seriesId, e.requiredInSeries, \n";
 		if (includeFields) {
 			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n";
 			sql += "from eventFieldValues v \n";
@@ -388,7 +388,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "join users up on up.id = r.addedById \n";
 		sql += "left join payments py on py.id = p.paymentId \n";
 		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
-		sql += "left join groups g on g.id = e.groupId \n";
 		sql += "where 1 = 1 \n";
 
 		if (args.getStatus() != Status.ALL) {
@@ -478,7 +477,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setEventStartDate(rs.getTimestamp("startDate"));
 				p.setEventEndDate(rs.getTimestamp("endDate"));
 				p.setEventGroupId(rs.getInt("groupId"));
-				p.setEventOrganizationId(rs.getInt("organizationId"));
+				p.setEventOrganizationId(rs.getInt("owningOrgId"));
 				p.setEventSeriesId(rs.getInt("seriesId"));
 				p.setRegistrantEmailAddress(rs.getString("registrantEmailAddress"));
 				p.setRequiredInSeries(rs.getBoolean("requiredInSeries"));
@@ -698,10 +697,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setAddedById(ServerContext.getCurrentUser().getId());
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, ";
-			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, ";
+			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, owningOrgId, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, ";
-			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, ";
+			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, :owningOrgId, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
@@ -910,7 +909,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	private String createSqlBase() {
 		int userId = ServerContext.getCurrentUserId();
-		String sql = "select e.*, g.groupName, g.organizationId, c.category, u.firstName, u.lastName, l.visibilityLevel, \n";
+		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.visibilityLevel, \n";
 		sql += "(select group_concat(price) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {
@@ -929,7 +928,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "join itemVisibilityLevels l on l.id = e.visibilityLevelId \n";
 
 		sql += "left join userGroupMembers ugm on ugm.groupId = e.groupId and ugm.userId = " + userId + " \n";
-		sql += "left join userGroupMembers org on org.groupId = g.organizationId and org.userId = " + userId + " \n";
+		sql += "left join userGroupMembers org on org.groupId = e.owningOrgId and org.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
 
 		int auth = ServerContext.isAuthenticated() ? 1 : 0;
