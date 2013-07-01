@@ -866,26 +866,24 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				return;
 			}
 
-			sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, ?, ?)";
-			update(sql, u.getId(), g.getId(), g.getAdministrator());
-
 			// associate to org if needed
-			if (!g.getOrganization()) {
-				sql = "select count(*) from userGroupMembers where userId = ? and groupId = ?";
-				if (queryForInt(sql, u.getId(), g.getOwningOrgId()) == 0) {
-					sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, ?, ?)";
-					update(sql, u.getId(), g.getOwningOrgId(), false);
-				}
+			sql = "select count(*) from userGroupMembers where userId = ? and groupId = ?";
+			if (g.getOrganization() || (!g.getOrganization() && queryForInt(sql, u.getId(), g.getOwningOrgId()) == 0)) {
+				addToOrganization(u.getId(), g.getOwningOrgId());
+			} else {
+				sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, ?, ?)";
+				update(sql, u.getId(), g.getId(), g.getAdministrator());
 			}
 		} else {
-			String sql = "delete from userGroupMembers where userId = ? ";
+			String sql = "delete from userGroupMembers where ";
 			// when deleting from org, cascade
 			if (g.getOrganization()) {
-				sql += "and organizationId = ? ";
+				sql += "groupId in(select id from groups where organizationId = ?) ";
 			} else {
-				sql += "and groupId = ? ";
+				sql += "groupId = ? ";
 			}
-			update(sql, u.getId(), g.getId());
+			sql += "and (userId = ? or userId in(select id from users where parentId = ?)) ";
+			update(sql, g.getId(), u.getId(), u.getId());
 		}
 	}
 
@@ -974,6 +972,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			return validator.getMessages(result);
 		}
 		return new ArrayList<String>();
+	}
+
+	private void addToOrganization(int userId, int orgId) {
+		// children too
+		String sql = "insert into userGroupMembers (userId, groupId, isAdministrator) ";
+		sql += "select id, ?, ? from users where (parentId = ? or id = ?)";
+		update(sql, orgId, false, userId, userId);
 	}
 
 	private String createSqlBase() {
