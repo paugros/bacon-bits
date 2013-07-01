@@ -1,11 +1,11 @@
 package com.areahomeschoolers.baconbits.server.dao.impl;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -19,7 +19,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
-import com.areahomeschoolers.baconbits.server.paypal.PayPalCredentials;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
@@ -29,24 +28,13 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
-import com.paypal.adaptive.api.requests.fnapi.SimplePay;
-import com.paypal.adaptive.api.responses.PayResponse;
-import com.paypal.adaptive.core.AckCode;
-import com.paypal.adaptive.core.CurrencyCodes;
-import com.paypal.adaptive.core.PayError;
-import com.paypal.adaptive.core.PaymentType;
-import com.paypal.adaptive.core.Receiver;
-import com.paypal.adaptive.core.ServiceEnvironment;
-import com.paypal.adaptive.exceptions.AuthorizationRequiredException;
-import com.paypal.adaptive.exceptions.InvalidAPICredentialsException;
-import com.paypal.adaptive.exceptions.InvalidResponseDataException;
-import com.paypal.adaptive.exceptions.MissingAPICredentialsException;
-import com.paypal.adaptive.exceptions.MissingParameterException;
-import com.paypal.adaptive.exceptions.PayPalErrorException;
-import com.paypal.adaptive.exceptions.PaymentExecException;
-import com.paypal.adaptive.exceptions.PaymentInCompleteException;
-import com.paypal.adaptive.exceptions.RequestAlreadyMadeException;
-import com.paypal.adaptive.exceptions.RequestFailureException;
+import com.paypal.svcs.services.AdaptivePaymentsService;
+import com.paypal.svcs.types.ap.PayRequest;
+import com.paypal.svcs.types.ap.PayResponse;
+import com.paypal.svcs.types.ap.Receiver;
+import com.paypal.svcs.types.ap.ReceiverList;
+import com.paypal.svcs.types.common.ClientDetailsType;
+import com.paypal.svcs.types.common.RequestEnvelope;
 
 @Repository
 public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
@@ -94,12 +82,9 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		}
 	}
 
-	private PayPalCredentials paypal;
-
 	@Autowired
-	public PaymentDaoImpl(DataSource dataSource, PayPalCredentials pp) {
+	public PaymentDaoImpl(DataSource dataSource) {
 		super(dataSource);
-		this.paypal = pp;
 	}
 
 	public String createSqlBase() {
@@ -206,6 +191,52 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		return data;
 	}
 
+	public PaypalData makePayment(Payment p) {
+		PaypalData data = new PaypalData();
+
+		RequestEnvelope requestEnvelope = new RequestEnvelope();
+		requestEnvelope.setErrorLanguage("en_US");
+
+		List<Receiver> receiverLst = new ArrayList<Receiver>();
+
+		// Amount to be credited to the receiver's account
+		Receiver receiver = new Receiver(p.getAmount());
+		receiver.setPaymentType("SERVICE");
+
+		// A receiver's email address
+		if (ServerContext.isLive()) {
+			receiver.setEmail("weare.home.educators@gmail.com");
+		} else {
+			receiver.setEmail("paul.a_1343673136_biz@gmail.com");
+		}
+		receiverLst.add(receiver);
+		ReceiverList receiverList = new ReceiverList(receiverLst);
+
+		StringBuilder url = new StringBuilder();
+		url.append(ServerContext.getBaseUrl() + "#page=" + p.getReturnPage());
+		String returnUrl = url.toString() + "&ps=return&payKey=${payKey}";
+		String cancelUrl = url.toString() + "&ps=cancel";
+		String ipnUrl = ServerContext.getBaseUrl() + "baconbits/service/ipn";
+
+		PayRequest payRequest = new PayRequest(requestEnvelope, "PAY", cancelUrl, "USD", receiverList, returnUrl);
+		payRequest.setMemo(p.getMemo());
+		payRequest.setIpnNotificationUrl(ipnUrl);
+		ClientDetailsType cd = new ClientDetailsType();
+		cd.setIpAddress(ServerContext.getRequest().getRemoteAddr());
+		cd.setApplicationId("weare.home.educators");
+		payRequest.setClientDetails(cd);
+		if (!ServerContext.isLive()) {
+			payRequest.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343833982
+		}
+
+		PayResponse payResponse = makePayPalApiCall(payRequest);
+
+		data.setPayKey(payResponse.getPayKey());
+		data.setPaymentExecStatus(payResponse.getPaymentExecStatus());
+
+		return data;
+	}
+
 	@Override
 	public Payment save(Payment payment) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(payment);
@@ -299,125 +330,103 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		return a;
 	}
 
-	private PaypalData makePayment(Payment p) {
-		PaypalData data = new PaypalData();
+	// private PaypalData makePayment(Payment p) {
+	// PaypalData data = new PaypalData();
 
-		ServiceEnvironment environment = ServerContext.isLive() ? ServiceEnvironment.PRODUCTION : ServiceEnvironment.SANDBOX;
+	// ServiceEnvironment environment = ServerContext.isLive() ? ServiceEnvironment.PRODUCTION : ServiceEnvironment.SANDBOX;
+	//
+	// try {
+	// StringBuilder url = new StringBuilder();
+	// url.append(ServerContext.getBaseUrl() + "#page=" + p.getReturnPage());
+	// String returnURL = url.toString() + "&ps=return&payKey=${payKey}";
+	// String cancelURL = url.toString() + "&ps=cancel";
+	// String ipnURL = ServerContext.getBaseUrl() + "baconbits/service/ipn";
+	//
+	// SimplePay payment = new SimplePay();
+	// // always the same
+	// payment.setCredentialObj(paypal);
+	// payment.setUserIp(ServerContext.getRequest().getRemoteAddr());
+	// payment.setApplicationName("weare.home.educators");
+	// payment.setCurrencyCode(CurrencyCodes.USD);
+	// payment.setLanguage("en_US");
+	// payment.setEnv(environment);
+	// if (!ServerContext.isLive()) {
+	// payment.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343833982
+	// }
+	//
+	// payment.setCancelUrl(cancelURL);
+	// payment.setReturnUrl(returnURL);
+	// payment.setIpnURL(ipnURL);
+	// payment.setMemo(p.getMemo());
+	//
+	// Receiver receiver = new Receiver();
+	// receiver.setAmount(p.getAmount());
+	// if (ServerContext.isLive()) {
+	// receiver.setEmail("weare.home.educators@gmail.com");
+	// } else {
+	// receiver.setEmail("paul.a_1343673136_biz@gmail.com");
+	// }
+	// receiver.setPaymentType(PaymentType.SERVICE);
+	// payment.setReceiver(receiver);
+	//
+	// PayResponse payResponse = payment.makeRequest();
+	// data.setPayKey(payResponse.getPayKey());
+	// data.setPaymentExecStatus(payResponse.getPaymentExecStatus().toString());
+	// return data;
+	// // System.out.println("PaymentExecStatus:" + payResponse.getPaymentExecStatus().toString());
+	// } catch (Exception e) {
+	//
+	// }
+	// return data;
+	// }
 
+	private PayResponse makePayPalApiCall(PayRequest payRequest) {
+		Logger logger = Logger.getLogger(this.getClass().toString());
+
+		// ## Creating service wrapper object
+		// Creating service wrapper object to make API call and loading
+		// configuration file for your credentials and endpoint
+		AdaptivePaymentsService service = null;
+		String properties = ServerContext.isLive() ? "/WEB-INF/paypal_production.properties" : "/WEB-INF/paypal_development.properties";
 		try {
-			StringBuilder url = new StringBuilder();
-			url.append(ServerContext.getBaseUrl() + "#page=" + p.getReturnPage());
-			String returnURL = url.toString() + "&ps=return&payKey=${payKey}";
-			String cancelURL = url.toString() + "&ps=cancel";
-			String ipnURL = ServerContext.getBaseUrl() + "baconbits/service/ipn";
-
-			SimplePay payment = new SimplePay();
-			// always the same
-			payment.setCredentialObj(paypal);
-			payment.setUserIp(ServerContext.getRequest().getRemoteAddr());
-			payment.setApplicationName("weare.home.educators");
-			payment.setCurrencyCode(CurrencyCodes.USD);
-			payment.setLanguage("en_US");
-			payment.setEnv(environment);
-			if (!ServerContext.isLive()) {
-				payment.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343833982
-			}
-
-			payment.setCancelUrl(cancelURL);
-			payment.setReturnUrl(returnURL);
-			payment.setIpnURL(ipnURL);
-			payment.setMemo(p.getMemo());
-
-			Receiver receiver = new Receiver();
-			receiver.setAmount(p.getAmount());
-			if (ServerContext.isLive()) {
-				receiver.setEmail("weare.home.educators@gmail.com");
-			} else {
-				receiver.setEmail("paul.a_1343673136_biz@gmail.com");
-			}
-			receiver.setPaymentType(PaymentType.SERVICE);
-			payment.setReceiver(receiver);
-
-			PayResponse payResponse = payment.makeRequest();
-			data.setPayKey(payResponse.getPayKey());
-			data.setPaymentExecStatus(payResponse.getPaymentExecStatus().toString());
-			return data;
-			// System.out.println("PaymentExecStatus:" + payResponse.getPaymentExecStatus().toString());
+			service = new AdaptivePaymentsService(properties);
 		} catch (IOException e) {
-			System.out.println("Payment Failed w/ IOException");
-		} catch (MissingAPICredentialsException e) {
-			// No API Credential Object provided - log error
-			// e.printStackTrace();
-			throw new RuntimeException("No APICredential object provided");
-		} catch (InvalidAPICredentialsException e) {
-			// invalid API Credentials provided - application error - log error
-			// e.printStackTrace();
-			System.out.println("Invalid API Credentials " + e.getMissingCredentials());
-		} catch (MissingParameterException e) {
-			// missing parameter - log error
-			// e.printStackTrace();
-			throw new RuntimeException("Missing Parameter error: " + e.getParameterName());
-		} catch (RequestFailureException e) {
-			// HTTP Error - some connection issues ?
-			// e.printStackTrace();
-			throw new RuntimeException("Request HTTP Error: " + e.getHTTP_RESPONSE_CODE());
-		} catch (InvalidResponseDataException e) {
-			// PayPal service error
-			// log error
-			// e.printStackTrace();
-			throw new RuntimeException("Invalid Response Data from PayPal: \"" + e.getResponseData() + "\"");
-		} catch (PayPalErrorException e) {
-			// Request failed due to a Service/Application error
-			// e.printStackTrace();
-			if (e.getResponseEnvelope().getAck() == AckCode.Failure) {
-				// log the error
-				String text = "Received Failure from PayPal (ack)\n";
-				text += "ErrorData provided:";
-				text += e.getPayErrorList().toString();
-				for (PayError error : e.getPayErrorList()) {
-					text += error.getError().getMessage();
-				}
-				if (e.getPaymentExecStatus() != null) {
-					text += "PaymentExecStatus: " + e.getPaymentExecStatus();
-				}
-				throw new RuntimeException(text);
-			} else if (e.getResponseEnvelope().getAck() == AckCode.FailureWithWarning) {
-				// there is a warning - log it!
-				String text = "Received Failure with Warning from PayPal (ack)";
-				text += "ErrorData provided:";
-				text += e.getPayErrorList().toString();
-				throw new RuntimeException(text);
-			}
-		} catch (RequestAlreadyMadeException e) {
-			// shouldn't occur - log the error
-			// e.printStackTrace();
-			throw new RuntimeException("Request to send a request that has already been sent!");
-		} catch (PaymentExecException e) {
-			String text = "Failed Payment Request w/ PaymentExecStatus: " + e.getPaymentExecStatus().toString();
-			text += "ErrorData provided:";
-
-			text += e.getPayErrorList().toString();
-
-			throw new RuntimeException(text);
-		} catch (PaymentInCompleteException e) {
-			String text = "Incomplete Payment w/ PaymentExecStatus: " + e.getPaymentExecStatus().toString();
-			text += "ErrorData provided:";
-
-			text += e.getPayErrorList().toString();
-			throw new RuntimeException(text);
-		} catch (AuthorizationRequiredException e) {
-			// redirect the user to PayPal for Authorization
-			// resp.sendRedirect(e.getAuthorizationUrl(ServiceEnvironment.SANDBOX));
-
-			try {
-				data.setAuthorizationUrl(e.getAuthorizationUrl(environment));
-				return data;
-			} catch (UnsupportedEncodingException ex) {
-				ex.printStackTrace();
-			}
+			logger.severe("Error Message : " + e.getMessage());
+		}
+		PayResponse payResponse = null;
+		try {
+			// ## Making API call
+			// Invoke the appropriate method corresponding to API in service
+			// wrapper object
+			payResponse = service.pay(payRequest);
+		} catch (Exception e) {
+			logger.severe("Error Message : " + e.getMessage());
 		}
 
-		return data;
+		// ## Accessing response parameters
+		// You can access the response parameters using getter methods in
+		// response object as shown below
+		// ### Success values
+		if (payResponse.getResponseEnvelope().getAck().getValue().equalsIgnoreCase("Success")) {
+
+			// The pay key, which is a token you use in other Adaptive
+			// Payment APIs (such as the Refund Method) to identify this
+			// payment. The pay key is valid for 3 hours; the payment must
+			// be approved while the pay key is valid.
+			logger.info("Pay Key : " + payResponse.getPayKey());
+
+			// Once you get success response, user has to redirect to PayPal
+			// for the payment. Construct redirectURL as follows,
+			// `redirectURL=https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey="
+			// + payResponse.getPayKey();`
+		}
+
+		// ### Error Values
+		// Access error values from error list using getter methods
+		else {
+			logger.severe("API Error Message : " + payResponse.getError().get(0).getMessage());
+		}
+		return payResponse;
 	}
 
 }
