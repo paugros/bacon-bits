@@ -91,7 +91,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private String description;
 	private Date startDate, endDate;
 	private boolean isOrganization;
-	private int organizationId;
+	private int owningOrgId;
 	private String shortName;
 	private String orgDomain;
 	private String orgSubDomain;
@@ -145,7 +145,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	@Override
 	public int getOwningOrgId() {
-		return organizationId;
+		return owningOrgId;
 	}
 
 	public String getShortName() {
@@ -195,7 +195,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	@Override
 	public void setOwningOrgId(int organizationId) {
-		this.organizationId = organizationId;
+		this.owningOrgId = organizationId;
 	}
 
 	public void setShortName(String shortName) {
