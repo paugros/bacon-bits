@@ -25,12 +25,6 @@ public class PaypalData implements IsSerializable {
 
 	public void setAuthorizationUrl(String authorizationUrl) {
 		this.authorizationUrl = authorizationUrl;
-
-		if (authorizationUrl.contains("paykey=")) {
-			String key = authorizationUrl.replaceFirst(".*paykey=", "");
-			key = key.replaceFirst("&.*", "");
-			payKey = key;
-		}
 	}
 
 	public void setPayKey(String payKey) {
