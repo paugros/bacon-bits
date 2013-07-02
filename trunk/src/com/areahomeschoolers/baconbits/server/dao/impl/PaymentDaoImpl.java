@@ -1,10 +1,10 @@
 package com.areahomeschoolers.baconbits.server.dao.impl;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -38,7 +38,6 @@ import com.paypal.svcs.types.common.RequestEnvelope;
 
 @Repository
 public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
-
 	private final class AdjustmentMapper implements RowMapper<Adjustment> {
 		@Override
 		public Adjustment mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -81,6 +80,8 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			return payment;
 		}
 	}
+
+	private Properties payPalProperties;
 
 	@Autowired
 	public PaymentDaoImpl(DataSource dataSource) {
@@ -233,6 +234,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 
 		data.setPayKey(payResponse.getPayKey());
 		data.setPaymentExecStatus(payResponse.getPaymentExecStatus());
+		data.setAuthorizationUrl(payPalProperties.getProperty("service.RedirectURL") + "_ap-payment&paykey=" + payResponse.getPayKey());
 
 		return data;
 	}
@@ -330,55 +332,45 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		return a;
 	}
 
-	// private PaypalData makePayment(Payment p) {
-	// PaypalData data = new PaypalData();
+	private Properties getPayPalProperties() {
+		if (payPalProperties == null) {
+			Properties p = new Properties();
+			if (ServerContext.isLive()) {
+				// account email: weare.home.educators@gmail.com
+				p.setProperty("acct1.UserName", "weare.home.educators_api1.gmail.com");
+				p.setProperty("acct1.Password", "BZFADA4CXJSCHYW8");
+				p.setProperty("acct1.Signature", "AFcWxV21C7fd0v3bYYYRCpSSRl31AIiJDk-qOGV.J6VfFcbztTiAOVoS");
+				p.setProperty("acct1.AppId", "APP-4NF95723S77525228");
+				p.setProperty("mode", "live");
+				p.setProperty("service.RedirectURL", "https://www.paypal.com/webscr&cmd=");
+			} else {
+				// account email: paul.a_1343673136_biz@gmail.com
+				p.setProperty("acct1.UserName", "paul.a_1343673136_biz_api1.gmail.com");
+				p.setProperty("acct1.Password", "1343673159");
+				p.setProperty("acct1.Signature", "AirQtU1053N9JvGp9xtKZtxvbZojAv39XGRp8tQ8KFG.CaL5sQWMC8F6");
+				p.setProperty("acct1.AppId", "APP-80W284485P519543T");
+				p.setProperty("mode", "sandbox");
+				p.setProperty("service.RedirectURL", "https://www.sandbox.paypal.com/webscr&cmd=");
+			}
 
-	// ServiceEnvironment environment = ServerContext.isLive() ? ServiceEnvironment.PRODUCTION : ServiceEnvironment.SANDBOX;
-	//
-	// try {
-	// StringBuilder url = new StringBuilder();
-	// url.append(ServerContext.getBaseUrl() + "#page=" + p.getReturnPage());
-	// String returnURL = url.toString() + "&ps=return&payKey=${payKey}";
-	// String cancelURL = url.toString() + "&ps=cancel";
-	// String ipnURL = ServerContext.getBaseUrl() + "baconbits/service/ipn";
-	//
-	// SimplePay payment = new SimplePay();
-	// // always the same
-	// payment.setCredentialObj(paypal);
-	// payment.setUserIp(ServerContext.getRequest().getRemoteAddr());
-	// payment.setApplicationName("weare.home.educators");
-	// payment.setCurrencyCode(CurrencyCodes.USD);
-	// payment.setLanguage("en_US");
-	// payment.setEnv(environment);
-	// if (!ServerContext.isLive()) {
-	// payment.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343833982
-	// }
-	//
-	// payment.setCancelUrl(cancelURL);
-	// payment.setReturnUrl(returnURL);
-	// payment.setIpnURL(ipnURL);
-	// payment.setMemo(p.getMemo());
-	//
-	// Receiver receiver = new Receiver();
-	// receiver.setAmount(p.getAmount());
-	// if (ServerContext.isLive()) {
-	// receiver.setEmail("weare.home.educators@gmail.com");
-	// } else {
-	// receiver.setEmail("paul.a_1343673136_biz@gmail.com");
-	// }
-	// receiver.setPaymentType(PaymentType.SERVICE);
-	// payment.setReceiver(receiver);
-	//
-	// PayResponse payResponse = payment.makeRequest();
-	// data.setPayKey(payResponse.getPayKey());
-	// data.setPaymentExecStatus(payResponse.getPaymentExecStatus().toString());
-	// return data;
-	// // System.out.println("PaymentExecStatus:" + payResponse.getPaymentExecStatus().toString());
-	// } catch (Exception e) {
-	//
-	// }
-	// return data;
-	// }
+			p.setProperty("http.ConnectionTimeOut", "5000");
+			p.setProperty("http.Retry", "2");
+			p.setProperty("http.ReadTimeOut", "30000");
+			p.setProperty("http.MaxConnection", "100");
+			p.setProperty("http.IPAddress", "127.0.0.1");
+			p.setProperty("http.UseProxy", "false");
+			p.setProperty("http.ProxyPort", "8080");
+			p.setProperty("http.ProxyHost", "127.0.0.1");
+			p.setProperty("http.ProxyUserName", "null");
+			p.setProperty("http.ProxyPassword", "null");
+			p.setProperty("http.GoogleAppEngine", "true");
+
+			p.setProperty("service.DevCentralURL", "https://developer.paypal.com");
+			payPalProperties = p;
+		}
+
+		return payPalProperties;
+	}
 
 	private PayResponse makePayPalApiCall(PayRequest payRequest) {
 		Logger logger = Logger.getLogger(this.getClass().toString());
@@ -386,13 +378,8 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		// ## Creating service wrapper object
 		// Creating service wrapper object to make API call and loading
 		// configuration file for your credentials and endpoint
-		AdaptivePaymentsService service = null;
-		String properties = ServerContext.isLive() ? "/WEB-INF/paypal_production.properties" : "/WEB-INF/paypal_development.properties";
-		try {
-			service = new AdaptivePaymentsService(properties);
-		} catch (IOException e) {
-			logger.severe("Error Message : " + e.getMessage());
-		}
+
+		AdaptivePaymentsService service = new AdaptivePaymentsService(getPayPalProperties());
 		PayResponse payResponse = null;
 		try {
 			// ## Making API call
@@ -400,7 +387,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			// wrapper object
 			payResponse = service.pay(payRequest);
 		} catch (Exception e) {
-			logger.severe("Error Message : " + e.getMessage());
+			logger.severe("Error Message: " + e.getMessage());
 		}
 
 		// ## Accessing response parameters
@@ -408,22 +395,17 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		// response object as shown below
 		// ### Success values
 		if (payResponse.getResponseEnvelope().getAck().getValue().equalsIgnoreCase("Success")) {
-
 			// The pay key, which is a token you use in other Adaptive
 			// Payment APIs (such as the Refund Method) to identify this
 			// payment. The pay key is valid for 3 hours; the payment must
 			// be approved while the pay key is valid.
-			logger.info("Pay Key : " + payResponse.getPayKey());
+			// logger.info("Pay Key : " + payResponse.getPayKey());
 
 			// Once you get success response, user has to redirect to PayPal
 			// for the payment. Construct redirectURL as follows,
 			// `redirectURL=https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey="
 			// + payResponse.getPayKey();`
-		}
-
-		// ### Error Values
-		// Access error values from error list using getter methods
-		else {
+		} else {
 			logger.severe("API Error Message : " + payResponse.getError().get(0).getMessage());
 		}
 		return payResponse;

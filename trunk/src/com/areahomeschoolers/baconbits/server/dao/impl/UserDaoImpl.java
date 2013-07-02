@@ -771,7 +771,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 			String sql = "insert into groups (groupName, description, isOrganization, organizationId, startDate, ";
 			sql += "shortName, orgDomain, orgSubDomain, endDate) ";
-			sql += "values(:groupName, :description, :organization, :organizationId, :startDate, ";
+			sql += "values(:groupName, :description, :organization, :owningOrgId, :startDate, ";
 			sql += ":shortName, :orgDomain, :orgSubDomain, :endDate)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
