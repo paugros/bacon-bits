@@ -375,38 +375,16 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 	private PayResponse makePayPalApiCall(PayRequest payRequest) {
 		Logger logger = Logger.getLogger(this.getClass().toString());
 
-		// ## Creating service wrapper object
-		// Creating service wrapper object to make API call and loading
-		// configuration file for your credentials and endpoint
-
 		AdaptivePaymentsService service = new AdaptivePaymentsService(getPayPalProperties());
 		PayResponse payResponse = null;
 		try {
-			// ## Making API call
-			// Invoke the appropriate method corresponding to API in service
-			// wrapper object
 			payResponse = service.pay(payRequest);
 		} catch (Exception e) {
 			logger.severe("Error Message: " + e.getMessage());
 		}
 
-		// ## Accessing response parameters
-		// You can access the response parameters using getter methods in
-		// response object as shown below
-		// ### Success values
-		if (payResponse.getResponseEnvelope().getAck().getValue().equalsIgnoreCase("Success")) {
-			// The pay key, which is a token you use in other Adaptive
-			// Payment APIs (such as the Refund Method) to identify this
-			// payment. The pay key is valid for 3 hours; the payment must
-			// be approved while the pay key is valid.
-			// logger.info("Pay Key : " + payResponse.getPayKey());
-
-			// Once you get success response, user has to redirect to PayPal
-			// for the payment. Construct redirectURL as follows,
-			// `redirectURL=https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey="
-			// + payResponse.getPayKey();`
-		} else {
-			logger.severe("API Error Message : " + payResponse.getError().get(0).getMessage());
+		if (!payResponse.getResponseEnvelope().getAck().getValue().equalsIgnoreCase("Success")) {
+			logger.severe("API Error Message: " + payResponse.getError().get(0).getMessage());
 		}
 		return payResponse;
 	}
