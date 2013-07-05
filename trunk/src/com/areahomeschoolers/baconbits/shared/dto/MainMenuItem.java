@@ -3,7 +3,9 @@ package com.areahomeschoolers.baconbits.shared.dto;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MainMenuItem extends EntityDto<MainMenuItem> implements HasGroupOwnership {
+import com.areahomeschoolers.baconbits.shared.Common;
+
+public class MainMenuItem extends EntityDto<MainMenuItem> implements HasGroupOwnership, HasOrdinal {
 
 	private static final long serialVersionUID = 1L;
 	private String name;
@@ -15,6 +17,7 @@ public class MainMenuItem extends EntityDto<MainMenuItem> implements HasGroupOwn
 	private Integer groupId;
 	private int addedById;
 	private Date addedDate;
+	private int ordinal;
 
 	// aux
 	private ArrayList<MainMenuItem> subItems = new ArrayList<MainMenuItem>();
@@ -52,6 +55,11 @@ public class MainMenuItem extends EntityDto<MainMenuItem> implements HasGroupOwn
 	}
 
 	@Override
+	public int getOrdinal() {
+		return ordinal;
+	}
+
+	@Override
 	public int getOwningOrgId() {
 		return owningOrgId;
 	}
@@ -75,6 +83,10 @@ public class MainMenuItem extends EntityDto<MainMenuItem> implements HasGroupOwn
 		return subItems != null && !subItems.isEmpty();
 	}
 
+	public boolean isSubMenu() {
+		return Common.isNullOrBlank(url) && Common.isNullOrBlank(articleIds);
+	}
+
 	public void setAddedById(int addedById) {
 		this.addedById = addedById;
 	}
@@ -94,6 +106,11 @@ public class MainMenuItem extends EntityDto<MainMenuItem> implements HasGroupOwn
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	@Override
+	public void setOrdinal(int ordinal) {
+		this.ordinal = ordinal;
 	}
 
 	@Override

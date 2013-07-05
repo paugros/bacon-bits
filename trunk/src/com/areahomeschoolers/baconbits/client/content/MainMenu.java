@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
@@ -14,18 +15,20 @@ import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -40,7 +43,7 @@ public final class MainMenu extends MenuBar {
 		} else {
 			item = "<a href=\"" + Url.getGwtCodeServerAsQueryString() + "#" + url + "\" class=menuLink>" + name + "</a>";
 		}
-		MenuItem mi = mb.addItem(item, true, new Command() {
+		MenuItem mi = mb.addItem(item, true, new ScheduledCommand() {
 			@Override
 			public void execute() {
 			}
@@ -63,7 +66,7 @@ public final class MainMenu extends MenuBar {
 		addCloseHandler(new CloseHandler<PopupPanel>() {
 			@Override
 			public void onClose(CloseEvent<PopupPanel> event) {
-				Scheduler.get().scheduleDeferred(new Command() {
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 					@Override
 					public void execute() {
 						handleClose();
@@ -72,7 +75,7 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
-		addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this);
+		addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this, null, 0);
 		addItem("Events", getEventsMenu());
 		addItem("Book Store", getBooksMenu());
 		if (Application.isAuthenticated() && Application.isSystemAdministrator()) {
@@ -98,12 +101,12 @@ public final class MainMenu extends MenuBar {
 		return super.addItem(text, popup);
 	}
 
-	private void addDynamicItems(List<MainMenuItem> items, MenuBar parent) {
+	private void addDynamicItems(final List<MainMenuItem> items, MenuBar parentMenu, final MainMenuItem parentItem, int depth) {
 		for (MainMenuItem item : items) {
-			if (item.hasChildren()) {
+			if (item.isSubMenu()) {
 				final MenuBar menu = new MenuBar(true);
-				addDynamicItems(item.getItems(), menu);
-				parent.addItem(item.getName(), menu);
+				addDynamicItems(item.getItems(), menu, item, depth + 1);
+				parentMenu.addItem(item.getName(), menu);
 			} else {
 				String url = "";
 				if (item.getArticleIds() != null) {
@@ -111,7 +114,26 @@ public final class MainMenu extends MenuBar {
 				} else {
 					url = item.getUrl();
 				}
-				addLinkToMenu(parent, item.getName(), url);
+				addLinkToMenu(parentMenu, item.getName(), url);
+			}
+		}
+
+		if (Application.administratorOfCurrentOrg()) {
+			ScheduledCommand scm = new ScheduledCommand() {
+				@Override
+				public void execute() {
+					MainMenuEditDialog dialog = new MainMenuEditDialog(items, parentItem);
+					dialog.center();
+				}
+			};
+
+			if (depth == 0) {
+				Image edit = new Image(MainImageBundle.INSTANCE.edit());
+				edit.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
+				parentMenu.addItem("<span style=\"vertical-align: middle;\">" + edit.toString() + " Edit</span>", true, scm);
+			} else {
+				parentMenu.addSeparator();
+				parentMenu.addItem("Edit This Menu", scm);
 			}
 		}
 	}
@@ -120,10 +142,24 @@ public final class MainMenu extends MenuBar {
 		MenuBar menu = new MenuBar(true);
 
 		addLinkToMenu(menu, "Add Article", PageUrl.article(0));
+		addLinkToMenu(menu, "List Articles", PageUrl.articleList());
 		addLinkToMenu(menu, "Add User", PageUrl.user(0));
 		addLinkToMenu(menu, "List Groups", PageUrl.userGroupList());
 
-		menu.addItem("Expire Session", new Command() {
+		MenuBar pol = new MenuBar(true);
+		for (GroupPolicy gp : GroupPolicy.values()) {
+			int id = Application.getCurrentOrg().getPolicyId(gp);
+			String url = PageUrl.article(id);
+			if (id == 0) {
+				url += "&gp=" + gp.toString();
+			}
+			addLinkToMenu(pol, gp.getTitle(), url);
+		}
+		menu.addItem("Group Policies", pol);
+
+		menu.addSeparator();
+
+		menu.addItem("Expire Session", new ScheduledCommand() {
 			@Override
 			public void execute() {
 				LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
@@ -145,7 +181,7 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
-		menu.addItem("Reload Page", new Command() {
+		menu.addItem("Reload Page", new ScheduledCommand() {
 			@Override
 			public void execute() {
 				Application.reloadPage();

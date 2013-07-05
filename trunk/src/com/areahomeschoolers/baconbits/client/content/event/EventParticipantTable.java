@@ -47,7 +47,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class EventParticipantTable extends EntityCellTable<EventParticipant, EventArg, ParticipantColumn> {
 	public enum ParticipantColumn implements EntityCellTableColumn<ParticipantColumn> {
-		ATTENDED("Attended"), EVENT("Event"), EVENT_DATE("Event date"), REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE(
+		ATTENDED("Attended"), EVENT("Event"), EVENT_DATE("Event Date"), REGISTRANT_NAME("Registrant"), PARTICIPANT_NAME("Participant"), ADDED_DATE("Added"), AGE(
 				"Age"), PRICE("Price"), TOTALED_PRICE("Price"), FIELDS("Fields"), STATUS("Status"), EDIT_STATUS("");
 
 		private String title;

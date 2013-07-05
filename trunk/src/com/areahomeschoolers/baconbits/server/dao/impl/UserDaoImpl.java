@@ -255,6 +255,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (userId > 0 && !ServerContext.getCurrentUser().isSwitched()) {
 			map.put(userId, new Date());
 		}
+
 		return map;
 	}
 
@@ -281,6 +282,12 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				return null;
 			}
 		});
+	}
+
+	@Override
+	public void deleteMenuItem(MainMenuItem item) {
+		String sql = "delete from menuItems where id = ?";
+		update(sql, item.getId());
 	}
 
 	@Override
@@ -339,6 +346,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				m.setParentNodeId(rs.getInt("parentNodeId"));
 				m.setUrl(rs.getString("url"));
 				m.setVisibilityLevelId(rs.getInt("visibilityLevelId"));
+				m.setOrdinal(rs.getInt("ordinal"));
 
 				treeMap.put(m.getId(), m);
 
@@ -718,14 +726,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(item);
 
 		if (item.isSaved()) {
-			String sql = "update menuItems set name = :name, articleIds = :articleIds, url = :url, parentNodeId = :parentNodeId, ";
-			sql += "organizationId = :organizationId, visibilityLevelId = :visibilityLevelId, groupId = :groupId where id = :id";
+			String sql = "update menuItems set name = :name, articleIds = :articleIds, url = :url, parentNodeId = :parentNodeId, ordinal = :ordinal, ";
+			sql += "organizationId = :owningOrgId, visibilityLevelId = :visibilityLevelId, groupId = :groupId where id = :id";
 			update(sql, namedParams);
 		} else {
 			item.setAddedById(ServerContext.getCurrentUserId());
 			item.setOwningOrgId(ServerContext.getCurrentOrgId());
 			String sql = "insert into menuItems (name, articleIds, url, parentNodeId, organizationId, visibilityLevelId, groupId, addedById, ordinal) ";
-			sql += "values(:name, :articleIds, :url, :parentNodeId, :organizationId, :visibilityLevelId, :groupId, :addedById, :ordinal)";
+			sql += "values(:name, :articleIds, :url, :parentNodeId, :owningOrgId, :visibilityLevelId, :groupId, :addedById, 100)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -762,6 +770,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 		if (group.isSaved()) {
 			String sql = "update groups set groupName = :groupName, description = :description, startDate = :startDate, ";
+			sql += "publicGreetingId = :publicGreetingId, privateGreetingId = :privateGreetingId, generalPolicyId = :generalPolicyId, ";
+			sql += "eventPolicyId = :eventPolicyId, coopPolicyId, = :coopPolicyId, ";
 			sql += "shortName = :shortName, orgDomain = :orgDomain, orgSubDomain = :orgSubDomain, endDate = :endDate where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -839,6 +849,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		return null;
+	}
+
+	@Override
+	public void updateMenuOrdinals(ArrayList<MainMenuItem> items) {
+		for (MainMenuItem item : items) {
+			String sql = "update menuItems set ordinal = " + item.getOrdinal() + " where id = " + item.getId();
+			update(sql);
+		}
 	}
 
 	@Override
@@ -1040,6 +1058,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setShortName(rs.getString("shortName"));
 		group.setOrgDomain(rs.getString("orgDomain"));
 		group.setOrgSubDomain(rs.getString("orgSubDomain"));
+		group.setPublicGreetingId(rs.getInt("publicGreetingId"));
+		group.setPrivateGreetingId(rs.getInt("privateGreetingId"));
+		group.setGeneralPolicyId(rs.getInt("generalPolicyId"));
+		group.setEventPolicyId(rs.getInt("eventPolicyId"));
+		group.setCoopPolicyId(rs.getInt("coopPolicyId"));
 		return group;
 	}
 

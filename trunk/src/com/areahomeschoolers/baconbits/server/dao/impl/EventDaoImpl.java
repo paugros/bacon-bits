@@ -35,6 +35,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
+import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
@@ -50,6 +51,7 @@ import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 @Repository
 public class EventDaoImpl extends SpringWrapper implements EventDao {
@@ -247,9 +249,18 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			pd.setMyUpcomingEvents(list(args));
 		}
 
-		int articleId = ServerContext.isAuthenticated() ? 68 : 6;
+		UserGroup org = ServerContext.getCurrentOrg();
+		int articleId = ServerContext.isAuthenticated() ? org.getPrivateGreetingId() : org.getPublicGreetingId();
 		ArticleDao articleDao = ServerContext.getDaoImpl("article");
-		pd.setIntro(articleDao.getById(articleId));
+		Article a = articleDao.getById(articleId);
+		if (a == null) {
+			a = new Article();
+			a.setTitle("Welcome!");
+			String text = "Welcome to " + ServerContext.getCurrentOrg().getGroupName() + ". ";
+			text += "Our site is still being constructed, but you can have a look around anyway.";
+			a.setArticle(text);
+		}
+		pd.setIntro(a);
 
 		return pd;
 	}

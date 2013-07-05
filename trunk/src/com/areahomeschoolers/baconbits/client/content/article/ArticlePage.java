@@ -22,8 +22,10 @@ import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -189,6 +191,13 @@ public class ArticlePage implements Page {
 		form.initialize();
 
 		if (!article.isSaved()) {
+			String policy = Url.getParameter("gp");
+			if (!Common.isNullOrBlank(policy)) {
+				try {
+					article.setGroupPolicy(GroupPolicy.valueOf(policy));
+				} catch (Exception e) {
+				}
+			}
 			form.configureForAdd(fieldTable);
 		} else {
 			form.emancipate();
@@ -214,6 +223,9 @@ public class ArticlePage implements Page {
 			@Override
 			protected void doOnSuccess(Article a) {
 				if (!Url.isParamValidId("articleId")) {
+					if (article.getGroupPolicy() != null) {
+						Application.getCurrentOrg().setPolicyId(article.getGroupPolicy(), article.getId());
+					}
 					HistoryToken.set(PageUrl.article(a.getId()));
 				} else {
 					article = a;

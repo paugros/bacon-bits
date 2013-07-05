@@ -24,6 +24,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("service/user")
 public interface UserService extends RemoteService {
+	public void deleteMenuItem(MainMenuItem item);
+
 	public User getById(int userId);
 
 	public ArrayList<MainMenuItem> getMenuItems(ArgMap<UserArg> args);
@@ -51,6 +53,8 @@ public interface UserService extends RemoteService {
 	public void sendEmail(Email email);
 
 	public void switchToUser(int userId);
+
+	public void updateMenuOrdinals(ArrayList<MainMenuItem> items);
 
 	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add);
 

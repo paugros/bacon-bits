@@ -19,6 +19,9 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 public interface UserDao {
+	@PreAuthorize("hasRole('ORGANIZATION_ADMINISTRATORS')")
+	public void deleteMenuItem(MainMenuItem item);
+
 	public void doUpdateUserActivity(int userId);
 
 	public User getById(int userId);
@@ -43,16 +46,20 @@ public interface UserDao {
 
 	public ServerResponseData<User> save(User user);
 
+	@PreAuthorize("hasRole('ORGANIZATION_ADMINISTRATORS')")
 	public MainMenuItem saveMenuItem(MainMenuItem item);
 
 	public PrivacyPreference savePrivacyPreference(PrivacyPreference privacyPreference);
 
-	@PreAuthorize("hasRole('SYSTEM_ADMINISTRATORS')")
+	@PreAuthorize("hasRole('ORGANIZATION_ADMINISTRATORS')")
 	public UserGroup saveUserGroup(UserGroup group);
 
 	public boolean sendPasswordResetEmail(String username);
 
 	public User setPasswordFromDigest(int id, String digest);
+
+	@PreAuthorize("hasRole('ORGANIZATION_ADMINISTRATORS')")
+	public void updateMenuOrdinals(ArrayList<MainMenuItem> items);
 
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add);

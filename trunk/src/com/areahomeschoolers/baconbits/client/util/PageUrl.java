@@ -11,6 +11,10 @@ public class PageUrl {
 		return "page=ArticleGroup&articleIds=" + ids;
 	}
 
+	public static String articleList() {
+		return "page=ArticleList";
+	}
+
 	public static String bookManagement() {
 		return "page=BookManagement";
 	}

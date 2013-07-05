@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class EventVolunteerTable extends EntityCellTable<Data, EventArg, VolunteerColumn> {
 	public enum VolunteerColumn implements EntityCellTableColumn<VolunteerColumn> {
-		FULFILLED("Fulfilled"), FULFILLED_READ_ONLY("Fulfilled"), EVENT("Event"), EVENT_DATE("Event date"), POSITION("Position"), NAME("Name");
+		FULFILLED("Fulfilled"), FULFILLED_READ_ONLY("Fulfilled"), EVENT("Event"), EVENT_DATE("Event Date"), POSITION("Position"), NAME("Name");
 
 		private String title;
 

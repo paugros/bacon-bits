@@ -41,8 +41,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
-		IMAGE("Image"), USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE(
-				"Price"), PRICE("Price"), CONTACT("Contact seller"), DELETE(""), DELETE_PURCHASE("");
+		IMAGE("Image"), USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade Level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE(
+				"Price"), PRICE("Price"), CONTACT("Contact Seller"), DELETE(""), DELETE_PURCHASE("");
 
 		private String title;
 
