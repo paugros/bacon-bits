@@ -176,8 +176,6 @@ public class HomePage implements Page {
 		grid.setWidget(0, 2, rightPanel);
 		grid.getCellFormatter().setWidth(0, 0, "250px");
 		grid.getCellFormatter().setWidth(0, 2, "250px");
-		// grid.getCellFormatter().getElement(0, 0).getStyle().setBackgroundColor("#d8e6f7");
-		// grid.getCellFormatter().getElement(0, 2).getStyle().setBackgroundColor("#ddf3da");
 		grid.getCellFormatter().setVerticalAlignment(0, 0, HasVerticalAlignment.ALIGN_TOP);
 		grid.getCellFormatter().setVerticalAlignment(0, 1, HasVerticalAlignment.ALIGN_TOP);
 		grid.getCellFormatter().setVerticalAlignment(0, 2, HasVerticalAlignment.ALIGN_TOP);
@@ -191,7 +189,7 @@ public class HomePage implements Page {
 				// upcoming
 				VerticalPanel uvp = new VerticalPanel();
 				uvp.add(new EventModulePanel("UPCOMING EVENTS", pageData.getUpcomingEvents(), null));
-				uvp.addStyleName("homePageModule");
+				uvp.addStyleName("homePageModule homePageEventPanel");
 
 				VerticalPanel vvp = new VerticalPanel();
 				vvp.setSpacing(8);
@@ -211,7 +209,7 @@ public class HomePage implements Page {
 				// community
 				VerticalPanel cvp = new VerticalPanel();
 				cvp.add(new EventModulePanel("COMMUNITY EVENTS", pageData.getCommunityEvents(), "&showCommunity=true"));
-				cvp.addStyleName("homePageModule");
+				cvp.addStyleName("homePageModule homePageEventPanel");
 
 				String ftext = "<iframe src=\"http://wms.assoc-amazon.com/20070822/US/html/searchbox_20.html?t=httpwhediment-20\" width=\"120\" height=\"90\" frameborder=\"0\" scrolling=\"no\"></iframe>";
 				SimplePanel sp = new SimplePanel(new HTML(ftext));

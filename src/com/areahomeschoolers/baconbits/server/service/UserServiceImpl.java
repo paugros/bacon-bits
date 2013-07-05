@@ -40,6 +40,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 	}
 
 	@Override
+	public void deleteMenuItem(MainMenuItem item) {
+		dao.deleteMenuItem(item);
+	}
+
+	@Override
 	public User getById(int userId) {
 		return dao.getById(userId);
 	}
@@ -139,6 +144,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 	@Override
 	public void switchToUser(int userId) {
 		ServerContext.switchToUser(userId);
+	}
+
+	@Override
+	public void updateMenuOrdinals(ArrayList<MainMenuItem> items) {
+		dao.updateMenuOrdinals(items);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.content.Layout;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleGroupPage;
+import com.areahomeschoolers.baconbits.client.content.article.ArticleListPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
 import com.areahomeschoolers.baconbits.client.content.book.BookManagementPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookReceiptPage;
@@ -94,6 +95,10 @@ public final class Application implements ValueChangeHandler<String> {
 
 	public static boolean administratorOfAny(Integer... groupIds) {
 		return isAuthenticated() && applicationData.getCurrentUser().administratorOfAny(groupIds);
+	}
+
+	public static boolean administratorOfCurrentOrg() {
+		return administratorOf(getCurrentOrgId());
 	}
 
 	public static ApplicationData getApplicationData() {
@@ -228,6 +233,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new EventCalendarPage(vp);
 		} else if ("RegistrationManagement".equals(page)) {
 			new RegistrationManagementPage(vp);
+		} else if ("ArticleList".equals(page)) {
+			new ArticleListPage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

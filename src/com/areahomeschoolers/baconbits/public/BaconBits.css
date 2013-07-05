@@ -168,6 +168,17 @@ img {
 	background: #e3e8f3;
 }
 
+.mainMenuItemEdit {
+	-webkit-border-radius: 6px; 
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+	width: 200px;
+	white-space: nowrap;
+	overflow: hidden;
+	padding: 10px;
+	background-color: #e3e8f3;
+}
+
 .selectedWidget {
 	background-color: #77b4e8;
 }
@@ -292,21 +303,16 @@ img {
 	display: none; 
 }
 
-/* overrides style from gwt-dnd.css */
-.verticalDragHandle {
-	background-color: #67a7e3;
-	vertical-align: middle;
-	border-right: 1px solid #67a7e3;
-	text-align: center;
-	font-size: 1px;
-	width: 10px;
-}
-
 .listBoxTitleOption {
 	color: black;
 	background-color: #cce2f8;
 	font-weight: bold;
 	width: 100%;
+}
+
+.homePageEventPanel {
+	min-width: 250px;
+	min-height: 310px;
 }
 
 .homePageModule {

@@ -45,6 +45,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			article.setVisibilityLevel(rs.getString("visibilityLevel"));
 			article.setVisibilityLevelId(rs.getInt("visibilityLevelId"));
 			article.setOwningOrgId(rs.getInt("owningOrgId"));
+			article.setAddedByFirstName(rs.getString("firstName"));
+			article.setAddedByLastName(rs.getString("lastName"));
 			return article;
 		}
 	}
@@ -55,10 +57,11 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 	}
 
 	public String createSqlBase() {
-		String sql = "select a.*, g.groupName, l.visibilityLevel, \n";
+		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, \n";
 		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
 		sql += "(select count(id) from tagArticleMapping where articleId = a.id) as tagCount \n";
 		sql += "from articles a \n";
+		sql += "join users u on u.id = a.addedById \n";
 		sql += "left join groups g on g.id = a.groupId \n";
 		sql += "join itemVisibilityLevels l on l.id = a.visibilityLevelId \n";
 
@@ -93,8 +96,14 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int top = args.getInt(ArticleArg.MOST_RECENT);
 		String idString = args.getString(ArticleArg.IDS);
+		int orgId = args.getInt(ArticleArg.OWNING_ORG_ID);
 
 		String sql = createSqlBase();
+
+		if (orgId > 0) {
+			sql += "and a.owningOrgId = ? ";
+			sqlArgs.add(orgId);
+		}
 
 		if (!Common.isNullOrBlank(idString)) {
 			List<String> scrubbedIds = new ArrayList<String>();
@@ -141,6 +150,12 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			update(sql, namedParams, keys);
 
 			article.setId(ServerUtils.getIdFromKeys(keys));
+
+			if (article.getGroupPolicy() != null) {
+				sql = "update groups set " + article.getGroupPolicy().getColumn() + " = ? where id = ?";
+				update(sql, article.getId(), article.getOwningOrgId());
+				ServerContext.getCurrentOrg().setPolicyId(article.getGroupPolicy(), article.getId());
+			}
 		}
 
 		return getById(article.getId());

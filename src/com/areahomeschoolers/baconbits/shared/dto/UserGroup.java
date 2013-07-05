@@ -6,6 +6,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.areahomeschoolers.baconbits.shared.Common;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership {
@@ -45,6 +47,27 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 		public int getId() {
 			return id;
+		}
+	}
+
+	public enum GroupPolicy implements IsSerializable, Serializable {
+		PUBLIC_GREETING("Public Greeting", "publicGreetingId"), PRIVATE_GREETING("Private Greeting", "privateGreetingId"), GENERAL_POLICY("General Policy",
+				"generalPolicyId"), EVENT_POLICY("Event Policy", "eventPolicyId"), COOP_POLICY("Co-op Policy", "coopPolicyId");
+
+		private String column;
+		private String title;
+
+		private GroupPolicy(String title, String column) {
+			this.column = column;
+			this.title = title;
+		}
+
+		public String getColumn() {
+			return column;
+		}
+
+		public String getTitle() {
+			return title;
 		}
 	}
 
@@ -95,6 +118,11 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private String shortName;
 	private String orgDomain;
 	private String orgSubDomain;
+	private int privateGreetingId;
+	private int publicGreetingId;
+	private int generalPolicyId;
+	private int eventPolicyId;
+	private int coopPolicyId;
 
 	// aux
 	private String organizationName;
@@ -110,12 +138,24 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return isAdministrator;
 	}
 
+	public int getCoopPolicyId() {
+		return coopPolicyId;
+	}
+
 	public String getDescription() {
 		return description;
 	}
 
 	public Date getEndDate() {
 		return endDate;
+	}
+
+	public int getEventPolicyId() {
+		return eventPolicyId;
+	}
+
+	public int getGeneralPolicyId() {
+		return generalPolicyId;
 	}
 
 	@Override
@@ -148,6 +188,31 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return owningOrgId;
 	}
 
+	public int getPolicyId(GroupPolicy policy) {
+		switch (policy) {
+		case COOP_POLICY:
+			return coopPolicyId;
+		case EVENT_POLICY:
+			return eventPolicyId;
+		case GENERAL_POLICY:
+			return generalPolicyId;
+		case PRIVATE_GREETING:
+			return privateGreetingId;
+		case PUBLIC_GREETING:
+			return publicGreetingId;
+		default:
+			return 0;
+		}
+	}
+
+	public int getPrivateGreetingId() {
+		return privateGreetingId;
+	}
+
+	public int getPublicGreetingId() {
+		return publicGreetingId;
+	}
+
 	public String getShortName() {
 		return shortName;
 	}
@@ -156,8 +221,24 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return startDate;
 	}
 
+	public boolean isActive() {
+		return Common.isActive(new Date(), endDate);
+	}
+
+	public boolean isAdministrator() {
+		return isAdministrator;
+	}
+
+	public boolean isOrganization() {
+		return isOrganization;
+	}
+
 	public void setAdministrator(boolean isAdministrator) {
 		this.isAdministrator = isAdministrator;
+	}
+
+	public void setCoopPolicyId(int coopPolicyId) {
+		this.coopPolicyId = coopPolicyId;
 	}
 
 	public void setDescription(String description) {
@@ -166,6 +247,14 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public void setEventPolicyId(int eventPolicyId) {
+		this.eventPolicyId = eventPolicyId;
+	}
+
+	public void setGeneralPolicyId(int generalPolicyId) {
+		this.generalPolicyId = generalPolicyId;
 	}
 
 	@Override
@@ -196,6 +285,30 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	@Override
 	public void setOwningOrgId(int organizationId) {
 		this.owningOrgId = organizationId;
+	}
+
+	public void setPolicyId(GroupPolicy policy, int id) {
+		switch (policy) {
+		case COOP_POLICY:
+			coopPolicyId = id;
+		case EVENT_POLICY:
+			eventPolicyId = id;
+		case GENERAL_POLICY:
+			generalPolicyId = id;
+		case PRIVATE_GREETING:
+			privateGreetingId = id;
+		case PUBLIC_GREETING:
+			publicGreetingId = id;
+		default:
+		}
+	}
+
+	public void setPrivateGreetingId(int privateGreetingId) {
+		this.privateGreetingId = privateGreetingId;
+	}
+
+	public void setPublicGreetingId(int publicGreetingId) {
+		this.publicGreetingId = publicGreetingId;
 	}
 
 	public void setShortName(String shortName) {

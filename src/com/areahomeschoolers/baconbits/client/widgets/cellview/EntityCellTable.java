@@ -939,7 +939,11 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 				data.setIndex(data.getIndex() - 1);
 			}
 		}
-		super.removeColumn(index - 1);
+
+		if (index > 0) {
+			index--;
+		}
+		super.removeColumn(index);
 		columnDataMap.remove(removed);
 	}
 

@@ -6,11 +6,13 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
+import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -22,6 +24,8 @@ import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.RowStyles;
@@ -67,6 +71,44 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 		setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.DESCRIPTION);
 
 		disablePaging();
+	}
+
+	public void addStatusFilterBox() {
+		final DefaultListBox filterBox = getTitleBar().addFilterListControl();
+		filterBox.addItem("Active");
+		filterBox.addItem("Inactive");
+		filterBox.addItem("All");
+		filterBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				switch (filterBox.getSelectedIndex()) {
+				case 0:
+					for (UserGroup group : getFullList()) {
+						setItemVisible(group, group.isActive(), false, false, false);
+					}
+					refreshForCurrentState();
+					break;
+				case 1:
+					for (UserGroup group : getFullList()) {
+						setItemVisible(group, !group.isActive(), false, false, false);
+					}
+					refreshForCurrentState();
+					break;
+				case 2:
+					showAllItems();
+					break;
+				}
+			}
+		});
+		filterBox.setSelectedIndex(0);
+
+		addDataReturnHandler(new DataReturnHandler() {
+			@Override
+			public void onDataReturn() {
+				filterBox.fireEvent(new ChangeEvent() {
+				});
+			}
+		});
 	}
 
 	public User getUser() {

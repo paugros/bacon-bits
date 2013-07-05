@@ -3,6 +3,8 @@ package com.areahomeschoolers.baconbits.shared.dto;
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.content.document.HasDocuments;
+import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 
 public final class Article extends EntityDto<Article> implements HasDocuments, HasGroupOwnership {
 	private static final long serialVersionUID = 1L;
@@ -20,17 +22,28 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	private int owningOrgId;
 
 	// auxiliary
+	private String addedByFirstName;
+	private String addedByLastName;
 	private String visibilityLevel;
 	private String groupName;
 	private int documentCount;
 	private int tagCount;
+	private GroupPolicy groupPolicy;
 
 	public Article() {
 
 	}
 
+	public String getAddedByFirstName() {
+		return addedByFirstName;
+	}
+
 	public int getAddedById() {
 		return addedById;
+	}
+
+	public String getAddedByLastName() {
+		return addedByLastName;
 	}
 
 	public Date getAddedDate() {
@@ -67,6 +80,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return groupName;
 	}
 
+	public GroupPolicy getGroupPolicy() {
+		return groupPolicy;
+	}
+
 	@Override
 	public int getOwningOrgId() {
 		return owningOrgId;
@@ -101,8 +118,20 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return tagCount > 0;
 	}
 
+	public boolean isActive() {
+		return Common.isActive(new Date(), endDate);
+	}
+
+	public void setAddedByFirstName(String addedByFirstName) {
+		this.addedByFirstName = addedByFirstName;
+	}
+
 	public void setAddedById(int addedById) {
 		this.addedById = addedById;
+	}
+
+	public void setAddedByLastName(String addedByLastName) {
+		this.addedByLastName = addedByLastName;
 	}
 
 	public void setAddedDate(Date addedDate) {
@@ -128,6 +157,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	public void setGroupPolicy(GroupPolicy groupPolicy) {
+		this.groupPolicy = groupPolicy;
 	}
 
 	@Override

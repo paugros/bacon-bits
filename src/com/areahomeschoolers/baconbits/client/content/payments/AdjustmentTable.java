@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class AdjustmentTable extends EntityCellTable<Adjustment, PaymentArg, AdjustmentColumn> {
 	public enum AdjustmentColumn implements EntityCellTableColumn<AdjustmentColumn> {
-		TYPE("Adjustment type"), USER("User"), STATUS("Status"), ADDED_DATE("Added date"), DESCRIPTION("Description"), AMOUNT("Amount"), TOTALED_AMOUNT(
+		TYPE("Adjustment Type"), USER("User"), STATUS("Status"), ADDED_DATE("Added Date"), DESCRIPTION("Description"), AMOUNT("Amount"), TOTALED_AMOUNT(
 				"Amount");
 
 		private String title;

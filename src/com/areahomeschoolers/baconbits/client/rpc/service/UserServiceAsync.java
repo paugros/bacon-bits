@@ -19,9 +19,15 @@ import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface UserServiceAsync {
+	public void deleteMenuItem(MainMenuItem item, AsyncCallback<Void> callback);
+
 	public void getById(int userId, AsyncCallback<User> callback);
 
+	public void getMenuItems(ArgMap<UserArg> args, AsyncCallback<ArrayList<MainMenuItem>> callback);
+
 	public void getPageData(int userId, AsyncCallback<UserPageData> callback);
+
+	public void getPollData(AsyncCallback<PollResponseData> callback);
 
 	public void getUserByUsername(String username, AsyncCallback<User> callback);
 
@@ -33,11 +39,17 @@ public interface UserServiceAsync {
 
 	public void save(User user, AsyncCallback<ServerResponseData<User>> callback);
 
+	public void saveMenuItem(MainMenuItem item, AsyncCallback<MainMenuItem> callback);
+
+	public void savePrivacyPreference(PrivacyPreference privacyPreference, AsyncCallback<PrivacyPreference> callback);
+
 	public void saveUserGroup(UserGroup group, AsyncCallback<UserGroup> callback);
 
 	public void sendEmail(Email email, AsyncCallback<Void> callback);
 
 	public void switchToUser(int userId, AsyncCallback<Void> callback);
+
+	public void updateMenuOrdinals(ArrayList<MainMenuItem> items, AsyncCallback<Void> callback);
 
 	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add, AsyncCallback<Void> callback);
 
@@ -46,12 +58,4 @@ public interface UserServiceAsync {
 	public void updateUserGroupRelation(User u, UserGroup g, boolean add, AsyncCallback<Void> callback);
 
 	public void validatePassword(String password, AsyncCallback<ServerResponseData<String>> callback);
-
-	void getMenuItems(ArgMap<UserArg> args, AsyncCallback<ArrayList<MainMenuItem>> callback);
-
-	void getPollData(AsyncCallback<PollResponseData> callback);
-
-	void saveMenuItem(MainMenuItem item, AsyncCallback<MainMenuItem> callback);
-
-	void savePrivacyPreference(PrivacyPreference privacyPreference, AsyncCallback<PrivacyPreference> callback);
 }
