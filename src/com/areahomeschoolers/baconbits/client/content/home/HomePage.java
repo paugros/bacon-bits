@@ -194,14 +194,16 @@ public class HomePage implements Page {
 				VerticalPanel vvp = new VerticalPanel();
 				vvp.setSpacing(8);
 
-				Image image = new Image(MainImageBundle.INSTANCE.faceBook());
-				String text = "<p><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" target=\"_TOP\" ";
-				text += "style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; color: #3B5998; text-decoration: none;\" ";
-				text += "title=\"WeAre Home Educators\">WeAre Home Educators</a><br><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" title=\"WeAre Home Educators\">";
-				text += image.toString() + "</a></p>";
-
-				HTML fb = new HTML(text);
-				vvp.add(fb);
+				// Image image = new Image(MainImageBundle.INSTANCE.faceBook());
+				// String text = "<p><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" target=\"_TOP\" ";
+				// text +=
+				// "style=\"font-family: &quot;lucida grande&quot;,tahoma,verdana,arial,sans-serif; font-size: 11px; color: #3B5998; text-decoration: none;\" ";
+				// text +=
+				// "title=\"WeAre Home Educators\">WeAre Home Educators</a><br><a href=\"http://www.facebook.com/pages/WeAre-Home-Educators/111756708899702\" title=\"WeAre Home Educators\">";
+				// text += image.toString() + "</a></p>";
+				//
+				// HTML fb = new HTML(text);
+				// vvp.add(fb);
 				uvp.add(vvp);
 
 				eventPanel.setWidget(uvp);
