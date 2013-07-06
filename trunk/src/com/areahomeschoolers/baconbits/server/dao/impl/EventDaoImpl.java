@@ -250,7 +250,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		UserGroup org = ServerContext.getCurrentOrg();
-		int articleId = ServerContext.isAuthenticated() ? org.getPrivateGreetingId() : org.getPublicGreetingId();
+		Integer articleId = ServerContext.isAuthenticated() ? org.getPrivateGreetingId() : org.getPublicGreetingId();
+		if (articleId == null) {
+			articleId = 0;
+		}
 		ArticleDao articleDao = ServerContext.getDaoImpl("article");
 		Article a = articleDao.getById(articleId);
 		if (a == null) {
