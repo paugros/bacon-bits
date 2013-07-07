@@ -4,13 +4,11 @@ import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
-import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -22,14 +20,11 @@ import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -76,15 +71,18 @@ public final class MainMenu extends MenuBar {
 		});
 
 		addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this, null, 0);
+
 		addItem("Events", getEventsMenu());
 		addItem("Book Store", getBooksMenu());
 		if (Application.isAuthenticated() && Application.isSystemAdministrator()) {
 			addItem("People", getPeopleMenu());
 		}
+
 		if (Application.isAuthenticated()) {
 			addItem("My Items", getMyItemsMenu());
 		}
-		if (Application.isSystemAdministrator()) {
+
+		if (Application.administratorOfCurrentOrg()) {
 			addItem("Admin", getAdminMenu());
 		}
 
@@ -127,11 +125,7 @@ public final class MainMenu extends MenuBar {
 				}
 			};
 
-			if (depth == 0) {
-				Image edit = new Image(MainImageBundle.INSTANCE.edit());
-				edit.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
-				parentMenu.addItem("<span style=\"vertical-align: middle;\">" + edit.toString() + " Edit</span>", true, scm);
-			} else {
+			if (depth > 0) {
 				parentMenu.addSeparator();
 				parentMenu.addItem("Edit This Menu", scm);
 			}
@@ -146,6 +140,14 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "Add User", PageUrl.user(0));
 		addLinkToMenu(menu, "List Groups", PageUrl.userGroupList());
 
+		menu.addItem("Edit Main Menu", new ScheduledCommand() {
+			@Override
+			public void execute() {
+				MainMenuEditDialog dialog = new MainMenuEditDialog(Application.getApplicationData().getDynamicMenuItems(), null);
+				dialog.center();
+			}
+		});
+
 		MenuBar pol = new MenuBar(true);
 		for (GroupPolicy gp : GroupPolicy.values()) {
 			int id = Application.getCurrentOrg().getPolicyId(gp);
@@ -158,28 +160,6 @@ public final class MainMenu extends MenuBar {
 		menu.addItem("Group Policies", pol);
 
 		menu.addSeparator();
-
-		menu.addItem("Expire Session", new ScheduledCommand() {
-			@Override
-			public void execute() {
-				LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
-				loginService.logout(new Callback<Void>(false) {
-					@Override
-					protected void doOnSuccess(Void result) {
-						GWT.runAsync(new RunAsyncCallback() {
-							@Override
-							public void onFailure(Throwable caught) {
-							}
-
-							@Override
-							public void onSuccess() {
-								AlertDialog.alert("Session Expiration", new Label("Success."));
-							}
-						});
-					}
-				});
-			}
-		});
 
 		menu.addItem("Reload Page", new ScheduledCommand() {
 			@Override

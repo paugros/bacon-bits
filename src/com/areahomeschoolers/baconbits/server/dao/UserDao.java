@@ -28,7 +28,7 @@ public interface UserDao {
 
 	public ArrayList<MainMenuItem> getMenuItems(ArgMap<UserArg> args);
 
-	public UserGroup getOrgBySubDomain(String subDomain);
+	public UserGroup getOrgForCurrentRequest();
 
 	public UserPageData getPageData(int userId);
 

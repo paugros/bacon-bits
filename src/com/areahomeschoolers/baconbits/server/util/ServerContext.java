@@ -153,21 +153,8 @@ public class ServerContext implements ApplicationContextAware {
 			return;
 		}
 
-		// TODO change this default to citrus when we have it
-		String sd = "wearehomeeducators";
-
-		String cdn = tl.get().request.getServerName();
-		if (cdn != null) {
-			if (cdn.contains(".")) {
-				String[] parts = cdn.split("\\.");
-				sd = parts[0];
-			} else {
-				sd = cdn;
-			}
-		}
-
 		UserDao userDao = getDaoImpl("user");
-		getSession().setAttribute("org", userDao.getOrgBySubDomain(sd));
+		getSession().setAttribute("org", userDao.getOrgForCurrentRequest());
 	}
 
 	/**

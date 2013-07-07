@@ -365,16 +365,46 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
-	public UserGroup getOrgBySubDomain(String subDomain) {
-		ArgMap<UserGroupArg> args = new ArgMap<UserGroupArg>();
-		args.put(UserGroupArg.ORG_SUB_DOMAIN, subDomain);
+	public UserGroup getOrgForCurrentRequest() {
+		String subDomain = "";
+		String domain = "";
 
-		List<UserGroup> grps = listGroups(args);
-		if (!grps.isEmpty()) {
-			return grps.get(0);
+		String cdn = ServerContext.getRequest().getServerName();
+		if (cdn != null) {
+			if (cdn.contains(".")) {
+				String[] parts = cdn.split("\\.");
+				subDomain = parts[0];
+				domain = parts[parts.length - 2] + "." + parts[parts.length - 1];
+			} else {
+				subDomain = domain = cdn;
+			}
 		}
-		args.remove(UserGroupArg.ORG_SUB_DOMAIN);
+
+		// try sub-domain first
+		List<UserGroup> grps;
+		ArgMap<UserGroupArg> args = new ArgMap<UserGroupArg>();
+		if (!subDomain.isEmpty()) {
+			args.put(UserGroupArg.ORG_SUB_DOMAIN, subDomain);
+
+			grps = listGroups(args);
+			if (!grps.isEmpty()) {
+				return grps.get(0);
+			}
+		}
+
+		// then the domain
+		if (!domain.isEmpty()) {
+			args.remove(UserGroupArg.ORG_SUB_DOMAIN);
+			args.put(UserGroupArg.ORG_DOMAIN, domain);
+			grps = listGroups(args);
+			if (!grps.isEmpty()) {
+				return grps.get(0);
+			}
+		}
+
 		// TODO change this default
+		args.remove(UserGroupArg.ORG_SUB_DOMAIN);
+		args.remove(UserGroupArg.ORG_DOMAIN);
 		args.put(UserGroupArg.ID, 11);
 
 		return listGroups(args).get(0);
@@ -567,6 +597,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int userAdminId = args.getInt(UserGroupArg.USER_IS_ADMIN_OF);
 		int id = args.getInt(UserGroupArg.ID);
 		String subDomain = args.getString(UserGroupArg.ORG_SUB_DOMAIN);
+		String domain = args.getString(UserGroupArg.ORG_DOMAIN);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select *, o.groupName as organizationName from groups g ";
@@ -605,6 +636,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (!Common.isNullOrBlank(subDomain)) {
 			sql += "and g.orgSubDomain = ? ";
 			sqlArgs.add(subDomain);
+		}
+
+		if (!Common.isNullOrBlank(domain)) {
+			sql += "and g.orgDomain = ? ";
+			sqlArgs.add(domain);
 		}
 
 		sql += "order by o.groupName, g.isOrganization desc, g.groupName";
