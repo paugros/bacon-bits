@@ -58,7 +58,7 @@ public class MenuItemEditDialog extends EntityEditDialog<MainMenuItem> {
 		if (entity.getParentNodeId() == null) {
 			nameInput.setMaxLength(15);
 		} else {
-			nameInput.setMaxLength(35);
+			nameInput.setMaxLength(50);
 		}
 		FormField nameField = form.createFormField("Name:", nameInput, null);
 		nameField.setInitializer(new Command() {

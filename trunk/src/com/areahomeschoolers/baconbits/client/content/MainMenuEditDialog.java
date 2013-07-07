@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ButtonPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
@@ -46,6 +47,8 @@ public class MainMenuEditDialog extends DefaultDialog {
 	});
 	private MenuItemEditDialog dialog = new MenuItemEditDialog();
 	private boolean changed;
+	private static final int ROOT_MENU_LIMIT = 5;
+	private static final int MENU_LIMIT = 20;
 
 	public MainMenuEditDialog(final List<MainMenuItem> menuItems, final MainMenuItem parent) {
 		bp.getCloseButton().addClickHandler(new ClickHandler() {
@@ -96,6 +99,20 @@ public class MainMenuEditDialog extends DefaultDialog {
 		ClickLabel add = new ClickLabel("+ Add new item", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				int limit = parent == null ? ROOT_MENU_LIMIT : MENU_LIMIT;
+
+				if (items.size() >= limit) {
+					String msg;
+					if (parent == null) {
+						msg = "There is a limit of " + ROOT_MENU_LIMIT + " top-level menu items. Sub-menus can have up to " + MENU_LIMIT + " items.";
+					} else {
+						msg = "There is a limit of " + MENU_LIMIT + " items in a menu.";
+					}
+					AlertDialog.alert(msg);
+
+					return;
+				}
+
 				MainMenuItem item = new MainMenuItem();
 				if (parent != null) {
 					item.setParentNodeId(parent.getId());
