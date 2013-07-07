@@ -237,7 +237,7 @@ public class HomePage implements Page {
 				// pp.add(l);
 				//
 				// vp.add(pp);
-				// Hyperlink priv = new Hyperlink("privacy preferences", PageUrl.user(Application.getCurrentUserId()) + "&tab=" + 8);
+				// Hyperlink priv = new Hyperlink("privacy preferences", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
 				// Hyperlink prof = new Hyperlink("profile page", PageUrl.user(Application.getCurrentUserId()));
 				// String t =
 				// "Click above to search our directory of homeschoolers. Find people in your area, with kids the same age as your own, who share your interests.<br><br>";
@@ -396,7 +396,7 @@ public class HomePage implements Page {
 				if (Application.isAuthenticated()) {
 					lp.add(new Hyperlink("My Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
 					if (Application.getCurrentUser().memberOfAny(16, 17)) {
-						lp.add(new Hyperlink("My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5"));
+						lp.add(new Hyperlink("My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
 					}
 					lp.add(new Hyperlink("My Profile", PageUrl.user(Application.getCurrentUserId())));
 					if (!Application.getCurrentUser().isChild()) {

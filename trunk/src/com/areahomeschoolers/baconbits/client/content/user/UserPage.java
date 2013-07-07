@@ -25,7 +25,6 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
-import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -256,6 +255,7 @@ public class UserPage implements Page {
 				tabPanel.add("Events", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
+						// payment return message
 						String paymentAction = Url.getParameter("ps");
 						if (paymentAction != null) {
 							String text = null;
@@ -278,7 +278,23 @@ public class UserPage implements Page {
 							}
 						}
 
-						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
+						// volunteer positions
+						ArgMap<EventArg> args = new ArgMap<EventArg>();
+						args.put(EventArg.USER_ID, user.getId());
+
+						final EventVolunteerTable vt = new EventVolunteerTable(args);
+						vt.removeColumn(VolunteerColumn.NAME);
+						if (!Application.administratorOf(user)) {
+							vt.removeColumn(VolunteerColumn.FULFILLED);
+							vt.addColumn(VolunteerColumn.FULFILLED_READ_ONLY);
+						}
+
+						tabBody.add(WidgetFactory.newSection(vt, ContentWidth.MAXWIDTH1000PX));
+
+						vt.populate();
+
+						// events
+						args = new ArgMap<EventArg>(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, user.getId());
 						args.setStatus(Status.ACTIVE);
 						EventParticipantTable table = new EventParticipantTable(args);
 						table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME,
@@ -303,36 +319,6 @@ public class UserPage implements Page {
 
 						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
 						tabPanel.selectTabNow(tabBody);
-					}
-				});
-			} else {
-				tabPanel.addSkipIndex();
-			}
-
-			if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.EVENTS)) {
-				tabPanel.add("Volunteer Positions", new TabPageCommand() {
-					@Override
-					public void execute(final VerticalPanel tabBody) {
-						final ArgMap<EventArg> args = new ArgMap<EventArg>();
-						args.put(EventArg.USER_ID, user.getId());
-
-						final EventVolunteerTable vt = new EventVolunteerTable(args);
-						vt.removeColumn(VolunteerColumn.NAME);
-						if (!Application.administratorOf(user)) {
-							vt.removeColumn(VolunteerColumn.FULFILLED);
-							vt.addColumn(VolunteerColumn.FULFILLED_READ_ONLY);
-						}
-
-						vt.addDataReturnHandler(new DataReturnHandler() {
-							@Override
-							public void onDataReturn() {
-								tabPanel.selectTabNow(tabBody);
-							}
-						});
-
-						tabBody.add(WidgetFactory.newSection(vt, ContentWidth.MAXWIDTH750PX));
-
-						vt.populate();
 					}
 				});
 			} else {
