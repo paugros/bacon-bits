@@ -18,7 +18,7 @@ public class StatusPanel extends Composite {
 	}
 
 	public void hide() {
-		setVisible(false);
+		Fader.fadeObjectOut(this);
 	}
 
 	public void show() {

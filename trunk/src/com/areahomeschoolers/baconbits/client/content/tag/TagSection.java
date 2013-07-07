@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.TagServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.Fader;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -50,7 +51,15 @@ public class TagSection extends Composite {
 			ClickLabel x = new ClickLabel("x", new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					TagWidget.this.removeFromParent();
+					Fader f = new Fader(TagWidget.this);
+					f.setCommandDelay(250);
+					f.fadeOut(new Command() {
+						@Override
+						public void execute() {
+							TagWidget.this.removeFromParent();
+						}
+					});
+
 					tagService.deleteMapping(tag, new Callback<Void>(false) {
 						@Override
 						protected void doOnSuccess(Void result) {
@@ -229,7 +238,9 @@ public class TagSection extends Composite {
 		tagService.addMapping(tag, new Callback<Tag>() {
 			@Override
 			protected void doOnSuccess(Tag result) {
-				fp.add(new TagWidget(result));
+				TagWidget tw = new TagWidget(result);
+				Fader.fadeOjbectIn(tw);
+				fp.add(tw);
 				tags.add(result);
 			}
 		});
