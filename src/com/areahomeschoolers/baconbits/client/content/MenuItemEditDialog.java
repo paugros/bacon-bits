@@ -138,7 +138,7 @@ public class MenuItemEditDialog extends EntityEditDialog<MainMenuItem> {
 						if (!url.matches("^\\w+:\\/\\/.*")) {
 							url = "http://" + url;
 						}
-						entity.setUrl(addr.getText());
+						entity.setUrl(url);
 					}
 				}
 			});

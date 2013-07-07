@@ -206,18 +206,17 @@ public final class MainMenu extends MenuBar {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Profile", PageUrl.user(Application.getCurrentUserId()));
 		addLinkToMenu(menu, "Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
-		addLinkToMenu(menu, "Volunteer Positions", PageUrl.user(Application.getCurrentUserId()) + "&tab=2");
 		if (!Application.getCurrentUser().isChild()) {
-			addLinkToMenu(menu, "Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
+			addLinkToMenu(menu, "Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=3");
 		}
 		if (Application.getCurrentUser().memberOfAny(16, 17)) {
-			addLinkToMenu(menu, "Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=5");
+			addLinkToMenu(menu, "Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
 		}
 		if (!Application.getCurrentUser().isChild()) {
-			addLinkToMenu(menu, "Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
+			addLinkToMenu(menu, "Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=5");
 		}
-		addLinkToMenu(menu, "Calendar", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
-		addLinkToMenu(menu, "Privacy", PageUrl.user(Application.getCurrentUserId()) + "&tab=8");
+		addLinkToMenu(menu, "Calendar", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
+		addLinkToMenu(menu, "Privacy", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
 
 		if (!Application.getCurrentUser().isChild()) {
 			addLinkToMenu(menu, "Shopping Cart", PageUrl.payment());
@@ -225,7 +224,7 @@ public final class MainMenu extends MenuBar {
 
 		menu.addSeparator();
 
-		menu.addItem("Change password", new ScheduledCommand() {
+		menu.addItem("Change Password", new ScheduledCommand() {
 			@Override
 			public void execute() {
 				GWT.runAsync(new RunAsyncCallback() {
@@ -241,7 +240,7 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
-		menu.addItem("Log out", new ScheduledCommand() {
+		menu.addItem("Log Out", new ScheduledCommand() {
 			@Override
 			public void execute() {
 				LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
