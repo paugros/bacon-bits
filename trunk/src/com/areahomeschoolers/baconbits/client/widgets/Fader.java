@@ -103,9 +103,7 @@ public class Fader {
 					onCompleteCommand = null;
 
 					// reset the opacity and set visible false afterwards
-					if (currentOpacity == 0) {
-						resetOpacity();
-					}
+					resetOpacity();
 				}
 			};
 
@@ -116,7 +114,9 @@ public class Fader {
 	}
 
 	private void resetOpacity() {
-		object.setVisible(false);
-		object.getElement().getStyle().setOpacity(1.0);
+		if (currentOpacity == 0) {
+			object.setVisible(false);
+			object.getElement().getStyle().setOpacity(1.0);
+		}
 	}
 }
