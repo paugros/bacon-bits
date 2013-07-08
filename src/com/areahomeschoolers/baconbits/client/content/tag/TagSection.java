@@ -239,8 +239,8 @@ public class TagSection extends Composite {
 			@Override
 			protected void doOnSuccess(Tag result) {
 				TagWidget tw = new TagWidget(result);
-				Fader.fadeOjbectIn(tw);
 				fp.add(tw);
+				Fader.fadeOjbectIn(tw);
 				tags.add(result);
 			}
 		});
