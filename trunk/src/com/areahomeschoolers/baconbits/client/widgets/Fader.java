@@ -77,6 +77,7 @@ public class Fader {
 	public void fadeIn(Command onCompleteCommand) {
 		this.onCompleteCommand = onCompleteCommand;
 		currentOpacity = 0;
+		object.getElement().getStyle().setOpacity(currentOpacity);
 		fadeInTimer.scheduleRepeating(fadeDelay);
 	}
 
