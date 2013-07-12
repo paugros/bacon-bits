@@ -93,9 +93,6 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 				} finally {
 					readChannel.close();
 				}
-			} else if (d.getFileSize() > 0) {
-				// if no gcs file, but we have sql data, copy to gcs before serving
-				saveGcsDocument(d);
 			}
 		} catch (IOException e) {
 			logger.warning("Could not fetch GCS document: " + d.getId());
