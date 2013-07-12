@@ -53,15 +53,6 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		}
 	}
 
-	private final class FullDocumentMapper implements RowMapper<Document> {
-		@Override
-		public Document mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Document d = createDocument(rs);
-			d.setData(rs.getBytes("document"));
-			return d;
-		}
-	}
-
 	private static final GcsService gcsService = GcsServiceFactory.createGcsService(RetryParams.getDefaultInstance());
 	private final Logger logger = Logger.getLogger(this.getClass().toString());
 
@@ -87,7 +78,7 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 	@Override
 	public Document getById(int documentId) {
 		String sql = "select * from documents where id = ?";
-		Document d = queryForObject(sql, new FullDocumentMapper(), documentId);
+		Document d = queryForObject(sql, new DocumentMapper(), documentId);
 		GcsFilename gf = new GcsFilename(GCS_BUCKET, getGcsFileName(d));
 		try {
 			GcsFileMetadata meta = gcsService.getMetadata(gf);
