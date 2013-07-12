@@ -175,6 +175,8 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 
 			saveGcsDocument(document);
 
+			int originalId = document.getId();
+
 			if (document.getLinkType() != null && document.getLinkId() > 0) {
 				if (document.getLinkType() == DocumentLinkType.BOOK) {
 					// attach the original to the book
@@ -184,6 +186,9 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 					scaleImageToMaximumSize(document, 80, 80);
 					// this inserts the same document again, but scaled
 					update(sql, namedParams, keys);
+					// save to gcs again
+					document.setId(ServerUtils.getIdFromKeys(keys));
+					saveGcsDocument(document);
 					// attach the second image to the book
 					sql = "update books set smallImageId = ? where id = ?";
 					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
@@ -195,6 +200,9 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 					scaleImageToMaximumSize(document, 80, 80);
 					// this inserts the same document again, but scaled
 					update(sql, namedParams, keys);
+					// save to gcs again
+					document.setId(ServerUtils.getIdFromKeys(keys));
+					saveGcsDocument(document);
 					// attach the second image to the user
 					sql = "update users set smallImageId = ? where id = ?";
 					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
@@ -202,6 +210,8 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 					link(document);
 				}
 			}
+
+			document.setId(originalId);
 		}
 
 		return document;
