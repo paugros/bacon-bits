@@ -164,7 +164,7 @@ public class ArticlePage implements Page {
 
 		if (article.isSaved() && (article.hasDocuments() || Application.administratorOf(article))) {
 			DocumentSection ds = new DocumentSection(article, Application.administratorOf(article));
-			ds.populate();
+			ds.init();
 			fieldTable.addField("Documents:", ds);
 		}
 

@@ -603,7 +603,7 @@ public class EventPage implements Page {
 
 		if (calendarEvent.isSaved() && (calendarEvent.hasDocuments() || Application.administratorOf(calendarEvent))) {
 			DocumentSection ds = new DocumentSection(calendarEvent, Application.administratorOf(calendarEvent));
-			ds.populate();
+			ds.init();
 			fieldTable.addField("Documents:", ds);
 		}
 

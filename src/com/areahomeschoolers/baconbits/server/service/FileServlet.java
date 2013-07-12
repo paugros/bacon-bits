@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.server.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
@@ -37,14 +38,8 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @Component
 @RequestMapping("/file")
 public class FileServlet extends RemoteServiceServlet implements ServletContextAware, Controller {
-
+	private final Logger logger = Logger.getLogger(this.getClass().toString());
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * Maximum size, in bytes, of accepted file upload
-	 */
-	private static final int MAX_FILE_SIZE = 10485760;
-
 	private final DocumentDao documentDao;
 	protected ServletContext servletContext;
 
@@ -88,22 +83,15 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 		Document document = documentDao.getById(id);
 
 		if (document == null) {
-			document = new Document();
-			document.setFileExtension("html");
-			document.setFileType("text/html; charset=UTF-8");
-			String text = "<p style=\"font-size: 16; text-align: center; font-weight: bold; margin-top: 200px;\">";
-			text += "The requested file does not exist or you do not have permission to view it.</p>";
-			byte[] bytes = text.getBytes();
-			document.setData(bytes);
-			document.setFileSize(bytes.length);
-			inline = "true";
+			return;
 		}
 
 		response.reset();
-		final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
-		response.setBufferSize(DEFAULT_BUFFER_SIZE);
-		response.setContentType(document.getFileType());
+		response.setBufferSize(10240);
 		response.setContentLength(document.getFileSize());
+		response.setContentType(document.getFileType());
+
+		// header
 		String disp = "attachment";
 		if (inline != null) {
 			disp = "inline";
@@ -111,9 +99,9 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 		response.setHeader("Content-Disposition", disp + "; filename=\"" + document.getFileName() + "\"");
 
 		ServletOutputStream out = response.getOutputStream();
-		if (document.getFileSize() > 0) {
-			out.write(document.getData(), 0, document.getFileSize());
-		}
+
+		out.write(document.getData());
+
 		out.flush();
 		out.close();
 
@@ -123,13 +111,11 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 	}
 
 	private void handlePost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		// FileItemFactory factory = new DiskFileItemFactory();
 		ServletFileUpload upload = new ServletFileUpload();
 
 		try {
 			if (ServletFileUpload.isMultipartContent(request)) {
 				// loop through multipart form initializing document dto
-				// List<FileItem> items = upload.parseRequest(request);
 				FileItemIterator iterator = upload.getItemIterator(request);
 
 				String responseMsg;
@@ -138,7 +124,7 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 				response.getWriter().write(responseMsg);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.warning("Unknown file upload error.");
 			response.getWriter().write("Unknown file upload error.");
 		}
 	}
@@ -182,18 +168,9 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 					document.setFileName(name);
 				}
 
-				if (document.getFileSize() > MAX_FILE_SIZE) {
-					return "Document uploads cannot exceed 10MB.";
-				}
-
 				String fn = document.getFileName().toLowerCase();
 				String ext = Common.getFileExtension(fn);
 				document.setFileExtension(ext);
-
-				if (!Common.ALLOWED_UPLOAD_EXTENSIONS.contains(document.getFileExtension())) {
-					return "The file extension '" + document.getFileExtension() + "' is not an allowed extension.";
-				}
-
 				document.setData(IOUtils.toByteArray(stream));
 			}
 		}

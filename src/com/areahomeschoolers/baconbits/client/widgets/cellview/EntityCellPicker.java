@@ -152,7 +152,7 @@ public abstract class EntityCellPicker<T extends EntityDto<T>, U extends Arg, C 
 	}
 
 	/**
-	 * Pass-through method to {@link EntitySelector#populate()}, which populates the selector either after an asynchronous call, or directly from a provided
+	 * Pass-through method to {@link EntitySelector#init()}, which populates the selector either after an asynchronous call, or directly from a provided
 	 * {@link List}. This method <b>must</b> be called in order for the selector to load its data. It does not run at construction time to allow flexibility in
 	 * configuring the picker and selector prior to loading data.
 	 */
