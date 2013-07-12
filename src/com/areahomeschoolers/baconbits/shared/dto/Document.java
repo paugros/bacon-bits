@@ -162,7 +162,9 @@ public final class Document extends EntityDto<Document> {
 
 	public void setData(byte[] data) {
 		this.data = data;
-		fileSize = data.length;
+		if (data != null) {
+			fileSize = data.length;
+		}
 	}
 
 	public void setDescription(String bannerText) {

@@ -58,7 +58,6 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		public Document mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Document d = createDocument(rs);
 			d.setData(rs.getBytes("document"));
-			d.setFileSize(d.getData().length);
 			return d;
 		}
 	}
@@ -89,7 +88,7 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 	public Document getById(int documentId) {
 		String sql = "select * from documents where id = ?";
 		Document d = queryForObject(sql, new FullDocumentMapper(), documentId);
-		GcsFilename gf = new GcsFilename(GCS_BUCKET, GCS_DOCUMENT_FOLDER + "/" + Integer.toString(d.getId()));
+		GcsFilename gf = new GcsFilename(GCS_BUCKET, getGcsFileName(d));
 		try {
 			GcsFileMetadata meta = gcsService.getMetadata(gf);
 			if (meta != null) {
