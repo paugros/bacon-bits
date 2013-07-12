@@ -100,7 +100,9 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 
 		ServletOutputStream out = response.getOutputStream();
 
-		out.write(document.getData());
+		if (document.getFileSize() > 0) {
+			out.write(document.getData());
+		}
 
 		out.flush();
 		out.close();
