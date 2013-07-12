@@ -9,7 +9,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface DocumentServiceAsync {
-	public void delete(int documentId, AsyncCallback<Void> callback);
+	public void delete(Document d, AsyncCallback<Void> callback);
 
 	public void getById(int documentId, AsyncCallback<Document> callback);
 

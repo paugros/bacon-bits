@@ -34,6 +34,7 @@ public class DocumentSection extends Composite {
 	private boolean isAdmin;
 	private HasDocuments item;
 	private ArrayList<Document> documents;
+	private boolean uploaded;
 
 	public DocumentSection(HasDocuments item, boolean isAdmin) {
 		this.item = item;
@@ -61,6 +62,7 @@ public class DocumentSection extends Composite {
 					FileUploadDialog dialog = new FileUploadDialog(linkType, entityId, new UploadCompleteHandler() {
 						@Override
 						public void onUploadComplete(int documentId) {
+							uploaded = true;
 							init();
 						}
 					});
@@ -77,7 +79,7 @@ public class DocumentSection extends Composite {
 	}
 
 	public void init() {
-		if (!item.hasDocuments()) {
+		if (!item.hasDocuments() && !uploaded) {
 			return;
 		}
 
@@ -110,7 +112,7 @@ public class DocumentSection extends Composite {
 						ConfirmDialog.confirm("Really delete \"" + d.getDescription() + "\"?", new ConfirmHandler() {
 							@Override
 							public void onConfirm() {
-								documentService.delete(d.getId(), new Callback<Void>() {
+								documentService.delete(d, new Callback<Void>() {
 									@Override
 									protected void doOnSuccess(Void result) {
 										documents.remove(d);

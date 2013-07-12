@@ -7,7 +7,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 
 public interface DocumentDao {
-	public void delete(int documentId);
+	public void delete(Document d);
 
 	public Document getById(int documentId);
 

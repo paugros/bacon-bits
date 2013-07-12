@@ -36,6 +36,7 @@ import com.google.appengine.api.images.ImagesServiceFactory;
 import com.google.appengine.api.images.Transform;
 import com.google.appengine.tools.cloudstorage.GcsFileMetadata;
 import com.google.appengine.tools.cloudstorage.GcsFileOptions;
+import com.google.appengine.tools.cloudstorage.GcsFileOptions.Builder;
 import com.google.appengine.tools.cloudstorage.GcsFilename;
 import com.google.appengine.tools.cloudstorage.GcsInputChannel;
 import com.google.appengine.tools.cloudstorage.GcsOutputChannel;
@@ -74,13 +75,13 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 	}
 
 	@Override
-	public void delete(int documentId) {
-		if (documentId > 0) {
-			update("delete from documentArticleMapping where documentId = ?", documentId);
-			update("delete from documentEventMapping where documentId = ?", documentId);
-			update("delete from documents where id = ?", documentId);
+	public void delete(Document d) {
+		if (d.getId() > 0) {
+			deleteGcsDocument(d);
 
-			deleteGcsDocument(documentId);
+			update("delete from documentArticleMapping where documentId = ?", d.getId());
+			update("delete from documentEventMapping where documentId = ?", d.getId());
+			update("delete from documents where id = ?", d.getId());
 		}
 	}
 
@@ -213,7 +214,7 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 			}
 		}
 
-		return getById(document.getId());
+		return document;
 	}
 
 	private Document createDocument(ResultSet rs) throws SQLException {
@@ -265,13 +266,18 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		return d;
 	}
 
-	private void deleteGcsDocument(int id) {
-		GcsFilename gf = new GcsFilename(GCS_BUCKET, GCS_DOCUMENT_FOLDER + "/" + Integer.toString(id));
+	private void deleteGcsDocument(Document d) {
+		GcsFilename gf = new GcsFilename(GCS_BUCKET, getGcsFileName(d));
 		try {
 			gcsService.delete(gf);
 		} catch (IOException e) {
-			logger.warning("Could not delete document from GCS: " + id);
+			e.printStackTrace();
+			logger.warning("Could not delete document from GCS: " + d.getId());
 		}
+	}
+
+	private String getGcsFileName(Document d) {
+		return GCS_DOCUMENT_FOLDER + "/" + Integer.toString(d.getId()) + "." + d.getFileExtension();
 	}
 
 	private Document link(Document document) {
@@ -284,9 +290,12 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 	}
 
 	private void saveGcsDocument(Document d) {
-		GcsFilename gf = new GcsFilename(GCS_BUCKET, GCS_DOCUMENT_FOLDER + "/" + Integer.toString(d.getId()));
+		GcsFilename gf = new GcsFilename(GCS_BUCKET, getGcsFileName(d));
+		GcsFileOptions.getDefaultInstance();
+		Builder b = new GcsFileOptions.Builder();
+		b.mimeType(d.getFileType());
 		try {
-			GcsOutputChannel go = gcsService.createOrReplace(gf, GcsFileOptions.getDefaultInstance());
+			GcsOutputChannel go = gcsService.createOrReplace(gf, b.build());
 			go.write(ByteBuffer.wrap(d.getData()));
 			go.close();
 		} catch (IOException e) {
