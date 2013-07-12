@@ -106,7 +106,7 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 		out.close();
 
 		if (delete != null) {
-			documentDao.delete(id);
+			documentDao.delete(document);
 		}
 	}
 
@@ -125,6 +125,7 @@ public class FileServlet extends RemoteServiceServlet implements ServletContextA
 			}
 		} catch (Exception e) {
 			logger.warning("Unknown file upload error.");
+			e.printStackTrace();
 			response.getWriter().write("Unknown file upload error.");
 		}
 	}
