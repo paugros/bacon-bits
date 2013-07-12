@@ -3,7 +3,6 @@ package com.areahomeschoolers.baconbits.shared;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +29,6 @@ public abstract class Common {
 	public static enum IpV6Style {
 		NO_LEADING_ZEROS, ABBREV
 	}
-
-	private static final String[] PRIVATE_ALLOWED_UPLOAD_EXTENSIONS = { "jpeg", "jpg", "gif", "png", "csv", "xls", "xlsx", "doc", "docx", "pdf", "vsd", "tif",
-			"pcap", "zip", "txt", "htm", "html", "pcf", "vpl", "ppt", "pptx", "mpp", "cap", "wav", "bmp", "mp3" };
-
-	public static final List<String> ALLOWED_UPLOAD_EXTENSIONS = Collections.unmodifiableList(Arrays.asList(PRIVATE_ALLOWED_UPLOAD_EXTENSIONS));
 
 	private final static String EMAIL_VALIDATION_REGEX = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
 

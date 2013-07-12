@@ -1,11 +1,14 @@
 package com.areahomeschoolers.baconbits.server.dao.impl;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -31,10 +34,17 @@ import com.google.appengine.api.images.Image;
 import com.google.appengine.api.images.ImagesService;
 import com.google.appengine.api.images.ImagesServiceFactory;
 import com.google.appengine.api.images.Transform;
+import com.google.appengine.tools.cloudstorage.GcsFileMetadata;
+import com.google.appengine.tools.cloudstorage.GcsFileOptions;
+import com.google.appengine.tools.cloudstorage.GcsFilename;
+import com.google.appengine.tools.cloudstorage.GcsInputChannel;
+import com.google.appengine.tools.cloudstorage.GcsOutputChannel;
+import com.google.appengine.tools.cloudstorage.GcsService;
+import com.google.appengine.tools.cloudstorage.GcsServiceFactory;
+import com.google.appengine.tools.cloudstorage.RetryParams;
 
 @Repository
 public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
-
 	private final class DocumentMapper implements RowMapper<Document> {
 		@Override
 		public Document mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -52,6 +62,12 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		}
 	}
 
+	private static final GcsService gcsService = GcsServiceFactory.createGcsService(RetryParams.getDefaultInstance());
+	private final Logger logger = Logger.getLogger(this.getClass().toString());
+
+	public static final String GCS_BUCKET = "baconbits-production";
+	public static final String GCS_DOCUMENT_FOLDER = "documents";
+
 	@Autowired
 	public DocumentDaoImpl(DataSource dataSource) {
 		super(dataSource);
@@ -63,14 +79,38 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 			update("delete from documentArticleMapping where documentId = ?", documentId);
 			update("delete from documentEventMapping where documentId = ?", documentId);
 			update("delete from documents where id = ?", documentId);
+
+			deleteGcsDocument(documentId);
 		}
 	}
 
 	@Override
 	public Document getById(int documentId) {
 		String sql = "select * from documents where id = ?";
+		Document d = queryForObject(sql, new FullDocumentMapper(), documentId);
+		GcsFilename gf = new GcsFilename(GCS_BUCKET, GCS_DOCUMENT_FOLDER + "/" + Integer.toString(d.getId()));
+		try {
+			GcsFileMetadata meta = gcsService.getMetadata(gf);
+			if (meta != null) {
+				// if we have a gcs file, serve it
+				ByteBuffer result = ByteBuffer.allocate((int) meta.getLength());
+				GcsInputChannel readChannel = gcsService.openReadChannel(gf, 0);
 
-		return queryForObject(sql, new FullDocumentMapper(), documentId);
+				try {
+					readChannel.read(result);
+					d.setData(result.array());
+				} finally {
+					readChannel.close();
+				}
+			} else if (d.getFileSize() > 0) {
+				// if no gcs file, but we have sql data, copy to gcs before serving
+				saveGcsDocument(d);
+			}
+		} catch (IOException e) {
+			logger.warning("Could not fetch GCS document: " + d.getId());
+		}
+
+		return d;
 	}
 
 	@Override
@@ -104,7 +144,7 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 			String sql = "update documents set description = :description, startDate = :startDate, endDate = :endDate where id = :id";
 			update(sql, namedParams);
 		} else {
-			// scale if needed
+			// scale original document if needed
 			if (document.getLinkType() != null) {
 				if (document.getLinkType() == DocumentLinkType.HTML_IMAGE_INSERT) {
 					scaleImageToMaximumSize(document, 600, 2000);
@@ -134,31 +174,37 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 				document.setStringData(null);
 			}
 
-			String sql = "insert into documents (addedById, startDate, endDate, addedDate, description, document, fileName, fileType, fileExtension) values ";
-			sql += "(:addedById, :startDate, :endDate, now(), :description, :data, :fileName, :fileType, :fileExtension)";
+			String sql = "insert into documents (addedById, startDate, endDate, addedDate, description, fileName, fileType, fileExtension) values ";
+			sql += "(:addedById, :startDate, :endDate, now(), :description, :fileName, :fileType, :fileExtension)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
 
 			document.setId(ServerUtils.getIdFromKeys(keys));
 
+			saveGcsDocument(document);
+
 			if (document.getLinkType() != null && document.getLinkId() > 0) {
 				if (document.getLinkType() == DocumentLinkType.BOOK) {
+					// attach the original to the book
 					String newsql = "update books set imageId = ? where id = ?";
 					update(newsql, document.getId(), document.getLinkId());
-
+					// this scales the document we just inserted
 					scaleImageToMaximumSize(document, 80, 80);
+					// this inserts the same document again, but scaled
 					update(sql, namedParams, keys);
-
+					// attach the second image to the book
 					sql = "update books set smallImageId = ? where id = ?";
 					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
 				} else if (document.getLinkType() == DocumentLinkType.PROFILE) {
+					// attach the original to the user
 					String newsql = "update users set imageId = ? where id = ?";
 					update(newsql, document.getId(), document.getLinkId());
-
+					// this scales the document we just inserted
 					scaleImageToMaximumSize(document, 80, 80);
+					// this inserts the same document again, but scaled
 					update(sql, namedParams, keys);
-
+					// attach the second image to the user
 					sql = "update users set smallImageId = ? where id = ?";
 					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
 				} else {
@@ -168,12 +214,6 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		}
 
 		return getById(document.getId());
-	}
-
-	public void scaleImageToMaximumSize(int docId, int maxWidth, int maxHeight) {
-		Document d = getById(docId);
-		d = scaleImageToMaximumSize(d, maxWidth, maxHeight);
-		save(d);
 	}
 
 	private Document createDocument(ResultSet rs) throws SQLException {
@@ -225,6 +265,15 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		return d;
 	}
 
+	private void deleteGcsDocument(int id) {
+		GcsFilename gf = new GcsFilename(GCS_BUCKET, GCS_DOCUMENT_FOLDER + "/" + Integer.toString(id));
+		try {
+			gcsService.delete(gf);
+		} catch (IOException e) {
+			logger.warning("Could not delete document from GCS: " + id);
+		}
+	}
+
 	private Document link(Document document) {
 		String entityType = document.getLinkType().getEntityType();
 
@@ -232,6 +281,17 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		update(sql, document.getId(), document.getLinkId());
 
 		return document;
+	}
+
+	private void saveGcsDocument(Document d) {
+		GcsFilename gf = new GcsFilename(GCS_BUCKET, GCS_DOCUMENT_FOLDER + "/" + Integer.toString(d.getId()));
+		try {
+			GcsOutputChannel go = gcsService.createOrReplace(gf, GcsFileOptions.getDefaultInstance());
+			go.write(ByteBuffer.wrap(d.getData()));
+			go.close();
+		} catch (IOException e) {
+			logger.warning("Could not save document to GCS: " + d.getId());
+		}
 	}
 
 	/**

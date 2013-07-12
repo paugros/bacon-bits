@@ -81,6 +81,8 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		}
 	}
 
+	private final Logger logger = Logger.getLogger(this.getClass().toString());
+
 	private Properties payPalProperties;
 
 	@Autowired
@@ -374,8 +376,6 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 	}
 
 	private PayResponse makePayPalApiCall(PayRequest payRequest) {
-		Logger logger = Logger.getLogger(this.getClass().toString());
-
 		AdaptivePaymentsService service = new AdaptivePaymentsService(getPayPalProperties());
 		PayResponse payResponse = null;
 		try {
