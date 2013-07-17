@@ -35,7 +35,7 @@ import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
-import com.areahomeschoolers.baconbits.client.widgets.GoogleMap;
+import com.areahomeschoolers.baconbits.client.widgets.GoogleMapWidget;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
@@ -839,7 +839,7 @@ public class EventPage implements Page {
 			tabPanel.add("Map", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					tabBody.add(new GoogleMap(calendarEvent.getAddress()));
+					tabBody.add(new GoogleMapWidget(calendarEvent.getAddress()));
 					tabPanel.selectTabNow(tabBody);
 				}
 			});
