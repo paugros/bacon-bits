@@ -1,5 +1,8 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
@@ -19,7 +22,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldDisplayLink;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
-import com.areahomeschoolers.baconbits.client.widgets.GoogleMap;
+import com.areahomeschoolers.baconbits.client.widgets.GoogleMapWidget;
 import com.areahomeschoolers.baconbits.client.widgets.MonthYearPicker;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
@@ -38,14 +41,17 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.maps.client.geocode.LocationCallback;
-import com.google.gwt.maps.client.geocode.Placemark;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.maps.gwt.client.Geocoder;
+import com.google.maps.gwt.client.GeocoderAddressComponent;
+import com.google.maps.gwt.client.GeocoderRequest;
+import com.google.maps.gwt.client.GeocoderResult;
+import com.google.maps.gwt.client.GeocoderStatus;
 
 public class UserFieldTable extends FieldTable {
 	public static void validateUserAddress(final User u, final Command saveCommand) {
@@ -61,7 +67,7 @@ public class UserFieldTable extends FieldTable {
 			return;
 		}
 
-		GoogleMap.runMapsCommand(new Command() {
+		GoogleMapWidget.runMapsCommand(new Command() {
 			@Override
 			public void execute() {
 				String address = u.getAddress();
@@ -69,22 +75,28 @@ public class UserFieldTable extends FieldTable {
 					address = u.getStreet() + " " + u.getZip();
 				}
 
-				GoogleMap.getGeoCoder().getLocations(address, new LocationCallback() {
+				GeocoderRequest request = GeocoderRequest.create();
+				request.setAddress(address);
+				GoogleMapWidget.getGeoCoder().geocode(request, new Geocoder.Callback() {
 					@Override
-					public void onFailure(int statusCode) {
-						saveCommand.execute();
-					}
+					public void handle(JsArray<GeocoderResult> results, GeocoderStatus status) {
+						if (status == GeocoderStatus.OK) {
+							GeocoderResult location = results.get(0);
+							Map<String, String> parts = new HashMap<String, String>();
+							for (int i = 0; i < location.getAddressComponents().length(); i++) {
+								GeocoderAddressComponent c = location.getAddressComponents().get(i);
+								parts.put(c.getTypes().get(0), c.getShortName());
+							}
+							// https://developers.google.com/maps/documentation/geocoding/#Types
+							u.setAddress(location.getFormattedAddress());
+							u.setStreet(parts.get("street_number") + " " + parts.get("route"));
+							u.setCity(parts.get("locality"));
+							u.setState(parts.get("administrative_area_level_1"));
+							u.setZip(parts.get("postal_code"));
+							u.setLat(location.getGeometry().getLocation().lat());
+							u.setLng(location.getGeometry().getLocation().lng());
+						}
 
-					@Override
-					public void onSuccess(JsArray<Placemark> locations) {
-						Placemark location = locations.get(0);
-						u.setAddress(location.getAddress());
-						u.setStreet(location.getStreet());
-						u.setCity(location.getCity());
-						u.setState(location.getState());
-						u.setZip(location.getPostalCode());
-						u.setLat(location.getPoint().getLatitude());
-						u.setLng(location.getPoint().getLongitude());
 						saveCommand.execute();
 					}
 				});

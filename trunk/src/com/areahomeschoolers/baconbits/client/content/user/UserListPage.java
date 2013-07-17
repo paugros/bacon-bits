@@ -10,7 +10,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.GoogleMap;
+import com.areahomeschoolers.baconbits.client.widgets.GoogleMapWidget;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -29,8 +29,6 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.maps.client.geocode.LocationCallback;
-import com.google.gwt.maps.client.geocode.Placemark;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -40,6 +38,10 @@ import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.maps.gwt.client.Geocoder;
+import com.google.maps.gwt.client.GeocoderRequest;
+import com.google.maps.gwt.client.GeocoderResult;
+import com.google.maps.gwt.client.GeocoderStatus;
 
 public final class UserListPage implements Page {
 	private VerticalPanel optionsPanel = new VerticalPanel();
@@ -219,21 +221,22 @@ public final class UserListPage implements Page {
 
 				lastLocationText = locationInput.getText();
 
-				GoogleMap.runMapsCommand(new Command() {
+				GoogleMapWidget.runMapsCommand(new Command() {
 					@Override
 					public void execute() {
-						GoogleMap.getGeoCoder().getLocations(locationInput.getText(), new LocationCallback() {
+						GeocoderRequest request = GeocoderRequest.create();
+						request.setAddress(locationInput.getText());
+						GoogleMapWidget.getGeoCoder().geocode(request, new Geocoder.Callback() {
 							@Override
-							public void onFailure(int statusCode) {
+							public void handle(JsArray<GeocoderResult> results, GeocoderStatus status) {
+								if (status == GeocoderStatus.OK) {
+									GeocoderResult location = results.get(0);
 
-							}
-
-							@Override
-							public void onSuccess(JsArray<Placemark> locations) {
-								args.put(UserArg.WITHIN_LAT, Double.toString(locations.get(0).getPoint().getLatitude()));
-								args.put(UserArg.WITHIN_LNG, Double.toString(locations.get(0).getPoint().getLongitude()));
-								args.put(UserArg.WITHIN_MILES, milesInput.getIntValue());
-								table.populate();
+									args.put(UserArg.WITHIN_LAT, Double.toString(location.getGeometry().getLocation().lat()));
+									args.put(UserArg.WITHIN_LNG, Double.toString(location.getGeometry().getLocation().lng()));
+									args.put(UserArg.WITHIN_MILES, milesInput.getIntValue());
+									table.populate();
+								}
 							}
 						});
 					}
