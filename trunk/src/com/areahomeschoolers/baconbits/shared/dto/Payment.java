@@ -12,7 +12,8 @@ public final class Payment extends EntityDto<Payment> {
 	private String payKey;
 	private int userId;
 	private Date paymentDate;
-	private double amount;
+	private double principalAmount;
+	private double markupAmount;
 	private int statusId;
 	private double paymentFee;
 	private String transactionId;
@@ -32,12 +33,12 @@ public final class Payment extends EntityDto<Payment> {
 
 	}
 
-	public double getAmount() {
-		return amount;
-	}
-
 	public Date getIpnDate() {
 		return ipnDate;
+	}
+
+	public double getMarkupAmount() {
+		return markupAmount;
 	}
 
 	public String getMemo() {
@@ -68,6 +69,10 @@ public final class Payment extends EntityDto<Payment> {
 		return paypalData;
 	}
 
+	public double getPrincipalAmount() {
+		return principalAmount;
+	}
+
 	public String getRawData() {
 		return rawData;
 	}
@@ -84,6 +89,10 @@ public final class Payment extends EntityDto<Payment> {
 		return statusId;
 	}
 
+	public double getTotalAmount() {
+		return principalAmount + markupAmount;
+	}
+
 	public String getTransactionId() {
 		return transactionId;
 	}
@@ -96,12 +105,12 @@ public final class Payment extends EntityDto<Payment> {
 		return userId;
 	}
 
-	public void setAmount(double amount) {
-		this.amount = amount;
-	}
-
 	public void setIpnDate(Date ipnDate) {
 		this.ipnDate = ipnDate;
+	}
+
+	public void setMarkupAmount(double markupAmount) {
+		this.markupAmount = markupAmount;
 	}
 
 	public void setMemo(String memo) {
@@ -130,6 +139,10 @@ public final class Payment extends EntityDto<Payment> {
 
 	public void setPaypalData(PaypalData paypalData) {
 		this.paypalData = paypalData;
+	}
+
+	public void setPrincipalAmount(double amount) {
+		this.principalAmount = amount;
 	}
 
 	public void setRawData(String rawData) {

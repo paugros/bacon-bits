@@ -237,7 +237,7 @@ public final class EventParticipantTable extends EntityCellTable<EventParticipan
 				addCurrencyColumn(col, new ValueGetter<Double, EventParticipant>() {
 					@Override
 					public Double get(EventParticipant item) {
-						return item.getPrice();
+						return item.getAdjustedPrice();
 					}
 				});
 				break;
@@ -245,7 +245,7 @@ public final class EventParticipantTable extends EntityCellTable<EventParticipan
 				addTotaledCurrencyColumn("Price", new ValueGetter<Number, EventParticipant>() {
 					@Override
 					public Number get(EventParticipant item) {
-						return item.getPrice();
+						return item.getAdjustedPrice();
 					}
 				});
 				break;

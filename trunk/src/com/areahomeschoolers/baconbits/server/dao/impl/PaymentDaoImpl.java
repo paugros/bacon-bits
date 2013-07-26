@@ -64,7 +64,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		public Payment mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Payment payment = new Payment();
 			payment.setId(rs.getInt("id"));
-			payment.setAmount(rs.getDouble("amount"));
+			payment.setPrincipalAmount(rs.getDouble("amount"));
 			payment.setIpnDate(rs.getTimestamp("ipnDate"));
 			payment.setPayKey(rs.getString("payKey"));
 			payment.setPaymentDate(rs.getTimestamp("paymentDate"));
@@ -155,7 +155,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 
 	@Override
 	public Data getUnpaidBalance(int userId) {
-		String sql = "select count(p.id) as itemCount, sum(case isnull(a.price) when true then e.price else a.price end) as balance \n";
+		String sql = "select count(p.id) as itemCount, sum(case isnull(a.price) when true then (e.price + e.markup) else (a.price + a.markup) end) as balance \n";
 		sql += "from eventRegistrationParticipants p \n";
 		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
@@ -202,17 +202,32 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 
 		List<Receiver> receiverLst = new ArrayList<Receiver>();
 
-		// Amount to be credited to the receiver's account
-		Receiver receiver = new Receiver(p.getAmount());
-		receiver.setPaymentType("SERVICE");
+		// Our cut
+		Receiver siteReceiver = new Receiver(p.getMarkupAmount());
+		siteReceiver.setPaymentType("SERVICE");
+		siteReceiver.setPrimary(Boolean.TRUE);
 
 		// A receiver's email address
 		if (ServerContext.isLive()) {
-			receiver.setEmail("weare.home.educators@gmail.com");
+			siteReceiver.setEmail("paul.augros@gmail.com");
 		} else {
-			receiver.setEmail("paul.a_1343673136_biz@gmail.com");
+			siteReceiver.setEmail("paul.a_1343673136_biz@gmail.com");
 		}
-		receiverLst.add(receiver);
+		receiverLst.add(siteReceiver);
+
+		// The organization's cut
+		Receiver orgReceiver = new Receiver(p.getPrincipalAmount());
+		orgReceiver.setPaymentType("SERVICE");
+		orgReceiver.setPrimary(Boolean.FALSE);
+
+		// org's email address
+		if (ServerContext.isLive()) {
+			orgReceiver.setEmail("weare.home.educators@gmail.com");
+		} else {
+			orgReceiver.setEmail("paul.a_1343673136_biz@gmail.com");
+		}
+		receiverLst.add(orgReceiver);
+
 		ReceiverList receiverList = new ReceiverList(receiverLst);
 
 		StringBuilder url = new StringBuilder();
@@ -255,16 +270,36 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			// apply any pending adjustments
 			String sql = "select 1 as id, sum(amount) as total from adjustments where userId = ? and statusId = 1";
 			Data sum = queryForObject(sql, ServerUtils.getGenericRowMapper(), ServerContext.getCurrentUserId());
-			payment.setAmount(payment.getAmount() + sum.getDouble("total"));
+			boolean adjustmentWasUsed = false;
+			double discount = sum.getDouble("total");
+			if (discount < 0 && payment.getTotalAmount() > 0) {
+				adjustmentWasUsed = true;
+				// apply discounts to principal first
+				payment.setPrincipalAmount(payment.getPrincipalAmount() + discount);
+
+				// roll over to markup if necessary
+				// we only do this so that we can completely hide our markup from the end user
+				if (payment.getPrincipalAmount() < 0) {
+					payment.setMarkupAmount(payment.getMarkupAmount() + payment.getPrincipalAmount());
+					payment.setPrincipalAmount(0);
+				}
+
+				// if there's any left over, put it back in the original discount variable
+				if (payment.getMarkupAmount() < 0) {
+					discount = payment.getMarkupAmount();
+					payment.setMarkupAmount(0);
+				}
+
+			}
 
 			// no need for pending status if payment amount is zero or less
-			if (payment.getAmount() <= 0) {
+			if (payment.getTotalAmount() <= 0) {
 				payment.setStatusId(2);
 			}
 			payment.setUserId(ServerContext.getCurrentUser().getId());
 
-			sql = "insert into payments (userId, paymentTypeId, paymentDate, amount, statusId) values ";
-			sql += "(:userId, :paymentTypeId, now(), :amount, :statusId)";
+			sql = "insert into payments (userId, paymentTypeId, paymentDate, amount, markupAmount, statusId) values ";
+			sql += "(:userId, :paymentTypeId, now(), :principalAmount, :markupAmount, :statusId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -272,11 +307,13 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			payment.setId(ServerUtils.getIdFromKeys(keys));
 
 			// link payment to applied adjustments
-			sql = "insert into paymentAdjustmentMapping (paymentId, adjustmentId) \n";
-			sql += "select ?, a.id from adjustments a where a.userId = ? and a.statusId = 1";
-			update(sql, payment.getId(), ServerContext.getCurrentUserId());
+			if (adjustmentWasUsed) {
+				sql = "insert into paymentAdjustmentMapping (paymentId, adjustmentId) \n";
+				sql += "select ?, a.id from adjustments a where a.userId = ? and a.statusId = 1";
+				update(sql, payment.getId(), ServerContext.getCurrentUserId());
+			}
 
-			if (payment.getAmount() > 0) {
+			if (payment.getTotalAmount() > 0) {
 				// when adding a new payment, we need to create a transaction with PayPal
 				data = makePayment(payment);
 				if (data.getPayKey() != null) {
@@ -287,18 +324,21 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			} else {
 				// if a negative value, we don't need PayPal
 				data = new PaypalData();
-				// mark all adjustments as applied
-				sql = "update adjustments set statusId = 2 where id in(select adjustmentId from paymentAdjustmentMapping where paymentId = ?)";
-				update(sql, payment.getId());
 
-				// then add a new adjustment for the left-over difference, if any
-				if (payment.getAmount() < 0) {
-					Adjustment adj = new Adjustment();
-					adj.setAmount(payment.getAmount());
-					adj.setUserId(payment.getUserId());
-					adj.setAdjustmentTypeId(3);
-					adj.setStatusId(1);
-					saveAdjustment(adj);
+				if (adjustmentWasUsed) {
+					// mark all adjustments as applied
+					sql = "update adjustments set statusId = 2 where id in(select adjustmentId from paymentAdjustmentMapping where paymentId = ?)";
+					update(sql, payment.getId());
+
+					// then add a new adjustment for the left-over difference, if any
+					if (discount < 0) {
+						Adjustment adj = new Adjustment();
+						adj.setAmount(discount);
+						adj.setUserId(payment.getUserId());
+						adj.setAdjustmentTypeId(3);
+						adj.setStatusId(1);
+						saveAdjustment(adj);
+					}
 				}
 			}
 		}

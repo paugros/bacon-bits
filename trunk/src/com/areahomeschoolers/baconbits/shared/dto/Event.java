@@ -22,6 +22,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private int categoryId;
 	private double cost;
 	private double price;
+	private double markup;
 	private String address;
 	private boolean adultRequired = false;
 	private boolean active = true;
@@ -98,6 +99,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return address;
 	}
 
+	public double getAdjustedPrice() {
+		return price + markup;
+	}
+
 	public boolean getAdultRequired() {
 		return adultRequired;
 	}
@@ -162,6 +167,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public String getGroupName() {
 		return groupName;
+	}
+
+	public double getMarkup() {
+		return markup;
 	}
 
 	public int getMaximumParticipants() {
@@ -344,6 +353,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	public void setMarkup(double markup) {
+		this.markup = markup;
 	}
 
 	public void setMaximumParticipants(int maximumParticipants) {
