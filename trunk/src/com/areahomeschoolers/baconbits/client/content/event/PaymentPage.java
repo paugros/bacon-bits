@@ -106,7 +106,7 @@ public final class PaymentPage implements Page {
 
 				if (!Common.isNullOrEmpty(table.getFullList())) {
 					PaddedPanel payPanel = new PaddedPanel(15);
-					Label l = new Label("Total:");
+					Label l = new Label("Amount due:");
 					l.addStyleName("hugeText");
 					payPanel.add(l);
 					total = new Label();
@@ -225,6 +225,10 @@ public final class PaymentPage implements Page {
 
 		for (Adjustment adjustment : adjustments.getFullList()) {
 			totalAmount += adjustment.getAmount();
+		}
+
+		if (totalAmount < 0) {
+			totalAmount = 0;
 		}
 
 		total.setText(Formatter.formatCurrency(totalAmount));

@@ -928,7 +928,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 	private double calculateMarkup(double price) {
 		// 2.9% to PayPal, then 2.5% and 50 cents to us
-		return price + (price * 0.054) + 0.5;
+		return (price * 0.054) + 0.5;
 	}
 
 	private EventField createBaseEventField(ResultSet rs) throws SQLException {

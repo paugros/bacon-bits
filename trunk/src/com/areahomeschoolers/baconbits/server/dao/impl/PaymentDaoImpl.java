@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.server.dao.impl;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -65,6 +66,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			Payment payment = new Payment();
 			payment.setId(rs.getInt("id"));
 			payment.setPrincipalAmount(rs.getDouble("amount"));
+			payment.setMarkupAmount(rs.getDouble("markupAmount"));
 			payment.setIpnDate(rs.getTimestamp("ipnDate"));
 			payment.setPayKey(rs.getString("payKey"));
 			payment.setPaymentDate(rs.getTimestamp("paymentDate"));
@@ -203,30 +205,33 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		List<Receiver> receiverLst = new ArrayList<Receiver>();
 
 		// Our cut
-		Receiver siteReceiver = new Receiver(p.getMarkupAmount());
+		Receiver siteReceiver = new Receiver(round(p.getTotalAmount(), 2, BigDecimal.ROUND_HALF_UP));
 		siteReceiver.setPaymentType("SERVICE");
-		siteReceiver.setPrimary(Boolean.TRUE);
 
 		// A receiver's email address
 		if (ServerContext.isLive()) {
 			siteReceiver.setEmail("paul.augros@gmail.com");
 		} else {
-			siteReceiver.setEmail("paul.a_1343673136_biz@gmail.com");
+			siteReceiver.setEmail("citrusgroups@citrusgroups.com"); // password same as email
 		}
-		receiverLst.add(siteReceiver);
 
 		// The organization's cut
-		Receiver orgReceiver = new Receiver(p.getPrincipalAmount());
-		orgReceiver.setPaymentType("SERVICE");
-		orgReceiver.setPrimary(Boolean.FALSE);
+		if (p.getPrincipalAmount() > 0) {
+			siteReceiver.setPrimary(Boolean.TRUE);
+			Receiver orgReceiver = new Receiver(round(p.getPrincipalAmount(), 2, BigDecimal.ROUND_HALF_UP));
+			orgReceiver.setPaymentType("SERVICE");
+			orgReceiver.setPrimary(Boolean.FALSE);
 
-		// org's email address
-		if (ServerContext.isLive()) {
-			orgReceiver.setEmail("weare.home.educators@gmail.com");
-		} else {
-			orgReceiver.setEmail("paul.a_1343673136_biz@gmail.com");
+			// org's email address
+			if (ServerContext.isLive()) {
+				orgReceiver.setEmail(ServerContext.getCurrentOrg().getPayPalEmail());
+			} else {
+				orgReceiver.setEmail("organization@fake.com"); // password same as email
+			}
+			receiverLst.add(orgReceiver);
 		}
-		receiverLst.add(orgReceiver);
+
+		receiverLst.add(siteReceiver);
 
 		ReceiverList receiverList = new ReceiverList(receiverLst);
 
@@ -245,7 +250,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 
 		payRequest.setClientDetails(cd);
 		if (!ServerContext.isLive()) {
-			payRequest.setSenderEmail("paul.a_1343673034_per@gmail.com"); // password: 343833982
+			payRequest.setSenderEmail("someone@enduser.com"); // password same as email
 		}
 
 		PayResponse payResponse = makePayPalApiCall(payRequest);
@@ -282,12 +287,16 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 				if (payment.getPrincipalAmount() < 0) {
 					payment.setMarkupAmount(payment.getMarkupAmount() + payment.getPrincipalAmount());
 					payment.setPrincipalAmount(0);
+				} else {
+					discount = 0;
 				}
 
 				// if there's any left over, put it back in the original discount variable
 				if (payment.getMarkupAmount() < 0) {
 					discount = payment.getMarkupAmount();
 					payment.setMarkupAmount(0);
+				} else {
+					discount = 0;
 				}
 
 			}
@@ -311,6 +320,20 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 				sql = "insert into paymentAdjustmentMapping (paymentId, adjustmentId) \n";
 				sql += "select ?, a.id from adjustments a where a.userId = ? and a.statusId = 1";
 				update(sql, payment.getId(), ServerContext.getCurrentUserId());
+
+				// mark all adjustments as applied
+				sql = "update adjustments set statusId = 2 where id in(select adjustmentId from paymentAdjustmentMapping where paymentId = ?)";
+				update(sql, payment.getId());
+
+				// then add a new adjustment for the left-over difference, if any
+				if (discount < 0) {
+					Adjustment adj = new Adjustment();
+					adj.setAmount(discount);
+					adj.setUserId(payment.getUserId());
+					adj.setAdjustmentTypeId(3);
+					adj.setStatusId(1);
+					saveAdjustment(adj);
+				}
 			}
 
 			if (payment.getTotalAmount() > 0) {
@@ -324,22 +347,6 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			} else {
 				// if a negative value, we don't need PayPal
 				data = new PaypalData();
-
-				if (adjustmentWasUsed) {
-					// mark all adjustments as applied
-					sql = "update adjustments set statusId = 2 where id in(select adjustmentId from paymentAdjustmentMapping where paymentId = ?)";
-					update(sql, payment.getId());
-
-					// then add a new adjustment for the left-over difference, if any
-					if (discount < 0) {
-						Adjustment adj = new Adjustment();
-						adj.setAmount(discount);
-						adj.setUserId(payment.getUserId());
-						adj.setAdjustmentTypeId(3);
-						adj.setStatusId(1);
-						saveAdjustment(adj);
-					}
-				}
 			}
 		}
 
@@ -428,6 +435,12 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			logger.severe("API Error Message: " + payResponse.getError().get(0).getMessage());
 		}
 		return payResponse;
+	}
+
+	private double round(double unrounded, int precision, int roundingMode) {
+		BigDecimal bd = new BigDecimal(unrounded);
+		BigDecimal rounded = bd.setScale(precision, roundingMode);
+		return rounded.doubleValue();
 	}
 
 }

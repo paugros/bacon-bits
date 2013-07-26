@@ -320,7 +320,10 @@ public class EventPage implements Page {
 				if (calendarEvent.getAdjustedPrice() == 0) {
 					text = "Free";
 				}
-				fieldTable.addField("Price", text);
+
+				if (calendarEvent.isSaved()) {
+					fieldTable.addField("Price:", text);
+				}
 			}
 		}
 
