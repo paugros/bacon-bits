@@ -115,6 +115,8 @@ public class EventPage implements Page {
 	private VolunteerPositionEditDialog volunteerDialog;
 	private AgeGroupEditDialog ageDialog;
 	private EmailDialog emailDialog;
+	private FormField priceField;
+	private Label priceLabel = new Label();
 
 	public EventPage(final VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -295,7 +297,7 @@ public class EventPage implements Page {
 					final Label priceDisplay = new Label();
 					final NumericTextBox priceInput = new NumericTextBox(2);
 					priceInput.setMaxLength(10);
-					FormField priceField = form.createFormField("Base price:", priceInput, priceDisplay);
+					priceField = form.createFormField("Base price:", priceInput, priceDisplay);
 					priceField.setInitializer(new Command() {
 						@Override
 						public void execute() {
@@ -316,13 +318,9 @@ public class EventPage implements Page {
 					fieldTable.addField(priceField);
 				}
 
-				String text = Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
-				if (calendarEvent.getAdjustedPrice() == 0) {
-					text = "Free";
-				}
-
 				if (calendarEvent.isSaved()) {
-					fieldTable.addField("Price:", text);
+					updatePriceDisplay();
+					fieldTable.addField("Price:", priceLabel);
 				}
 			}
 		}
@@ -992,8 +990,21 @@ public class EventPage implements Page {
 					calendarEvent = e;
 					form.setDto(e);
 					field.setInputVisibility(false);
+
+					if (field.equals(priceField)) {
+						updatePriceDisplay();
+					}
 				}
 			}
 		});
+	}
+
+	private void updatePriceDisplay() {
+		String text = Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
+		if (calendarEvent.getAdjustedPrice() == 0) {
+			text = "Free";
+		}
+
+		priceLabel.setText(text);
 	}
 }
