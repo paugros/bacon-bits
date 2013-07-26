@@ -64,7 +64,7 @@ public final class PaymentTable extends EntityCellTable<Payment, PaymentArg, Pay
 				addCurrencyColumn(col, new ValueGetter<Double, Payment>() {
 					@Override
 					public Double get(Payment item) {
-						return item.getPrincipalAmount();
+						return item.getTotalAmount();
 					}
 				});
 				break;
@@ -72,7 +72,7 @@ public final class PaymentTable extends EntityCellTable<Payment, PaymentArg, Pay
 				addTotaledCurrencyColumn("Amount", new ValueGetter<Number, Payment>() {
 					@Override
 					public Number get(Payment item) {
-						return item.getPrincipalAmount();
+						return item.getTotalAmount();
 					}
 				});
 				break;

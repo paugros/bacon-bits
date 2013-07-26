@@ -123,6 +123,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private int generalPolicyId;
 	private int eventPolicyId;
 	private int coopPolicyId;
+	private String payPalEmail;
 
 	// aux
 	private String organizationName;
@@ -186,6 +187,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	@Override
 	public int getOwningOrgId() {
 		return owningOrgId;
+	}
+
+	public String getPayPalEmail() {
+		return payPalEmail;
 	}
 
 	public int getPolicyId(GroupPolicy policy) {
@@ -285,6 +290,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	@Override
 	public void setOwningOrgId(int organizationId) {
 		this.owningOrgId = organizationId;
+	}
+
+	public void setPayPalEmail(String payPalEmail) {
+		this.payPalEmail = payPalEmail;
 	}
 
 	public void setPolicyId(GroupPolicy policy, int id) {

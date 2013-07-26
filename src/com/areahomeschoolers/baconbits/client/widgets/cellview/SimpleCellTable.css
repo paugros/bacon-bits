@@ -1,6 +1,6 @@
 .cellTableWidget {
 	border-collapse: collapse;
-	border: 1px solid #ACACAC;
+	border: 1px solid #acacac;
 }
 
 .cellTableHeader {
@@ -18,7 +18,7 @@
 }
 
 .cellTableCell {
-	border-top: 1px solid #ACACAC;
+	border-top: 1px solid #acacac;
 	padding-left: 8px;
 	padding-right: 8px;
 	padding-top: 8px;
@@ -43,11 +43,11 @@
 }
 
 .cellTableEvenRowCell {
-	background-color: #FFFFFF;
+	background-color: #ffffff;
 }
 
 .cellTableOddRowCell {
-	background-color: #FFFFFF;
+	background-color: #ffffff;
 }
 
 .cellTableSortableHeader:hover {
@@ -65,7 +65,7 @@
 }
 
 .cellTableSelectedRowCell {
-	background-color: #77B4E8;
+	background-color: #b0d5f2;
 }
 
 .cellTableKeyboardSelectedCell {
@@ -77,7 +77,7 @@
 }
 
 .cellTableFooter {
-	border-top: 1px solid #ACACAC;
+	border-top: 1px solid #acacac;
 	padding-left: 8px;
 	padding-right: 8px;
 	padding-top: 8px;
