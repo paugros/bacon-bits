@@ -17,7 +17,6 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
@@ -69,6 +68,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setCategoryId(rs.getInt("categoryId"));
 			event.setCost(rs.getDouble("cost"));
 			event.setPrice(rs.getDouble("price"));
+			event.setMarkup(rs.getDouble("markup"));
 			event.setDescription(rs.getString("description"));
 			event.setEndDate(rs.getTimestamp("endDate"));
 			event.setGroupId(rs.getInt("groupId"));
@@ -308,6 +308,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 					g.setMaximumParticipants(rs.getInt("maximumParticipants"));
 					g.setMinimumParticipants(rs.getInt("minimumParticipants"));
 					g.setPrice(rs.getDouble("price"));
+					g.setMarkup(rs.getDouble("markup"));
 					g.setRegisterCount(rs.getInt("registerCount"));
 					g.setFieldCount(rs.getInt("fieldCount"));
 					return g;
@@ -397,7 +398,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			sql += "join eventFields f on f.id = v.eventFieldId \n";
 			sql += "where v.participantId = p.id) as fieldValues, \n";
 		}
-		sql += "case isnull(a.price) when true then e.price else a.price end as price \n";
+		sql += "case isnull(a.price) when true then e.price else a.price end as price, \n";
+		sql += "case isnull(a.markup) when true then e.markup else a.markup end as markup \n";
 		sql += "from eventRegistrationParticipants p \n";
 		sql += "join users u on u.id = p.userId \n";
 		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
@@ -483,6 +485,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				p.setStatusId(rs.getInt("statusId"));
 				p.setStatus(rs.getString("status"));
 				p.setPrice(rs.getDouble("price"));
+				p.setMarkup(rs.getDouble("markup"));
 				p.setBirthDate(rs.getDate("birthDate"));
 				p.setAddedByFirstName(rs.getString("addedByFirstName"));
 				p.setAddedByLastName(rs.getString("addedByLastName"));
@@ -657,7 +660,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
-	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void overrideParticipantStatus(EventParticipant participant) {
 		String sql = "update eventRegistrationParticipants set statusId = ? where id = ?";
 		update(sql, participant.getStatusId(), participant.getId());
@@ -669,11 +671,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			return null;
 		}
 		ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.PARTICIPANT_IDS, participantIds);
-		// scrub the participants because client prices can't be trusted
+		// fetch the participants because client prices can't be trusted
 		List<EventParticipant> participants = getParticipants(args);
-		double total = 0.00;
+		double principal = 0.00;
+		double markup = 0.00;
 		for (EventParticipant p : participants) {
-			total += p.getPrice();
+			principal += p.getPrice();
+			markup += p.getMarkup();
 		}
 
 		// add a payment record
@@ -682,14 +686,15 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		p.setUserId(ServerContext.getCurrentUserId());
 		p.setPaymentTypeId(1);
 		p.setStatusId(1);
-		p.setAmount(total);
+		p.setPrincipalAmount(principal);
+		p.setMarkupAmount(markup);
 		p.setReturnPage("User&tab=1&userId=" + ServerContext.getCurrentUserId());
 		p.setMemo("Payment for events");
 		p = paymentDao.save(p);
 
 		String sql = "update eventRegistrationParticipants set paymentId = ?";
-		// for zero or negative payments, update status now instead of waiting for ipn
-		if (p.getAmount() <= 0) {
+		// for zero or negative payments, update status now because there will be no ipn
+		if (p.getTotalAmount() <= 0) {
 			sql += ", statusId = 2 ";
 		}
 		sql += " where id in(" + Common.join(participantIds, ", ") + ")";
@@ -702,9 +707,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	public Event save(Event event) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(event);
 
+		if (event.getPrice() > 0) {
+			event.setMarkup(calculateMarkup(event.getPrice()));
+		}
+
 		if (event.isSaved()) {
 			String sql = "update events set title = :title, description = :description, startDate = :startDate, endDate = :endDate, visibilityLevelId = :visibilityLevelId, ";
-			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, ";
+			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, markup = :markup, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, requiresRegistration = :requiresRegistration, ";
 			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, ";
@@ -715,10 +724,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 			event.setAddedById(ServerContext.getCurrentUserId());
 			event.setOwningOrgId(ServerContext.getCurrentOrgId());
 
-			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, ";
+			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, owningOrgId, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
-			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, ";
+			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, :markup, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, :owningOrgId, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
 
@@ -729,8 +738,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 
 			if (event.getCloneFromId() > 0) {
 				// clone age groups
-				sql = "insert into eventAgeGroups (eventId, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price, clonedFromId) ";
-				sql += "select ?, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price, id ";
+				sql = "insert into eventAgeGroups (eventId, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price, markup, clonedFromId) ";
+				sql += "select ?, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price, markup, id ";
 				sql += "from eventAgeGroups where eventId = ? order by id";
 				update(sql, event.getId(), event.getCloneFromId());
 
@@ -759,13 +768,17 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(ageGroup);
 
+		if (ageGroup.getPrice() > 0) {
+			ageGroup.setMarkup(calculateMarkup(ageGroup.getPrice()));
+		}
+
 		if (ageGroup.isSaved()) {
 			String sql = "update eventAgeGroups set minimumAge = :minimumAge, maximumAge = :maximumAge, minimumParticipants = :minimumParticipants, ";
-			sql += "maximumParticipants = :maximumParticipants, price = :price where id = :id";
+			sql += "maximumParticipants = :maximumParticipants, price = :price, markup = :markup where id = :id";
 			update(sql, namedParams);
 		} else {
-			String sql = "insert into eventAgeGroups (eventId, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price) ";
-			sql += "values(:eventId, :minimumAge, :maximumAge, :minimumParticipants, :maximumParticipants, :price)";
+			String sql = "insert into eventAgeGroups (eventId, minimumAge, maximumAge, minimumParticipants, maximumParticipants, price, markup) ";
+			sql += "values(:eventId, :minimumAge, :maximumAge, :minimumParticipants, :maximumParticipants, :price, :markup)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -913,6 +926,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 	}
 
+	private double calculateMarkup(double price) {
+		// 2.9% to PayPal, then 2.5% and 50 cents to us
+		return price + (price * 0.054) + 0.5;
+	}
+
 	private EventField createBaseEventField(ResultSet rs) throws SQLException {
 		EventField f = new EventField();
 		f.setId(rs.getInt("id"));
@@ -929,7 +947,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	private String createSqlBase() {
 		int userId = ServerContext.getCurrentUserId();
 		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.visibilityLevel, \n";
-		sql += "(select group_concat(price) from eventAgeGroups where eventId = e.id) as agePrices, \n";
+		sql += "(select group_concat(price + markup) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {
 			sql += "(select count(p.id) from eventRegistrationParticipants p join eventRegistrations r on r.id = p.eventRegistrationId and r.addedById = "
@@ -1235,7 +1253,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		// free events go straight to confirmed/paid
 		if (participant.getStatusId() == 1) {
 			for (EventParticipant p : list) {
-				if (p.getId() == participant.getId() && p.getPrice() == 0) {
+				if (p.getId() == participant.getId() && p.getAdjustedPrice() == 0) {
 					sql = "update eventRegistrationParticipants set statusId = 2 where id = ?";
 					update(sql, p.getId());
 					p.setStatusId(2);

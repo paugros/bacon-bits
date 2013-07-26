@@ -281,12 +281,12 @@ public class EventRegistrationSection extends Composite {
 			}
 			participantTable.setWidget(i, 0, editLabel);
 
-			participantTable.setText(i, 1, Formatter.formatCurrency(p.getPrice()));
+			participantTable.setText(i, 1, Formatter.formatCurrency(p.getAdjustedPrice()));
 			if (p.isCanceled() || registration.getCanceled()) {
 				participantTable.getCellFormatter().addStyleName(i, 1, "strikeText");
 			} else {
 				if (!p.isWaiting()) {
-					totalPrice += p.getPrice();
+					totalPrice += p.getAdjustedPrice();
 				}
 			}
 
@@ -357,7 +357,7 @@ public class EventRegistrationSection extends Composite {
 		if (pageData.getRegistration() != null) {
 			boolean hasPay = false;
 			for (EventParticipant p : pageData.getRegistration().getParticipants()) {
-				if (p.getPrice() > 0 && p.getStatusId() == 1) {
+				if (p.getAdjustedPrice() > 0 && p.getStatusId() == 1) {
 					hasPay = true;
 					break;
 				}

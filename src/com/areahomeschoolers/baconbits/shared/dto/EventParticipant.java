@@ -26,6 +26,7 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 	private User user;
 	private Date birthDate;
 	private double price;
+	private double markup;
 	private List<EventField> eventFields = new ArrayList<EventField>();
 	private String addedByFirstName, addedByLastName;
 	private int addedById;
@@ -59,6 +60,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 		return addedDate;
 	}
 
+	public double getAdjustedPrice() {
+		return price + markup;
+	}
+
 	public Integer getAgeGroupId() {
 		if (ageGroupId == null || ageGroupId == 0) {
 			return null;
@@ -84,6 +89,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public int getEventId() {
 		return eventId;
+	}
+
+	public Integer getEventOrganizationId() {
+		return eventOrganizationId;
 	}
 
 	public int getEventRegistrationId() {
@@ -112,6 +121,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public String getLastName() {
 		return lastName;
+	}
+
+	public double getMarkup() {
+		return markup;
 	}
 
 	public int getParentId() {
@@ -217,6 +230,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 		this.eventId = eventId;
 	}
 
+	public void setEventOrganizationId(Integer eventOrganizationId) {
+		this.eventOrganizationId = eventOrganizationId;
+	}
+
 	public void setEventRegistrationId(int eventRegistrationId) {
 		this.eventRegistrationId = eventRegistrationId;
 	}
@@ -243,6 +260,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public void setMarkup(double markup) {
+		this.markup = markup;
 	}
 
 	public void setParentId(int parentId) {
@@ -291,14 +312,6 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setUserId(int userId) {
 		this.userId = userId;
-	}
-
-	public Integer getEventOrganizationId() {
-		return eventOrganizationId;
-	}
-
-	public void setEventOrganizationId(Integer eventOrganizationId) {
-		this.eventOrganizationId = eventOrganizationId;
 	}
 
 }

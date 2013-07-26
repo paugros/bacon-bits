@@ -78,7 +78,7 @@ public class AgeGroupEditDialog extends EntityEditDialog<EventAgeGroup> {
 		ft.addField(participantsField);
 
 		final NumericTextBox priceInput = new NumericTextBox(2);
-		FormField priceField = form.createFormField("Price:", priceInput, null);
+		FormField priceField = form.createFormField("Base price:", priceInput, null);
 		priceField.setRequired(true);
 		priceField.setInitializer(new Command() {
 			@Override

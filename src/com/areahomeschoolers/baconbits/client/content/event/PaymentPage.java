@@ -220,7 +220,7 @@ public final class PaymentPage implements Page {
 
 		double totalAmount = 0.00;
 		for (EventParticipant p : table.getSelectedItems()) {
-			totalAmount += p.getPrice();
+			totalAmount += p.getAdjustedPrice();
 		}
 
 		for (Adjustment adjustment : adjustments.getFullList()) {

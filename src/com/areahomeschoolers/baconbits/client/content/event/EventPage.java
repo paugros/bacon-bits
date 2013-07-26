@@ -291,28 +291,36 @@ public class EventPage implements Page {
 			}
 
 			if (Common.isNullOrEmpty(pageData.getAgeGroups())) {
-				final Label priceDisplay = new Label();
-				final NumericTextBox priceInput = new NumericTextBox(2);
-				priceInput.setMaxLength(10);
-				FormField priceField = form.createFormField("Price:", priceInput, priceDisplay);
-				priceField.setInitializer(new Command() {
-					@Override
-					public void execute() {
-						String text = Formatter.formatCurrency(calendarEvent.getPrice());
-						if (calendarEvent.getPrice() == 0) {
-							text = "Free";
+				if (Application.administratorOf(calendarEvent)) {
+					final Label priceDisplay = new Label();
+					final NumericTextBox priceInput = new NumericTextBox(2);
+					priceInput.setMaxLength(10);
+					FormField priceField = form.createFormField("Base price:", priceInput, priceDisplay);
+					priceField.setInitializer(new Command() {
+						@Override
+						public void execute() {
+							String text = Formatter.formatCurrency(calendarEvent.getPrice());
+							if (calendarEvent.getPrice() == 0) {
+								text = "Free";
+							}
+							priceDisplay.setText(text);
+							priceInput.setValue(calendarEvent.getPrice());
 						}
-						priceDisplay.setText(text);
-						priceInput.setValue(calendarEvent.getPrice());
-					}
-				});
-				priceField.setDtoUpdater(new Command() {
-					@Override
-					public void execute() {
-						calendarEvent.setPrice(priceInput.getDouble());
-					}
-				});
-				fieldTable.addField(priceField);
+					});
+					priceField.setDtoUpdater(new Command() {
+						@Override
+						public void execute() {
+							calendarEvent.setPrice(priceInput.getDouble());
+						}
+					});
+					fieldTable.addField(priceField);
+				}
+
+				String text = Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
+				if (calendarEvent.getAdjustedPrice() == 0) {
+					text = "Free";
+				}
+				fieldTable.addField("Price", text);
 			}
 		}
 
@@ -652,7 +660,7 @@ public class EventPage implements Page {
 
 					if (pageData.getRegistration() != null) {
 						for (EventParticipant p : pageData.getRegistration().getParticipants()) {
-							if (p.getPrice() > 0 && p.getStatusId() == 1) {
+							if (p.getAdjustedPrice() > 0 && p.getStatusId() == 1) {
 								tb.addLink(new Hyperlink("Pay", PageUrl.payment()));
 								break;
 							}
@@ -884,7 +892,7 @@ public class EventPage implements Page {
 				ageTable.setWidget(row, 0, new Label(ageText));
 			}
 
-			ageTable.setText(row, 1, Formatter.formatCurrency(g.getPrice()));
+			ageTable.setText(row, 1, Formatter.formatCurrency(g.getAdjustedPrice()));
 
 			if (Application.administratorOf(calendarEvent) && (g.getRegisterCount() + g.getFieldCount()) == 0) {
 				ageTable.setWidget(row, 2, new ClickLabel("X", new ClickHandler() {
