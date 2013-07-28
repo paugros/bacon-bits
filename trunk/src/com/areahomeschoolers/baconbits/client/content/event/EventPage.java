@@ -37,6 +37,7 @@ import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.GoogleMapWidget;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
+import com.areahomeschoolers.baconbits.client.widgets.MarkupTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
@@ -295,8 +296,7 @@ public class EventPage implements Page {
 			if (Common.isNullOrEmpty(pageData.getAgeGroups())) {
 				if (Application.administratorOf(calendarEvent)) {
 					final Label priceDisplay = new Label();
-					final NumericTextBox priceInput = new NumericTextBox(2);
-					priceInput.setMaxLength(10);
+					final MarkupTextBox priceInput = new MarkupTextBox();
 					priceField = form.createFormField("Base price:", priceInput, priceDisplay);
 					priceField.setInitializer(new Command() {
 						@Override

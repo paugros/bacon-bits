@@ -178,7 +178,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 							if (item.getPrice() == 0) {
 								text = "Free";
 							} else {
-								text = Formatter.formatCurrency(item.getPrice());
+								text = Formatter.formatCurrency(item.getAdjustedPrice());
 							}
 						}
 						return text;
