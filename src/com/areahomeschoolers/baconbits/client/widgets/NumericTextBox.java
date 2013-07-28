@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
+import com.areahomeschoolers.baconbits.client.validation.HasValidator;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -17,7 +18,7 @@ import com.google.gwt.user.client.ui.TextBox;
  * An extension of {@link ValidationTextBox} that: <b>a)</b> allows numeric characters into it, and <b>b)</b> formats input according to the specified
  * precision. This class will not produce validation errors because it does not allow malformed data to be entered.
  */
-public class NumericTextBox extends TextBox implements com.areahomeschoolers.baconbits.client.validation.HasValidator {
+public class NumericTextBox extends TextBox implements HasValidator {
 	private final List<Character> allowedChars = new ArrayList<Character>();
 	private boolean allowNegatives = false;
 	private double minimumValue;

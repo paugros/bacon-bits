@@ -123,6 +123,11 @@ public abstract class Common {
 		return Integer.toString((b & 0xff) + 0x100, 16).substring(1).toUpperCase();
 	}
 
+	public static double calculateEventMarkup(double price) {
+		// 2.9% to PayPal, then 2.5% and 50 cents to us
+		return (price * 0.054) + 0.5;
+	}
+
 	/**
 	 * Converts degrees to radians.
 	 * 

@@ -216,20 +216,21 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		}
 
 		// The organization's cut
-		if (p.getPrincipalAmount() > 0) {
-			siteReceiver.setPrimary(Boolean.TRUE);
-			Receiver orgReceiver = new Receiver(round(p.getPrincipalAmount(), 2, BigDecimal.ROUND_HALF_UP));
-			orgReceiver.setPaymentType("SERVICE");
-			orgReceiver.setPrimary(Boolean.FALSE);
-
-			// org's email address
-			if (ServerContext.isLive()) {
-				orgReceiver.setEmail(ServerContext.getCurrentOrg().getPayPalEmail());
-			} else {
-				orgReceiver.setEmail("organization@fake.com"); // password same as email
-			}
-			receiverLst.add(orgReceiver);
-		}
+		// TODO re-enable when ready
+		// if (p.getPrincipalAmount() > 0) {
+		// siteReceiver.setPrimary(Boolean.TRUE);
+		// Receiver orgReceiver = new Receiver(round(p.getPrincipalAmount(), 2, BigDecimal.ROUND_HALF_UP));
+		// orgReceiver.setPaymentType("SERVICE");
+		// orgReceiver.setPrimary(Boolean.FALSE);
+		//
+		// // org's email address
+		// if (ServerContext.isLive()) {
+		// orgReceiver.setEmail(ServerContext.getCurrentOrg().getPayPalEmail());
+		// } else {
+		// orgReceiver.setEmail("organization@fake.com"); // password same as email
+		// }
+		// receiverLst.add(orgReceiver);
+		// }
 
 		receiverLst.add(siteReceiver);
 

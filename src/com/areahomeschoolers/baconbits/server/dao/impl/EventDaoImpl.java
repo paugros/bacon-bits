@@ -708,7 +708,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(event);
 
 		if (event.getPrice() > 0 && event.getCategoryId() != 6) {
-			event.setMarkup(calculateMarkup(event.getPrice()));
+			event.setMarkup(Common.calculateEventMarkup(event.getPrice()));
 		}
 
 		if (event.isSaved()) {
@@ -769,7 +769,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(ageGroup);
 
 		if (ageGroup.getPrice() > 0) {
-			ageGroup.setMarkup(calculateMarkup(ageGroup.getPrice()));
+			ageGroup.setMarkup(Common.calculateEventMarkup(ageGroup.getPrice()));
 		}
 
 		if (ageGroup.isSaved()) {
@@ -924,11 +924,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				update(sql, mapping.getInt("addedById"), mapping.getInt("eventVolunteerPositionId"), position.getDouble("discount") * -1);
 			}
 		}
-	}
-
-	private double calculateMarkup(double price) {
-		// 2.9% to PayPal, then 2.5% and 50 cents to us
-		return (price * 0.054) + 0.5;
 	}
 
 	private EventField createBaseEventField(ResultSet rs) throws SQLException {
