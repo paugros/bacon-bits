@@ -707,7 +707,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	public Event save(Event event) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(event);
 
-		if (event.getPrice() > 0) {
+		if (event.getPrice() > 0 && event.getCategoryId() != 6) {
 			event.setMarkup(calculateMarkup(event.getPrice()));
 		}
 
