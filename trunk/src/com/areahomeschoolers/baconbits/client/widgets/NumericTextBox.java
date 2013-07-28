@@ -39,15 +39,15 @@ public class NumericTextBox extends TextBox implements HasValidator {
 				validator.setError(true);
 			}
 
-			Double doubleValue = getDouble();
+			double doubleValue = getDouble();
 
-			if (minimumValue > 0 && doubleValue != null) {
+			if (minimumValue > 0) {
 				if (doubleValue < minimumValue) {
 					validator.setError(true);
 				}
 			}
 
-			if (maximumValue > 0 && doubleValue != null) {
+			if (maximumValue > 0) {
 				if (doubleValue > maximumValue) {
 					validator.setError(true);
 				}
@@ -103,13 +103,13 @@ public class NumericTextBox extends TextBox implements HasValidator {
 		return allowNegatives;
 	}
 
-	public Double getDouble() {
+	public double getDouble() {
 		String value = getText();
 		if (Common.isDouble(value)) {
 			return Double.parseDouble(value);
 		}
 
-		return null;
+		return 0;
 	}
 
 	public Integer getInteger() {
