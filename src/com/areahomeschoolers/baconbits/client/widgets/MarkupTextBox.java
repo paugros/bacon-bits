@@ -40,7 +40,7 @@ public class MarkupTextBox extends Composite {
 		initWidget(hp);
 	}
 
-	public double getDouble() {
+	public Double getDouble() {
 		return input.getDouble();
 	}
 

@@ -284,6 +284,27 @@ public class EventPage implements Page {
 			fieldTable.addField(phoneField);
 		}
 
+		if (Application.administratorOf(calendarEvent)) {
+			final Label costDisplay = new Label();
+			final NumericTextBox costInput = new NumericTextBox(2);
+			costInput.setMaxLength(10);
+			FormField costField = form.createFormField("Cost:", costInput, costDisplay);
+			costField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					costDisplay.setText(Formatter.formatCurrency(calendarEvent.getCost()));
+					costInput.setValue(calendarEvent.getCost());
+				}
+			});
+			costField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setCost(costInput.getDouble());
+				}
+			});
+			fieldTable.addField(costField);
+		}
+
 		if (calendarEvent.getRequiresRegistration()) {
 			if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
 				ageTable.setWidth("150px");
@@ -373,9 +394,7 @@ public class EventPage implements Page {
 				}
 			});
 			fieldTable.addField(instructionsField);
-		}
 
-		if (Application.administratorOf(calendarEvent)) {
 			final Label registrationDatesDisplay = new Label();
 			final DateTimeRangeBox registrationDatesInput = new DateTimeRangeBox();
 			FormField registrationDatesField = form.createFormField("Registration open/close:", registrationDatesInput, registrationDatesDisplay);
@@ -490,25 +509,6 @@ public class EventPage implements Page {
 				}
 			});
 			fieldTable.addField(emailField);
-
-			final Label costDisplay = new Label();
-			final NumericTextBox costInput = new NumericTextBox(2);
-			costInput.setMaxLength(10);
-			FormField costField = form.createFormField("Cost:", costInput, costDisplay);
-			costField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					costDisplay.setText(Formatter.formatCurrency(calendarEvent.getCost()));
-					costInput.setValue(calendarEvent.getCost());
-				}
-			});
-			costField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setCost(costInput.getDouble());
-				}
-			});
-			fieldTable.addField(costField);
 
 			if ((Common.isNullOrEmpty(pageData.getAgeGroups()) || Application.administratorOf(calendarEvent)) || !calendarEvent.getRequiresRegistration()) {
 				final NumericRangeBox participantInput = new NumericRangeBox();
