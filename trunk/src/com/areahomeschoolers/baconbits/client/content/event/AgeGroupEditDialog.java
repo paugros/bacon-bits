@@ -10,8 +10,8 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
-import com.areahomeschoolers.baconbits.client.widgets.MarkupTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
+import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 
 import com.google.gwt.user.client.Command;
@@ -77,8 +77,8 @@ public class AgeGroupEditDialog extends EntityEditDialog<EventAgeGroup> {
 		});
 		ft.addField(participantsField);
 
-		final MarkupTextBox priceInput = new MarkupTextBox();
-		FormField priceField = form.createFormField("Base price:", priceInput, null);
+		final NumericTextBox priceInput = new NumericTextBox(2);
+		FormField priceField = form.createFormField("Price:", priceInput, null);
 		priceField.setRequired(true);
 		priceField.setInitializer(new Command() {
 			@Override
