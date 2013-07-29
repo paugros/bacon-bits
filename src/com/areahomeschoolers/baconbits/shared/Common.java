@@ -125,7 +125,8 @@ public abstract class Common {
 
 	public static double calculateEventMarkup(double price) {
 		// 2.9% to PayPal, then 2.5% and 50 cents to us
-		return (price * 0.054) + 0.5;
+		return 0;
+		// return (price * 0.054) + 0.5;
 	}
 
 	/**
