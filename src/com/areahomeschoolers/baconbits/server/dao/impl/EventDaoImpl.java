@@ -263,7 +263,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		if (a == null) {
 			a = new Article();
 			a.setTitle("Welcome!");
-			String text = "Welcome to " + ServerContext.getCurrentOrg().getGroupName() + ". ";
+			String text;
+			if (org != null) {
+				text = "Welcome to " + org.getGroupName() + ". ";
+			} else {
+				text = "Welcome. ";
+			}
 			text += "Our site is still being constructed, but you can have a look around anyway.";
 			a.setArticle(text);
 		}
