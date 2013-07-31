@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -29,6 +30,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.RowStyles;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -141,14 +143,7 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
 						@Override
 						protected Widget createWidget(final UserGroup item) {
-							return new ClickLabel(item.getGroupName(), new ClickHandler() {
-								@Override
-								public void onClick(ClickEvent event) {
-									UserGroupEditDialog dialog = new UserGroupEditDialog(UserGroupTable.this);
-									dialog.setText("Edit Group");
-									dialog.center(item);
-								}
-							});
+							return new Hyperlink(item.getGroupName(), PageUrl.userGroup(item.getId()));
 						}
 					});
 				} else {

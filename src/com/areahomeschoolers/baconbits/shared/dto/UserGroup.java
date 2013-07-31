@@ -118,11 +118,11 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private String shortName;
 	private String orgDomain;
 	private String orgSubDomain;
-	private int privateGreetingId;
-	private int publicGreetingId;
-	private int generalPolicyId;
-	private int eventPolicyId;
-	private int coopPolicyId;
+	private Integer privateGreetingId;
+	private Integer publicGreetingId;
+	private Integer generalPolicyId;
+	private Integer eventPolicyId;
+	private Integer coopPolicyId;
 	private String payPalEmail;
 
 	// aux
@@ -139,7 +139,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return isAdministrator;
 	}
 
-	public int getCoopPolicyId() {
+	public Integer getCoopPolicyId() {
+		if (coopPolicyId == 0) {
+			return null;
+		}
 		return coopPolicyId;
 	}
 
@@ -151,11 +154,17 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return endDate;
 	}
 
-	public int getEventPolicyId() {
+	public Integer getEventPolicyId() {
+		if (eventPolicyId == 0) {
+			return null;
+		}
 		return eventPolicyId;
 	}
 
-	public int getGeneralPolicyId() {
+	public Integer getGeneralPolicyId() {
+		if (generalPolicyId == 0) {
+			return null;
+		}
 		return generalPolicyId;
 	}
 
@@ -210,11 +219,17 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		}
 	}
 
-	public int getPrivateGreetingId() {
+	public Integer getPrivateGreetingId() {
+		if (privateGreetingId == 0) {
+			return null;
+		}
 		return privateGreetingId;
 	}
 
-	public int getPublicGreetingId() {
+	public Integer getPublicGreetingId() {
+		if (publicGreetingId == 0) {
+			return null;
+		}
 		return publicGreetingId;
 	}
 
@@ -242,7 +257,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		this.isAdministrator = isAdministrator;
 	}
 
-	public void setCoopPolicyId(int coopPolicyId) {
+	public void setCoopPolicyId(Integer coopPolicyId) {
 		this.coopPolicyId = coopPolicyId;
 	}
 
@@ -254,11 +269,11 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		this.endDate = endDate;
 	}
 
-	public void setEventPolicyId(int eventPolicyId) {
+	public void setEventPolicyId(Integer eventPolicyId) {
 		this.eventPolicyId = eventPolicyId;
 	}
 
-	public void setGeneralPolicyId(int generalPolicyId) {
+	public void setGeneralPolicyId(Integer generalPolicyId) {
 		this.generalPolicyId = generalPolicyId;
 	}
 
@@ -312,11 +327,11 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		}
 	}
 
-	public void setPrivateGreetingId(int privateGreetingId) {
+	public void setPrivateGreetingId(Integer privateGreetingId) {
 		this.privateGreetingId = privateGreetingId;
 	}
 
-	public void setPublicGreetingId(int publicGreetingId) {
+	public void setPublicGreetingId(Integer publicGreetingId) {
 		this.publicGreetingId = publicGreetingId;
 	}
 

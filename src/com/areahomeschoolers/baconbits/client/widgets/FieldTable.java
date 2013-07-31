@@ -126,9 +126,24 @@ public class FieldTable extends Composite {
 		return flexTable;
 	}
 
+	public void hideField(FormField field) {
+		field.setEnabled(false);
+		if (parentRows.get(field) != null) {
+			flexTable.getRowFormatter().setVisible(parentRows.get(field).getRowIndex(), false);
+		}
+	}
+
 	public void removeAllRows() {
 		if (flexTable.getRowCount() > 0) {
 			flexTable.removeAllRows();
+		}
+	}
+
+	public void setFieldVisibility(FormField field, boolean visible) {
+		if (visible) {
+			showField(field);
+		} else {
+			hideField(field);
 		}
 	}
 
@@ -155,6 +170,13 @@ public class FieldTable extends Composite {
 	public void setText(String text) {
 		flexTable.removeAllRows();
 		flexTable.setText(0, 0, text);
+	}
+
+	public void showField(FormField field) {
+		field.setEnabled(true);
+		if (parentRows.get(field) != null) {
+			flexTable.getRowFormatter().setVisible(parentRows.get(field).getRowIndex(), true);
+		}
 	}
 
 	private void addField(Widget label, Widget content) {

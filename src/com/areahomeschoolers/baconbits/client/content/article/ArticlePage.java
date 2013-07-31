@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
@@ -22,6 +23,7 @@ import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
@@ -108,9 +110,10 @@ public class ArticlePage implements Page {
 		});
 		fieldTable.addField(titleField);
 
-		if (Application.isAuthenticated()) {
+		if (allowEdit()) {
 			final Label accessDisplay = new Label();
 			final ItemVisibilityWidget accessInput = new ItemVisibilityWidget();
+			accessInput.showOnlyCurrentOrganization();
 			accessInput.removeItem(VisibilityLevel.PRIVATE);
 			accessInput.removeItem(VisibilityLevel.MY_GROUPS);
 			FormField accessField = form.createFormField("Visible to:", accessInput, accessDisplay);
@@ -134,6 +137,24 @@ public class ArticlePage implements Page {
 				}
 			});
 			fieldTable.addField(accessField);
+
+			final Label endDateDisplay = new Label();
+			final ValidatorDateBox endDateInput = new ValidatorDateBox();
+			FormField endDateField = form.createFormField("Inactive date:", endDateInput, endDateDisplay);
+			endDateField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					endDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(article.getEndDate())));
+					endDateInput.setValue(article.getEndDate());
+				}
+			});
+			endDateField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					article.setEndDate(endDateInput.getValue());
+				}
+			});
+			fieldTable.addField(endDateField);
 		}
 
 		if (article.isSaved() && (article.hasTags() || allowEdit())) {

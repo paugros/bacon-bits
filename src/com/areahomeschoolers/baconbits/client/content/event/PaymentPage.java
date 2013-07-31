@@ -15,7 +15,6 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
-import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
@@ -34,12 +33,12 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
-import com.google.gwt.dom.client.Style.Cursor;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -51,9 +50,11 @@ public final class PaymentPage implements Page {
 	private EventParticipantTable table;
 	private Label total;
 	private SimplePanel payContainer = new SimplePanel();
-	// used to prevent double pay
-	private boolean paying;
 	private AdjustmentTable adjustments;
+	private SimplePanel buttonContainer = new SimplePanel();
+	private ClickHandler payClickHandler;
+	private Button payPalButton;
+	private Button adjustmentButton;
 
 	public PaymentPage(final VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
@@ -71,6 +72,7 @@ public final class PaymentPage implements Page {
 		table.disablePaging();
 		table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
 		table.setWidth("850px");
+		buttonContainer.getElement().getStyle().setPaddingTop(10, Unit.PX);
 
 		final VerticalPanel vp = new VerticalPanel();
 		vp.setSpacing(15);
@@ -89,6 +91,60 @@ public final class PaymentPage implements Page {
 		page.add(vp);
 		page.add(WidgetFactory.wrapForWidth(payContainer, ContentWidth.MAXWIDTH750PX));
 		page.setCellHorizontalAlignment(payContainer, HasHorizontalAlignment.ALIGN_RIGHT);
+
+		payClickHandler = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				payPalButton.setEnabled(false);
+				adjustmentButton.setEnabled(false);
+
+				// list of selected items
+				List<EventParticipant> items = table.getSelectedItems();
+
+				// at least one is required
+				if (items.isEmpty()) {
+					AlertDialog.alert("Please select at least one item.");
+					return;
+				}
+
+				Map<Integer, Boolean> states = new HashMap<Integer, Boolean>();
+				for (EventParticipant p : table.getFullList()) {
+					if (p.getRequiredInSeries()) {
+						// required series events for the same series must be all of the same state
+						if (!states.containsKey(p.getEventSeriesId())) {
+							states.put(p.getEventSeriesId(), items.contains(p));
+						} else {
+							if (!states.get(p.getEventSeriesId()).equals(items.contains(p))) {
+								AlertDialog.alert("Event dates in the following series must be paid for together: " + p.getEventTitle());
+								return;
+							}
+						}
+					}
+				}
+
+				eventService.payForEvents(Common.asArrayList(table.getSelectedItemIds()), new Callback<PaypalData>() {
+					@Override
+					protected void doOnFailure(Throwable caught) {
+						super.doOnFailure(caught);
+						payPalButton.setEnabled(true);
+						adjustmentButton.setEnabled(true);
+					}
+
+					@Override
+					protected void doOnSuccess(PaypalData result) {
+						if (result.getAuthorizationUrl() != null) {
+							Window.Location.replace(result.getAuthorizationUrl());
+						} else {
+							HistoryToken.set(PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
+						}
+					}
+
+				});
+			}
+		};
+
+		payPalButton = new Button("Check Out With PayPal&trade;", payClickHandler);
+		adjustmentButton = new Button("Apply My Adjustments", payClickHandler);
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
@@ -115,64 +171,10 @@ public final class PaymentPage implements Page {
 					VerticalPanel pvp = new VerticalPanel();
 					pvp.setWidth("100%");
 					pvp.add(payPanel);
-					Image logo = new Image(MainImageBundle.INSTANCE.paypalButton());
-					logo.getElement().getStyle().setCursor(Cursor.POINTER);
-					logo.addClickHandler(new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							// list of selected items
-							List<EventParticipant> items = table.getSelectedItems();
-
-							// at least one is required
-							if (items.isEmpty()) {
-								AlertDialog.alert("Please select at least one item.");
-								return;
-							}
-
-							Map<Integer, Boolean> states = new HashMap<Integer, Boolean>();
-							for (EventParticipant p : table.getFullList()) {
-								if (p.getRequiredInSeries()) {
-									// required series events for the same series must be all of the same state
-									if (!states.containsKey(p.getEventSeriesId())) {
-										states.put(p.getEventSeriesId(), items.contains(p));
-									} else {
-										if (!states.get(p.getEventSeriesId()).equals(items.contains(p))) {
-											AlertDialog.alert("Event dates in the following series must be paid for together: " + p.getEventTitle());
-											return;
-										}
-									}
-								}
-							}
-
-							if (paying) {
-								return;
-							}
-
-							paying = true;
-
-							eventService.payForEvents(Common.asArrayList(table.getSelectedItemIds()), new Callback<PaypalData>() {
-								@Override
-								protected void doOnFailure(Throwable caught) {
-									super.doOnFailure(caught);
-									paying = false;
-								}
-
-								@Override
-								protected void doOnSuccess(PaypalData result) {
-									if (result.getAuthorizationUrl() != null) {
-										Window.Location.replace(result.getAuthorizationUrl());
-									} else {
-										HistoryToken.set(PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
-									}
-								}
-
-							});
-						}
-					});
-					pvp.add(logo);
-
+					pvp.add(buttonContainer);
 					pvp.setCellHorizontalAlignment(payPanel, HasHorizontalAlignment.ALIGN_RIGHT);
-					pvp.setCellHorizontalAlignment(logo, HasHorizontalAlignment.ALIGN_RIGHT);
+					pvp.setCellHorizontalAlignment(buttonContainer, HasHorizontalAlignment.ALIGN_RIGHT);
+
 					payContainer.setWidget(pvp);
 				}
 
@@ -229,6 +231,11 @@ public final class PaymentPage implements Page {
 
 		if (totalAmount < 0) {
 			totalAmount = 0;
+			buttonContainer.setWidget(adjustmentButton);
+		} else if (totalAmount > 0) {
+			buttonContainer.setWidget(payPalButton);
+		} else {
+			buttonContainer.clear();
 		}
 
 		total.setText(Formatter.formatCurrency(totalAmount));

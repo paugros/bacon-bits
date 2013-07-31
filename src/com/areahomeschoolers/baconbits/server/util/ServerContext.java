@@ -173,6 +173,10 @@ public class ServerContext implements ApplicationContextAware {
 		getSession().setAttribute("user", u);
 	}
 
+	public static void setCurrentUser(User u) {
+		getSession().setAttribute("user", u);
+	}
+
 	public static void switchToUser(int userId) {
 		User currentUser = getCurrentUser();
 		if (currentUser.getId() == userId || currentUser.canSwitch() == false) {
