@@ -139,7 +139,7 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 
 	@Override
 	public void logout() {
-		ServerContext.setCurrentUser(null);
+		ServerContext.setCurrentUser((User) null);
 		ServerContext.getSession().setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, null);
 		SecurityContextHolder.clearContext();
 	}

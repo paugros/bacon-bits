@@ -554,6 +554,7 @@ public class EventPage implements Page {
 
 			final Label accessDisplay = new Label();
 			final ItemVisibilityWidget accessInput = new ItemVisibilityWidget();
+			accessInput.showOnlyCurrentOrganization();
 			accessInput.removeItem(VisibilityLevel.PRIVATE);
 			accessInput.removeItem(VisibilityLevel.MY_GROUPS);
 			FormField accessField = form.createFormField("Visible to:", accessInput, accessDisplay);
@@ -678,7 +679,7 @@ public class EventPage implements Page {
 				}
 			});
 
-			if (calendarEvent.getRequiresRegistration()) {
+			if (calendarEvent.getRequiresRegistration() && calendarEvent.getCategoryId() != 6) {
 				tabPanel.add("Register", false, new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {

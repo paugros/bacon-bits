@@ -57,6 +57,11 @@ public class PageUrl {
 		return (id == 0) ? url : url + "&userId=" + id;
 	}
 
+	public static String userGroup(int id) {
+		String url = "page=UserGroup";
+		return (id == 0) ? url : url + "&userGroupId=" + id;
+	}
+
 	public static String userGroupList() {
 		return "page=UserGroupList";
 	}

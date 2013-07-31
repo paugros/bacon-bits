@@ -39,6 +39,7 @@ public class DateTimeRangeBox extends Composite implements HasValidator, CustomF
 	private boolean allDay = false;
 
 	public DateTimeRangeBox() {
+		panel.add(new Label("from "));
 		panel.add(startDateBox);
 		panel.add(new Label(" to "));
 		panel.add(endDateBox);

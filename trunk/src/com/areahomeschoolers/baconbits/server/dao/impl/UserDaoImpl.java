@@ -750,10 +750,18 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
 
-			user.setId(Integer.parseInt(keys.getKeys().get(Constants.GENERATED_KEY_TOKEN).toString()));
+			user.setId(ServerUtils.getIdFromKeys(keys));
 		}
 
-		retData.setData(getById(user.getId()));
+		User returnUser = getById(user.getId());
+
+		retData.setData(returnUser);
+
+		// when updating your own user, ensure that it gets rewritten to the session
+		if (user.equals(ServerContext.getCurrentUser())) {
+			ServerContext.setCurrentUser(user);
+		}
+
 		return retData;
 	}
 
@@ -774,7 +782,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
 
-			item.setId(Integer.parseInt(keys.getKeys().get(Constants.GENERATED_KEY_TOKEN).toString()));
+			item.setId(ServerUtils.getIdFromKeys(keys));
 		}
 
 		return item;
@@ -794,7 +802,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
 
-			privacyPreference.setId(Integer.parseInt(keys.getKeys().get(Constants.GENERATED_KEY_TOKEN).toString()));
+			privacyPreference.setId(ServerUtils.getIdFromKeys(keys));
 		}
 
 		return privacyPreference;
@@ -807,7 +815,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (group.isSaved()) {
 			String sql = "update groups set groupName = :groupName, description = :description, startDate = :startDate, ";
 			sql += "publicGreetingId = :publicGreetingId, privateGreetingId = :privateGreetingId, generalPolicyId = :generalPolicyId, ";
-			sql += "eventPolicyId = :eventPolicyId, coopPolicyId, = :coopPolicyId, ";
+			sql += "eventPolicyId = :eventPolicyId, coopPolicyId = :coopPolicyId, payPalEmail = :payPalEmail, ";
 			sql += "shortName = :shortName, orgDomain = :orgDomain, orgSubDomain = :orgSubDomain, endDate = :endDate where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -815,22 +823,28 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				group.setStartDate(new Date());
 			}
 
-			String sql = "insert into groups (groupName, description, isOrganization, organizationId, startDate, ";
-			sql += "shortName, orgDomain, orgSubDomain, endDate) ";
-			sql += "values(:groupName, :description, :organization, :owningOrgId, :startDate, ";
-			sql += ":shortName, :orgDomain, :orgSubDomain, :endDate)";
+			String sql = "insert into groups (groupName, description, isOrganization, startDate, ";
+			if (group.getOwningOrgId() > 0) {
+				sql += "organizationId, ";
+			}
+			sql += "shortName, orgDomain, orgSubDomain, payPalEmail, endDate) ";
+			sql += "values(:groupName, :description, :organization, :startDate, ";
+			if (group.getOwningOrgId() > 0) {
+				sql += ":owningOrgId, ";
+			}
+			sql += ":shortName, :orgDomain, :orgSubDomain, :payPalEmail, :endDate)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
 
-			group.setId(Integer.parseInt(keys.getKeys().get(Constants.GENERATED_KEY_TOKEN).toString()));
+			group.setId(ServerUtils.getIdFromKeys(keys));
 			if (group.getOrganization()) {
 				update("update groups set organizationId = id where id = ?", group.getId());
 				group.setOrganizationName(group.getGroupName());
 			}
 		}
 
-		return group;
+		return listGroups(new ArgMap<UserGroupArg>(UserGroupArg.ID, group.getId())).get(0);
 	}
 
 	@Override
@@ -855,7 +869,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			body += "If clicking the link above doesn't work, please copy and paste the URL in a new browser window instead.\n\n";
 			body += "If you've received this mail in error, it's likely that another user entered your email address by mistake while trying to reset a password. ";
 			body += "If you didn't initiate the request, you don't need to take any further action and can safely disregard this email.\n\n";
-			body += "If you have further difficulty or any questions, please contact Kristin Augros at kaugros@gmail.com.\n\n";
+			body += "If you have any questions, please contact Kristin Augros at kaugros@gmail.com.\n\n";
 			body += "Thank you for using " + sn + " services.\n\n";
 			body += "This is a post-only mailing.  Replies to this message are not monitored or answered.";
 			mailer.setBody(body);

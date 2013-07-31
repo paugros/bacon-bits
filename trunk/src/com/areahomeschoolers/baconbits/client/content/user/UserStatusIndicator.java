@@ -92,7 +92,7 @@ public class UserStatusIndicator extends Composite {
 
 		if (lastActivity == null) {
 			icon.removeFromParent();
-			idleTime.setText("Never");
+			idleTime.setText("");
 			setTitle("");
 			return;
 		}
@@ -102,12 +102,14 @@ public class UserStatusIndicator extends Composite {
 		String titlePrefix = "";
 		if (idleMinutes < 5) {
 			icon.setResource(MainImageBundle.INSTANCE.circleGreen());
-		} else if (idleMinutes < (60 * 12)) {
-			titlePrefix = "Idle ";
+		} else if (idleMinutes < (60 * 48)) {
+			titlePrefix = "";
 			icon.setResource(MainImageBundle.INSTANCE.circleOrange());
 		} else {
-			titlePrefix = "Logged out ";
-			icon.setResource(MainImageBundle.INSTANCE.circleGray());
+			titlePrefix = "";
+			icon.setResource(MainImageBundle.INSTANCE.pixel());
+			// titlePrefix = "Logged out ";
+			// icon.setResource(MainImageBundle.INSTANCE.circleGray());
 		}
 
 		updateIdleTime(idleMinutes);
@@ -120,7 +122,7 @@ public class UserStatusIndicator extends Composite {
 	}
 
 	private void updateIdleTime(long minutes) {
-		String text;
+		String text = "";
 		if (minutes < 5) {
 			text = "Active";
 		} else if (minutes < 60) {
@@ -132,23 +134,23 @@ public class UserStatusIndicator extends Composite {
 				text += "s";
 			}
 		} else if (minutes < (60 * 24 * 14)) {
-			double days = Math.round((minutes / 60.0) / 24);
-			text = Formatter.formatNumber(days, "0") + " day";
-			if (days > 1) {
-				text += "s";
-			}
+			// double days = Math.round((minutes / 60.0) / 24);
+			// text = Formatter.formatNumber(days, "0") + " day";
+			// if (days > 1) {
+			// text += "s";
+			// }
 		} else if (minutes < (60 * 24 * 60)) {
-			double weeks = Math.round(((minutes / 60.0) / 24) / 7);
-			text = Formatter.formatNumber(weeks, "0") + " week";
-			if (weeks > 1) {
-				text += "s";
-			}
+			// double weeks = Math.round(((minutes / 60.0) / 24) / 7);
+			// text = Formatter.formatNumber(weeks, "0") + " week";
+			// if (weeks > 1) {
+			// text += "s";
+			// }
 		} else {
-			double months = Math.round(((minutes / 60.0) / 24) / 30.5);
-			text = Formatter.formatNumber(months, "0") + " month";
-			if (months > 1) {
-				text += "s";
-			}
+			// double months = Math.round(((minutes / 60.0) / 24) / 30.5);
+			// text = Formatter.formatNumber(months, "0") + " month";
+			// if (months > 1) {
+			// text += "s";
+			// }
 		}
 
 		idleTime.setText(text);

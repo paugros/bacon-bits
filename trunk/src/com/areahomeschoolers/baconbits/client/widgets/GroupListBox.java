@@ -19,6 +19,7 @@ public class GroupListBox extends DefaultListBox {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private static List<UserGroup> groups;
 	private boolean onlyOrgs = false;
+	private boolean onlyCurrentOrg = false;
 	private Command populateCommand;
 
 	public GroupListBox() {
@@ -33,6 +34,11 @@ public class GroupListBox extends DefaultListBox {
 		}
 	}
 
+	public void showOnlyCurrentOrganization() {
+		onlyCurrentOrg = true;
+		populate();
+	}
+
 	public void showOnlyOrganizations() {
 		onlyOrgs = true;
 		populate();
@@ -45,6 +51,11 @@ public class GroupListBox extends DefaultListBox {
 			if (onlyOrgs && !g.getOrganization()) {
 				continue;
 			}
+
+			if (onlyCurrentOrg && g.getOwningOrgId() != Application.getCurrentOrgId()) {
+				continue;
+			}
+
 			String text = g.getGroupName();
 			if (!g.getOrganization()) {
 				text = " - " + text;

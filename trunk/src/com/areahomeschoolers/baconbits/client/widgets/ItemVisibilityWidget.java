@@ -112,6 +112,10 @@ public class ItemVisibilityWidget extends Composite {
 		toggleGroupListBox();
 	}
 
+	public void showOnlyCurrentOrganization() {
+		glb.showOnlyCurrentOrganization();
+	}
+
 	private void toggleGroupListBox() {
 		int levelId = alb.getIntValue();
 

@@ -44,8 +44,9 @@ public class DateRangeBox extends Composite implements HasValidator, CustomFocus
 	});
 
 	public DateRangeBox() {
+		panel.add(new Label("from "));
 		panel.add(startDateBox);
-		panel.add(new Label("to"));
+		panel.add(new Label(" to "));
 		panel.add(endDateBox);
 
 		initWidget(focusPanel);
