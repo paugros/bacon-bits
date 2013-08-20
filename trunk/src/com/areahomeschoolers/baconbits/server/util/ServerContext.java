@@ -55,7 +55,7 @@ public class ServerContext implements ApplicationContextAware {
 	public static String getBaseUrlWithCodeServer() {
 		String url = getBaseUrl();
 
-		if (!isLive) {
+		if (!isLive()) {
 			url += "?gwt.codesvr=127.0.0.1:9997";
 		}
 
