@@ -249,6 +249,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		return column;
 	}
 
+	@SafeVarargs
 	public final void addColumn(C... columns) {
 		for (C column : columns) {
 			if (displayColumns.contains(column)) {
@@ -383,7 +384,6 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		}, dateGetter);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void addItem(T item, final AddOption... options) {
 		Arrays.sort(options);
 		entityIdMap.put(entityKeyProvider.getKey(item), item);
@@ -1054,7 +1054,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		this.defaultByIndex = false;
 	}
 
-	// @SafeVarargs
+	@SafeVarargs
 	public final void setDisplayColumns(C... displayColumns) {
 		this.displayColumns = EnumSet.copyOf(Arrays.asList(displayColumns));
 	}
