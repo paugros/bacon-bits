@@ -31,6 +31,7 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
+import com.areahomeschoolers.baconbits.client.widgets.UserAgreementDialog;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
@@ -333,6 +334,11 @@ public final class Application implements ValueChangeHandler<String> {
 		final String page = HistoryToken.getElement("page") == null ? "Home" : HistoryToken.getElement("page");
 
 		createNewPage(page);
+
+		if (getCurrentUser().getShowUserAgreement()) {
+			UserAgreementDialog dialog = new UserAgreementDialog();
+			dialog.center();
+		}
 	}
 
 	private void pollForData() {
