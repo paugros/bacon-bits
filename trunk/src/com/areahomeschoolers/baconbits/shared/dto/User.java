@@ -27,7 +27,7 @@ public final class User extends EntityDto<User> {
 	private String zip;
 	private double lat;
 	private double lng;
-	private boolean directoryOptOut;
+	private boolean directoryOptOut = true;
 
 	// password is only for setting
 	private String password;
@@ -41,6 +41,7 @@ public final class User extends EntityDto<User> {
 	private Date startDate, endDate, addedDate, lastLoginDate, birthDate;
 	private Integer parentId;
 	private boolean canSwitch;
+	private boolean showUserAgreement;
 	private String sex;
 	private int imageId;
 	private int smallImageId;
@@ -270,6 +271,10 @@ public final class User extends EntityDto<User> {
 		return "";
 	}
 
+	public boolean getShowUserAgreement() {
+		return showUserAgreement;
+	}
+
 	public int getSmallImageId() {
 		return smallImageId;
 	}
@@ -481,6 +486,10 @@ public final class User extends EntityDto<User> {
 		this.sex = sex;
 	}
 
+	public void setShowUserAgreement(boolean showUserAgreement) {
+		this.showUserAgreement = showUserAgreement;
+	}
+
 	public void setSmallImageId(int smallImageId) {
 		this.smallImageId = smallImageId;
 	}
@@ -531,7 +540,7 @@ public final class User extends EntityDto<User> {
 		}
 
 		// self
-		if (u.getId() == getId()) {
+		if (u.getId() == getId() || u.getEmail().equals(email)) {
 			return true;
 		}
 

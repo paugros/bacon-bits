@@ -5,7 +5,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public enum PrivacyPreferenceType implements IsSerializable {
-	EMAIL(VisibilityLevel.PRIVATE), HOME_PHONE(VisibilityLevel.PRIVATE), MOBILE_PHONE(VisibilityLevel.PRIVATE), ADDRESS(VisibilityLevel.PRIVATE), EVENTS(
+	EMAIL(VisibilityLevel.MY_GROUPS), HOME_PHONE(VisibilityLevel.MY_GROUPS), MOBILE_PHONE(VisibilityLevel.MY_GROUPS), ADDRESS(VisibilityLevel.MY_GROUPS), EVENTS(
 			VisibilityLevel.SITE_MEMBERS), FAMILY(VisibilityLevel.MY_GROUPS);
 
 	private VisibilityLevel defaultVisibilityLevel;

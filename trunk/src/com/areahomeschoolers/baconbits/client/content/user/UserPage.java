@@ -74,7 +74,9 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
@@ -558,6 +560,15 @@ public class UserPage implements Page {
 						ft.addField("Event registrations:", makePrivacyWidget(PrivacyPreferenceType.EVENTS));
 
 						ft.addField("Family members:", makePrivacyWidget(PrivacyPreferenceType.FAMILY));
+
+						if (Url.getBooleanParameter("gb")) {
+							ft.addField("", new Button("All done, go back", new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									History.back();
+								}
+							}));
+						}
 
 						cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 							@Override

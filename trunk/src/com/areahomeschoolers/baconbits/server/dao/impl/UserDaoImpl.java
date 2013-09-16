@@ -179,6 +179,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			user.setLastLoginDate(rs.getTimestamp("lastLoginDate"));
 			user.setActive(rs.getBoolean("isEnabled"));
 			user.setBirthDate(rs.getTimestamp("birthDate"));
+			user.setShowUserAgreement(rs.getBoolean("showUserAgreement"));
 			user.setParentId(rs.getInt("parentId"));
 			user.setCity(rs.getString("city"));
 			user.setZip(rs.getString("zip"));
@@ -724,7 +725,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (user.isSaved()) {
 			sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, email = :email, ";
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
-			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex, ";
+			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex, showUserAgreement = :showUserAgreement, ";
 			sql += "street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, directoryOptOut = :directoryOptOut ";
 			sql += "where id = :id";
 			update(sql, namedParams);
