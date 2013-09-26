@@ -50,6 +50,7 @@ public class ArticlePage implements Page {
 	private FieldTable fieldTable = new FieldTable();
 	private Article article = new Article();
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
+	private boolean noTitle = Url.getBooleanParameter("noTitle");
 
 	public ArticlePage(VerticalPanel page) {
 		int articleId = Url.getIntegerParameter("articleId");
@@ -231,8 +232,17 @@ public class ArticlePage implements Page {
 		Application.getLayout().setPage(title, page);
 	}
 
+	private void createTextPage() {
+		HTML h = new HTML(article.getArticle());
+		h.setWidth("1000px");
+		page.add(h);
+		Application.getLayout().setPage(article.getTitle(), page);
+	}
+
 	private void initializePage() {
-		if (!Application.isAuthenticated()) {
+		if (noTitle) {
+			createTextPage();
+		} else if (!Application.isAuthenticated()) {
 			createReadOnlyPage();
 		} else {
 			createReadWritePage();

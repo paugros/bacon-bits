@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content;
 
+import java.util.Date;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
@@ -11,6 +13,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
@@ -18,6 +21,7 @@ import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
 import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 
 import com.google.gwt.core.client.GWT;
@@ -306,13 +310,21 @@ public final class Layout {
 	}
 
 	private void addPageToBodyPanel(String title, VerticalPanel page) {
-		HTML footer = new HTML("Copyright &copy; 2005-2013 " + Application.getCurrentOrg().getShortName() + ". All rights reserved.");
+		String yr = Formatter.formatDate(new Date(), "yyyy");
+		HTML footer = new HTML("Copyright &copy; 2013-" + yr + " Citrus Groups. All rights reserved.");
 		footer.setStylePrimaryName("footer");
+
+		String txt = "<a href=\"" + Constants.TOS_URL + "&noTitle=true\">Terms of service</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+		txt += "<a href=\"" + Constants.PRIVACY_POLICY_URL + "&noTitle=true\">Privacy policy</a>";
+
+		HTML links = new HTML(txt);
+		links.setStylePrimaryName("footer");
 
 		VerticalPanel vp = new VerticalPanel();
 		vp.setWidth("100%");
 		vp.add(page);
 		vp.add(footer);
+		vp.add(links);
 
 		Application.setTitle(title);
 		if (isMobileBrowser) {

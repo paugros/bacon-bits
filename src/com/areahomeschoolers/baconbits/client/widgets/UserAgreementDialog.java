@@ -4,12 +4,10 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
-import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
-import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.shared.dto.Article;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -25,7 +23,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class UserAgreementDialog extends DefaultDialog {
-	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private VerticalPanel vp = new VerticalPanel();
 
@@ -47,56 +44,61 @@ public class UserAgreementDialog extends DefaultDialog {
 			return;
 		}
 
-		articleService.getById(72, new Callback<Article>() {
+		String msg = "Hello,<br><br>Our site policies have changed. To continue using our site, please review them, then check the box below and continue on to your privacy settings.";
+		HTML h = new HTML(msg);
+		h.addStyleName("mediumText heavyPadding");
+		vp.add(h);
+
+		String txt = "I agree to the site ";
+		txt += "<a href=\"" + Constants.TOS_URL + "&noTitle=true\" target=\"_blank\">terms of service</a> ";
+		txt += "and <a href=\"" + Constants.PRIVACY_POLICY_URL + "&noTitle=true\" target=\"_blank\">privacy policy</a> ";
+		final CheckBox scb = new CheckBox(txt, true);
+		scb.addStyleName("heavyPadding");
+		vp.add(scb);
+
+		ButtonPanel bp = new ButtonPanel();
+
+		final Button settings = new Button("Continue to Privacy Settings");
+		settings.setEnabled(false);
+		settings.addClickHandler(new ClickHandler() {
 			@Override
-			protected void doOnSuccess(Article result) {
-				MaxHeightScrollPanel sp = new MaxHeightScrollPanel(new HTML(result.getArticle()));
-				vp.add(sp);
-				final CheckBox cb = new CheckBox("<b>I agree to the terms and conditions above</b>", true);
-				vp.add(cb);
-				ButtonPanel bp = new ButtonPanel();
-				final Button settings = new Button("Continue to Privacy Settings");
+			public void onClick(ClickEvent event) {
+				if (!scb.getValue()) {
+					scb.addStyleName("gwt-TextBoxError");
+					return;
+				}
+
 				settings.setEnabled(false);
-				settings.addClickHandler(new ClickHandler() {
+				User u = Application.getCurrentUser();
+				u.setShowUserAgreement(false);
+				u.setDirectoryOptOut(false);
+				userService.save(u, new Callback<ServerResponseData<User>>() {
 					@Override
-					public void onClick(ClickEvent event) {
-						if (!cb.getValue()) {
-							cb.addStyleName("gwt-TextBoxError");
-							return;
-						}
-
-						settings.setEnabled(false);
-						User u = Application.getCurrentUser();
-						u.setShowUserAgreement(false);
-						u.setDirectoryOptOut(false);
-						userService.save(u, new Callback<ServerResponseData<User>>() {
-							@Override
-							protected void doOnSuccess(ServerResponseData<User> result) {
-								HistoryToken.set(PageUrl.user(Application.getCurrentUserId()) + "&tab=7&gb=true");
-							}
-						});
-
-					}
-				});
-				bp.addCenterButton(settings);
-
-				cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-					@Override
-					public void onValueChange(ValueChangeEvent<Boolean> event) {
-						settings.setEnabled(event.getValue());
+					protected void doOnSuccess(ServerResponseData<User> result) {
+						HistoryToken.set(PageUrl.user(Application.getCurrentUserId()) + "&tab=7&gb=true");
 					}
 				});
 
-				vp.add(bp);
-
-				UserAgreementDialog.super.show();
-				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-					@Override
-					public void execute() {
-						UserAgreementDialog.super.center();
-					}
-				});
 			}
 		});
+		bp.addCenterButton(settings);
+
+		scb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				settings.setEnabled(event.getValue());
+			}
+		});
+
+		vp.add(bp);
+
+		UserAgreementDialog.super.show();
+		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+			@Override
+			public void execute() {
+				UserAgreementDialog.super.center();
+			}
+		});
+
 	}
 }

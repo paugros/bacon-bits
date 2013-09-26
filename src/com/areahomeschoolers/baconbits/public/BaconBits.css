@@ -258,8 +258,13 @@ img {
 .footer {
 	padding-bottom: 10px;
 	text-align: center;
-	color: #bbbbbb;
-	font-size: 10px;
+	color: #aaaaaa;
+	font-size: 11px;
+}
+
+.footer a {
+	color: #aaaaaa;
+	text-decoration: underline;
 }
 
 .FormField {

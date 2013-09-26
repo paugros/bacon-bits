@@ -674,14 +674,22 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		ServerResponseData<User> retData = new ServerResponseData<User>();
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(user);
 
-		// verify no duplicate email/login
-		String sql = "select count(id) from users where email = ? and id != ?";
-		int conflict = queryForInt(sql, user.getEmail(), user.getId());
+		String sql = "";
+		int conflict = 0;
 
-		if (conflict > 0) {
-			retData.addError("Email address is already registered to another account.");
-			retData.setData(user);
-			return retData;
+		// verify no duplicate email/login
+		if (!Common.isNullOrBlank(user.getEmail())) {
+			sql = "select count(id) from users where email = ? and id != ?";
+			conflict = queryForInt(sql, user.getEmail(), user.getId());
+
+			if (conflict > 0) {
+				retData.addError("Email address is already registered to another account.");
+				retData.setData(user);
+				return retData;
+			}
+		} else {
+			// ensure email is null, not empty, or it'll produce sql errors
+			user.setEmail(null);
 		}
 
 		// verify no duplicate name in same family
@@ -743,10 +751,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			}
 			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
 			sql += "address, isSystemAdministrator, resetPassword, birthDate, parentId, sex, ";
-			sql += "street, city, state, zip, lat, lng, imageId, smallImageId, directoryOptOut) values ";
+			sql += "street, city, state, zip, lat, lng, imageId, smallImageId, directoryOptOut, showUserAgreement) values ";
 			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
 			sql += ":address, :systemAdministrator, :resetPassword, :birthDate, :parentId, :sex, ";
-			sql += ":street, :city, :state, :zip, :lat, :lng, :imageId, :smallImageId, :directoryOptOut)";
+			sql += ":street, :city, :state, :zip, :lat, :lng, :imageId, :smallImageId, :directoryOptOut, :showUserAgreement)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -1087,10 +1095,12 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String sql = "where 1 = 1 ";
 		if (!ServerContext.isAuthenticated()) {
 			sql += "and u.directoryOptOut = 0 \n";
+			// sql += "and u.birthDate < date_add(now(), interval -18 year) \n";
 		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().isSwitched() || ServerContext.getCurrentUser().hasRole(
 				AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
 			int id = ServerContext.getCurrentUserId();
 			sql += "and (u.directoryOptOut = 0 or u.id = " + id + ") \n";
+			// sql += "and (u.birthDate < date_add(now(), interval -18 year) or u.parentId = " + id + ") \n";
 		}
 
 		return sql;

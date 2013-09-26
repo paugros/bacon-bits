@@ -74,7 +74,7 @@ public final class MainMenu extends MenuBar {
 
 		addItem("Events", getEventsMenu());
 		addItem("Book Store", getBooksMenu());
-		if (Application.isAuthenticated() && Application.isSystemAdministrator()) {
+		if (Application.isAuthenticated()) {
 			addItem("People", getPeopleMenu());
 		}
 
@@ -174,7 +174,7 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getBooksMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Search Books", PageUrl.bookSearch());
-		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
 		}
 
@@ -192,7 +192,7 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "Event Listing", PageUrl.eventList());
 		addLinkToMenu(menu, "Calendar", PageUrl.eventCalendar());
 
-		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
 			addLinkToMenu(menu, "Registration Management", PageUrl.registrationManagement());
 		}

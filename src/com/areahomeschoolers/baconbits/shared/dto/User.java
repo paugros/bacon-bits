@@ -58,7 +58,7 @@ public final class User extends EntityDto<User> {
 	private int age;
 	private boolean addressChanged;
 
-	private HashMap<Integer, GroupData> groups;
+	private HashMap<Integer, GroupData> groups = new HashMap<Integer, GroupData>();
 	private HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences = new HashMap<PrivacyPreferenceType, PrivacyPreference>();
 
 	public User() {
