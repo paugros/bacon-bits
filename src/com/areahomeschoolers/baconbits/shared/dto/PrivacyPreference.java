@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
+
 public class PrivacyPreference extends EntityDto<PrivacyPreference> {
 
 	private static final long serialVersionUID = 1L;
@@ -27,12 +29,16 @@ public class PrivacyPreference extends EntityDto<PrivacyPreference> {
 		return organizationId;
 	}
 
-	public String getPreferenceType() {
-		return preferenceType;
+	public PrivacyPreferenceType getPreferenceType() {
+		return PrivacyPreferenceType.valueOf(preferenceType);
 	}
 
 	public int getUserId() {
 		return userId;
+	}
+
+	public VisibilityLevel getVisibilityLevel() {
+		return VisibilityLevel.getById(visibilityLevelId);
 	}
 
 	public int getVisibilityLevelId() {
