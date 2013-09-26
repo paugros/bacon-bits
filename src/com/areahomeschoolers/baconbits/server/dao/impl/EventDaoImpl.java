@@ -47,10 +47,13 @@ import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Pair;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 @Repository
 public class EventDaoImpl extends SpringWrapper implements EventDao {
@@ -1216,6 +1219,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 				u.setParentId(ServerContext.getCurrentUserId());
 				u.setHomePhone(ServerContext.getCurrentUser().getHomePhone());
 				u.setAddress(ServerContext.getCurrentUser().getAddress());
+				PrivacyPreference fam = ServerContext.getCurrentUser().getPrivacyPreference(PrivacyPreferenceType.FAMILY);
+				u.setDirectoryOptOut(fam.getVisibilityLevel().equals(VisibilityLevel.PRIVATE));
 			}
 
 			UserDao userDao = ServerContext.getDaoImpl("user");
