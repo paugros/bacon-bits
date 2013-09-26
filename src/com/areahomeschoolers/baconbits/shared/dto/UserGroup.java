@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -247,6 +248,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public boolean isAdministrator() {
 		return isAdministrator;
+	}
+
+	public boolean isCitrus() {
+		return getId() == Constants.CG_ORG_ID;
 	}
 
 	public boolean isOrganization() {

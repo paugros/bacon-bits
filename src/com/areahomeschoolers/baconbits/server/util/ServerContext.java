@@ -125,6 +125,10 @@ public class ServerContext implements ApplicationContextAware {
 		return getCurrentUser() != null;
 	}
 
+	public static boolean isCitrus() {
+		return getCurrentOrg().isCitrus();
+	}
+
 	public static boolean isLive() {
 		if (isLiveIsSet) {
 			return isLive;

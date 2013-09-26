@@ -167,6 +167,10 @@ public final class Application implements ValueChangeHandler<String> {
 		return applicationData.getCurrentUser() != null;
 	}
 
+	public static boolean isCitrus() {
+		return applicationData.getCurrentOrg().isCitrus();
+	}
+
 	public static boolean isIdle() {
 		return inactivityManager.isIdle();
 	}
