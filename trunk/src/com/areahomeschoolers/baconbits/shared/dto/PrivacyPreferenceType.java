@@ -6,7 +6,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public enum PrivacyPreferenceType implements IsSerializable {
 	EMAIL(VisibilityLevel.MY_GROUPS), HOME_PHONE(VisibilityLevel.MY_GROUPS), MOBILE_PHONE(VisibilityLevel.MY_GROUPS), ADDRESS(VisibilityLevel.MY_GROUPS), EVENTS(
-			VisibilityLevel.SITE_MEMBERS), FAMILY(VisibilityLevel.MY_GROUPS);
+			VisibilityLevel.SITE_MEMBERS), FAMILY(VisibilityLevel.SITE_MEMBERS);
 
 	private VisibilityLevel defaultVisibilityLevel;
 

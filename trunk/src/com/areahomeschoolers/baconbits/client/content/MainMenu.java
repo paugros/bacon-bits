@@ -263,9 +263,9 @@ public final class MainMenu extends MenuBar {
 		menu.addSeparator();
 		addLinkToMenu(menu, "My Profile", PageUrl.user(Application.getCurrentUserId()));
 		if (!Application.getCurrentUser().isChild()) {
-			addLinkToMenu(menu, "My Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
+			addLinkToMenu(menu, "My Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=3");
 		}
-		addLinkToMenu(menu, "Privacy Settings", PageUrl.user(Application.getCurrentUserId()) + "&tab=8");
+		addLinkToMenu(menu, "Privacy Settings", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
 		return menu;
 	}
 

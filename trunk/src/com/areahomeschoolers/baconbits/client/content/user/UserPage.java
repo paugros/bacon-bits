@@ -64,6 +64,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 import com.google.gwt.dom.client.Style;
@@ -571,7 +572,10 @@ public class UserPage implements Page {
 
 						ft.addField("Event registrations:", makePrivacyWidget(PrivacyPreferenceType.EVENTS));
 
-						ft.addField("Family members:", makePrivacyWidget(PrivacyPreferenceType.FAMILY));
+						PrivacyPreferenceWidget fw = makePrivacyWidget(PrivacyPreferenceType.FAMILY);
+						fw.getVisibilityWidget().removeItem(VisibilityLevel.GROUP_MEMBERS);
+						fw.getVisibilityWidget().removeItem(VisibilityLevel.MY_GROUPS);
+						ft.addField("Family members:", fw);
 
 						if (Url.getBooleanParameter("gb")) {
 							ft.addField("", new Button("All done, go back", new ClickHandler() {
@@ -596,6 +600,7 @@ public class UserPage implements Page {
 								});
 							}
 						});
+						cb.setValue(user.getDirectoryOptOut(), true);
 
 						tabPanel.selectTabNow(tabBody);
 					}

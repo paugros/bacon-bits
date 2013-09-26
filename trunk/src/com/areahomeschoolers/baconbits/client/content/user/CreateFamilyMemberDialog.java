@@ -11,8 +11,11 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidt
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -56,6 +59,8 @@ public class CreateFamilyMemberDialog extends EntityEditDialog<User> {
 
 	@Override
 	protected Widget createContent() {
+		PrivacyPreference fam = parent.getPrivacyPreference(PrivacyPreferenceType.FAMILY);
+		entity.setDirectoryOptOut(fam.getVisibilityLevel().equals(VisibilityLevel.PRIVATE));
 		entity.setParentId(parent.getId());
 		entity.setLastName(parent.getLastName());
 		entity.setAddress(parent.getAddress());

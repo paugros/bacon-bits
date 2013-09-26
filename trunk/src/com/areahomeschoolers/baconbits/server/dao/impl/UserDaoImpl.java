@@ -54,6 +54,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 import edu.vt.middleware.password.CharacterCharacteristicsRule;
@@ -798,10 +799,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
-	public PrivacyPreference savePrivacyPreference(PrivacyPreference privacyPreference) {
-		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(privacyPreference);
+	public PrivacyPreference savePrivacyPreference(PrivacyPreference pref) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(pref);
 
-		if (privacyPreference.isSaved()) {
+		if (pref.isSaved()) {
 			String sql = "update userPrivacyPreferences set visibilityLevelId = :visibilityLevelId, groupId = :groupId where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -811,10 +812,16 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
 
-			privacyPreference.setId(ServerUtils.getIdFromKeys(keys));
+			pref.setId(ServerUtils.getIdFromKeys(keys));
 		}
 
-		return privacyPreference;
+		if (pref.getPreferenceType().equals(PrivacyPreferenceType.FAMILY)) {
+			int optOut = pref.getVisibilityLevel().equals(VisibilityLevel.PRIVATE) ? 1 : 0;
+			String sql = "update users set directoryOptOut = " + optOut + " where parentId = ?";
+			update(sql, pref.getUserId());
+		}
+
+		return pref;
 	}
 
 	@Override
@@ -1095,12 +1102,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String sql = "where 1 = 1 ";
 		if (!ServerContext.isAuthenticated()) {
 			sql += "and u.directoryOptOut = 0 \n";
-			// sql += "and u.birthDate < date_add(now(), interval -18 year) \n";
 		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().isSwitched() || ServerContext.getCurrentUser().hasRole(
 				AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
 			int id = ServerContext.getCurrentUserId();
-			sql += "and (u.directoryOptOut = 0 or u.id = " + id + ") \n";
-			// sql += "and (u.birthDate < date_add(now(), interval -18 year) or u.parentId = " + id + ") \n";
+			sql += "and (u.directoryOptOut = 0 or u.id = " + id + " or u.parentId = " + id + ") \n";
 		}
 
 		return sql;

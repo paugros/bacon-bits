@@ -53,6 +53,10 @@ public class PrivacyPreferenceWidget extends Composite {
 		initWidget(hp);
 	}
 
+	public ItemVisibilityWidget getVisibilityWidget() {
+		return visibilityWidget;
+	}
+
 	public void setEnabled(boolean enabled) {
 		visibilityWidget.setEnabled(enabled);
 	}
