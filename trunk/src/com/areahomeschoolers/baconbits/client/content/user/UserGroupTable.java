@@ -139,21 +139,12 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 				});
 				break;
 			case GROUP:
-				if (user == null && Application.isSystemAdministrator()) {
-					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
-						@Override
-						protected Widget createWidget(final UserGroup item) {
-							return new Hyperlink(item.getGroupName(), PageUrl.userGroup(item.getId()));
-						}
-					});
-				} else {
-					addTextColumn(col, new ValueGetter<String, UserGroup>() {
-						@Override
-						public String get(UserGroup item) {
-							return item.getGroupName();
-						}
-					});
-				}
+				addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
+					@Override
+					protected Widget createWidget(final UserGroup item) {
+						return new Hyperlink(item.getGroupName(), PageUrl.userGroup(item.getId()));
+					}
+				});
 				break;
 			case DESCRIPTION:
 				addTextColumn(col, new ValueGetter<String, UserGroup>() {

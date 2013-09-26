@@ -542,6 +542,18 @@ public class UserPage implements Page {
 						ft.getFlexTable().setCellSpacing(8);
 						tabBody.add(WidgetFactory.newSection("Privacy Settings", ft, ContentWidth.MAXWIDTH900PX));
 
+						if (user.getGroups().isEmpty()) {
+							String text = "NOTE: Since ";
+							if (user.equals(Application.getCurrentUser())) {
+								text += "you are ";
+							} else {
+								text += "this user is ";
+							}
+							text += "not yet a member of any groups, the \"All my groups\" setting is effectively the same as the Private setting.";
+
+							ft.addField("", text);
+						}
+
 						CheckBox cb = new CheckBox("Exclude me from the directory entirely");
 						ft.addField("Directory:", cb);
 

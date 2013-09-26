@@ -26,7 +26,6 @@ public class ItemVisibilityWidget extends Composite {
 			public void execute() {
 				if (glb.getItemCount() == 0) {
 					removeItem(VisibilityLevel.GROUP_MEMBERS);
-					removeItem(VisibilityLevel.MY_GROUPS);
 				}
 			}
 		});

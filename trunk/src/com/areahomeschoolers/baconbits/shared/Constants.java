@@ -27,4 +27,7 @@ public abstract class Constants {
 	public static final int BLANK_PROFILE_FEMALE_SMALL = 962;
 	public static final int BLANK_BOOK_IMAGE_SMALL = 34;
 	public static final int BLANK_BOOK_IMAGE = 32;
+	public static final String TOS_URL = "http://www.myhomeschoolgroups.com/#page=Article&articleId=73";
+	public static final String PRIVACY_POLICY_URL = "http://www.myhomeschoolgroups.com/#page=Article&articleId=72";
+
 }
