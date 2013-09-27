@@ -125,6 +125,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private Integer eventPolicyId;
 	private Integer coopPolicyId;
 	private String payPalEmail;
+	private Integer logoId;
 
 	// aux
 	private String organizationName;
@@ -176,6 +177,13 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public String getGroupName() {
 		return groupName;
+	}
+
+	public Integer getLogoId() {
+		if (logoId == 0) {
+			return null;
+		}
+		return logoId;
 	}
 
 	public boolean getOrganization() {
@@ -289,6 +297,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	public void setLogoId(Integer logoId) {
+		this.logoId = logoId;
 	}
 
 	public void setOrganization(boolean isOrganization) {

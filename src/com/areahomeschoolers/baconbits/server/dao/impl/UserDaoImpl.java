@@ -404,10 +404,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			}
 		}
 
-		// TODO change this default
 		args.remove(UserGroupArg.ORG_SUB_DOMAIN);
 		args.remove(UserGroupArg.ORG_DOMAIN);
-		args.put(UserGroupArg.ID, 11);
+		args.put(UserGroupArg.ID, Constants.DEFAULT_ORG_ID);
 
 		return listGroups(args).get(0);
 	}
@@ -1130,6 +1129,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setEventPolicyId(rs.getInt("eventPolicyId"));
 		group.setCoopPolicyId(rs.getInt("coopPolicyId"));
 		group.setPayPalEmail(rs.getString("payPalEmail"));
+		group.setLogoId(rs.getInt("logoId"));
 		return group;
 	}
 

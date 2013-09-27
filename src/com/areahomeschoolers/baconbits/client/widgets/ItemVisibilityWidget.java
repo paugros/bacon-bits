@@ -16,7 +16,7 @@ public class ItemVisibilityWidget extends Composite {
 
 	public ItemVisibilityWidget() {
 		alb.addItem("Public", VisibilityLevel.PUBLIC.getId());
-		alb.addItem("All site members", VisibilityLevel.SITE_MEMBERS.getId());
+		alb.addItem("All network members", VisibilityLevel.SITE_MEMBERS.getId());
 		alb.addItem("All my groups", VisibilityLevel.MY_GROUPS.getId());
 		alb.addItem("Members of...", VisibilityLevel.GROUP_MEMBERS.getId());
 		alb.addItem("Private", VisibilityLevel.PRIVATE.getId());

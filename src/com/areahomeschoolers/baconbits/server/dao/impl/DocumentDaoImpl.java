@@ -29,6 +29,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.DocumentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.appengine.api.images.Image;
 import com.google.appengine.api.images.ImagesService;
@@ -203,6 +204,13 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 					// attach the second image to the user
 					sql = "update users set smallImageId = ? where id = ?";
 					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
+				} else if (document.getLinkType() == DocumentLinkType.LOGO) {
+					// attach logo to org
+					String newsql = "update groups set logoId = ? where id = ?";
+					UserGroup g = ServerContext.getCurrentOrg();
+					g.setLogoId(document.getId());
+					ServerContext.setCurrentOrg(g);
+					update(newsql, document.getId(), document.getLinkId());
 				} else {
 					link(document);
 				}

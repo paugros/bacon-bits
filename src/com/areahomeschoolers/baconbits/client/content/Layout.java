@@ -36,6 +36,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -71,7 +72,7 @@ public final class Layout {
 
 	private static final int HEADER_HEIGHT = 53;
 	private static final int MENU_HEIGHT = 35;
-	private static final int LOGO_DIV_WIDTH = 125;
+	private static final int LOGO_DIV_WIDTH = 115;
 	private final MainLayoutDock dock = new MainLayoutDock(Unit.PX);
 	private final SearchBox searchBox;
 	private final SimplePanel mobileBodyPanel = new SimplePanel();
@@ -85,6 +86,7 @@ public final class Layout {
 	private final HorizontalPanel headerPanel = new HorizontalPanel();
 	private final HorizontalPanel menuPanel = new HorizontalPanel();
 	private boolean isMobileBrowser = false;
+	private Image logo;
 
 	public Layout() {
 		isMobileBrowser = ClientUtils.isMobileBrowser();
@@ -97,7 +99,11 @@ public final class Layout {
 		}
 
 		// logo
-		Image logo = new Image(MainImageBundle.INSTANCE.logo());
+		if (Application.getCurrentOrg().getLogoId() == null) {
+			logo = new Image(MainImageBundle.INSTANCE.logo());
+		} else {
+			logo = new Image(Constants.DOCUMENT_URL_PREFIX + Application.getCurrentOrg().getLogoId());
+		}
 
 		HTML logoDiv = new HTML("<a href=\"#" + PageUrl.home() + "\">" + logo + "</a>");
 		logoDiv.addClickHandler(new ClickHandler() {
@@ -236,6 +242,8 @@ public final class Layout {
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setWidth("100%");
 		hp.add(logoDiv);
+		hp.setCellHorizontalAlignment(logoDiv, HasHorizontalAlignment.ALIGN_CENTER);
+		hp.setCellVerticalAlignment(logoDiv, HasVerticalAlignment.ALIGN_MIDDLE);
 		hp.setCellWidth(logoDiv, LOGO_DIV_WIDTH + "px");
 		hp.setHeight(HEADER_HEIGHT + MENU_HEIGHT + "px");
 
@@ -301,6 +309,10 @@ public final class Layout {
 		dock.forceLayout();
 
 		headerIsVisible = visible;
+	}
+
+	public void setLogo(int documentId) {
+		logo.setUrl(Constants.DOCUMENT_URL_PREFIX + documentId);
 	}
 
 	public void setPage(String title, VerticalPanel page) {
