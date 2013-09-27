@@ -6,7 +6,6 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
-import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
@@ -86,7 +85,7 @@ public final class Layout {
 	private final HorizontalPanel headerPanel = new HorizontalPanel();
 	private final HorizontalPanel menuPanel = new HorizontalPanel();
 	private boolean isMobileBrowser = false;
-	private Image logo;
+	private HTML logoDiv;
 
 	public Layout() {
 		isMobileBrowser = ClientUtils.isMobileBrowser();
@@ -98,14 +97,9 @@ public final class Layout {
 			RootLayoutPanel.get().setStyleName("overflowHidden");
 		}
 
-		// logo
-		if (Application.getCurrentOrg().getLogoId() == null) {
-			logo = new Image(MainImageBundle.INSTANCE.logo());
-		} else {
-			logo = new Image(Constants.DOCUMENT_URL_PREFIX + Application.getCurrentOrg().getLogoId());
-		}
+		logoDiv = new HTML();
+		setLogo(Application.getCurrentOrg().getLogoId());
 
-		HTML logoDiv = new HTML("<a href=\"#" + PageUrl.home() + "\">" + logo + "</a>");
 		logoDiv.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -311,8 +305,14 @@ public final class Layout {
 		headerIsVisible = visible;
 	}
 
-	public void setLogo(int documentId) {
-		logo.setUrl(Constants.DOCUMENT_URL_PREFIX + documentId);
+	public void setLogo(Integer documentId) {
+		if (documentId == null) {
+			documentId = Constants.DEFAULT_LOGO_ID;
+		}
+
+		Image logo = new Image(Constants.DOCUMENT_URL_PREFIX + documentId);
+
+		logoDiv.setHTML("<a href=\"#" + PageUrl.home() + "\">" + logo + "</a>");
 	}
 
 	public void setPage(String title, VerticalPanel page) {
