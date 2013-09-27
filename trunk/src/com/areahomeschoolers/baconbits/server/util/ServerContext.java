@@ -161,6 +161,10 @@ public class ServerContext implements ApplicationContextAware {
 		getSession().setAttribute("org", userDao.getOrgForCurrentRequest());
 	}
 
+	public static void setCurrentOrg(UserGroup org) {
+		getSession().setAttribute("org", org);
+	}
+
 	/**
 	 * Called after successful authentication, pulls current user from db and puts it in session
 	 * 

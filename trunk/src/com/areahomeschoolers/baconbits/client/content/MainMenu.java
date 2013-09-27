@@ -4,12 +4,19 @@ import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.document.FileUploadDialog;
+import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.validation.Validator;
+import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
+import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Document;
+import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -139,6 +146,39 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "List Articles", PageUrl.articleList());
 		addLinkToMenu(menu, "Add User", PageUrl.user(0));
 		addLinkToMenu(menu, "List Groups", PageUrl.userGroupList());
+
+		if (Application.isSystemAdministrator()) {
+			menu.addItem("Change Logo", new ScheduledCommand() {
+				@Override
+				public void execute() {
+					final FileUploadDialog dialog = new FileUploadDialog(DocumentLinkType.LOGO, Application.getCurrentOrgId(), false,
+							new UploadCompleteHandler() {
+								@Override
+								public void onUploadComplete(int documentId) {
+									Application.getCurrentOrg().setLogoId(documentId);
+									Application.getLayout().setLogo(documentId);
+								}
+							});
+
+					dialog.getForm().addFormValidatorCommand(new ValidatorCommand() {
+						@Override
+						public void validate(Validator validator) {
+							String fileName = dialog.getFileName();
+							if (Common.isNullOrBlank(fileName)) {
+								validator.setError(true);
+							}
+
+							if (!Document.hasImageExtension(fileName)) {
+								validator.setError(true);
+								validator.setErrorMessage("Invalid image file.");
+							}
+						}
+					});
+
+					dialog.center();
+				}
+			});
+		}
 
 		menu.addItem("Edit Main Menu", new ScheduledCommand() {
 			@Override
