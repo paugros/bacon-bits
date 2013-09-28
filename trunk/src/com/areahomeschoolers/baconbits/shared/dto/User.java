@@ -544,7 +544,7 @@ public final class User extends EntityDto<User> {
 		}
 
 		// self
-		if (u.getId() == getId() || u.getEmail().equals(email)) {
+		if (u.getId() == getId() || (u.getEmail() != null && u.getEmail().equals(email))) {
 			return true;
 		}
 
