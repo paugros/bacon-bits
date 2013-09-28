@@ -474,6 +474,10 @@ public final class User extends EntityDto<User> {
 		this.passwordDigest = passwordDigest;
 	}
 
+	public void setPrivacyPreference(PrivacyPreference pref) {
+		privacyPreferences.put(pref.getPreferenceType(), pref);
+	}
+
 	public void setPrivacyPreferences(HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences) {
 		this.privacyPreferences = privacyPreferences;
 	}

@@ -197,7 +197,7 @@ public class UserFieldTable extends FieldTable {
 			addField(emailField);
 		}
 
-		if (user.isSaved()) {
+		if (!user.isChild() && user.isSaved()) {
 			UserStatusIndicator st = new UserStatusIndicator();
 			st.setUserId(user.getId());
 			addField("Last activity:", st);
@@ -255,7 +255,7 @@ public class UserFieldTable extends FieldTable {
 		});
 		addField(birthDateField);
 
-		if (Application.isSystemAdministrator()) {
+		if (!user.isChild() && Application.isSystemAdministrator()) {
 			final Label adminDisplay = new Label();
 			final DefaultListBox adminInput = new DefaultListBox();
 			adminInput.addItem("Yes");
@@ -277,7 +277,7 @@ public class UserFieldTable extends FieldTable {
 			addField(adminField);
 		}
 
-		if (user.isSaved() && Application.administratorOf(user)) {
+		if (user.isSaved() && !user.isChild() && Application.administratorOf(user)) {
 			FormField passwordField = new FormField("Password:", passwordLabel, passwordLabel);
 			passwordField.setInitializer(new Command() {
 				@Override
@@ -477,48 +477,52 @@ public class UserFieldTable extends FieldTable {
 			addField("Parent:", new Hyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId())));
 		}
 
-		if (Application.administratorOf(user)) {
-			final Label startDateDisplay = new Label();
-			final ValidatorDateBox startDateInput = new ValidatorDateBox();
-			FormField startDateField = form.createFormField("Start date:", startDateInput, startDateDisplay);
-			startDateField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					startDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(user.getStartDate())));
-					startDateInput.setValue(user.getStartDate());
-				}
-			});
-			startDateField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					user.setStartDate(startDateInput.getValue());
-				}
-			});
-			addField(startDateField);
-		}
+		if (!user.isChild()) {
+			if (Application.administratorOf(user)) {
+				final Label startDateDisplay = new Label();
+				final ValidatorDateBox startDateInput = new ValidatorDateBox();
+				FormField startDateField = form.createFormField("Start date:", startDateInput, startDateDisplay);
+				startDateField.setInitializer(new Command() {
+					@Override
+					public void execute() {
+						startDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(user.getStartDate())));
+						startDateInput.setValue(user.getStartDate());
+					}
+				});
+				startDateField.setDtoUpdater(new Command() {
+					@Override
+					public void execute() {
+						user.setStartDate(startDateInput.getValue());
+					}
+				});
+				addField(startDateField);
+			}
 
-		if (Application.isAuthenticated() && (Application.administratorOf(user) || user.childOf(Application.getCurrentUser()))) {
-			final Label endDateDisplay = new Label();
-			final ValidatorDateBox endDateInput = new ValidatorDateBox();
-			FormField endDateField = form.createFormField("End date:", endDateInput, endDateDisplay);
-			endDateField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					endDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(user.getEndDate())));
-					endDateInput.setValue(user.getEndDate());
-				}
-			});
-			endDateField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					user.setEndDate(endDateInput.getValue());
-				}
-			});
-			addField(endDateField);
+			if (Application.isAuthenticated() && (Application.administratorOf(user) || user.childOf(Application.getCurrentUser()))) {
+				final Label endDateDisplay = new Label();
+				final ValidatorDateBox endDateInput = new ValidatorDateBox();
+				FormField endDateField = form.createFormField("End date:", endDateInput, endDateDisplay);
+				endDateField.setInitializer(new Command() {
+					@Override
+					public void execute() {
+						endDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(user.getEndDate())));
+						endDateInput.setValue(user.getEndDate());
+					}
+				});
+				endDateField.setDtoUpdater(new Command() {
+					@Override
+					public void execute() {
+						user.setEndDate(endDateInput.getValue());
+					}
+				});
+				addField(endDateField);
+			}
 		}
 
 		if (user.isSaved()) {
-			addField("Last login:", Common.getDefaultIfNull(Formatter.formatDateTime(user.getLastLoginDate())));
+			if (!user.isChild()) {
+				addField("Last login:", Common.getDefaultIfNull(Formatter.formatDateTime(user.getLastLoginDate())));
+			}
 			addField("Date added:", Formatter.formatDateTime(user.getAddedDate()));
 		}
 	}
