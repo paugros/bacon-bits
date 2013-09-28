@@ -175,10 +175,6 @@ public class ServerContext implements ApplicationContextAware {
 		User u = null;
 		if (username != null) {
 			// put this shell in first so that userdao will know we've authenticated as this user
-			User uu = new User();
-			uu.setEmail(username);
-			getSession().setAttribute("user", uu);
-
 			UserService userService = (UserService) ctx.getBean("userServiceImpl");
 			u = userService.getUserByUsername(username);
 		}
