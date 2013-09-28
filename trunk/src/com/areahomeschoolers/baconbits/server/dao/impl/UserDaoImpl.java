@@ -91,116 +91,17 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 	}
 
+	private final class InsecureUserMapper implements RowMapper<User> {
+		@Override
+		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return createUser(rs, false);
+		}
+	}
+
 	private final class UserMapper implements RowMapper<User> {
 		@Override
 		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-			User user = new User();
-			user.setSystemAdministrator(rs.getBoolean("isSystemAdministrator"));
-			user.setId(rs.getInt("id"));
-			User cu = ServerContext.getCurrentUser();
-
-			String groupText = rs.getString("groups");
-			final HashMap<Integer, GroupData> groups = new HashMap<Integer, GroupData>();
-			final HashSet<AccessLevel> levels = new HashSet<AccessLevel>();
-			String gt = "";
-			if (!Common.isNullOrBlank(groupText)) {
-				String[] groupRows = groupText.split("\n");
-				for (int i = 0; i < groupRows.length; i++) {
-					String[] cells = groupRows[i].split(":");
-					int groupId = Integer.parseInt(cells[0]);
-					boolean isAdmin = cells[2].equals("1");
-					int orgId = Integer.parseInt(cells[2]);
-
-					// levels
-					levels.add(AccessLevel.GROUP_MEMBERS);
-					if (isAdmin) {
-						levels.add(AccessLevel.GROUP_ADMINISTRATORS);
-						if (groupId > 0 && groupId == orgId) {
-							levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
-						}
-					}
-
-					// groups
-					GroupData gd = new GroupData();
-					gd.setAdministrator(isAdmin);
-					gd.setOrganizationId(orgId);
-					gd.setOrganization(groupId > 0 && groupId == orgId);
-					groups.put(groupId, gd);
-					gt += cells[1] + "\n";
-				}
-				user.setGroupsText(gt);
-			}
-
-			levels.add(AccessLevel.SITE_MEMBERS);
-			if (user.getSystemAdministrator()) {
-				levels.add(AccessLevel.SYSTEM_ADMINISTRATORS);
-				levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
-				levels.add(AccessLevel.GROUP_ADMINISTRATORS);
-				levels.add(AccessLevel.GROUP_MEMBERS);
-			}
-
-			user.setGroups(groups);
-			user.setAccessLevels(levels);
-
-			String prefText = rs.getString("privacyPrefs");
-			final HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences = new HashMap<PrivacyPreferenceType, PrivacyPreference>();
-			if (!Common.isNullOrBlank(prefText)) {
-				String[] prefRows = prefText.split("\n");
-				for (int i = 0; i < prefRows.length; i++) {
-					String[] cells = prefRows[i].split(":");
-					PrivacyPreference p = new PrivacyPreference();
-					p.setId(Integer.parseInt(cells[0]));
-					p.setPreferenceType(cells[1]);
-					p.setUserId(user.getId());
-					p.setVisibilityLevelId(Integer.parseInt(cells[2]));
-					p.setGroupId(Integer.parseInt(cells[3]));
-					p.setOrganizationId(Integer.parseInt(cells[4]));
-					privacyPreferences.put(PrivacyPreferenceType.valueOf(cells[1]), p);
-				}
-			}
-
-			user.setPrivacyPreferences(privacyPreferences);
-
-			if (user.userCanSee(cu, PrivacyPreferenceType.EMAIL)) {
-				user.setEmail(rs.getString("email"));
-			}
-			user.setFirstName(rs.getString("firstName"));
-			user.setLastName(rs.getString("lastName"));
-			user.setPasswordDigest(rs.getString("passwordDigest"));
-			if (user.userCanSee(cu, PrivacyPreferenceType.HOME_PHONE)) {
-				user.setHomePhone(rs.getString("homePhone"));
-			}
-			if (user.userCanSee(cu, PrivacyPreferenceType.MOBILE_PHONE)) {
-				user.setMobilePhone(rs.getString("mobilePhone"));
-			}
-			user.setStartDate(rs.getTimestamp("startDate"));
-			user.setEndDate(rs.getTimestamp("endDate"));
-			user.setResetPassword(rs.getBoolean("resetPassword"));
-			user.setAddedDate(rs.getTimestamp("addedDate"));
-			user.setLastLoginDate(rs.getTimestamp("lastLoginDate"));
-			user.setActive(rs.getBoolean("isEnabled"));
-			user.setBirthDate(rs.getTimestamp("birthDate"));
-			user.setShowUserAgreement(rs.getBoolean("showUserAgreement"));
-			user.setParentId(rs.getInt("parentId"));
-			user.setCity(rs.getString("city"));
-			user.setZip(rs.getString("zip"));
-			user.setState(rs.getString("state"));
-			if (user.userCanSee(cu, PrivacyPreferenceType.ADDRESS)) {
-				user.setAddress(rs.getString("address"));
-				user.setStreet(rs.getString("street"));
-				user.setLat(rs.getDouble("lat"));
-				user.setLng(rs.getDouble("lng"));
-			}
-			user.setParentFirstName(rs.getString("parentFirstName"));
-			user.setParentLastName(rs.getString("parentLastName"));
-			user.setSex(rs.getString("sex"));
-			user.setChild(rs.getBoolean("isChild"));
-			user.setCommonInterestCount(rs.getInt("commonInterests"));
-			user.setAge(rs.getInt("age"));
-			user.setImageId(rs.getInt("imageId"));
-			user.setSmallImageId(rs.getInt("smallImageId"));
-			user.setDirectoryOptOut(rs.getBoolean("directoryOptOut"));
-			return user;
+			return createUser(rs, true);
 		}
 	}
 
@@ -456,11 +357,12 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 	@Override
 	public User getUserByUsername(String username) {
+		// this is only to be used after a successful login. otherwise it could expose private user data.
 		if (username == null) {
 			throw new UsernameNotFoundException("Username null not found");
 		}
 
-		User user = queryForObject(createSqlBase() + "where u.email = ?", new UserMapper(), username.toLowerCase());
+		User user = queryForObject(createSqlBase() + "where u.email = ?", new InsecureUserMapper(), username.toLowerCase());
 		if (user == null) {
 			throw new UsernameNotFoundException("Username not found or duplicate: " + username);
 		}
@@ -1112,6 +1014,116 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		return sql;
+	}
+
+	private User createUser(ResultSet rs, boolean security) throws SQLException {
+		User user = new User();
+		user.setSystemAdministrator(rs.getBoolean("isSystemAdministrator"));
+		user.setId(rs.getInt("id"));
+		User cu = ServerContext.getCurrentUser();
+
+		String groupText = rs.getString("groups");
+		final HashMap<Integer, GroupData> groups = new HashMap<Integer, GroupData>();
+		final HashSet<AccessLevel> levels = new HashSet<AccessLevel>();
+		String gt = "";
+		if (!Common.isNullOrBlank(groupText)) {
+			String[] groupRows = groupText.split("\n");
+			for (int i = 0; i < groupRows.length; i++) {
+				String[] cells = groupRows[i].split(":");
+				int groupId = Integer.parseInt(cells[0]);
+				boolean isAdmin = cells[2].equals("1");
+				int orgId = Integer.parseInt(cells[2]);
+
+				// levels
+				levels.add(AccessLevel.GROUP_MEMBERS);
+				if (isAdmin) {
+					levels.add(AccessLevel.GROUP_ADMINISTRATORS);
+					if (groupId > 0 && groupId == orgId) {
+						levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
+					}
+				}
+
+				// groups
+				GroupData gd = new GroupData();
+				gd.setAdministrator(isAdmin);
+				gd.setOrganizationId(orgId);
+				gd.setOrganization(groupId > 0 && groupId == orgId);
+				groups.put(groupId, gd);
+				gt += cells[1] + "\n";
+			}
+			user.setGroupsText(gt);
+		}
+
+		levels.add(AccessLevel.SITE_MEMBERS);
+		if (user.getSystemAdministrator()) {
+			levels.add(AccessLevel.SYSTEM_ADMINISTRATORS);
+			levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
+			levels.add(AccessLevel.GROUP_ADMINISTRATORS);
+			levels.add(AccessLevel.GROUP_MEMBERS);
+		}
+
+		user.setGroups(groups);
+		user.setAccessLevels(levels);
+
+		String prefText = rs.getString("privacyPrefs");
+		final HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences = new HashMap<PrivacyPreferenceType, PrivacyPreference>();
+		if (!Common.isNullOrBlank(prefText)) {
+			String[] prefRows = prefText.split("\n");
+			for (int i = 0; i < prefRows.length; i++) {
+				String[] cells = prefRows[i].split(":");
+				PrivacyPreference p = new PrivacyPreference();
+				p.setId(Integer.parseInt(cells[0]));
+				p.setPreferenceType(cells[1]);
+				p.setUserId(user.getId());
+				p.setVisibilityLevelId(Integer.parseInt(cells[2]));
+				p.setGroupId(Integer.parseInt(cells[3]));
+				p.setOrganizationId(Integer.parseInt(cells[4]));
+				privacyPreferences.put(PrivacyPreferenceType.valueOf(cells[1]), p);
+			}
+		}
+
+		user.setPrivacyPreferences(privacyPreferences);
+
+		if (!security || user.userCanSee(cu, PrivacyPreferenceType.EMAIL)) {
+			user.setEmail(rs.getString("email"));
+		}
+		user.setFirstName(rs.getString("firstName"));
+		user.setLastName(rs.getString("lastName"));
+		user.setPasswordDigest(rs.getString("passwordDigest"));
+		if (!security || user.userCanSee(cu, PrivacyPreferenceType.HOME_PHONE)) {
+			user.setHomePhone(rs.getString("homePhone"));
+		}
+		if (!security || user.userCanSee(cu, PrivacyPreferenceType.MOBILE_PHONE)) {
+			user.setMobilePhone(rs.getString("mobilePhone"));
+		}
+		user.setStartDate(rs.getTimestamp("startDate"));
+		user.setEndDate(rs.getTimestamp("endDate"));
+		user.setResetPassword(rs.getBoolean("resetPassword"));
+		user.setAddedDate(rs.getTimestamp("addedDate"));
+		user.setLastLoginDate(rs.getTimestamp("lastLoginDate"));
+		user.setActive(rs.getBoolean("isEnabled"));
+		user.setBirthDate(rs.getTimestamp("birthDate"));
+		user.setShowUserAgreement(rs.getBoolean("showUserAgreement"));
+		user.setParentId(rs.getInt("parentId"));
+		user.setCity(rs.getString("city"));
+		user.setZip(rs.getString("zip"));
+		user.setState(rs.getString("state"));
+		if (!security || user.userCanSee(cu, PrivacyPreferenceType.ADDRESS)) {
+			user.setAddress(rs.getString("address"));
+			user.setStreet(rs.getString("street"));
+			user.setLat(rs.getDouble("lat"));
+			user.setLng(rs.getDouble("lng"));
+		}
+		user.setParentFirstName(rs.getString("parentFirstName"));
+		user.setParentLastName(rs.getString("parentLastName"));
+		user.setSex(rs.getString("sex"));
+		user.setChild(rs.getBoolean("isChild"));
+		user.setCommonInterestCount(rs.getInt("commonInterests"));
+		user.setAge(rs.getInt("age"));
+		user.setImageId(rs.getInt("imageId"));
+		user.setSmallImageId(rs.getInt("smallImageId"));
+		user.setDirectoryOptOut(rs.getBoolean("directoryOptOut"));
+		return user;
 	}
 
 	private UserGroup createUserGroup(ResultSet rs) throws SQLException {
