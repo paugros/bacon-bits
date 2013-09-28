@@ -33,6 +33,10 @@ public class PrivacyPreference extends EntityDto<PrivacyPreference> {
 		return PrivacyPreferenceType.valueOf(preferenceType);
 	}
 
+	public String getPreferenceTypeString() {
+		return preferenceType;
+	}
+
 	public int getUserId() {
 		return userId;
 	}

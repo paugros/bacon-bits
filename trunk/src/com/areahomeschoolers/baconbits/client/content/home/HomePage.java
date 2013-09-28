@@ -214,10 +214,12 @@ public class HomePage implements Page {
 				cvp.add(new EventModulePanel("COMMUNITY EVENTS", pageData.getCommunityEvents(), "&showCommunity=true"));
 				cvp.addStyleName("homePageModule homePageEventPanel");
 
-				String ftext = "<iframe src=\"http://wms.assoc-amazon.com/20070822/US/html/searchbox_20.html?t=httpwhediment-20\" width=\"120\" height=\"90\" frameborder=\"0\" scrolling=\"no\"></iframe>";
-				SimplePanel sp = new SimplePanel(new HTML(ftext));
-				sp.addStyleName("mediumPadding");
-				cvp.add(sp);
+				// String ftext =
+				// "<iframe src=\"http://wms.assoc-amazon.com/20070822/US/html/searchbox_20.html?t=httpwhediment-20\" width=\"120\" height=\"90\" frameborder=\"0\" scrolling=\"no\"></iframe>";
+				// SimplePanel sp = new SimplePanel(new HTML(ftext));
+				// sp.addStyleName("mediumPadding");
+				// cvp.add(sp);
+
 				communityPanel.setWidget(cvp);
 
 				HomeContentPanel hcp = new HomeContentPanel();

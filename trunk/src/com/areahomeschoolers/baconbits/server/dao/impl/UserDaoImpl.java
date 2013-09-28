@@ -806,7 +806,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			update(sql, namedParams);
 		} else {
 			String sql = "insert into userPrivacyPreferences (userId, preferenceType, visibilityLevelId, groupId) ";
-			sql += "values(:userId, :preferenceType, :visibilityLevelId, :groupId)";
+			sql += "values(:userId, :preferenceTypeString, :visibilityLevelId, :groupId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -818,6 +818,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			int optOut = pref.getVisibilityLevel().equals(VisibilityLevel.PRIVATE) ? 1 : 0;
 			String sql = "update users set directoryOptOut = " + optOut + " where parentId = ?";
 			update(sql, pref.getUserId());
+		}
+
+		if (pref.getUserId() == ServerContext.getCurrentUserId()) {
+			ServerContext.getCurrentUser().setPrivacyPreference(pref);
 		}
 
 		return pref;

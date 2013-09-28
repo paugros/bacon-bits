@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
@@ -33,6 +34,9 @@ public class PrivacyPreferenceWidget extends Composite {
 				userService.savePrivacyPreference(visibilityWidget.getPrivacyPreference(), new Callback<PrivacyPreference>() {
 					@Override
 					protected void doOnSuccess(PrivacyPreference result) {
+						if (visibilityWidget.getPrivacyPreference().getUserId() == Application.getCurrentUserId()) {
+							Application.getCurrentUser().setPrivacyPreference(result);
+						}
 						save.setVisible(false);
 					}
 				});
