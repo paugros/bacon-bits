@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -207,6 +208,17 @@ public final class User extends EntityDto<User> {
 
 	public String getMobilePhone() {
 		return mobilePhone;
+	}
+
+	public ArrayList<Integer> getOrganizationIds() {
+		ArrayList<Integer> ids = new ArrayList<Integer>();
+		for (GroupData g : groups.values()) {
+			if (!ids.contains(g.getOrganizationId())) {
+				ids.add(g.getOrganizationId());
+			}
+		}
+
+		return ids;
 	}
 
 	public String getOriginalEmail() {

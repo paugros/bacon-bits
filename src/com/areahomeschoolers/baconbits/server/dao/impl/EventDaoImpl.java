@@ -633,10 +633,17 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		}
 
 		if (!(seriesId > 0)) {
+			String ids;
+			if (ServerContext.isAuthenticated()) {
+				ids = Common.join(ServerContext.getCurrentUser().getOrganizationIds(), ", ");
+			} else {
+				ids = Integer.toString(ServerContext.getCurrentOrgId());
+			}
+
 			if (showCommunity) {
-				sql += "and e.categoryId = 6 ";
+				sql += "and (e.categoryId = 6 or e.owningOrgId not in(" + ids + ")) ";
 			} else if (!includeCommunity) {
-				sql += "and e.categoryId != 6 ";
+				sql += "and (e.categoryId != 6 and e.owningOrgId in(" + ids + ")) ";
 			}
 		}
 
@@ -970,8 +977,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "left join userGroupMembers ugm on ugm.groupId = e.groupId and ugm.userId = " + userId + " \n";
 		sql += "left join userGroupMembers org on org.groupId = e.owningOrgId and org.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
-
-		sql += "and e.owningOrgId = " + ServerContext.getCurrentOrgId() + " \n";
 
 		int auth = ServerContext.isAuthenticated() ? 1 : 0;
 		if (!ServerContext.isSystemAdministrator()) {

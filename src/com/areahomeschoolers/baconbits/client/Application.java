@@ -30,7 +30,6 @@ import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
-import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.client.widgets.UserAgreementDialog;
@@ -347,7 +346,7 @@ public final class Application implements ValueChangeHandler<String> {
 			viewingPolicies = true;
 		}
 
-		if (isAuthenticated() && getCurrentUser().getShowUserAgreement() && !ClientUtils.isMobileBrowser() && !viewingPolicies) {
+		if (isAuthenticated() && getCurrentUser().getShowUserAgreement() && !viewingPolicies) {
 			UserAgreementDialog dialog = new UserAgreementDialog();
 			dialog.center();
 		}
