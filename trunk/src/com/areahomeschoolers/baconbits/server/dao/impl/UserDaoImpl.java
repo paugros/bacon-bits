@@ -1032,7 +1032,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				String[] cells = groupRows[i].split(":");
 				int groupId = Integer.parseInt(cells[0]);
 				boolean isAdmin = cells[2].equals("1");
-				int orgId = Integer.parseInt(cells[2]);
+				int orgId = Integer.parseInt(cells[3]);
 
 				// levels
 				levels.add(AccessLevel.GROUP_MEMBERS);

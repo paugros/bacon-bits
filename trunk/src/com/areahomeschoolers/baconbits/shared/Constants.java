@@ -29,7 +29,7 @@ public abstract class Constants {
 	public static final int BLANK_BOOK_IMAGE = 32;
 
 	public static final int CG_ORG_ID = 21;
-	public static final int DEFAULT_ORG_ID = 11;
+	public static final int DEFAULT_ORG_ID = 21;
 	public static final int DEFAULT_LOGO_ID = 1236;
 	public static final String CG_DOMAIN = "myhomeschoolgroups.com";
 	public static final String CG_URL = "http://www." + CG_DOMAIN;
