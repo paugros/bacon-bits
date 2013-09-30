@@ -8,6 +8,8 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Constants;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
+import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -72,6 +74,12 @@ public class UserAgreementDialog extends DefaultDialog {
 				User u = Application.getCurrentUser();
 				u.setShowUserAgreement(false);
 				u.setDirectoryOptOut(false);
+				// this will ensure that the kids settings are synchronized with the parent's
+				userService.savePrivacyPreference(u.getPrivacyPreference(PrivacyPreferenceType.FAMILY), new Callback<PrivacyPreference>() {
+					@Override
+					protected void doOnSuccess(PrivacyPreference result) {
+					}
+				});
 				userService.save(u, new Callback<ServerResponseData<User>>() {
 					@Override
 					protected void doOnSuccess(ServerResponseData<User> result) {

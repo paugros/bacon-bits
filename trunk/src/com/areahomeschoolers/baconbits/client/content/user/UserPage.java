@@ -328,54 +328,56 @@ public class UserPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			tabPanel.add("Groups", new TabPageCommand() {
-				@Override
-				public void execute(VerticalPanel tabBody) {
-					ArgMap<UserGroupArg> userArgs = new ArgMap<UserGroupArg>();
-					userArgs.put(UserGroupArg.USER_ID, user.getId());
-					final UserGroupTable groupsTable = new UserGroupTable(userArgs);
-					groupsTable.setUser(user);
-					groupsTable.setTitle("Group Membership");
-					groupsTable.setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
-					groupsTable.getTitleBar().addExcelControl();
-					if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
-						groupsTable.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								ArgMap<UserGroupArg> grpArgs = new ArgMap<UserGroupArg>(Status.ACTIVE);
-								grpArgs.put(UserGroupArg.USER_NOT_MEMBER_OF, user.getId());
-								if (!Application.isSystemAdministrator()) {
-									grpArgs.put(UserGroupArg.USER_IS_ADMIN_OF, Application.getCurrentUserId());
-								}
-								final UserGroupSelector selector = new UserGroupSelector(grpArgs);
-								selector.addSubmitCommand(new Command() {
-									@Override
-									public void execute() {
-										final UserGroup group = selector.getSelectedItem();
-
-										userService.updateUserGroupRelation(user, group, true, new Callback<Void>() {
-											@Override
-											protected void doOnSuccess(Void item) {
-												groupsTable.addItem(group);
-												selector.getCellTable().removeItem(group);
-											}
-										});
-										selector.clearSelection();
+			if (canEditUser(user)) {
+				tabPanel.add("Groups", new TabPageCommand() {
+					@Override
+					public void execute(VerticalPanel tabBody) {
+						ArgMap<UserGroupArg> userArgs = new ArgMap<UserGroupArg>();
+						userArgs.put(UserGroupArg.USER_ID, user.getId());
+						final UserGroupTable groupsTable = new UserGroupTable(userArgs);
+						groupsTable.setUser(user);
+						groupsTable.setTitle("Group Membership");
+						groupsTable.setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
+						groupsTable.getTitleBar().addExcelControl();
+						if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+							groupsTable.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									ArgMap<UserGroupArg> grpArgs = new ArgMap<UserGroupArg>(Status.ACTIVE);
+									grpArgs.put(UserGroupArg.USER_NOT_MEMBER_OF, user.getId());
+									if (!Application.isSystemAdministrator()) {
+										grpArgs.put(UserGroupArg.USER_IS_ADMIN_OF, Application.getCurrentUserId());
 									}
-								});
+									final UserGroupSelector selector = new UserGroupSelector(grpArgs);
+									selector.addSubmitCommand(new Command() {
+										@Override
+										public void execute() {
+											final UserGroup group = selector.getSelectedItem();
 
-								selector.setSelectedItems(groupsTable.getFullList());
-								selector.center();
-							}
-						}));
+											userService.updateUserGroupRelation(user, group, true, new Callback<Void>() {
+												@Override
+												protected void doOnSuccess(Void item) {
+													groupsTable.addItem(group);
+													selector.getCellTable().removeItem(group);
+												}
+											});
+											selector.clearSelection();
+										}
+									});
+
+									selector.setSelectedItems(groupsTable.getFullList());
+									selector.center();
+								}
+							}));
+						}
+
+						groupsTable.populate();
+
+						tabBody.add(WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH750PX));
+						tabPanel.selectTabNow(tabBody);
 					}
-
-					groupsTable.populate();
-
-					tabBody.add(WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH750PX));
-					tabPanel.selectTabNow(tabBody);
-				}
-			});
+				});
+			}
 
 			if (!user.isChild() && user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.FAMILY)) {
 				tabPanel.add("Family", new TabPageCommand() {
