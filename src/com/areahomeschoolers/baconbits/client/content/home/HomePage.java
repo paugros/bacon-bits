@@ -45,6 +45,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -466,7 +467,7 @@ public class HomePage implements Page {
 					public Number get(Data item) {
 						return item.getInt("memberCount");
 					}
-				});
+				}).setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
 			}
 		};
 
