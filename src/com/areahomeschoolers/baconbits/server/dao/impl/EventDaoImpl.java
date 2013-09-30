@@ -30,6 +30,7 @@ import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -234,6 +235,18 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	@Override
 	public HomePageData getHomePageData() {
 		HomePageData pd = new HomePageData();
+
+		if (ServerContext.isCitrus()) {
+			String sql = "select g.id, g.groupName, g.description, g.orgDomain, g.orgSubDomain, g.logoId, \n";
+			sql += "(select count(ugm.id) from userGroupMembers ugm \n";
+			sql += "join users u on u.id = ugm.userId \n";
+			sql += "where groupId = g.id and isActive(u.startDate, u.endDate) = 1) as memberCount \n";
+			sql += "from groups g \n";
+			sql += "where g.isOrganization = 1 and g.id != " + Constants.CG_ORG_ID + "\n";
+			sql += "order by g.groupName";
+			pd.setGroups(query(sql, ServerUtils.getGenericRowMapper()));
+		}
+
 		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 		args.put(EventArg.UPCOMING_NUMBER, 5);
 

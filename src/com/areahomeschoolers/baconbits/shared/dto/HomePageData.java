@@ -9,6 +9,7 @@ public class HomePageData implements IsSerializable {
 	private ArrayList<Event> communityEvents;
 	private ArrayList<Event> newlyAddedEvents;
 	private ArrayList<Event> myUpcomingEvents;
+	private ArrayList<Data> groups;
 	private Article intro;
 
 	public HomePageData() {
@@ -17,6 +18,10 @@ public class HomePageData implements IsSerializable {
 
 	public ArrayList<Event> getCommunityEvents() {
 		return communityEvents;
+	}
+
+	public ArrayList<Data> getGroups() {
+		return groups;
 	}
 
 	public Article getIntro() {
@@ -37,6 +42,10 @@ public class HomePageData implements IsSerializable {
 
 	public void setCommunityEvents(ArrayList<Event> communityEvents) {
 		this.communityEvents = communityEvents;
+	}
+
+	public void setGroups(ArrayList<Data> groups) {
+		this.groups = groups;
 	}
 
 	public void setIntro(Article intro) {

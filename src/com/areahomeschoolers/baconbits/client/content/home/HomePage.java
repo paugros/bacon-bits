@@ -18,11 +18,17 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.GenericCellTable;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
@@ -35,6 +41,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
@@ -421,8 +428,52 @@ public class HomePage implements Page {
 				hcp.add(rp);
 				// introduction
 				centerPanel.add(new ArticleWidget(pageData.getIntro()));
+
+				if (Application.isCitrus()) {
+					centerPanel.add(createGroupsTable());
+				}
 			}
 		});
 
+	}
+
+	private Widget createGroupsTable() {
+		GenericCellTable groupsTable = new GenericCellTable() {
+			@Override
+			protected void fetchData() {
+
+			}
+
+			@Override
+			protected void setColumns() {
+				addCompositeWidgetColumn("Group Name", new WidgetCellCreator<Data>() {
+					@Override
+					protected Widget createWidget(Data item) {
+						Anchor link = new Anchor(item.get("groupName"), "http://www." + item.get("orgDomain"));
+						return link;
+					}
+				});
+
+				addTextColumn("Description", new ValueGetter<String, Data>() {
+					@Override
+					public String get(Data item) {
+						return item.get("description");
+					}
+				});
+
+				addNumberColumn("Members", new ValueGetter<Number, Data>() {
+					@Override
+					public Number get(Data item) {
+						return item.getInt("memberCount");
+					}
+				});
+			}
+		};
+
+		groupsTable.populate(pageData.getGroups());
+		groupsTable.disablePaging();
+		groupsTable.setTitle("Our Groups");
+
+		return WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH750PX);
 	}
 }
