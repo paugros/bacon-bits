@@ -29,6 +29,7 @@ import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -290,34 +291,43 @@ public class UserFieldTable extends FieldTable {
 			passwordField.getLinkPanel().clear();
 			passwordField.setEnabled(false);
 			if (UserPage.canEditUser(user)) {
-				passwordField.getLinkPanel().add(new ClickLabel("Reset password", new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						if (user.getEmail() == null) {
-							AlertDialog.alert("Please specify an email address before resetting the password.");
-							return;
+				if (user.equals(Application.getCurrentUser()) && user.getEmail() != null) {
+					passwordField.getLinkPanel().add(new ClickLabel("Change password", new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							new ResetPasswordDialog(true).center();
 						}
-						String msg = "Reset the password for this user? Login information will be sent to their email address.";
-						ConfirmDialog.confirm(msg, new ConfirmHandler() {
-							@Override
-							public void onConfirm() {
-								user.setGeneratePassword(true);
-								userService.save(user, new Callback<ServerResponseData<User>>() {
-									@Override
-									protected void doOnSuccess(ServerResponseData<User> result) {
-										if (result.hasErrors()) {
-											new ServerResponseDialog(result).center();
-											return;
-										}
-										user = result.getData();
-										updatePasswordLabel();
-										AlertDialog.alert("Login Information Sent", new Label("Login information has been emailed to the user."));
-									}
-								});
+					}));
+				} else {
+					passwordField.getLinkPanel().add(new ClickLabel("Reset password", new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							if (user.getEmail() == null) {
+								AlertDialog.alert("Please specify an email address before resetting the password.");
+								return;
 							}
-						});
-					}
-				}));
+							String msg = "Reset the password for this user? Login information will be sent to their email address.";
+							ConfirmDialog.confirm(msg, new ConfirmHandler() {
+								@Override
+								public void onConfirm() {
+									user.setGeneratePassword(true);
+									userService.save(user, new Callback<ServerResponseData<User>>() {
+										@Override
+										protected void doOnSuccess(ServerResponseData<User> result) {
+											if (result.hasErrors()) {
+												new ServerResponseDialog(result).center();
+												return;
+											}
+											user = result.getData();
+											updatePasswordLabel();
+											AlertDialog.alert("Login Information Sent", new Label("Login information has been emailed to the user."));
+										}
+									});
+								}
+							});
+						}
+					}));
+				}
 			}
 			addField(passwordField);
 		}
