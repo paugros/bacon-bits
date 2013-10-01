@@ -211,8 +211,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			return null;
 		}
 
+		// if you're not a sysadmin, and the user has opted out, and the user isn't you...
 		if (!ServerContext.isSystemAdministrator() && u.getDirectoryOptOut() && !u.equals(ServerContext.getCurrentUser())) {
-			if (!ServerContext.isAuthenticated() || !ServerContext.getCurrentUser().administratorOf(u) || !ServerContext.getCurrentUser().parentOf(u)) {
+			// and either you're not authenticated, or you're not an admin or parent of the person
+			if (!ServerContext.isAuthenticated() || !(ServerContext.getCurrentUser().administratorOf(u) || ServerContext.getCurrentUser().parentOf(u))) {
+				// and you aren't switched to that person, then you can't see them
 				if (!ServerContext.getCurrentUser().isSwitched()) {
 					return null;
 				}
