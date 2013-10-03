@@ -63,6 +63,11 @@ public class UserGroupPage implements Page {
 	public UserGroupPage(final VerticalPanel page) {
 		int userGroupId = Url.getIntegerParameter("userGroupId");
 
+		if (!Application.isAuthenticated()) {
+			new ErrorPage(PageError.NOT_AUTHORIZED);
+			return;
+		}
+
 		if (!Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS) && userGroupId < 0) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
@@ -306,11 +311,13 @@ public class UserGroupPage implements Page {
 					ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 					args.put(UserArg.GROUP_ID, userGroup.getId());
 					final UserTable userTable = new UserTable(args);
+					userTable.setUserGroup(userGroup);
 					userTable.disablePaging();
-					userTable.setDisplayColumns(UserColumn.PICTURE, UserColumn.ACTIVITY, UserColumn.NAME, UserColumn.EMAIL, UserColumn.PHONE);
 					userTable.setTitle("Members");
 					userTable.getTitleBar().addExcelControl();
 					userTable.getTitleBar().addSearchControl();
+					userTable.setDisplayColumns(UserColumn.PICTURE, UserColumn.ACTIVITY, UserColumn.NAME, UserColumn.EMAIL, UserColumn.PHONE,
+							UserColumn.ADMINISTRATOR, UserColumn.DELETE);
 					userTable.addDataReturnHandler(new DataReturnHandler() {
 						@Override
 						public void onDataReturn() {

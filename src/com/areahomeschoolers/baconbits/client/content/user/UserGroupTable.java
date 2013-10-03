@@ -5,15 +5,12 @@ import java.util.Date;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
-import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
-import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
-import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.GroupMembershipControl;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -27,11 +24,9 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.RowStyles;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupArg, UserGroupColumn> {
@@ -159,26 +154,10 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
 						@Override
 						protected Widget createWidget(final UserGroup item) {
-							if (!Application.administratorOf(item)) {
-								return new Label(Common.yesNo(item.getAdministrator()));
-							}
-							return new ClickLabel(Common.yesNo(item.getAdministrator()), new ClickHandler() {
+							return new GroupMembershipControl(user, item).createAdminWidget(new Command() {
 								@Override
-								public void onClick(ClickEvent event) {
-									String action = item.getAdministrator() ? "Revoke" : "Grant";
-									String confirm = action + " administrator access for " + user.getFullName() + " in the " + item.getGroupName() + " group?";
-									ConfirmDialog.confirm(confirm, new ConfirmHandler() {
-										@Override
-										public void onConfirm() {
-											item.setAdministrator(!item.getAdministrator());
-											refresh();
-											userService.updateUserGroupRelation(user, item, true, new Callback<Void>(false) {
-												@Override
-												protected void doOnSuccess(Void item) {
-												}
-											});
-										}
-									});
+								public void execute() {
+									refresh();
 								}
 							});
 						}
@@ -223,25 +202,10 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 			addCompositeWidgetColumn("Delete", new WidgetCellCreator<UserGroup>() {
 				@Override
 				protected Widget createWidget(final UserGroup group) {
-					if (!Application.administratorOf(group)) {
-						return new Label("");
-					}
-
-					return new ClickLabel("X", new ClickHandler() {
+					return new GroupMembershipControl(user, group).createMemberWidget(new Command() {
 						@Override
-						public void onClick(ClickEvent event) {
-							String confirm = "Remove " + user.getFullName() + " from the " + group.getGroupName() + " group?";
-							ConfirmDialog.confirm(confirm, new ConfirmHandler() {
-								@Override
-								public void onConfirm() {
-									removeItem(group);
-									userService.updateUserGroupRelation(user, group, false, new Callback<Void>(false) {
-										@Override
-										protected void doOnSuccess(Void item) {
-										}
-									});
-								}
-							});
+						public void execute() {
+							removeItem(group);
 						}
 					});
 				}
