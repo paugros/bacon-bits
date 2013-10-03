@@ -23,10 +23,10 @@ public final class ArticleListPage implements Page {
 		}
 
 		ArgMap<ArticleArg> args = new ArgMap<ArticleArg>();
-		final String title = "Organizations and Groups";
+		final String title = "Articles";
 		final ArticleTable table = new ArticleTable(args);
 		table.setTitle(title);
-		if (Application.isSystemAdministrator()) {
+		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			table.getTitleBar().addLink(new Hyperlink("Add", PageUrl.article(0)));
 		}
 

@@ -386,9 +386,7 @@ public class HomePage implements Page {
 				lp.add(linkLabel);
 
 				if (Application.isAuthenticated()) {
-					if (Application.isSystemAdministrator()) {
-						lp.add(new Hyperlink("Find People", PageUrl.userList()));
-					}
+					lp.add(new Hyperlink("Find People", PageUrl.userList()));
 				} else {
 					ClickLabel cl = new ClickLabel("Create an Account", new ClickHandler() {
 						@Override
