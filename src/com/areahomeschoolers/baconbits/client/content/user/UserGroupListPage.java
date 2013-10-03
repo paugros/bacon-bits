@@ -29,7 +29,7 @@ public final class UserGroupListPage implements Page {
 		table.setTitle(title);
 		table.setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.ORGANIZATION, UserGroupColumn.DESCRIPTION, UserGroupColumn.START_DATE,
 				UserGroupColumn.END_DATE);
-		if (Application.isSystemAdministrator()) {
+		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
 			table.getTitleBar().addLink(new Hyperlink("Add", PageUrl.userGroup(0)));
 		}
 
