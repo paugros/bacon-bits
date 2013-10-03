@@ -21,6 +21,7 @@ public class GroupMembershipControl {
 	private UserGroup userGroup;
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
+	// used for toggling membership and administrator privs
 	public GroupMembershipControl(User user, UserGroup userGroup) {
 		this.user = user;
 		this.userGroup = userGroup;
