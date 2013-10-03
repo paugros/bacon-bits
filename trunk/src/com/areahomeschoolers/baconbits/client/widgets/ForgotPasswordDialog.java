@@ -1,8 +1,11 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
-import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
+import com.areahomeschoolers.baconbits.shared.Constants;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -31,7 +34,13 @@ public class ForgotPasswordDialog extends DialogBox {
 		VerticalPanel vp = new VerticalPanel();
 		vp.setSpacing(10);
 		vp.setWidth("360px");
-		Image logo = new Image(MainImageBundle.INSTANCE.logo());
+		Integer documentId = Application.getCurrentOrg().getLogoId();
+		if (documentId == null) {
+			documentId = Constants.DEFAULT_LOGO_ID;
+		}
+
+		Image logo = new Image(Constants.DOCUMENT_URL_PREFIX + documentId);
+
 		vp.add(logo);
 		vp.setCellHorizontalAlignment(logo, HasHorizontalAlignment.ALIGN_CENTER);
 		Label instructions = new Label("Submit your registered username/e-mail address below to receive an email which will allow you to reset your password.");
@@ -44,6 +53,7 @@ public class ForgotPasswordDialog extends DialogBox {
 		vp.add(errorLabel);
 
 		usernameInput = new TextBox();
+		usernameInput.setVisibleLength(30);
 		HorizontalPanel field = new HorizontalPanel();
 		field.setSpacing(5);
 		field.add(new Label("Email address:"));
@@ -69,6 +79,17 @@ public class ForgotPasswordDialog extends DialogBox {
 		setWidget(vp);
 	}
 
+	@Override
+	public void show() {
+		super.show();
+		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+			@Override
+			public void execute() {
+				usernameInput.setFocus(true);
+			}
+		});
+	}
+
 	private void closeOut() {
 		hide();
 		command.execute();
@@ -86,13 +107,16 @@ public class ForgotPasswordDialog extends DialogBox {
 			public void onSuccess(Boolean success) {
 				if (!success) {
 					String txt = "The username provided is not registered. Please register for an account. ";
-					txt += "If you have any questions, please contact the Kristin Augros at kaugros@gmail.com.";
+					txt += "If you have any questions, please contact Kristin Augros at kaugros@gmail.com.";
 					errorLabel.setHTML(txt);
 					return;
 				}
 
 				String msg = "To get back into your account, follow the instructions we've sent to " + usernameInput.getText().toLowerCase() + ".";
-				AlertDialog dialog = new AlertDialog("Success", new Label(msg));
+				Label label = new Label(msg);
+				label.setWidth("300px");
+				AlertDialog dialog = new AlertDialog("Success", label);
+
 				dialog.getButton().addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {

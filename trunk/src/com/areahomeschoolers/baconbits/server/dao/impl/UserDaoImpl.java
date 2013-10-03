@@ -810,19 +810,15 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String sql = "select id from users where id = ? and passwordDigest = ?";
 		try {
 			int id = queryForInt(sql, userId, digest);
-			User u = getById(id);
-			String pwd = UserDaoImpl.getSha1Hash(digest, u.getUserName());
-			u.setPasswordDigest(pwd);
-			u.setResetPassword(true);
-			ServerResponseData<User> result = save(u);
-			if (!result.hasErrors()) {
-				return result.getData();
-			}
+			User u = queryForObject(createSqlBase() + "where u.id = ?", new InsecureUserMapper(), id);
+			sql = "update users set passwordDigest = ?, resetPassword = 1 where id = ?";
+			update(sql, UserDaoImpl.getSha1Hash(digest, u.getUserName()), id);
+
+			return u;
 		} catch (DataAccessException e) {
+			e.printStackTrace();
 			return null;
 		}
-
-		return null;
 	}
 
 	@Override
