@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EmailDisplay;
+import com.areahomeschoolers.baconbits.client.widgets.GroupMembershipControl;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -23,11 +24,13 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -36,7 +39,7 @@ import com.google.gwt.user.client.ui.Widget;
 public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
 		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS(
-				"Same Interests"), AGE("Age");
+				"Same Interests"), AGE("Age"), ADMINISTRATOR("Administrator"), DELETE("Delete");
 
 		private String title;
 
@@ -52,6 +55,7 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private HashMap<Integer, UserStatusIndicator> userIndicators = new HashMap<Integer, UserStatusIndicator>();
+	private UserGroup userGroup;
 
 	public UserTable(ArgMap<UserArg> args) {
 		this();
@@ -90,6 +94,14 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 		});
 
 		filterBox.setSelectedIndex(0);
+	}
+
+	public UserGroup getUserGroup() {
+		return userGroup;
+	}
+
+	public void setUserGroup(UserGroup userGroup) {
+		this.userGroup = userGroup;
 	}
 
 	@Override
@@ -221,6 +233,41 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 						return new HTML(text);
 					}
 				});
+				break;
+			case ADMINISTRATOR:
+				if (userGroup != null) {
+					addCompositeWidgetColumn("Administrator", new WidgetCellCreator<User>() {
+						@Override
+						protected Widget createWidget(final User user) {
+							return new GroupMembershipControl(user, userGroup).createAdminWidget(new Command() {
+								@Override
+								public void execute() {
+									refresh();
+								}
+							});
+						}
+					}, new ValueGetter<Boolean, User>() {
+						@Override
+						public Boolean get(User item) {
+							return item.administratorOf(userGroup.getId());
+						}
+					});
+				}
+				break;
+			case DELETE:
+				if (userGroup != null && Application.administratorOf(userGroup)) {
+					addCompositeWidgetColumn("Delete", new WidgetCellCreator<User>() {
+						@Override
+						protected Widget createWidget(final User user) {
+							return new GroupMembershipControl(user, userGroup).createMemberWidget(new Command() {
+								@Override
+								public void execute() {
+									removeItem(user);
+								}
+							});
+						}
+					});
+				}
 				break;
 			default:
 				new AssertionError();
