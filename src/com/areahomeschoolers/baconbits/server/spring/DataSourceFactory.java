@@ -4,13 +4,13 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
-import com.google.appengine.api.utils.SystemProperty;
+import com.areahomeschoolers.baconbits.server.util.ServerContext;
 
 public class DataSourceFactory {
 	public DataSource createDataSource() {
 		BasicDataSource ds = new BasicDataSource();
 
-		String db = "production".equals(SystemProperty.version.get()) ? "areahomeschoolers" : "development";
+		String db = ServerContext.isLive() ? "areahomeschoolers" : "development";
 		ds.setUrl("jdbc:google:rdbms://baconbits-sql:" + db + "/baconbits");
 		ds.setValidationQuery("select max(id) from articles");
 		ds.setTestWhileIdle(true);

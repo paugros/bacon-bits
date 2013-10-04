@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
@@ -135,6 +136,16 @@ public class ServerContext implements ApplicationContextAware {
 		}
 
 		isLive = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production;
+
+		String version = SystemProperty.applicationVersion.get();
+		if (version == null) {
+			version = Constants.PRODUCTION_VERSION;
+		}
+
+		if (!version.contains(Constants.PRODUCTION_VERSION)) {
+			isLive = false;
+		}
+
 		isLiveIsSet = true;
 
 		return isLive;
