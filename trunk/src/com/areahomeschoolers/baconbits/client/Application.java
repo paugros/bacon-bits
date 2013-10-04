@@ -37,7 +37,9 @@ import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.HasGroupOwnership;
+import com.areahomeschoolers.baconbits.shared.dto.HistoryEntry;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.PollUpdateData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -72,6 +74,25 @@ public final class Application implements ValueChangeHandler<String> {
 	private static final int inactivityInterval = pollInterval * 2 + 1;
 	private static InactivityManager inactivityManager = new InactivityManager(inactivityInterval);
 	private static UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
+	private static PollUpdateData pollUpdateData = null;
+	private static List<HistoryEntry> historyEntries = new ArrayList<HistoryEntry>();
+
+	public static void addHistoryEntry(String title, String url) {
+		if (historyEntries == null) {
+			historyEntries = new ArrayList<HistoryEntry>();
+		}
+
+		HistoryEntry item = new HistoryEntry(title, History.getToken());
+		if (!historyEntries.isEmpty() && historyEntries.get(0).equals(item)) {
+			return;
+		}
+
+		if (historyEntries.contains(item)) {
+			historyEntries.remove(item);
+		}
+		historyEntries.add(0, item);
+		pollUpdateData.addHistoryUpdate(title, url);
+	}
 
 	public static HandlerRegistration addPollReturnHandler(final ParameterHandler<PollResponseData> handler) {
 		pollReturnHandlers.add(handler);
@@ -206,6 +227,9 @@ public final class Application implements ValueChangeHandler<String> {
 
 	public static void setTitle(String title) {
 		Window.setTitle(title + " - " + Application.APPLICATION_NAME);
+		if (pollUpdateData != null && (!isAuthenticated() || !getCurrentUser().isSwitched())) {
+			addHistoryEntry(title, History.getToken());
+		}
 	}
 
 	private static void createNewPage(String page) {
@@ -287,44 +311,46 @@ public final class Application implements ValueChangeHandler<String> {
 			});
 		}
 
-		if (isAuthenticated()) {
-			pollTimer = new Timer() {
-				@Override
-				public void run() {
-					pollForData();
-				}
-			};
-			pollTimer.scheduleRepeating(pollInterval);
+		pollTimer = new Timer() {
+			@Override
+			public void run() {
+				pollForData();
+			}
+		};
+		pollTimer.scheduleRepeating(pollInterval);
 
-			inactivityManager.addWakeUpCommand(new Command() {
-				@Override
-				public void execute() {
-					pollForData();
-					pollTimer.scheduleRepeating(pollInterval);
-				}
-			});
+		inactivityManager.addWakeUpCommand(new Command() {
+			@Override
+			public void execute() {
+				pollForData();
+				pollTimer.scheduleRepeating(pollInterval);
+			}
+		});
 
-			inactivityManager.addOnSleepCommand(new Command() {
-				@Override
-				public void execute() {
-					pollTimer.cancel();
-				}
-			});
+		inactivityManager.addOnSleepCommand(new Command() {
+			@Override
+			public void execute() {
+				pollTimer.cancel();
+			}
+		});
 
-			addPollReturnHandler(new ParameterHandler<PollResponseData>() {
-				@Override
-				public void execute(PollResponseData item) {
-					getApplicationData().updateUserActivityFromMap(item.getUserActivity());
-					UserStatusIndicator.updateAllStatusIndicators();
-				}
-			});
+		addPollReturnHandler(new ParameterHandler<PollResponseData>() {
+			@Override
+			public void execute(PollResponseData item) {
+				getApplicationData().updateUserActivityFromMap(item.getUserActivity());
+				UserStatusIndicator.updateAllStatusIndicators();
+			}
+		});
 
-			pollForData();
-		}
+		pollUpdateData = new PollUpdateData(isAuthenticated() ? getCurrentUserId() : null);
+
+		pollForData();
 
 		Window.addWindowClosingHandler(new ClosingHandler() {
 			@Override
 			public void onWindowClosing(ClosingEvent event) {
+				pollForData();
+
 				if (confirmNavigation) {
 					event.setMessage("Confirm Action");
 				}
@@ -353,12 +379,13 @@ public final class Application implements ValueChangeHandler<String> {
 	}
 
 	private void pollForData() {
-		userService.getPollData(new Callback<PollResponseData>(false) {
+		userService.getPollData(pollUpdateData, new Callback<PollResponseData>(false) {
 			@Override
 			protected void doOnSuccess(PollResponseData summary) {
 				for (ParameterHandler<PollResponseData> handler : pollReturnHandlers) {
 					handler.execute(summary);
 				}
+				historyEntries = summary.getHistoryItems();
 			}
 		});
 	}

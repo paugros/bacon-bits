@@ -19,8 +19,10 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
+import com.areahomeschoolers.baconbits.shared.dto.HistoryEntry;
 import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.PollUpdateData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -55,13 +57,18 @@ public class UserServiceImpl extends GwtController implements UserService {
 	}
 
 	@Override
+	public ArrayList<HistoryEntry> getNavigationHistory(int userId) {
+		return dao.getNavigationHistory(userId);
+	}
+
+	@Override
 	public UserPageData getPageData(int userId) {
 		return dao.getPageData(userId);
 	}
 
 	@Override
-	public PollResponseData getPollData() {
-		return dao.getPollData();
+	public PollResponseData getPollData(PollUpdateData pollData) {
+		return dao.getPollData(pollData);
 	}
 
 	@Override
