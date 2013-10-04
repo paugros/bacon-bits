@@ -99,7 +99,7 @@ public class ArticlePage implements Page {
 		titleField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				article.setTitle(titleInput.getText());
+				article.setTitle(titleInput.getText().trim());
 			}
 		});
 		titleField.setInitializer(new Command() {
