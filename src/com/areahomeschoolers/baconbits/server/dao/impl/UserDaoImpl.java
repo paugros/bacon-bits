@@ -363,9 +363,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (pollData.hasHistoryUpdates()) {
 			ArrayList<Object[]> historyUpdate = new ArrayList<Object[]>();
 			for (HistoryEntry he : pollData.getHistoryUpdates()) {
-				historyUpdate.add(new Object[] { ServerContext.getCurrentOrgId(), pollData.getUserId(), he.getTitle(), he.getUrl() });
+				historyUpdate.add(new Object[] { ServerContext.getCurrentOrgId(), pollData.getUserId(), he.getTitle(), he.getUrl(),
+						ServerContext.getRequest().getRemoteAddr() });
 			}
-			batchUpdate("insert into userHistory(organizationId, userID, pageTitle, historyToken) values(?, ?, ?, ?)", historyUpdate);
+			batchUpdate("insert into userHistory(organizationId, userID, pageTitle, historyToken, ipAddress) values(?, ?, ?, ?, ?)", historyUpdate);
 		}
 
 		if (userId != null) {
