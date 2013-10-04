@@ -10,8 +10,10 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
+import com.areahomeschoolers.baconbits.shared.dto.HistoryEntry;
 import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.PollUpdateData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -28,11 +30,13 @@ public interface UserDao {
 
 	public ArrayList<MainMenuItem> getMenuItems(ArgMap<UserArg> args);
 
+	public ArrayList<HistoryEntry> getNavigationHistory(int userId);
+
 	public UserGroup getOrgForCurrentRequest();
 
 	public UserPageData getPageData(int userId);
 
-	public PollResponseData getPollData();
+	public PollResponseData getPollData(PollUpdateData pollData);
 
 	public User getUserByUsername(String username);
 

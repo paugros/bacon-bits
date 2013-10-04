@@ -8,8 +8,10 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
+import com.areahomeschoolers.baconbits.shared.dto.HistoryEntry;
 import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.PollUpdateData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -27,7 +29,7 @@ public interface UserServiceAsync {
 
 	public void getPageData(int userId, AsyncCallback<UserPageData> callback);
 
-	public void getPollData(AsyncCallback<PollResponseData> callback);
+	public void getPollData(PollUpdateData pollData, AsyncCallback<PollResponseData> callback);
 
 	public void getUserByUsername(String username, AsyncCallback<User> callback);
 
@@ -58,4 +60,6 @@ public interface UserServiceAsync {
 	public void updateUserGroupRelation(User u, UserGroup g, boolean add, AsyncCallback<Void> callback);
 
 	public void validatePassword(String password, AsyncCallback<ServerResponseData<String>> callback);
+
+	void getNavigationHistory(int userId, AsyncCallback<ArrayList<HistoryEntry>> callback);
 }

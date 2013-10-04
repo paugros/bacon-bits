@@ -44,8 +44,10 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
+import com.areahomeschoolers.baconbits.shared.dto.HistoryEntry;
 import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.PollUpdateData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
@@ -272,6 +274,20 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
+	public ArrayList<HistoryEntry> getNavigationHistory(int userId) {
+		String sql = "select distinct historyToken, pageTitle from ";
+		sql += "(select historyToken, pageTitle from ";
+		sql += "userHistory where userId = ? order by id desc limit 200) as tbl limit 25";
+
+		return query(sql, new RowMapper<HistoryEntry>() {
+			@Override
+			public HistoryEntry mapRow(ResultSet arg0, int arg1) throws SQLException {
+				return new HistoryEntry(arg0.getString("pageTitle"), arg0.getString("historyToken"));
+			}
+		}, userId);
+	}
+
+	@Override
 	public UserGroup getOrgForCurrentRequest() {
 		String subDomain = "";
 		String domain = "";
@@ -339,9 +355,22 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
-	public PollResponseData getPollData() {
+	public PollResponseData getPollData(PollUpdateData pollData) {
+		Integer userId = pollData.getUserId();
 		PollResponseData data = new PollResponseData();
 		data.setUserActivity(getUserActivitySinceLastPoll(ServerContext.getCurrentUserId()));
+
+		if (pollData.hasHistoryUpdates()) {
+			ArrayList<Object[]> historyUpdate = new ArrayList<Object[]>();
+			for (HistoryEntry he : pollData.getHistoryUpdates()) {
+				historyUpdate.add(new Object[] { pollData.getUserId(), he.getTitle(), he.getUrl() });
+			}
+			batchUpdate("insert into userHistory(userID, pageTitle, historyToken) values(?, ?, ?)", historyUpdate);
+		}
+
+		if (userId != null) {
+			data.setHistoryItems(getNavigationHistory(userId));
+		}
 
 		return data;
 	}
