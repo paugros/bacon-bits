@@ -5,15 +5,17 @@ import java.util.ArrayList;
 public class PollUpdateData extends EntityDto<PollUpdateData> {
 	private static final long serialVersionUID = -4524434771240327430L;
 	private Integer userId;
+	private int organizationId;
 	private ArrayList<HistoryEntry> historyUpdates;
 
 	public PollUpdateData() {
 		super();
 	}
 
-	public PollUpdateData(Integer userId) {
+	public PollUpdateData(Integer userId, int organizationId) {
 		this();
 		this.userId = userId;
+		this.organizationId = organizationId;
 		historyUpdates = new ArrayList<HistoryEntry>();
 	}
 
@@ -29,12 +31,20 @@ public class PollUpdateData extends EntityDto<PollUpdateData> {
 		return historyUpdates;
 	}
 
+	public int getOrganizationId() {
+		return organizationId;
+	}
+
 	public Integer getUserId() {
 		return userId;
 	}
 
 	public boolean hasHistoryUpdates() {
 		return historyUpdates != null && !historyUpdates.isEmpty();
+	}
+
+	public void setOrganizationId(int organizationId) {
+		this.organizationId = organizationId;
 	}
 
 	public void setUserId(Integer userId) {

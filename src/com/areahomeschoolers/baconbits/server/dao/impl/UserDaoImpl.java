@@ -277,14 +277,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	public ArrayList<HistoryEntry> getNavigationHistory(int userId) {
 		String sql = "select distinct historyToken, pageTitle from ";
 		sql += "(select historyToken, pageTitle from ";
-		sql += "userHistory where userId = ? order by id desc limit 200) as tbl limit 25";
+		sql += "userHistory where userId = ? and organizationId = ? order by id desc limit 200) as tbl limit 25";
 
 		return query(sql, new RowMapper<HistoryEntry>() {
 			@Override
 			public HistoryEntry mapRow(ResultSet arg0, int arg1) throws SQLException {
 				return new HistoryEntry(arg0.getString("pageTitle"), arg0.getString("historyToken"));
 			}
-		}, userId);
+		}, userId, ServerContext.getCurrentOrgId());
 	}
 
 	@Override
@@ -363,9 +363,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (pollData.hasHistoryUpdates()) {
 			ArrayList<Object[]> historyUpdate = new ArrayList<Object[]>();
 			for (HistoryEntry he : pollData.getHistoryUpdates()) {
-				historyUpdate.add(new Object[] { pollData.getUserId(), he.getTitle(), he.getUrl() });
+				historyUpdate.add(new Object[] { ServerContext.getCurrentOrgId(), pollData.getUserId(), he.getTitle(), he.getUrl() });
 			}
-			batchUpdate("insert into userHistory(userID, pageTitle, historyToken) values(?, ?, ?)", historyUpdate);
+			batchUpdate("insert into userHistory(organizationId, userID, pageTitle, historyToken) values(?, ?, ?, ?)", historyUpdate);
 		}
 
 		if (userId != null) {
