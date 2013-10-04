@@ -539,6 +539,9 @@ public final class User extends EntityDto<User> {
 		PrivacyPreference p = getPrivacyPreference(type);
 
 		VisibilityLevel level = VisibilityLevel.getById(p.getVisibilityLevelId());
+		if (directoryOptOut) {
+			level = VisibilityLevel.PRIVATE;
+		}
 
 		// user null, but public
 		if (u == null) {
