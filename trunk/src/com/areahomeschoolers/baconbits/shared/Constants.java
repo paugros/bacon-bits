@@ -35,5 +35,6 @@ public abstract class Constants {
 	public static final String CG_URL = "http://www." + CG_DOMAIN;
 	public static final String TOS_URL = CG_URL + "/#page=Article&articleId=73";
 	public static final String PRIVACY_POLICY_URL = CG_URL + "/#page=Article&articleId=72";
+	public static final String PRODUCTION_VERSION = "production";
 
 }
