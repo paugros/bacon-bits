@@ -54,7 +54,7 @@ public class VolunteerPositionEditDialog extends EntityEditDialog<EventVolunteer
 		titleField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setJobTitle(titleInput.getText());
+				entity.setJobTitle(titleInput.getText().trim());
 			}
 		});
 		ft.addField(titleField);
@@ -71,7 +71,7 @@ public class VolunteerPositionEditDialog extends EntityEditDialog<EventVolunteer
 		descriptionField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setDescription(descriptionInput.getText());
+				entity.setDescription(descriptionInput.getText().trim());
 			}
 		});
 		ft.addField(descriptionField);

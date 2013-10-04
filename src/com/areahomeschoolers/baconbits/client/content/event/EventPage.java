@@ -182,7 +182,7 @@ public class EventPage implements Page {
 		titleField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				calendarEvent.setTitle(titleInput.getText());
+				calendarEvent.setTitle(titleInput.getText().trim());
 			}
 		});
 		titleField.setInitializer(new Command() {
@@ -233,7 +233,7 @@ public class EventPage implements Page {
 		addressField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				calendarEvent.setAddress(addressInput.getText());
+				calendarEvent.setAddress(addressInput.getText().trim());
 			}
 		});
 		fieldTable.addField(addressField);
@@ -257,7 +257,7 @@ public class EventPage implements Page {
 			websiteField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					calendarEvent.setWebsite(websiteInput.getText());
+					calendarEvent.setWebsite(websiteInput.getText().trim());
 				}
 			});
 			fieldTable.addField(websiteField);
@@ -390,7 +390,7 @@ public class EventPage implements Page {
 			instructionsField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					calendarEvent.setRegistrationInstructions(instructionsInput.getText());
+					calendarEvent.setRegistrationInstructions(instructionsInput.getText().trim());
 				}
 			});
 			fieldTable.addField(instructionsField);
