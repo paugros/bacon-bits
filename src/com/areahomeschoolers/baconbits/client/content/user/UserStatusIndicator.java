@@ -134,11 +134,11 @@ public class UserStatusIndicator extends Composite {
 				text += "s";
 			}
 		} else if (minutes < (60 * 24 * 14)) {
-			// double days = Math.round((minutes / 60.0) / 24);
-			// text = Formatter.formatNumber(days, "0") + " day";
-			// if (days > 1) {
-			// text += "s";
-			// }
+			double days = Math.round((minutes / 60.0) / 24);
+			text = Formatter.formatNumber(days, "0") + " day";
+			if (days > 1) {
+				text += "s";
+			}
 		} else if (minutes < (60 * 24 * 60)) {
 			// double weeks = Math.round(((minutes / 60.0) / 24) / 7);
 			// text = Formatter.formatNumber(weeks, "0") + " week";

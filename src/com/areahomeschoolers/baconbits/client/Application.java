@@ -382,6 +382,7 @@ public final class Application implements ValueChangeHandler<String> {
 		userService.getPollData(pollUpdateData, new Callback<PollResponseData>(false) {
 			@Override
 			protected void doOnSuccess(PollResponseData summary) {
+				pollUpdateData.clearHistoryUpdates();
 				for (ParameterHandler<PollResponseData> handler : pollReturnHandlers) {
 					handler.execute(summary);
 				}

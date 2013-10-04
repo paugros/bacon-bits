@@ -21,6 +21,10 @@ public class PollUpdateData extends EntityDto<PollUpdateData> {
 		historyUpdates.add(new HistoryEntry(title, url));
 	}
 
+	public void clearHistoryUpdates() {
+		historyUpdates.clear();
+	}
+
 	public ArrayList<HistoryEntry> getHistoryUpdates() {
 		return historyUpdates;
 	}
