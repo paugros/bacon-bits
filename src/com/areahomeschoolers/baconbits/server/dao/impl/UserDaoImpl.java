@@ -1173,6 +1173,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setCoopPolicyId(rs.getInt("coopPolicyId"));
 		group.setPayPalEmail(rs.getString("payPalEmail"));
 		group.setLogoId(rs.getInt("logoId"));
+		group.setFaviconId(rs.getInt("faviconId"));
 		return group;
 	}
 

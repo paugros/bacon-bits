@@ -126,6 +126,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private Integer coopPolicyId;
 	private String payPalEmail;
 	private Integer logoId;
+	private Integer faviconId;
 
 	// aux
 	private String organizationName;
@@ -161,6 +162,13 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 			return null;
 		}
 		return eventPolicyId;
+	}
+
+	public Integer getFaviconId() {
+		if (faviconId == 0) {
+			return null;
+		}
+		return faviconId;
 	}
 
 	public Integer getGeneralPolicyId() {
@@ -284,6 +292,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public void setEventPolicyId(Integer eventPolicyId) {
 		this.eventPolicyId = eventPolicyId;
+	}
+
+	public void setFaviconId(Integer faviconId) {
+		this.faviconId = faviconId;
 	}
 
 	public void setGeneralPolicyId(Integer generalPolicyId) {

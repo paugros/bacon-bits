@@ -33,6 +33,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.client.widgets.UserAgreementDialog;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
@@ -47,6 +48,9 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.LinkElement;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -283,6 +287,20 @@ public final class Application implements ValueChangeHandler<String> {
 		// set session information
 		applicationData = ap;
 		APPLICATION_NAME = ap.getCurrentOrg().getShortName();
+
+		if (getCurrentOrg().getFaviconId() != null) {
+			NodeList<Element> links = com.google.gwt.dom.client.Document.get().getElementsByTagName("link");
+			for (int i = 0; i < links.getLength(); i++) {
+				LinkElement link = LinkElement.as(links.getItem(i));
+				if (link.getRel() != null && "SHORTCUT ICON".equals(link.getRel().toUpperCase())) {
+					link.setHref(Constants.DOCUMENT_URL_PREFIX + getCurrentOrg().getFaviconId());
+					Element head = link.getParentElement();
+					link.removeFromParent();
+					head.appendChild(link);
+					break;
+				}
+			}
+		}
 
 		History.addValueChangeHandler(this);
 
