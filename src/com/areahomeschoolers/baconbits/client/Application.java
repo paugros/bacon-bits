@@ -288,7 +288,7 @@ public final class Application implements ValueChangeHandler<String> {
 		applicationData = ap;
 		APPLICATION_NAME = ap.getCurrentOrg().getShortName();
 
-		if (getCurrentOrg().getFaviconId() != null) {
+		if (getCurrentOrg() != null && getCurrentOrg().getFaviconId() != null) {
 			NodeList<Element> links = com.google.gwt.dom.client.Document.get().getElementsByTagName("link");
 			for (int i = 0; i < links.getLength(); i++) {
 				LinkElement link = LinkElement.as(links.getItem(i));
