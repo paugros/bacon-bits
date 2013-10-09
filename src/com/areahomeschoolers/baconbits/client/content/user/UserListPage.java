@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GoogleMapWidget;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SortDirection;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -65,6 +66,7 @@ public final class UserListPage implements Page {
 		table = new UserTable(args);
 		table.removeColumn(UserColumn.STATUS);
 		table.removeColumn(UserColumn.SEX);
+		table.setDefaultSortColumn(UserColumn.ACTIVITY, SortDirection.SORT_DESC);
 
 		table.setTitle(title);
 		table.getTitleBar().addExcelControl();

@@ -100,7 +100,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 	}
 
-	private final class UserMapper implements RowMapper<User> {
+	private final class SecureUserMapper implements RowMapper<User> {
 		@Override
 		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return createUser(rs, true);
@@ -207,7 +207,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 	@Override
 	public User getById(int userId) {
-		User u = queryForObject(createSqlBase() + createSqlWhere() + "and u.id = ?", new UserMapper(), userId);
+		return getById(userId, true);
+	}
+
+	@Override
+	public User getById(int userId, boolean useSecureMapper) {
+		User u = queryForObject(createSqlBase() + createSqlWhere() + "and u.id = ?", useSecureMapper ? new SecureUserMapper() : new InsecureUserMapper(),
+				userId);
 
 		if (u == null) {
 			return null;
@@ -522,7 +528,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		sql += "order by u.lastName, u.firstName";
-		ArrayList<User> data = query(sql, new UserMapper(), sqlArgs.toArray());
+		ArrayList<User> data = query(sql, new SecureUserMapper(), sqlArgs.toArray());
 
 		return data;
 	}
@@ -699,10 +705,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 		retData.setData(returnUser);
 
-		// when updating your own user, ensure that it gets rewritten to the session
-		if (user.equals(ServerContext.getCurrentUser())) {
-			ServerContext.setCurrentUser(user);
-		}
+		// update the user cache (using insecure mapper to ensure all data is present)
+		ServerContext.updateUserCache(getById(user.getId(), false));
 
 		return retData;
 	}
@@ -796,7 +800,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			}
 		}
 
-		return listGroups(new ArgMap<UserGroupArg>(UserGroupArg.ID, group.getId())).get(0);
+		group = listGroups(new ArgMap<UserGroupArg>(UserGroupArg.ID, group.getId())).get(0);
+
+		if (group.getOrganization()) {
+			ServerContext.updateGroupCache(group);
+		}
+
+		return group;
 	}
 
 	@Override
@@ -858,20 +868,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
-	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add) {
-		for (User u : users) {
-			updateUserGroupRelation(u, g, add);
-		}
-	}
-
-	@Override
-	public void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add) {
-		for (UserGroup ug : g) {
-			updateUserGroupRelation(u, ug, add);
-		}
-	}
-
-	@Override
 	public void updateUserGroupRelation(User u, UserGroup g, boolean add) {
 		if (add) {
 			// Check if relation already exists
@@ -901,6 +897,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "and (userId = ? or userId in(select id from users where parentId = ?)) ";
 			update(sql, g.getId(), u.getId(), u.getId());
 		}
+
+		ServerContext.updateUserCache(getById(u.getId(), false));
 	}
 
 	@Override

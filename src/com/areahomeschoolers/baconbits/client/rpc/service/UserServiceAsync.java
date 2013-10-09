@@ -53,10 +53,6 @@ public interface UserServiceAsync {
 
 	public void updateMenuOrdinals(ArrayList<MainMenuItem> items, AsyncCallback<Void> callback);
 
-	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add, AsyncCallback<Void> callback);
-
-	public void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add, AsyncCallback<Void> callback);
-
 	public void updateUserGroupRelation(User u, UserGroup g, boolean add, AsyncCallback<Void> callback);
 
 	public void validatePassword(String password, AsyncCallback<ServerResponseData<String>> callback);
