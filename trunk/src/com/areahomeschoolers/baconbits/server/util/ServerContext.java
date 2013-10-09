@@ -1,5 +1,8 @@
 package com.areahomeschoolers.baconbits.server.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.shared.Constants;
@@ -30,6 +34,8 @@ public class ServerContext implements ApplicationContextAware {
 	private static ThreadLocal<ServerContext> tl = new ThreadLocal<ServerContext>();
 	private static boolean isLiveIsSet;
 	private static boolean isLive;
+	private static Map<Integer, UserGroup> groupCache = new HashMap<>();
+	private static Map<Integer, User> userCache = new HashMap<>();
 
 	public static ApplicationContext getApplicationContext() {
 		return ctx;
@@ -69,16 +75,27 @@ public class ServerContext implements ApplicationContextAware {
 			return null;
 		}
 
-		return (UserGroup) session.getAttribute("org");
+		Integer orgId = (Integer) session.getAttribute("orgId");
+		if (orgId == null) {
+			setCurrentOrg();
+			orgId = getCurrentOrgId();
+		}
+
+		return groupCache.get(orgId);
 	}
 
 	public static int getCurrentOrgId() {
-		UserGroup ug = getCurrentOrg();
-		if (ug == null) {
+		HttpSession session = ServerContext.getSession();
+		if (session == null) {
 			return 0;
 		}
 
-		return ug.getId();
+		Integer orgId = (Integer) session.getAttribute("orgId");
+		if (orgId == null) {
+			return 0;
+		}
+
+		return orgId;
 	}
 
 	public static User getCurrentUser() {
@@ -87,16 +104,29 @@ public class ServerContext implements ApplicationContextAware {
 			return null;
 		}
 
-		return (User) session.getAttribute("user");
+		Integer userId = (Integer) session.getAttribute("userId");
+		User u = userCache.get(userId);
+		if (u == null && userId != null) {
+			UserDao userDao = getDaoImpl("user");
+			u = userDao.getById(userId, false);
+			setCurrentUser(u);
+		}
+
+		return u;
 	}
 
 	public static int getCurrentUserId() {
-		User u = getCurrentUser();
-		if (u == null) {
+		HttpSession session = ServerContext.getSession();
+		if (session == null) {
 			return 0;
 		}
 
-		return u.getId();
+		Integer userId = (Integer) session.getAttribute("userId");
+		if (userId == null) {
+			return 0;
+		}
+
+		return userId;
 	}
 
 	public static <T> T getDaoImpl(String dao) {
@@ -164,19 +194,28 @@ public class ServerContext implements ApplicationContextAware {
 		sc.response = response;
 		sc.servletContext = servletContext;
 		tl.set(sc);
+
+		// an active session for a disabled user -- kill it
+		User u = getCurrentUser();
+		if (u != null && !u.isActive()) {
+			LoginService loginService = (LoginService) getApplicationContext().getBean("LoginServiceImpl");
+			loginService.logout();
+		}
 	}
 
 	public static void setCurrentOrg() {
-		if (getCurrentOrg() != null) {
+		if (getCurrentOrgId() > 0) {
 			return;
 		}
 
 		UserDao userDao = getDaoImpl("user");
-		getSession().setAttribute("org", userDao.getOrgForCurrentRequest());
+		UserGroup org = userDao.getOrgForCurrentRequest();
+		getSession().setAttribute("orgId", org.getId());
+		groupCache.put(org.getId(), org);
 	}
 
 	public static void setCurrentOrg(UserGroup org) {
-		getSession().setAttribute("org", org);
+		getSession().setAttribute("orgId", org.getId());
 	}
 
 	/**
@@ -188,16 +227,17 @@ public class ServerContext implements ApplicationContextAware {
 	public static void setCurrentUser(String username) {
 		User u = null;
 		if (username != null) {
-			// put this shell in first so that userdao will know we've authenticated as this user
 			UserService userService = (UserService) ctx.getBean("userServiceImpl");
 			u = userService.getUserByUsername(username);
 		}
 
-		getSession().setAttribute("user", u);
+		getSession().setAttribute("userId", u.getId());
+		userCache.put(u.getId(), u);
 	}
 
 	public static void setCurrentUser(User u) {
-		getSession().setAttribute("user", u);
+		getSession().setAttribute("userId", u.getId());
+		userCache.put(u.getId(), u);
 	}
 
 	public static void switchToUser(int userId) {
@@ -221,6 +261,14 @@ public class ServerContext implements ApplicationContextAware {
 
 	public static void unloadContext() {
 		tl.remove();
+	}
+
+	public static void updateGroupCache(UserGroup group) {
+		groupCache.put(group.getId(), group);
+	}
+
+	public static void updateUserCache(User user) {
+		userCache.put(user.getId(), user);
 	}
 
 	private ServletContext servletContext;

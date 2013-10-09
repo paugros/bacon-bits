@@ -33,7 +33,6 @@ public class GwtController extends RemoteServiceServlet implements ServletConfig
 	// Call GWT's RemoteService doPost() method and return null.
 	@Override
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// System.out.println(request.getSession().getCreationTime());
 		// load our ServerContext with current request, response, session, user, appContext, etc.
 		ServerContext.loadContext(request, response, servletContext);
 		try {
@@ -43,12 +42,6 @@ public class GwtController extends RemoteServiceServlet implements ServletConfig
 		}
 		return null; // response handled by GWT RPC over XmlHttpRequest
 	}
-
-	// @Override
-	// public void init() throws ServletException {
-	// super.init();
-	// TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
-	// }
 
 	@Override
 	public void setServletConfig(ServletConfig conf) {

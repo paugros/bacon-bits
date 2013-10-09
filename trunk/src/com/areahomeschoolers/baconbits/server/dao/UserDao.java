@@ -28,6 +28,8 @@ public interface UserDao {
 
 	public User getById(int userId);
 
+	public User getById(int userId, boolean useSecureMapper);
+
 	public ArrayList<MainMenuItem> getMenuItems(ArgMap<UserArg> args);
 
 	public ArrayList<HistoryEntry> getNavigationHistory(int userId);
@@ -64,12 +66,6 @@ public interface UserDao {
 
 	@PreAuthorize("hasRole('ORGANIZATION_ADMINISTRATORS')")
 	public void updateMenuOrdinals(ArrayList<MainMenuItem> items);
-
-	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
-	public void updateUserGroupRelation(ArrayList<User> users, UserGroup g, boolean add);
-
-	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
-	public void updateUserGroupRelation(User u, ArrayList<UserGroup> g, boolean add);
 
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void updateUserGroupRelation(User u, UserGroup g, boolean add);
