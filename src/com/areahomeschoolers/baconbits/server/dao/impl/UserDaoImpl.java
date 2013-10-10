@@ -212,21 +212,30 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 	@Override
 	public User getById(int userId, boolean useSecureMapper) {
-		User u = queryForObject(createSqlBase() + createSqlWhere() + "and u.id = ?", useSecureMapper ? new SecureUserMapper() : new InsecureUserMapper(),
-				userId);
+		// we can't do any sort of isAuthenticate or currentUser checks unless we're using the secure mapper
+		// otherwise we won't be able to initialize a logging-in user
+		String sql = createSqlBase();
+		if (useSecureMapper) {
+			sql += createSqlWhere();
+		}
+		sql += "and u.id = ?";
+
+		User u = queryForObject(sql, useSecureMapper ? new SecureUserMapper() : new InsecureUserMapper(), userId);
 
 		if (u == null) {
 			return null;
 		}
 
-		// if you're not an org admin, and the user has opted out, and the user isn't you...
-		if (!ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS) && u.getDirectoryOptOut()
-				&& !u.equals(ServerContext.getCurrentUser())) {
-			// and either you're not authenticated, or you're not an admin or parent of the person
-			if (!ServerContext.isAuthenticated() || !(ServerContext.getCurrentUser().administratorOf(u) || ServerContext.getCurrentUser().parentOf(u))) {
-				// and you aren't switched to that person, then you can't see them
-				if (!ServerContext.getCurrentUser().isSwitched()) {
-					return null;
+		if (useSecureMapper) {
+			// if you're not an org admin, and the user has opted out, and the user isn't you...
+			if (!ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS) && u.getDirectoryOptOut()
+					&& !u.equals(ServerContext.getCurrentUser())) {
+				// and either you're not authenticated, or you're not an admin or parent of the person
+				if (!ServerContext.isAuthenticated() || !(ServerContext.getCurrentUser().administratorOf(u) || ServerContext.getCurrentUser().parentOf(u))) {
+					// and you aren't switched to that person, then you can't see them
+					if (!ServerContext.getCurrentUser().isSwitched()) {
+						return null;
+					}
 				}
 			}
 		}
