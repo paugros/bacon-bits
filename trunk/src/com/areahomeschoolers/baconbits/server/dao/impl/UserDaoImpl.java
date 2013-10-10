@@ -706,7 +706,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		retData.setData(returnUser);
 
 		// update the user cache (using insecure mapper to ensure all data is present)
-		ServerContext.updateUserCache(getById(user.getId(), false));
+		if (ServerContext.getCache().contains("user_" + user.getId())) {
+			ServerContext.updateUserCache(getById(user.getId(), false));
+		}
 
 		return retData;
 	}

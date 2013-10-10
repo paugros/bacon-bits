@@ -1,7 +1,6 @@
 package com.areahomeschoolers.baconbits.server.util;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.logging.Level;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +19,9 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
+import com.google.appengine.api.memcache.ErrorHandlers;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.utils.SystemProperty;
 
 /**
@@ -34,8 +36,11 @@ public class ServerContext implements ApplicationContextAware {
 	private static ThreadLocal<ServerContext> tl = new ThreadLocal<ServerContext>();
 	private static boolean isLiveIsSet;
 	private static boolean isLive;
-	private static Map<Integer, UserGroup> groupCache = new HashMap<>();
-	private static Map<Integer, User> userCache = new HashMap<>();
+	private static MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
+
+	static {
+		cache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+	}
 
 	public static ApplicationContext getApplicationContext() {
 		return ctx;
@@ -69,6 +74,10 @@ public class ServerContext implements ApplicationContextAware {
 		return url;
 	}
 
+	public static MemcacheService getCache() {
+		return cache;
+	}
+
 	public static UserGroup getCurrentOrg() {
 		HttpSession session = ServerContext.getSession();
 		if (session == null) {
@@ -81,7 +90,7 @@ public class ServerContext implements ApplicationContextAware {
 			orgId = getCurrentOrgId();
 		}
 
-		return groupCache.get(orgId);
+		return (UserGroup) cache.get("group_" + orgId);
 	}
 
 	public static int getCurrentOrgId() {
@@ -105,7 +114,7 @@ public class ServerContext implements ApplicationContextAware {
 		}
 
 		Integer userId = (Integer) session.getAttribute("userId");
-		User u = userCache.get(userId);
+		User u = (User) cache.get("user_" + userId);
 		if (u == null && userId != null) {
 			UserDao userDao = getDaoImpl("user");
 			u = userDao.getById(userId, false);
@@ -211,7 +220,7 @@ public class ServerContext implements ApplicationContextAware {
 		UserDao userDao = getDaoImpl("user");
 		UserGroup org = userDao.getOrgForCurrentRequest();
 		getSession().setAttribute("orgId", org.getId());
-		groupCache.put(org.getId(), org);
+		cache.put("group_" + org.getId(), org);
 	}
 
 	public static void setCurrentOrg(UserGroup org) {
@@ -232,12 +241,12 @@ public class ServerContext implements ApplicationContextAware {
 		}
 
 		getSession().setAttribute("userId", u.getId());
-		userCache.put(u.getId(), u);
+		cache.put("user_" + u.getId(), u);
 	}
 
 	public static void setCurrentUser(User u) {
 		getSession().setAttribute("userId", u.getId());
-		userCache.put(u.getId(), u);
+		updateUserCache(u);
 	}
 
 	public static void switchToUser(int userId) {
@@ -264,11 +273,11 @@ public class ServerContext implements ApplicationContextAware {
 	}
 
 	public static void updateGroupCache(UserGroup group) {
-		groupCache.put(group.getId(), group);
+		cache.put("group_" + group.getId(), group);
 	}
 
 	public static void updateUserCache(User user) {
-		userCache.put(user.getId(), user);
+		cache.put("user_" + user.getId(), user);
 	}
 
 	private ServletContext servletContext;
