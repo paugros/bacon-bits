@@ -215,7 +215,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		// we can't do any sort of isAuthenticate or currentUser checks unless we're using the secure mapper
 		// otherwise we won't be able to initialize a logging-in user
 		String sql = createSqlBase();
-		sql += createSqlWhere(useSecureMapper);
+		if (useSecureMapper) {
+			sql += createSqlWhere();
+		} else {
+			sql += "where 1 = 1 ";
+		}
 		sql += "and u.id = ?";
 
 		User u = queryForObject(sql, useSecureMapper ? new SecureUserMapper() : new InsecureUserMapper(), userId);
@@ -461,7 +465,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "left join eventRegistrationParticipants p on p.userId = u.id and p.eventRegistrationId = ? \n";
 			sqlArgs.add(registrationId);
 		}
-		sql += createSqlWhere(true);
+		sql += createSqlWhere();
 
 		// start directory logic //
 		if (onlyParents) {
@@ -1037,16 +1041,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		return sql;
 	}
 
-	private String createSqlWhere(boolean security) {
+	private String createSqlWhere() {
 		String sql = "where 1 = 1 ";
-		if (security) {
-			if (!ServerContext.isAuthenticated()) {
-				sql += "and u.directoryOptOut = 0 \n";
-			} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().isSwitched() || ServerContext.getCurrentUser().hasRole(
-					AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
-				int id = ServerContext.getCurrentUserId();
-				sql += "and (u.directoryOptOut = 0 or u.id = " + id + " or u.parentId = " + id + ") \n";
-			}
+		if (!ServerContext.isAuthenticated()) {
+			sql += "and u.directoryOptOut = 0 \n";
+		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().isSwitched() || ServerContext.getCurrentUser().hasRole(
+				AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
+			int id = ServerContext.getCurrentUserId();
+			sql += "and (u.directoryOptOut = 0 or u.id = " + id + " or u.parentId = " + id + ") \n";
 		}
 
 		return sql;
