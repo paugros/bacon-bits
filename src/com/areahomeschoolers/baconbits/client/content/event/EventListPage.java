@@ -22,14 +22,12 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -132,16 +130,6 @@ public final class EventListPage implements Page {
 			for (int i = 0; i < pp.getWidgetCount(); i++) {
 				pp.setCellVerticalAlignment(pp.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
 			}
-
-			HTML message = new HTML();
-			message.getElement().getStyle().setMarginBottom(10, Unit.PX);
-			String text = "<ul><li>Events must be paid for using PayPal or credit card (MC, Visa, Discover)</li>";
-			text += "<li>Register for all your events and then pay for all at once</li>";
-			text += "<li>If payment is not received within 24 hours of registering, your registration will be canceled</li>";
-			text += "<li>No refunds</li></ul>";
-			message.setHTML(text);
-			message.addStyleName("smallText errorText");
-			vp.add(message);
 
 			hp.add(vp);
 
