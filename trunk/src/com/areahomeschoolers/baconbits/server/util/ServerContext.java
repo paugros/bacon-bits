@@ -162,7 +162,12 @@ public class ServerContext implements ApplicationContextAware {
 	}
 
 	public static boolean isAuthenticated() {
-		return getCurrentUser() != null;
+		HttpSession session = ServerContext.getSession();
+		if (session == null) {
+			return false;
+		}
+
+		return session.getAttribute("userId") != null;
 	}
 
 	public static boolean isCitrus() {
