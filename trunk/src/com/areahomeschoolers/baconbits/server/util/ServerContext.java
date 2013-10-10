@@ -218,6 +218,11 @@ public class ServerContext implements ApplicationContextAware {
 	}
 
 	public static void setCurrentOrg() {
+		int orgId = getCurrentOrgId();
+		if (orgId > 0 && cache.contains("group_" + orgId)) {
+			return;
+		}
+
 		UserDao userDao = getDaoImpl("user");
 		UserGroup org = userDao.getOrgForCurrentRequest();
 		getSession().setAttribute("orgId", org.getId());
