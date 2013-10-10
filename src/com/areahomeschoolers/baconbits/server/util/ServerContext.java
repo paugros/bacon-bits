@@ -245,7 +245,8 @@ public class ServerContext implements ApplicationContextAware {
 	}
 
 	public static void setCurrentUser(User u) {
-		getSession().setAttribute("userId", u.getId());
+		Integer userId = u == null ? null : u.getId();
+		getSession().setAttribute("userId", userId);
 		updateUserCache(u);
 	}
 
