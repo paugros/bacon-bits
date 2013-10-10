@@ -237,8 +237,6 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "Registration Management", PageUrl.registrationManagement());
 		}
 
-		addLinkToMenu(menu, "Policies", PageUrl.articleGroup("57,56,58"));
-
 		return menu;
 	}
 
