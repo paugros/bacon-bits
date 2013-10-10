@@ -1056,7 +1056,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		User user = new User();
 		user.setSystemAdministrator(rs.getBoolean("isSystemAdministrator"));
 		user.setId(rs.getInt("id"));
-		User cu = ServerContext.getCurrentUser();
+		User cu = null;
+		if (security) {
+			cu = ServerContext.getCurrentUser();
+		}
 
 		String groupText = rs.getString("groups");
 		final HashMap<Integer, GroupData> groups = new HashMap<Integer, GroupData>();
