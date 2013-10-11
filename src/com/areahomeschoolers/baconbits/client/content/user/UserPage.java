@@ -49,6 +49,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
@@ -416,7 +417,7 @@ public class UserPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			if (user.memberOfAny(16, 17)) {
+			if (user.memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
 				tabPanel.add("Books", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {

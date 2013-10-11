@@ -63,9 +63,9 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource link();
 
-	ImageResource mapShadow();
+	ImageResource littleLogo();
 
-	ImageResource paypalButton();
+	ImageResource mapShadow();
 
 	ImageResource pixel();
 
