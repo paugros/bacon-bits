@@ -10,14 +10,22 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class ArticleWidget extends Composite {
 
 	public ArticleWidget(Article article) {
 		VerticalPanel vp = new VerticalPanel();
 		vp.setSpacing(10);
-		Hyperlink title = new Hyperlink(article.getTitle(), PageUrl.article(article.getId()));
+		Widget title;
+
+		if (Application.administratorOf(article)) {
+			title = new Hyperlink(article.getTitle(), PageUrl.article(article.getId()));
+		} else {
+			title = new Label(article.getTitle());
+		}
 		title.addStyleName("hugeText bold");
 		vp.add(title);
 		vp.add(new HTML(article.getArticle()));
