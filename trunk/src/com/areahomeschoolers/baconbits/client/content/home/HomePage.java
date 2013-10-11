@@ -28,6 +28,7 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.GenericCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
@@ -448,7 +449,11 @@ public class HomePage implements Page {
 				addCompositeWidgetColumn("Group Name", new WidgetCellCreator<Data>() {
 					@Override
 					protected Widget createWidget(Data item) {
-						Anchor link = new Anchor(item.get("groupName"), "http://www." + item.get("orgDomain"));
+						String url = "http://www." + item.get("orgDomain");
+						if (Constants.CG_DOMAIN.equals(item.get("orgDomain"))) {
+							url = "http://" + item.get("orgSubDomain") + "." + item.get("orgDomain");
+						}
+						Anchor link = new Anchor(item.get("groupName"), url);
 						return link;
 					}
 				});
