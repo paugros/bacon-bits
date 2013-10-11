@@ -229,10 +229,11 @@ public final class PaymentPage implements Page {
 			totalAmount += adjustment.getAmount();
 		}
 
-		if (Application.isCitrus()) {
-			Label msg = new Label("Payments disabled on this site for now.  Please visit your group(s) site(s) to make payments.");
-			buttonContainer.setWidget(msg);
-		} else if (totalAmount < 0) {
+		// if (Application.isCitrus()) {
+		// Label msg = new Label("Payments disabled on this site for now.  Please visit your group(s) site(s) to make payments.");
+		// buttonContainer.setWidget(msg);
+		// } else
+		if (totalAmount < 0) {
 			totalAmount = 0;
 			buttonContainer.setWidget(adjustmentButton);
 		} else if (totalAmount > 0) {

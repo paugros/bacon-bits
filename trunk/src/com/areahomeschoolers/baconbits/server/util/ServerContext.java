@@ -80,12 +80,10 @@ public class ServerContext implements ApplicationContextAware {
 
 	public static UserGroup getCurrentOrg() {
 		HttpSession session = ServerContext.getSession();
-		if (session == null) {
-			return null;
-		}
 
 		Integer orgId = (Integer) session.getAttribute("orgId");
-		if (orgId == null) {
+
+		if (orgId == null || !cache.contains("group_" + orgId)) {
 			setCurrentOrg();
 			orgId = getCurrentOrgId();
 		}
@@ -95,9 +93,6 @@ public class ServerContext implements ApplicationContextAware {
 
 	public static int getCurrentOrgId() {
 		HttpSession session = ServerContext.getSession();
-		if (session == null) {
-			return 0;
-		}
 
 		Integer orgId = (Integer) session.getAttribute("orgId");
 		if (orgId == null) {
@@ -109,9 +104,6 @@ public class ServerContext implements ApplicationContextAware {
 
 	public static User getCurrentUser() {
 		HttpSession session = ServerContext.getSession();
-		if (session == null) {
-			return null;
-		}
 
 		Integer userId = (Integer) session.getAttribute("userId");
 		User u = (User) cache.get("user_" + userId);
@@ -126,9 +118,6 @@ public class ServerContext implements ApplicationContextAware {
 
 	public static int getCurrentUserId() {
 		HttpSession session = ServerContext.getSession();
-		if (session == null) {
-			return 0;
-		}
 
 		Integer userId = (Integer) session.getAttribute("userId");
 		if (userId == null) {
@@ -155,25 +144,16 @@ public class ServerContext implements ApplicationContextAware {
 	}
 
 	public static HttpSession getSession() {
-		if (tl.get() == null) {
-			return null;
-		}
 		return tl.get().request.getSession();
 	}
 
 	public static boolean isAuthenticated() {
 		HttpSession session = ServerContext.getSession();
-		if (session == null) {
-			return false;
-		}
 
 		return session.getAttribute("userId") != null;
 	}
 
 	public static boolean isCitrus() {
-		if (getCurrentOrg() == null) {
-			return true;
-		}
 		return getCurrentOrg().isCitrus();
 	}
 
