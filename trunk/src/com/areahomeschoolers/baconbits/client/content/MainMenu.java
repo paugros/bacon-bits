@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
@@ -247,7 +248,7 @@ public final class MainMenu extends MenuBar {
 		if (!Application.getCurrentUser().isChild()) {
 			addLinkToMenu(menu, "Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=3");
 		}
-		if (Application.getCurrentUser().memberOfAny(16, 17)) {
+		if (Application.getCurrentUser().memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
 			addLinkToMenu(menu, "Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
 		}
 		if (!Application.getCurrentUser().isChild()) {

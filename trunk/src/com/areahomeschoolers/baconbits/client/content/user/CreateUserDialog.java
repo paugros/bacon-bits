@@ -7,6 +7,8 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
+import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
@@ -16,25 +18,34 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.shared.Constants;
+import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class CreateUserDialog extends EntityEditDialog<User> {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
+	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
+	private Article instructions;
 	private CheckBox cb;
 
 	public CreateUserDialog() {
@@ -80,9 +91,38 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 		});
 	}
 
+	private void showInstructions(Widget relative) {
+		DecoratedPopupPanel pp = new DecoratedPopupPanel(true);
+		HTML h = new HTML(instructions.getArticle());
+		h.setWidth("240px");
+		pp.setWidget(h);
+		pp.showRelativeTo(relative);
+	}
+
 	@Override
 	protected Widget createContent() {
 		VerticalPanel vp = new VerticalPanel();
+		final ClickLabel help = new ClickLabel("Help");
+		help.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (instructions == null) {
+					articleService.getById(Constants.ACCOUNT_CREATION_INSTRUCTIONS_ID, new Callback<Article>() {
+						@Override
+						protected void doOnSuccess(Article result) {
+							instructions = result;
+							showInstructions(help);
+						}
+					});
+				} else {
+					showInstructions(help);
+				}
+			}
+		});
+		help.addStyleName("bold");
+		vp.add(help);
+		vp.setCellHorizontalAlignment(help, HasHorizontalAlignment.ALIGN_RIGHT);
+
 		vp.setWidth("530px");
 		vp.setSpacing(6);
 

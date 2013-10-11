@@ -23,6 +23,7 @@ import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Adjustment;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.PaymentArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -204,35 +205,34 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 
 		List<Receiver> receiverLst = new ArrayList<Receiver>();
 
-		// Our cut
-		Receiver siteReceiver = new Receiver(round(p.getTotalAmount(), 2, BigDecimal.ROUND_HALF_UP));
-		siteReceiver.setPaymentType("SERVICE");
+		// The organization's cut
+		Receiver orgReceiver = new Receiver(round(p.getTotalAmount(), 2, BigDecimal.ROUND_HALF_UP));
+		orgReceiver.setPaymentType("SERVICE");
 
-		// A receiver's email address
 		if (ServerContext.isLive()) {
-			siteReceiver.setEmail(ServerContext.getCurrentOrg().getPayPalEmail());
+			orgReceiver.setEmail(ServerContext.getCurrentOrg().getPayPalEmail());
 		} else {
-			siteReceiver.setEmail("citrusgroups@citrusgroups.com"); // password same as email
+			orgReceiver.setEmail("organization@fake.com"); // password same as email
 		}
 
-		// The organization's cut
-		// TODO re-enable when ready
-		// if (p.getPrincipalAmount() > 0) {
-		// siteReceiver.setPrimary(Boolean.TRUE);
-		// Receiver orgReceiver = new Receiver(round(p.getPrincipalAmount(), 2, BigDecimal.ROUND_HALF_UP));
-		// orgReceiver.setPaymentType("SERVICE");
-		// orgReceiver.setPrimary(Boolean.FALSE);
-		//
-		// // org's email address
-		// if (ServerContext.isLive()) {
-		// orgReceiver.setEmail(ServerContext.getCurrentOrg().getPayPalEmail());
-		// } else {
-		// orgReceiver.setEmail("organization@fake.com"); // password same as email
-		// }
-		// receiverLst.add(orgReceiver);
-		// }
+		// Our cut
+		if (p.getMarkupAmount() > 0) {
+			// according to PayPal, the organization (tenant) must be the primary receiver
+			orgReceiver.setPrimary(Boolean.TRUE);
+			Receiver siteReceiver = new Receiver(round(p.getMarkupAmount(), 2, BigDecimal.ROUND_HALF_UP));
+			siteReceiver.setPaymentType("SERVICE");
+			siteReceiver.setPrimary(Boolean.FALSE);
 
-		receiverLst.add(siteReceiver);
+			// site email address
+			if (ServerContext.isLive()) {
+				siteReceiver.setEmail(Constants.CG_PAYPAL_EMAIL);
+			} else {
+				siteReceiver.setEmail("citrusgroups@citrusgroups.com"); // password same as email
+			}
+			receiverLst.add(siteReceiver);
+		}
+
+		receiverLst.add(orgReceiver);
 
 		ReceiverList receiverList = new ReceiverList(receiverLst);
 
@@ -388,10 +388,16 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			Properties p = new Properties();
 			if (ServerContext.isLive()) {
 				// account email: weare.home.educators@gmail.com
-				p.setProperty("acct1.UserName", "weare.home.educators_api1.gmail.com");
-				p.setProperty("acct1.Password", "BZFADA4CXJSCHYW8");
-				p.setProperty("acct1.Signature", "AFcWxV21C7fd0v3bYYYRCpSSRl31AIiJDk-qOGV.J6VfFcbztTiAOVoS");
-				p.setProperty("acct1.AppId", "APP-4NF95723S77525228");
+				// p.setProperty("acct1.UserName", "weare.home.educators_api1.gmail.com");
+				// p.setProperty("acct1.Password", "BZFADA4CXJSCHYW8");
+				// p.setProperty("acct1.Signature", "AFcWxV21C7fd0v3bYYYRCpSSRl31AIiJDk-qOGV.J6VfFcbztTiAOVoS");
+				// p.setProperty("acct1.AppId", "APP-4NF95723S77525228");
+
+				p.setProperty("acct1.UserName", "paul.augros_api1.gmail.com");
+				p.setProperty("acct1.Password", "366SHLHYTSFMK268");
+				p.setProperty("acct1.Signature", "AkZ0S-OmRwy-Ntfed39a8awwiQ.kA-1t-xPweQAFDqq0jOHX5pVzJxAo");
+				p.setProperty("acct1.AppId", "APP-17B48118GA533502S");
+
 				p.setProperty("mode", "live");
 				p.setProperty("service.RedirectURL", "https://www.paypal.com/webscr&cmd=");
 			} else {
