@@ -326,11 +326,12 @@ img {
 	-moz-border-radius: 14px;
 	border-radius: 14px;
 	background-color: #dddddd;
+	min-width: 250px;
 }
 
 .module-light {
 	border: 1px solid #cccccc;
-	background-color: #f8f8f8;
+	background-color: #efefef;
 }
 
 .moduleTitle {

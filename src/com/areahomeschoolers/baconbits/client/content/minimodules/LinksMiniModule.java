@@ -13,25 +13,24 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class LinksMiniModule extends Composite {
 
 	public LinksMiniModule() {
-		SimplePanel sp = new SimplePanel();
-		sp.getElement().getStyle().setPadding(8, Unit.PX);
-		VerticalPanel lp = new VerticalPanel();
+		VerticalPanel sp = new VerticalPanel();
+		sp.setSpacing(8);
+		VerticalPanel vp = new VerticalPanel();
 		sp.setStyleName("module");
 		sp.addStyleDependentName("light");
-		sp.setWidget(lp);
+		sp.add(vp);
 		Label linkLabel = new Label("LINKS");
 		linkLabel.addStyleName("moduleTitle");
 		linkLabel.getElement().getStyle().setMarginBottom(4, Unit.PX);
-		lp.add(linkLabel);
+		vp.add(linkLabel);
 
 		if (Application.isAuthenticated()) {
-			lp.add(new Hyperlink("Find People", PageUrl.userList()));
+			vp.add(new Hyperlink("Find People", PageUrl.userList()));
 		} else {
 			ClickLabel cl = new ClickLabel("Create an Account", new ClickHandler() {
 				@Override
@@ -40,20 +39,20 @@ public class LinksMiniModule extends Composite {
 				}
 			});
 			cl.addStyleName("bold");
-			lp.add(cl);
+			vp.add(cl);
 		}
-		lp.add(new Hyperlink("Event Listing", PageUrl.eventList()));
-		lp.add(new Hyperlink("Event Calendar", PageUrl.eventCalendar()));
-		lp.add(new Hyperlink("Book Store", PageUrl.bookSearch()));
+		vp.add(new Hyperlink("Event Listing", PageUrl.eventList()));
+		vp.add(new Hyperlink("Event Calendar", PageUrl.eventCalendar()));
+		vp.add(new Hyperlink("Book Store", PageUrl.bookSearch()));
 
 		if (Application.isAuthenticated()) {
-			lp.add(new Hyperlink("My Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
+			vp.add(new Hyperlink("My Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
 			if (Application.getCurrentUser().memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
-				lp.add(new Hyperlink("My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
+				vp.add(new Hyperlink("My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
 			}
-			lp.add(new Hyperlink("My Profile", PageUrl.user(Application.getCurrentUserId())));
+			vp.add(new Hyperlink("My Profile", PageUrl.user(Application.getCurrentUserId())));
 			if (!Application.getCurrentUser().isChild()) {
-				lp.add(new Hyperlink("My Shopping Cart", PageUrl.payment()));
+				vp.add(new Hyperlink("My Shopping Cart", PageUrl.payment()));
 			}
 		}
 

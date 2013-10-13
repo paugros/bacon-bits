@@ -8,7 +8,6 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
@@ -46,11 +45,6 @@ public class EventMiniModule extends Composite {
 	}
 
 	protected void populate(String title, ArrayList<Event> events, String extraParams) {
-		if (Common.isNullOrEmpty(events)) {
-			removeFromParent();
-			return;
-		}
-
 		vp.addStyleName("module moduleEventPanel");
 
 		if (extraParams == null) {

@@ -31,49 +31,45 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class HomePage implements Page {
 
-	private class HomeContentPanel extends Composite {
-		private HorizontalPanel hp = new HorizontalPanel();
-		private VerticalPanel lp = new VerticalPanel();
-		private VerticalPanel rp = new VerticalPanel();
-
-		public HomeContentPanel() {
-			hp.add(lp);
-			hp.add(rp);
-			initWidget(hp);
-		}
-
-		public void add(Widget w) {
-			Style style = w.getElement().getStyle();
-
-			if (lp.getOffsetHeight() > rp.getOffsetHeight()) {
-				rp.add(w);
-			} else {
-				lp.add(w);
-				style.setMarginRight(10, Unit.PX);
-			}
-
-			style.setMarginBottom(10, Unit.PX);
-			style.setWidth(250, Unit.PX);
-		}
-	}
+	// private class HomeContentPanel extends Composite {
+	// private HorizontalPanel hp = new HorizontalPanel();
+	// private VerticalPanel lp = new VerticalPanel();
+	// private VerticalPanel rp = new VerticalPanel();
+	//
+	// public HomeContentPanel() {
+	// hp.add(lp);
+	// hp.add(rp);
+	// initWidget(hp);
+	// }
+	//
+	// public void add(Widget w) {
+	// Style style = w.getElement().getStyle();
+	//
+	// if (lp.getOffsetHeight() > rp.getOffsetHeight()) {
+	// rp.add(w);
+	// } else {
+	// lp.add(w);
+	// style.setMarginRight(10, Unit.PX);
+	// }
+	//
+	// style.setMarginBottom(10, Unit.PX);
+	// style.setWidth(250, Unit.PX);
+	// }
+	// }
 
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private VerticalPanel page = new VerticalPanel();
@@ -126,51 +122,46 @@ public class HomePage implements Page {
 			protected void doOnSuccess(HomePageData result) {
 				pageData = result;
 
-				// upcoming
-				rightPanel.add(new UpcomingEventsMiniModule(pageData.getUpcomingEvents()));
-
-				leftPanel.add(new CitrusMiniModule());
-				// community
-				leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
-
-				HomeContentPanel hcp = new HomeContentPanel();
-				centerPanel.add(hcp);
-				Application.getLayout().setPage("Home", page);
-
-				if (Application.isAuthenticated()) {
-					hcp.add(new FindPeopleMiniModule());
-				}
-
-				// new
-				if (!Common.isNullOrEmpty(pageData.getNewlyAddedEvents())) {
-					hcp.add(new NewEventsMiniModule(pageData.getNewlyAddedEvents()));
-				}
-
+				// book promo
 				if (!Application.memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
-					hcp.add(new SellBooksMiniModule());
+					leftPanel.add(new SellBooksMiniModule());
 				}
 
+				// find people promo
 				if (Application.isAuthenticated()) {
-					// my events
-					if (!Common.isNullOrEmpty(pageData.getMyUpcomingEvents())) {
-						hcp.add(new MyEventsMiniModule(pageData.getMyUpcomingEvents()));
-					}
+					leftPanel.add(new FindPeopleMiniModule());
 				}
 
-				// links
-				VerticalPanel rp = new VerticalPanel();
-				rp.setSpacing(8);
-
-				rp.add(new LinksMiniModule());
-
+				// shopping cart
 				if (Application.isAuthenticated()) {
 					BalanceBox bb = new BalanceBox();
 					bb.populate();
-					rp.add(bb);
-					rp.setCellVerticalAlignment(bb, HasVerticalAlignment.ALIGN_BOTTOM);
+					leftPanel.add(bb);
 				}
 
-				hcp.add(rp);
+				// community
+				leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
+
+				// citrus link
+				leftPanel.add(new CitrusMiniModule());
+
+				// new
+				if (!Common.isNullOrEmpty(pageData.getNewlyAddedEvents())) {
+					rightPanel.add(new NewEventsMiniModule(pageData.getNewlyAddedEvents()));
+				}
+
+				// links
+				rightPanel.add(new LinksMiniModule());
+
+				// my events
+				if (Application.isAuthenticated()) {
+					if (!Common.isNullOrEmpty(pageData.getMyUpcomingEvents())) {
+						rightPanel.add(new MyEventsMiniModule(pageData.getMyUpcomingEvents()));
+					}
+				}
+
+				// upcoming
+				rightPanel.add(new UpcomingEventsMiniModule(pageData.getUpcomingEvents()));
 
 				// introduction
 				centerPanel.add(new ArticleWidget(pageData.getIntro()));
@@ -178,6 +169,8 @@ public class HomePage implements Page {
 				if (Application.isCitrus()) {
 					centerPanel.add(createGroupsTable());
 				}
+
+				Application.getLayout().setPage("Home", page);
 			}
 		});
 
