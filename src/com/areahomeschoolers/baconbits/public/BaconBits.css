@@ -281,11 +281,11 @@ img {
 }
 
 .FormField-emancipated:hover {
-	background-color: #e0efff;
+	background-color: #ecf5ef;
 }
 
 .FormField-editing {
-	background-color: #cfe5ff;
+	background-color: #ecf5ef;
 }
 
 .GoogleMap {
@@ -315,12 +315,12 @@ img {
 	width: 100%;
 }
 
-.homePageEventPanel {
+.moduleEventPanel {
 	min-width: 250px;
 	min-height: 310px;
 }
 
-.homePageModule {
+.module {
 	border: 1px solid #aaaaaa;
 	-webkit-border-radius: 14px; 
 	-moz-border-radius: 14px;
@@ -328,7 +328,12 @@ img {
 	background-color: #dddddd;
 }
 
-.homePageModuleTitle {
+.module-light {
+	border: 1px solid #cccccc;
+	background-color: #f8f8f8;
+}
+
+.moduleTitle {
 	font-size: 18px;
 	font-weight: bold;
 	color: #333333;
@@ -364,9 +369,9 @@ img {
 	width: 100%;
 	padding: 6px 2px;
 	background: #f8f8f8;
-	border: 1px solid #acacac;
+	border: 1px solid #cccccc;
 	border-top: none;
-	-webkit-border-radius: 0px 0px 14px 14px; 
+	-webkit-border-radius: 0px 0px 14px 14px;
 	-moz-border-radius: 0px 0px 14px 14px;
 	border-radius: 0px 0px 14px 14px;
 }

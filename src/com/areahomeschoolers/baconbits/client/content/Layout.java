@@ -34,6 +34,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -314,13 +315,26 @@ public final class Layout {
 		logoDiv.setHTML("<a href=\"#" + PageUrl.home() + "\">" + logo + "</a>");
 	}
 
+	public void setPage(String title, MiniModuleSidebar sidebar, VerticalPanel page) {
+		if (currentPagePanel == page) {
+			Grid pageGrid = new Grid(1, 2);
+
+			pageGrid.setWidget(0, 0, sidebar);
+			pageGrid.setWidget(0, 1, page);
+			pageGrid.getCellFormatter().setWidth(0, 0, "250px");
+			pageGrid.getCellFormatter().setVerticalAlignment(0, 0, HasVerticalAlignment.ALIGN_TOP);
+			pageGrid.getCellFormatter().setVerticalAlignment(0, 1, HasVerticalAlignment.ALIGN_TOP);
+			addPageToBodyPanel(title, pageGrid);
+		}
+	}
+
 	public void setPage(String title, VerticalPanel page) {
 		if (currentPagePanel == page) {
 			addPageToBodyPanel(title, page);
 		}
 	}
 
-	private void addPageToBodyPanel(String title, VerticalPanel page) {
+	private void addPageToBodyPanel(String title, Widget page) {
 		String yr = Formatter.formatDate(new Date(), "yyyy");
 		HTML footer = new HTML("Copyright &copy; 2013-" + yr + " Citrus Groups. All rights reserved.");
 		footer.setStylePrimaryName("footer");
