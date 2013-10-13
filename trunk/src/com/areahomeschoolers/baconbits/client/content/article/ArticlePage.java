@@ -3,6 +3,8 @@ package com.areahomeschoolers.baconbits.client.content.article;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar;
+import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
@@ -51,6 +53,7 @@ public class ArticlePage implements Page {
 	private Article article = new Article();
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private boolean noTitle = Url.getBooleanParameter("noTitle");
+	private MiniModuleSidebar sidebar = new MiniModuleSidebar();
 
 	public ArticlePage(VerticalPanel page) {
 		int articleId = Url.getIntegerParameter("articleId");
@@ -60,6 +63,7 @@ public class ArticlePage implements Page {
 			return;
 		}
 
+		sidebar.add(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.NEW_EVENTS, MiniModule.UPCOMING_EVENTS, MiniModule.CITRUS);
 		this.page = page;
 
 		if (articleId > 0) {
@@ -203,7 +207,7 @@ public class ArticlePage implements Page {
 	private void createReadOnlyPage() {
 		String title = article.isSaved() ? article.getTitle() : "New Article";
 		page.add(new ArticleWidget(article));
-		Application.getLayout().setPage(title, page);
+		Application.getLayout().setPage(title, sidebar, page);
 	}
 
 	private void createReadWritePage() {
@@ -229,14 +233,14 @@ public class ArticlePage implements Page {
 
 		form.setEnabled(allowEdit());
 
-		Application.getLayout().setPage(title, page);
+		Application.getLayout().setPage(title, sidebar, page);
 	}
 
 	private void createTextPage() {
 		HTML h = new HTML(article.getArticle());
 		h.setWidth("1000px");
 		page.add(h);
-		Application.getLayout().setPage(article.getTitle(), page);
+		Application.getLayout().setPage(article.getTitle(), sidebar, page);
 	}
 
 	private void initializePage() {
