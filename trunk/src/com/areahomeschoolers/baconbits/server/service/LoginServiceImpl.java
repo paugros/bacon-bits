@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
+import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
 import com.areahomeschoolers.baconbits.server.dao.TagDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.dao.impl.UserDaoImpl;
@@ -50,7 +51,6 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		ServerContext.setCurrentOrg();
 
 		User user = ServerContext.getCurrentUser();
-
 		ApplicationData ap = new ApplicationData();
 		ap.setCurrentOrg(ServerContext.getCurrentOrg());
 		ap.setCurrentUser(user);
@@ -69,6 +69,9 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_TYPE, TagMappingType.USER.toString());
 			args.put(TagArg.ENTITY_ID, user.getId());
 			ap.setInterests(tagDao.list(args));
+
+			PaymentDao paymentDao = ServerContext.getDaoImpl("payment");
+			ap.setUnpaidBalance(paymentDao.getUnpaidBalance(user.getId()));
 		}
 
 		return ap;

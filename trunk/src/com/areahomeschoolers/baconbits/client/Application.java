@@ -129,6 +129,10 @@ public final class Application implements ValueChangeHandler<String> {
 		return administratorOf(getCurrentOrgId());
 	}
 
+	public static boolean canSwitchUser() {
+		return isAuthenticated() && getCurrentUser().canSwitch();
+	}
+
 	public static ApplicationData getApplicationData() {
 		return applicationData;
 	}

@@ -28,6 +28,7 @@ import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
+import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
 import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.dao.TagDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
@@ -376,6 +377,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		Integer userId = pollData.getUserId();
 		PollResponseData data = new PollResponseData();
 		data.setUserActivity(getUserActivitySinceLastPoll(ServerContext.getCurrentUserId()));
+
+		if (ServerContext.isAuthenticated()) {
+			PaymentDao paymentDao = ServerContext.getDaoImpl("payment");
+			data.setUnpaidBalance(paymentDao.getUnpaidBalance(ServerContext.getCurrentUserId()));
+		}
 
 		if (pollData.hasHistoryUpdates()) {
 			ArrayList<Object[]> historyUpdate = new ArrayList<Object[]>();

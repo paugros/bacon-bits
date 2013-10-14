@@ -451,17 +451,19 @@ img {
 }
 
 .BalanceBox {
-	color: #327526;
-	text-align: left;
-	background-color: #c5eabf;
+	color: #2c539e;
+	background-color: #ffffff;
 	vertical-align: middle;
-	border: 2px solid #439b33;
-	padding: 0px 15px 2px 15px;
+	border: 1px solid #3478f5;
+	padding: 3px;
 	cursor: pointer;
 	white-space: nowrap;
-	font-size: 14px;
 	display: table;
 	border-spacing: 0px;
+	-webkit-border-radius: 8px; 
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	margin-right: 8px;
 }
 
 .BalanceBox:hover {
