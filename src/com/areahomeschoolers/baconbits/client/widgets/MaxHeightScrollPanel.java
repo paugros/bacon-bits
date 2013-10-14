@@ -14,6 +14,7 @@ public class MaxHeightScrollPanel extends ScrollPanel {
 	private boolean scrolling = true;
 	private HandlerRegistration attachHandler;
 	private boolean useChildWidth = true;
+	private boolean alwaysUseMaxHeight = false;
 
 	public MaxHeightScrollPanel() {
 		super();
@@ -60,7 +61,7 @@ public class MaxHeightScrollPanel extends ScrollPanel {
 
 		getScrollableElement().getStyle().setOverflowX(Overflow.HIDDEN);
 
-		if (scrolling && w.getOffsetHeight() > maxHeight) {
+		if (alwaysUseMaxHeight || (scrolling && w.getOffsetHeight() > maxHeight)) {
 			setHeight(maxHeight + "px");
 		} else {
 			// if (getMaximumHorizontalScrollPosition() <= 22) {
@@ -106,6 +107,10 @@ public class MaxHeightScrollPanel extends ScrollPanel {
 			width += 22;
 		}
 		setWidth(width + "px");
+	}
+
+	public void alwaysUseMaxHeight(boolean always) {
+		alwaysUseMaxHeight = always;
 	}
 
 	@Override
