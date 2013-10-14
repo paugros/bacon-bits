@@ -9,6 +9,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class PollResponseData implements IsSerializable {
 	private LinkedHashMap<Integer, Date> userActivity;
 	private ArrayList<HistoryEntry> historyItems;
+	private Data unpaidBalance;
 
 	public PollResponseData() {
 
@@ -18,12 +19,20 @@ public class PollResponseData implements IsSerializable {
 		return historyItems;
 	}
 
+	public Data getUnpaidBalance() {
+		return unpaidBalance;
+	}
+
 	public LinkedHashMap<Integer, Date> getUserActivity() {
 		return userActivity;
 	}
 
 	public void setHistoryItems(ArrayList<HistoryEntry> historyItems) {
 		this.historyItems = historyItems;
+	}
+
+	public void setUnpaidBalance(Data unpaidBalance) {
+		this.unpaidBalance = unpaidBalance;
 	}
 
 	public void setUserActivity(LinkedHashMap<Integer, Date> userActivity) {

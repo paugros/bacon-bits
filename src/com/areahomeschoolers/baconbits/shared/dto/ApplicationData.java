@@ -11,6 +11,7 @@ public class ApplicationData implements IsSerializable {
 	private UserGroup currentOrg;
 	private Data userPreferences;
 	private LinkedHashMap<Integer, Date> userActivity;
+	private Data unpaidBalance;
 	private boolean isLive;
 	private int adultBirthYear;
 	private ArrayList<Tag> interests = new ArrayList<Tag>();
@@ -34,6 +35,10 @@ public class ApplicationData implements IsSerializable {
 
 	public ArrayList<MainMenuItem> getDynamicMenuItems() {
 		return dynamicMenuItems;
+	}
+
+	public Data getUnpaidBalance() {
+		return unpaidBalance;
 	}
 
 	public LinkedHashMap<Integer, Date> getUserActivity() {
@@ -74,6 +79,10 @@ public class ApplicationData implements IsSerializable {
 
 	public void setLive(boolean isLive) {
 		this.isLive = isLive;
+	}
+
+	public void setUnpaidBalance(Data unpaidBalance) {
+		this.unpaidBalance = unpaidBalance;
 	}
 
 	public void setUserActivity(LinkedHashMap<Integer, Date> userActivity) {

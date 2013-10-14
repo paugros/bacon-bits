@@ -1,7 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content;
 
 import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CommunityEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.FindPeopleMiniModule;
@@ -18,7 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class MiniModuleSidebar extends SidebarPanel {
 	public enum MiniModule {
-		COMMUNITY_EVENTS, UPCOMING_EVENTS, FIND_PEOPLE, LINKS, SELL_BOOKS, NEW_EVENTS, MY_EVENTS, BALANCE_BOX, CITRUS;
+		COMMUNITY_EVENTS, UPCOMING_EVENTS, FIND_PEOPLE, LINKS, SELL_BOOKS, NEW_EVENTS, MY_EVENTS, CITRUS;
 	}
 
 	public MiniModuleSidebar() {
@@ -32,13 +31,6 @@ public class MiniModuleSidebar extends SidebarPanel {
 
 	public void add(MiniModule module) {
 		switch (module) {
-		case BALANCE_BOX:
-			if (Application.isAuthenticated()) {
-				BalanceBox bb = new BalanceBox();
-				bb.populate();
-				add(bb);
-			}
-			break;
 		case COMMUNITY_EVENTS:
 			add(new CommunityEventsMiniModule());
 			break;

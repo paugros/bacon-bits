@@ -41,16 +41,12 @@ public final class User extends EntityDto<User> {
 	private String parentLastName;
 	private Date startDate, endDate, addedDate, lastLoginDate, birthDate;
 	private Integer parentId;
-	private boolean canSwitch;
 	private boolean showUserAgreement;
 	private String sex;
 	private int imageId;
 	private int smallImageId;
 	// aux
-	// these two keep track of your original user when switching
-	private int originalUserId;
-	private String originalEmail;
-
+	private boolean isSwitched;
 	private int commonInterestCount;
 	private String groupsText;
 	private boolean generatePassword;
@@ -111,7 +107,7 @@ public final class User extends EntityDto<User> {
 	}
 
 	public boolean canSwitch() {
-		return canSwitch;
+		return systemAdministrator || isSwitched();
 	}
 
 	public boolean childOf(User parent) {
@@ -221,14 +217,6 @@ public final class User extends EntityDto<User> {
 		return ids;
 	}
 
-	public String getOriginalEmail() {
-		return originalEmail;
-	}
-
-	public int getOriginalUserId() {
-		return originalUserId;
-	}
-
 	public String getParentFirstName() {
 		return parentFirstName;
 	}
@@ -323,16 +311,12 @@ public final class User extends EntityDto<User> {
 		return active;
 	}
 
-	public boolean isCanSwitch() {
-		return canSwitch;
-	}
-
 	public boolean isChild() {
 		return isChild;
 	}
 
 	public boolean isSwitched() {
-		return originalUserId > 0 && getId() != originalUserId;
+		return isSwitched;
 	}
 
 	public boolean memberOf(Integer groupId) {
@@ -381,10 +365,6 @@ public final class User extends EntityDto<User> {
 
 	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
-	}
-
-	public void setCanSwitch(boolean canSwitch) {
-		this.canSwitch = canSwitch;
 	}
 
 	public void setChild(boolean isChild) {
@@ -458,14 +438,6 @@ public final class User extends EntityDto<User> {
 		this.mobilePhone = mobilePhone;
 	}
 
-	public void setOriginalEmail(String originalEmail) {
-		this.originalEmail = originalEmail;
-	}
-
-	public void setOriginalUserId(int originalUserId) {
-		this.originalUserId = originalUserId;
-	}
-
 	public void setParentFirstName(String parentFirstName) {
 		this.parentFirstName = parentFirstName;
 	}
@@ -522,9 +494,12 @@ public final class User extends EntityDto<User> {
 		this.street = street;
 	}
 
+	public void setSwitched(boolean switched) {
+		isSwitched = switched;
+	}
+
 	public void setSystemAdministrator(boolean systemAdministrator) {
 		this.systemAdministrator = systemAdministrator;
-		canSwitch = systemAdministrator;
 	}
 
 	public void setZip(String zip) {

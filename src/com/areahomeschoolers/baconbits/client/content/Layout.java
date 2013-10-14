@@ -5,7 +5,9 @@ import java.util.Date;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
@@ -19,11 +21,13 @@ import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -98,6 +102,11 @@ public final class Layout {
 			RootLayoutPanel.get().setStyleName("overflowHidden");
 		}
 
+		// status panel
+		StatusPanel sp = new StatusPanel();
+		Callback.setStatusPanel(sp);
+		RootPanel.get().add(sp);
+
 		logoDiv = new HTML();
 		setLogo(Application.getCurrentOrg().getLogoId());
 
@@ -121,14 +130,19 @@ public final class Layout {
 		// headerPanel.add(searchBox);
 
 		LinkPanel sessionPanel = new LinkPanel();
-		headerPanel.add(sessionPanel);
 		sessionPanel.addStyleName("sessionPanel");
+
+		headerPanel.add(sessionPanel);
 
 		final ClickLabel logInOrOut = new ClickLabel();
 		if (Application.isAuthenticated()) {
-			if (Application.getCurrentUser().canSwitch()) {
+			HorizontalPanel upn = new PaddedPanel(4);
+			final Hyperlink name = new Hyperlink("Hello, " + Application.getCurrentUser().getFirstName(), PageUrl.user(Application.getCurrentUserId()));
+			name.addStyleName("nowrap");
+
+			if (Application.canSwitchUser()) {
 				final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
-				EntitySuggestBox userSearchBox = new EntitySuggestBox("User");
+				final EntitySuggestBox userSearchBox = new EntitySuggestBox("User");
 				userSearchBox.setSelectionHandler(new ParameterHandler<Integer>() {
 					@Override
 					public void execute(Integer userId) {
@@ -143,7 +157,8 @@ public final class Layout {
 				userSearchBox.setResetHandler(new ParameterHandler<SuggestBox>() {
 					@Override
 					public void execute(SuggestBox suggestBox) {
-						suggestBox.setText(Application.getCurrentUser().getFullName());
+						name.setVisible(true);
+						userSearchBox.setVisible(false);
 					}
 				});
 				userSearchBox.getElement().getStyle().setMarginLeft(20, Unit.PX);
@@ -155,12 +170,32 @@ public final class Layout {
 				});
 				userSearchBox.setClearOnFocus(true);
 
-				sessionPanel.add(userSearchBox);
-			} else {
-				Hyperlink name = new Hyperlink("Hello, " + Application.getCurrentUser().getFirstName(), PageUrl.user(Application.getCurrentUserId()));
-				name.addStyleName("nowrap");
-				sessionPanel.add(name);
+				userSearchBox.setVisible(false);
+				Image swap = new Image(MainImageBundle.INSTANCE.swap());
+				swap.setTitle("Switch user");
+				swap.getElement().getStyle().setCursor(Cursor.POINTER);
+				swap.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						boolean show = name.isVisible();
+
+						if (show) {
+							name.setVisible(false);
+							userSearchBox.setVisible(true);
+							userSearchBox.getTextBox().setFocus(true);
+						} else {
+							name.setVisible(true);
+							userSearchBox.setVisible(false);
+						}
+					}
+				});
+
+				upn.add(swap);
+				upn.add(userSearchBox);
 			}
+
+			upn.add(name);
+			sessionPanel.add(upn);
 
 			logInOrOut.setText("Log out");
 			logInOrOut.addClickHandler(new ClickHandler() {
@@ -223,16 +258,17 @@ public final class Layout {
 			bodyPanel.add(ap);
 		}
 
-		// status panel
-		StatusPanel sp = new StatusPanel();
-		Callback.setStatusPanel(sp);
-		RootPanel.get().add(sp);
-
 		menu = new MainMenu();
 		menuPanel.setHeight(MENU_HEIGHT + "px");
 		menuPanel.setWidth("100%");
 		menuPanel.add(menu);
 		menuPanel.setCellWidth(menu, "100%");
+
+		if (Application.isAuthenticated()) {
+			BalanceBox bb = new BalanceBox();
+			menuPanel.add(bb);
+		}
+
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setWidth("100%");
 		hp.add(logoDiv);

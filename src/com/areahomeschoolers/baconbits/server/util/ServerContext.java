@@ -113,6 +113,13 @@ public class ServerContext implements ApplicationContextAware {
 			setCurrentUser(u);
 		}
 
+		if (u != null) {
+			Integer originalUserId = (Integer) session.getAttribute("originalUserId");
+			if (originalUserId != null && originalUserId > 0) {
+				u.setSwitched(true);
+			}
+		}
+
 		return u;
 	}
 
@@ -241,18 +248,14 @@ public class ServerContext implements ApplicationContextAware {
 		if (currentUser.getId() == userId || currentUser.canSwitch() == false) {
 			return;
 		}
-		UserDao userDao = (UserDao) ctx.getBean("userDaoImpl");
-		User newCurrentUser = userDao.getById(userId);
-		newCurrentUser.setCanSwitch(true);
-		if (currentUser.isSwitched()) {
-			newCurrentUser.setOriginalUserId(currentUser.getOriginalUserId());
-			newCurrentUser.setOriginalEmail(currentUser.getOriginalEmail());
-		} else {
-			newCurrentUser.setOriginalUserId(currentUser.getId());
-			newCurrentUser.setOriginalEmail(currentUser.getEmail());
-		}
 
-		getSession().setAttribute("user", newCurrentUser);
+		getSession().setAttribute("userId", userId);
+		boolean switched = currentUser.getId() != userId;
+		if (switched) {
+			getSession().setAttribute("originalUserId", currentUser.getId());
+		} else {
+			getSession().removeAttribute("originalUserId");
+		}
 	}
 
 	public static void unloadContext() {

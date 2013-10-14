@@ -4,7 +4,6 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
-import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CommunityEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.FindPeopleMiniModule;
@@ -130,13 +129,6 @@ public class HomePage implements Page {
 				// find people promo
 				if (Application.isAuthenticated()) {
 					leftPanel.add(new FindPeopleMiniModule());
-				}
-
-				// shopping cart
-				if (Application.isAuthenticated()) {
-					BalanceBox bb = new BalanceBox();
-					bb.populate();
-					leftPanel.add(bb);
 				}
 
 				// community

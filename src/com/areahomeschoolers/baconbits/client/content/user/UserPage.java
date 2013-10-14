@@ -15,7 +15,6 @@ import com.areahomeschoolers.baconbits.client.content.book.BookTable;
 import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.calendar.Appointment;
 import com.areahomeschoolers.baconbits.client.content.calendar.AppointmentStyle;
-import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTable;
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerTable;
@@ -82,7 +81,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
@@ -163,12 +161,6 @@ public class UserPage implements Page {
 					HorizontalPanel hp = new HorizontalPanel();
 					hp.setWidth("100%");
 					hp.add(createBreadCrumb());
-					if (viewingSelf()) {
-						BalanceBox bb = new BalanceBox();
-						bb.populate();
-						hp.add(bb);
-						hp.setCellHorizontalAlignment(bb, HasHorizontalAlignment.ALIGN_RIGHT);
-					}
 					page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH900PX));
 				}
 

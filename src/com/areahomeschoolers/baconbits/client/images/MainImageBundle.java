@@ -73,11 +73,15 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource search();
 
+	ImageResource shoppingCart();
+
 	ImageResource sortAscending();
 
 	ImageResource sortBlank();
 
 	ImageResource sortDescending();
+
+	ImageResource swap();
 
 	ImageResource verticalDragHandle();
 

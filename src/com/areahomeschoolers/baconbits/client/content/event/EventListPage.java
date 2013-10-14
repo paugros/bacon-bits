@@ -28,7 +28,6 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -132,11 +131,6 @@ public final class EventListPage implements Page {
 			}
 
 			hp.add(vp);
-
-			BalanceBox eb = new BalanceBox();
-			eb.populate();
-			hp.add(eb);
-			hp.setCellHorizontalAlignment(eb, HasHorizontalAlignment.ALIGN_RIGHT);
 
 			page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH1000PX));
 

@@ -172,24 +172,6 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 						return preview;
 					}
 				});
-
-				// addWidgetColumn(col, new WidgetCellCreator<Event>() {
-				// @Override
-				// protected Widget createWidget(Event item) {
-				// HTML h = new HTML();
-				// h.setHTML(item.getDescription().replaceAll("<br>", " "));
-				// String text = h.getText().replaceAll("\\s+", " ");
-				// if (text.length() > 85) {
-				// text = text.substring(0, 86) + "...";
-				// }
-				// h.setTitle(text);
-				//
-				// Label l = new Label(text);
-				// l.addStyleName("smallText");
-				// l.setTitle(h.getText());
-				// return l;
-				// }
-				// });
 				break;
 			case PRICE:
 				addTextColumn(col, new ValueGetter<String, Event>() {

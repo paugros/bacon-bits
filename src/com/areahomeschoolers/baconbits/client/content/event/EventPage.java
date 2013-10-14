@@ -69,7 +69,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -157,10 +156,6 @@ public class EventPage implements Page {
 					Label heading = new Label(calendarEvent.getTitle() + " - " + Formatter.formatDateTime(calendarEvent.getStartDate()));
 					heading.addStyleName("hugeText");
 					hp.add(heading);
-					BalanceBox bb = new BalanceBox();
-					bb.populate();
-					hp.add(bb);
-					hp.setCellHorizontalAlignment(bb, HasHorizontalAlignment.ALIGN_RIGHT);
 					page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH900PX));
 				}
 
