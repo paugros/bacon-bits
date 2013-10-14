@@ -57,8 +57,6 @@ public class BalanceBox extends Composite {
 		balance = result.getDouble("balance");
 		count = result.getInt("itemCount");
 
-		count = 76;
-		balance = 452.78;
 		if (balance == 0) {
 			setVisible(false);
 			return;
