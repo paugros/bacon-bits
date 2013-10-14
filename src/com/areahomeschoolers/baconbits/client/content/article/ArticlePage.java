@@ -63,7 +63,6 @@ public class ArticlePage implements Page {
 			return;
 		}
 
-		sidebar.add(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.NEW_EVENTS, MiniModule.UPCOMING_EVENTS, MiniModule.CITRUS);
 		this.page = page;
 
 		if (articleId > 0) {
@@ -233,7 +232,7 @@ public class ArticlePage implements Page {
 
 		form.setEnabled(allowEdit());
 
-		Application.getLayout().setPage(title, sidebar, page);
+		Application.getLayout().setPage(title, page);
 	}
 
 	private void createTextPage() {
@@ -244,9 +243,11 @@ public class ArticlePage implements Page {
 	}
 
 	private void initializePage() {
+		sidebar.add(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.NEW_EVENTS, MiniModule.UPCOMING_EVENTS, MiniModule.CITRUS);
+
 		if (noTitle) {
 			createTextPage();
-		} else if (!Application.isAuthenticated()) {
+		} else if (!Application.administratorOf(article)) {
 			createReadOnlyPage();
 		} else {
 			createReadWritePage();

@@ -46,8 +46,8 @@ public class TitleBar extends Composite {
 	private Label titleLabel = new Label();
 	protected HorizontalPanel totalPanel = new HorizontalPanel();
 	private HorizontalPanel widgetPanel = new HorizontalPanel();
-	private LinkPanel linkPanel = new LinkPanel();
-	protected LinkPanel controlPanel = new LinkPanel();
+	private PaddedPanel linkPanel = new PaddedPanel();
+	protected PaddedPanel controlPanel = new PaddedPanel();
 	protected String titleText;
 	private Widget titleWidget, contents;
 	private TitleBarStyle type;
@@ -121,10 +121,9 @@ public class TitleBar extends Composite {
 
 		if (controlPanel.getWidgetCount() == 0) {
 			controlPanel.add(new HTML("&nbsp;&nbsp;&nbsp;"));
-			controlPanel.add(control, false);
-		} else {
-			controlPanel.add(control);
 		}
+
+		controlPanel.add(control);
 	}
 
 	/**
@@ -270,15 +269,6 @@ public class TitleBar extends Composite {
 	 */
 	public TitleBarStyle getType() {
 		return type;
-	}
-
-	/**
-	 * Removes a link from the left {@link LinkPanel}.
-	 * 
-	 * @param link
-	 */
-	public void removeLink(Widget link) {
-		linkPanel.removeWidget(link);
 	}
 
 	public void setLinksEnabled(boolean enabled) {

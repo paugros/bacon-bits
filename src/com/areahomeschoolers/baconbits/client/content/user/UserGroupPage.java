@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar;
+import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
@@ -292,14 +294,14 @@ public class UserGroupPage implements Page {
 
 		if (!userGroup.isSaved()) {
 			form.configureForAdd(fieldTable);
-			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
+			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH900PX));
 		} else {
 			tabPanel = new TabPage();
 			form.emancipate();
 			tabPanel.add("Group", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					tabBody.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
+					tabBody.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH900PX));
 
 					tabPanel.selectTabNow(tabBody);
 				}
@@ -314,8 +316,8 @@ public class UserGroupPage implements Page {
 					userTable.setUserGroup(userGroup);
 					userTable.disablePaging();
 					userTable.setTitle("Members");
-					userTable.getTitleBar().addExcelControl();
 					userTable.getTitleBar().addSearchControl();
+					userTable.getTitleBar().addExcelControl();
 					userTable.setDisplayColumns(UserColumn.PICTURE, UserColumn.ACTIVITY, UserColumn.NAME, UserColumn.EMAIL, UserColumn.PHONE,
 							UserColumn.ADMINISTRATOR, UserColumn.DELETE);
 					userTable.addDataReturnHandler(new DataReturnHandler() {
@@ -335,7 +337,8 @@ public class UserGroupPage implements Page {
 			page.add(tabPanel);
 		}
 
-		Application.getLayout().setPage(title, page);
+		MiniModuleSidebar sb = MiniModuleSidebar.create(MiniModule.LINKS, MiniModule.UPCOMING_EVENTS, MiniModule.CITRUS);
+		Application.getLayout().setPage(title, sb, page);
 	}
 
 	private void save(final FormField field) {
