@@ -22,7 +22,6 @@ public class LinksMiniModule extends Composite {
 		sp.setSpacing(8);
 		VerticalPanel vp = new VerticalPanel();
 		sp.setStyleName("module");
-		sp.addStyleDependentName("light");
 		sp.add(vp);
 		Label linkLabel = new Label("LINKS");
 		linkLabel.addStyleName("moduleTitle");

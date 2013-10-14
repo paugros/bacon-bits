@@ -62,7 +62,7 @@ public class SellBooksMiniModule extends Composite {
 				});
 			}
 		});
-		String sellText = "You can sell your used homeschool curriculum with us. Click the payment button ($5.00) to sign up as a book seller and begin listing your items.";
+		String sellText = "You can sell your used homeschool curriculum with us. Click below to sign up as a book seller and begin listing your items.";
 		vp.add(new Label(sellText));
 		vp.add(payButton);
 
