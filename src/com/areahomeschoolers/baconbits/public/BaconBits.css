@@ -501,14 +501,9 @@ img {
 	padding: 4px;
 }
 
-.TitleBar-sidebar {
-	background-color: #acd3ff;
-	border: 1px solid #8cb3df;
-}
-
 .TitleBar-section {
-	background-color: #acd3ff;
-	border: 1px solid #8cb3df;
+	background-color: #6397f7;
+	border: 1px solid #4377d7;
 }
 
 .TitleBar-subSection {
@@ -517,39 +512,13 @@ img {
 }
 
 .TitleBar-cellTable {
-	background-color: #acd3ff;
-	border: 1px solid #8cb3df;
+	background-color: #6397f7;
+	border: 1px solid #4377d7;
 	border-bottom: none;
 }
 
 .TitleBar .control {
 	cursor: pointer;
-}
-
-.customerBar {
-	font-weight: bold;
-	padding: 1px;
-	background-color: #c3f8ce;
-	border: 1px solid #93c89e;
-	color: black;
-}
-
-.customerBar-normal {
-	background-color: #bdf1c8;
-	color: black;
-	border: 1px solid #9dd1a8;
-}
-
-.customerBar-inactive {
-	background-color: #fbb9b9;
-	color: #7A1412;
-	border: 1px solid #db9999;
-}
-
-.customerBar-overdue {
-	background-color: #b9befb;
-	color: #0C188F;
-	border: 1px solid #999edb;
 }
 
 /*  --------------------------------------- GENERAL STYLES --------------------------------------- */
