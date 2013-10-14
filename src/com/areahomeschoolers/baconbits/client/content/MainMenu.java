@@ -219,8 +219,6 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
 		}
 
-		addLinkToMenu(menu, "Book Seller Instructions", PageUrl.article(65));
-
 		if (Application.administratorOf(17)) {
 			addLinkToMenu(menu, "Create Book Receipt", PageUrl.bookReceipt());
 		}
