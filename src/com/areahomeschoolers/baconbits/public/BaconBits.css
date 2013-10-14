@@ -321,17 +321,12 @@ img {
 }
 
 .module {
-	border: 1px solid #aaaaaa;
+	border: 1px solid #cccccc;
 	-webkit-border-radius: 14px; 
 	-moz-border-radius: 14px;
 	border-radius: 14px;
-	background-color: #dddddd;
-	min-width: 250px;
-}
-
-.module-light {
-	border: 1px solid #cccccc;
 	background-color: #efefef;
+	min-width: 250px;
 }
 
 .moduleTitle {
@@ -476,7 +471,7 @@ img {
 
 .boxedBlurb {
 	background-color: #c5eabf;
-	border: 2px solid #439b33;
+	border: 1px solid #a5c99e;
 	padding: 18px;
 	-webkit-border-radius: 14px; 
 	-moz-border-radius: 14px;
