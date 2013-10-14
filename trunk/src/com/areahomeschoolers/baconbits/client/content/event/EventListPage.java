@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
+import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar;
+import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -132,7 +134,8 @@ public final class EventListPage implements Page {
 
 			hp.add(vp);
 
-			page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH1000PX));
+			page.add(hp);
+			// page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH1000PX));
 
 			table.addDataReturnHandler(new DataReturnHandler() {
 				@Override
@@ -159,7 +162,10 @@ public final class EventListPage implements Page {
 				if (table.returnHandlersHaveRun()) {
 					return;
 				}
-				Application.getLayout().setPage(title, page);
+
+				MiniModuleSidebar sb = MiniModuleSidebar.create(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.COMMUNITY_EVENTS, MiniModule.SELL_BOOKS,
+						MiniModule.CITRUS);
+				Application.getLayout().setPage(title, sb, page);
 			}
 		});
 
@@ -175,9 +181,9 @@ public final class EventListPage implements Page {
 		}
 
 		table.addStatusFilterBox();
-		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addSearchControl();
-		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
+		table.getTitleBar().addExcelControl();
+		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH900PX));
 
 		table.populate();
 	}

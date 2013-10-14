@@ -39,6 +39,7 @@ public class SimpleEventMiniModule extends Composite {
 				if (!result.isEmpty()) {
 					populate(title, result, url);
 				} else {
+					setVisible(false);
 					removeFromParent();
 				}
 			}
