@@ -138,7 +138,7 @@ public final class EventListPage implements Page {
 			hp.add(eb);
 			hp.setCellHorizontalAlignment(eb, HasHorizontalAlignment.ALIGN_RIGHT);
 
-			page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH1300PX));
+			page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH1000PX));
 
 			table.addDataReturnHandler(new DataReturnHandler() {
 				@Override
@@ -183,7 +183,7 @@ public final class EventListPage implements Page {
 		table.addStatusFilterBox();
 		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addSearchControl();
-		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1300PX));
+		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
 
 		table.populate();
 	}

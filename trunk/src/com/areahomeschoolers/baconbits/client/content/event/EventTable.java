@@ -10,7 +10,9 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
@@ -25,6 +27,10 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -138,23 +144,52 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 				});
 				break;
 			case DESCRIPTION:
-				addWidgetColumn(col, new WidgetCellCreator<Event>() {
+				addCompositeWidgetColumn(col, new WidgetCellCreator<Event>() {
 					@Override
-					protected Widget createWidget(Event item) {
-						HTML h = new HTML();
-						h.setHTML(item.getDescription().replaceAll("<br>", " "));
-						String text = h.getText().replaceAll("\\s+", " ");
-						if (text.length() > 85) {
-							text = text.substring(0, 86) + "...";
-						}
-						h.setTitle(text);
+					protected Widget createWidget(final Event item) {
+						final ClickLabel preview = new ClickLabel("Preview");
+						preview.addClickHandler(new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								DecoratedPopupPanel p = new DecoratedPopupPanel(true);
+								p.setModal(true);
+								int spHeight = 350;
+								MaxHeightScrollPanel sp = new MaxHeightScrollPanel(spHeight);
+								sp.alwaysUseMaxHeight(true);
+								HTML h = new HTML(item.getDescription());
+								h.setWidth("500px");
+								sp.setWidget(h);
+								p.setWidget(sp);
+								int y = event.getY();
+								if (y + spHeight + 15 > Window.getClientHeight()) {
+									y -= spHeight + 15;
+								}
+								p.setPopupPosition(event.getX(), y);
+								p.show();
+							}
+						});
 
-						Label l = new Label(text);
-						l.addStyleName("smallText");
-						l.setTitle(h.getText());
-						return l;
+						return preview;
 					}
 				});
+
+				// addWidgetColumn(col, new WidgetCellCreator<Event>() {
+				// @Override
+				// protected Widget createWidget(Event item) {
+				// HTML h = new HTML();
+				// h.setHTML(item.getDescription().replaceAll("<br>", " "));
+				// String text = h.getText().replaceAll("\\s+", " ");
+				// if (text.length() > 85) {
+				// text = text.substring(0, 86) + "...";
+				// }
+				// h.setTitle(text);
+				//
+				// Label l = new Label(text);
+				// l.addStyleName("smallText");
+				// l.setTitle(h.getText());
+				// return l;
+				// }
+				// });
 				break;
 			case PRICE:
 				addTextColumn(col, new ValueGetter<String, Event>() {
@@ -190,6 +225,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 					@Override
 					protected Widget createWidget(Event item) {
 						Hyperlink h = new Hyperlink(item.getTitle(), PageUrl.event(item.getId()));
+
 						h.addStyleName("bold");
 
 						if (!item.isNewlyAdded()) {
