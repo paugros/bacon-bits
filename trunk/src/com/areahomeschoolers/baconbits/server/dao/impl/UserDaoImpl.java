@@ -435,6 +435,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int parentId = args.getInt(UserArg.PARENT_ID);
 		int registrationId = args.getInt(UserArg.NOT_ON_REGISTRATION_ID);
 		int groupId = args.getInt(UserArg.GROUP_ID);
+		int activeNumber = args.getInt(UserArg.ACTIVE_NUMBER);
+		int newNumber = args.getInt(UserArg.NEW_NUMBER);
 		boolean onlyParents = args.getBoolean(UserArg.PARENTS);
 		boolean onlyChildren = args.getBoolean(UserArg.CHILDREN);
 		boolean parentsOfBoys = args.getBoolean(UserArg.PARENTS_OF_BOYS);
@@ -540,11 +542,27 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sqlArgs.add(parentId);
 		}
 
+		if (ServerContext.isAuthenticated() && (activeNumber > 0 || newNumber > 0)) {
+			sql += "and u.id != ? ";
+			sqlArgs.add(ServerContext.getCurrentUserId());
+			if (newNumber > 0) {
+				sql += "and u.passwordDigest is not null and date_add(now(), interval -2 week) < u.addedDate ";
+			} else if (activeNumber > 0) {
+				sql += "and date_add(now(), interval 5 minute) < u.lastActivityDate ";
+			}
+		}
+
 		if (distanceCol != null) {
 			sql += "having distance < " + withinMiles + " ";
 		}
 
-		sql += "order by u.lastName, u.firstName";
+		if (activeNumber > 0) {
+			sql += "order by u.lastActivityDate desc limit " + activeNumber;
+		} else if (newNumber > 0) {
+			sql += "order by u.addedDate desc limit " + newNumber;
+		} else {
+			sql += "order by u.lastName, u.firstName";
+		}
 		ArrayList<User> data = query(sql, new SecureUserMapper(), sqlArgs.toArray());
 
 		return data;

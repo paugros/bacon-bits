@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar;
-import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar.MiniModule;
+import com.areahomeschoolers.baconbits.client.content.Sidebar;
+import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
@@ -32,7 +32,7 @@ public class ArticleGroupPage implements Page {
 					page.add(new ArticleWidget(item));
 				}
 
-				MiniModuleSidebar sb = MiniModuleSidebar.create(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.NEW_EVENTS, MiniModule.UPCOMING_EVENTS,
+				Sidebar sb = Sidebar.create(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.NEW_EVENTS, MiniModule.UPCOMING_EVENTS,
 						MiniModule.CITRUS);
 				Application.getLayout().setPage("Articles", sb, page);
 			}

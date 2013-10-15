@@ -21,7 +21,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
-import com.areahomeschoolers.baconbits.client.widgets.SidebarPanel;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedVerticalPanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.GenericCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
@@ -73,9 +73,9 @@ public class HomePage implements Page {
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private VerticalPanel page = new VerticalPanel();
 	private Grid grid = new Grid(1, 3);
-	private VerticalPanel leftPanel = new SidebarPanel();
+	private VerticalPanel leftPanel = new PaddedVerticalPanel();
 	private VerticalPanel centerPanel = new VerticalPanel();
-	private VerticalPanel rightPanel = new SidebarPanel();
+	private VerticalPanel rightPanel = new PaddedVerticalPanel();
 	private HomePageData pageData;
 
 	public HomePage(VerticalPanel p) {
