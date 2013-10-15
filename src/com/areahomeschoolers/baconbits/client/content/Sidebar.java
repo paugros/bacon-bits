@@ -99,6 +99,7 @@ public class Sidebar extends Composite {
 			add(module, new NewEventsMiniModule());
 			break;
 		case SELL_BOOKS:
+			// only show if not already a member
 			if (!Application.memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
 				add(module, new SellBooksMiniModule());
 			}
