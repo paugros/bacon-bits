@@ -351,7 +351,7 @@ public final class Layout {
 		logoDiv.setHTML("<a href=\"#" + PageUrl.home() + "\">" + logo + "</a>");
 	}
 
-	public void setPage(String title, MiniModuleSidebar sidebar, VerticalPanel page) {
+	public void setPage(String title, Sidebar sidebar, VerticalPanel page) {
 		if (currentPagePanel == page) {
 			Grid pageGrid = new Grid(1, 2);
 			pageGrid.setWidth("100%");

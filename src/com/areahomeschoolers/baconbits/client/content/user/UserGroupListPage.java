@@ -1,6 +1,8 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.content.Sidebar;
+import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
@@ -41,7 +43,8 @@ public final class UserGroupListPage implements Page {
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
 			public void onDataReturn() {
-				Application.getLayout().setPage(title, page);
+				Sidebar sb = Sidebar.create(MiniModule.ACTIVE_USERS, MiniModule.NEW_USERS, MiniModule.UPCOMING_EVENTS, MiniModule.CITRUS);
+				Application.getLayout().setPage(title, sb, page);
 			}
 		});
 

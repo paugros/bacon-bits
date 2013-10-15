@@ -3,8 +3,8 @@ package com.areahomeschoolers.baconbits.client.content.article;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar;
-import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar.MiniModule;
+import com.areahomeschoolers.baconbits.client.content.Sidebar;
+import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
@@ -53,7 +53,7 @@ public class ArticlePage implements Page {
 	private Article article = new Article();
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private boolean noTitle = Url.getBooleanParameter("noTitle");
-	private MiniModuleSidebar sidebar = new MiniModuleSidebar();
+	private Sidebar sidebar = new Sidebar();
 
 	public ArticlePage(VerticalPanel page) {
 		int articleId = Url.getIntegerParameter("articleId");

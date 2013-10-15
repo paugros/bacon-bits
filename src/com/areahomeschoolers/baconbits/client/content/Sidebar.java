@@ -5,30 +5,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.content.minimodules.ActiveUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CommunityEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.FindPeopleMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.LinksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.MyEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewEventsMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.NewUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.UpcomingEventsMiniModule;
-import com.areahomeschoolers.baconbits.client.widgets.SidebarPanel;
 import com.areahomeschoolers.baconbits.shared.Constants;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class MiniModuleSidebar extends SidebarPanel {
+public class Sidebar extends Composite {
 	public enum MiniModule {
-		COMMUNITY_EVENTS, UPCOMING_EVENTS, FIND_PEOPLE, LINKS, SELL_BOOKS, NEW_EVENTS, MY_EVENTS, CITRUS;
+		COMMUNITY_EVENTS, UPCOMING_EVENTS, FIND_PEOPLE, LINKS, SELL_BOOKS, NEW_EVENTS, MY_EVENTS, CITRUS, NEW_USERS, ACTIVE_USERS;
 	}
 
 	private static Map<MiniModule, Widget> cache = new HashMap<MiniModule, Widget>();
 
 	private static EnumSet<MiniModule> expireModules = EnumSet.of(MiniModule.COMMUNITY_EVENTS, MiniModule.UPCOMING_EVENTS, MiniModule.NEW_EVENTS,
-			MiniModule.MY_EVENTS);
+			MiniModule.MY_EVENTS, MiniModule.ACTIVE_USERS, MiniModule.NEW_USERS);
+	private static EnumSet<MiniModule> noCacheModules = EnumSet.of(MiniModule.ACTIVE_USERS);
+	private VerticalPanel vp = new VerticalPanel();
+	private SimplePanel container = new SimplePanel();
 
 	private static Timer timer = new Timer() {
 		@Override
@@ -43,15 +50,18 @@ public class MiniModuleSidebar extends SidebarPanel {
 		timer.scheduleRepeating(10 * 60 * 1000);
 	}
 
-	public static MiniModuleSidebar create(MiniModule... modules) {
-		return new MiniModuleSidebar(modules);
+	public static Sidebar create(MiniModule... modules) {
+		return new Sidebar(modules);
 	}
 
-	public MiniModuleSidebar() {
-
+	public Sidebar() {
+		container.setWidget(vp);
+		container.getElement().getStyle().setPaddingLeft(10, Unit.PX);
+		container.getElement().getStyle().setPaddingTop(10, Unit.PX);
+		initWidget(container);
 	}
 
-	public MiniModuleSidebar(MiniModule... modules) {
+	public Sidebar(MiniModule... modules) {
 		this();
 		add(modules);
 	}
@@ -64,7 +74,7 @@ public class MiniModuleSidebar extends SidebarPanel {
 
 	public void add(MiniModule module) {
 		if (cache.containsKey(module)) {
-			add(cache.get(module));
+			add(module, cache.get(module));
 			return;
 		}
 
@@ -99,23 +109,23 @@ public class MiniModuleSidebar extends SidebarPanel {
 		case CITRUS:
 			add(module, new CitrusMiniModule());
 			break;
+		case ACTIVE_USERS:
+			add(module, new ActiveUsersMiniModule());
+			break;
+		case NEW_USERS:
+			add(module, new NewUsersMiniModule());
+			break;
 		default:
 			break;
 		}
 	}
 
-	@Override
-	public void add(Widget w) {
-		w.getElement().getStyle().setMarginLeft(10, Unit.PX);
-		if (getWidgetCount() == 0) {
-			w.getElement().getStyle().setMarginTop(10, Unit.PX);
-		}
-		super.add(w);
-	}
-
 	private void add(MiniModule module, Widget widget) {
-		cache.put(module, widget);
-		add(widget);
+		widget.getElement().getStyle().setMarginBottom(10, Unit.PX);
+		if (!noCacheModules.contains(module)) {
+			cache.put(module, widget);
+		}
+		vp.add(widget);
 	}
 
 }

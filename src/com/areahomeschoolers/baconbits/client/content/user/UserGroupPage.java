@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar;
-import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar.MiniModule;
+import com.areahomeschoolers.baconbits.client.content.Sidebar;
+import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
@@ -337,7 +337,7 @@ public class UserGroupPage implements Page {
 			page.add(tabPanel);
 		}
 
-		MiniModuleSidebar sb = MiniModuleSidebar.create(MiniModule.LINKS, MiniModule.UPCOMING_EVENTS, MiniModule.CITRUS);
+		Sidebar sb = Sidebar.create(MiniModule.ACTIVE_USERS, MiniModule.NEW_USERS, MiniModule.UPCOMING_EVENTS, MiniModule.CITRUS);
 		Application.getLayout().setPage(title, sb, page);
 	}
 

@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
-import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar;
-import com.areahomeschoolers.baconbits.client.content.MiniModuleSidebar.MiniModule;
+import com.areahomeschoolers.baconbits.client.content.Sidebar;
+import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -163,7 +163,7 @@ public final class EventListPage implements Page {
 					return;
 				}
 
-				MiniModuleSidebar sb = MiniModuleSidebar.create(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.COMMUNITY_EVENTS, MiniModule.SELL_BOOKS,
+				Sidebar sb = Sidebar.create(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.COMMUNITY_EVENTS, MiniModule.SELL_BOOKS,
 						MiniModule.CITRUS);
 				Application.getLayout().setPage(title, sb, page);
 			}
