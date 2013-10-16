@@ -32,8 +32,6 @@ import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DoubleClickEvent;
-import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
@@ -95,7 +93,6 @@ public final class Layout {
 	public Layout() {
 		isMobileBrowser = ClientUtils.isMobileBrowser();
 
-		// headerPanel.setStyleName("headerPanel");
 		headerPanel.setHeight(HEADER_HEIGHT + "px");
 		headerPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		if (!isMobileBrowser) {
@@ -159,15 +156,10 @@ public final class Layout {
 					public void execute(SuggestBox suggestBox) {
 						name.setVisible(true);
 						userSearchBox.setVisible(false);
+						userSearchBox.getTextBox().setFocus(false);
 					}
 				});
 				userSearchBox.getElement().getStyle().setMarginLeft(20, Unit.PX);
-				userSearchBox.getTextBox().addDoubleClickHandler(new DoubleClickHandler() {
-					@Override
-					public void onDoubleClick(DoubleClickEvent event) {
-						HistoryToken.set(PageUrl.user(Application.getCurrentUser().getId()));
-					}
-				});
 				userSearchBox.setClearOnFocus(true);
 
 				userSearchBox.setVisible(false);
@@ -186,6 +178,7 @@ public final class Layout {
 						} else {
 							name.setVisible(true);
 							userSearchBox.setVisible(false);
+							userSearchBox.getTextBox().setFocus(false);
 						}
 					}
 				});
