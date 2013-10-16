@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -51,12 +50,6 @@ public class FieldTable extends Composite {
 		for (FormField field : form.getAllFormFields()) {
 			addField(field);
 		}
-	}
-
-	public void addBottomPanel(VerticalPanel bottomPanel) {
-		int row = flexTable.getRowCount();
-		flexTable.setWidget(row, 0, bottomPanel);
-		flexTable.getFlexCellFormatter().setColSpan(row, 0, 2);
 	}
 
 	public void addField(FormField field) {
@@ -99,6 +92,12 @@ public class FieldTable extends Composite {
 		flexTable.insertRow(0);
 		flexTable.setWidget(0, 0, linkPanel);
 		flexTable.getFlexCellFormatter().setColSpan(0, 0, 2);
+	}
+
+	public void addSpanningWidget(Widget widget) {
+		int row = flexTable.getRowCount();
+		flexTable.setWidget(row, 0, widget);
+		flexTable.getFlexCellFormatter().setColSpan(row, 0, 2);
 	}
 
 	public void clear() {

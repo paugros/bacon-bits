@@ -150,7 +150,7 @@ public class Form {
 
 	public void configureForAdd(FieldTable fieldTable) {
 		fieldTable.addLinkPanel(getLinkPanel());
-		fieldTable.addBottomPanel(getBottomPanel());
+		fieldTable.addSpanningWidget(getBottomPanel());
 		configureForAdd();
 	}
 
