@@ -171,7 +171,7 @@ public class EventPage implements Page {
 		final Label titleDisplay = new Label();
 		titleInput.addStyleName("hugeText");
 		titleDisplay.addStyleName("hugeText");
-		titleInput.setVisibleLength(65);
+		titleInput.setVisibleLength(50);
 		titleInput.setMaxLength(100);
 		FormField titleField = form.createFormField("Title:", titleInput, titleDisplay);
 		titleField.setDtoUpdater(new Command() {
@@ -590,6 +590,8 @@ public class EventPage implements Page {
 		final HTML descriptionDisplay = new HTML();
 		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
 		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
+		descriptionDisplay.getElement().getStyle().setPadding(10, Unit.PX);
+		descriptionDisplay.setWidth("800px");
 		descriptionField.setRequired(true);
 		descriptionField.setInitializer(new Command() {
 			@Override
@@ -604,7 +606,7 @@ public class EventPage implements Page {
 				calendarEvent.setDescription(descriptionInput.getTextArea().getHTML());
 			}
 		});
-		fieldTable.addField(descriptionField);
+		fieldTable.addSpanningWidget(descriptionField);
 
 		if (calendarEvent.isSaved() && (calendarEvent.hasDocuments() || Application.administratorOf(calendarEvent))) {
 			DocumentSection ds = new DocumentSection(calendarEvent, Application.administratorOf(calendarEvent));
@@ -621,7 +623,7 @@ public class EventPage implements Page {
 
 		if (!calendarEvent.isSaved()) {
 			form.configureForAdd(fieldTable);
-			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
+			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1000PX));
 		} else {
 			tabPanel = new TabPage();
 			form.emancipate();
@@ -664,7 +666,7 @@ public class EventPage implements Page {
 						}
 					}
 
-					tabBody.add(WidgetFactory.newSection(tb, fieldTable, ContentWidth.MAXWIDTH1100PX));
+					tabBody.add(WidgetFactory.newSection(tb, fieldTable, ContentWidth.MAXWIDTH1000PX));
 
 					// we need to do this again in case we started on another tab
 					form.initialize();

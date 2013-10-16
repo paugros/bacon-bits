@@ -32,6 +32,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -96,7 +97,7 @@ public class ArticlePage implements Page {
 		final Label titleDisplay = new Label();
 		titleDisplay.addStyleName("hugeText");
 		titleInput.addStyleName("hugeText");
-		titleInput.setVisibleLength(65);
+		titleInput.setVisibleLength(50);
 		titleInput.setMaxLength(100);
 		FormField titleField = form.createFormField("Title:", titleInput, titleDisplay);
 		titleField.setDtoUpdater(new Command() {
@@ -170,6 +171,7 @@ public class ArticlePage implements Page {
 
 		final ControlledRichTextArea dataInput = new ControlledRichTextArea();
 		final HTML dataDisplay = new HTML();
+		dataDisplay.getElement().getStyle().setPadding(10, Unit.PX);
 		dataDisplay.setWidth("800px");
 		FormField dataField = form.createFormField("", dataInput, dataDisplay);
 		dataField.setDtoUpdater(new Command() {
@@ -185,7 +187,7 @@ public class ArticlePage implements Page {
 				dataDisplay.setHTML(article.getArticle());
 			}
 		});
-		fieldTable.addField(dataField);
+		fieldTable.addSpanningWidget(dataField);
 
 		if (article.isSaved() && (article.hasDocuments() || Application.administratorOf(article))) {
 			DocumentSection ds = new DocumentSection(article, Application.administratorOf(article));
@@ -228,7 +230,7 @@ public class ArticlePage implements Page {
 			form.emancipate();
 		}
 
-		page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
+		page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1000PX));
 
 		form.setEnabled(allowEdit());
 
