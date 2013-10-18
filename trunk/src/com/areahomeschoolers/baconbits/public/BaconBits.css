@@ -632,22 +632,34 @@ img {
 	background-image: linear-gradient(top, #eeeeee, #cccccc);
 	border: 1px solid #ccc;
 	border-bottom: 1px solid #999;
-	-webkit-border-radius: 2px; 
-	-moz-border-radius: 2px;
-	border-radius: 2px;
+	-webkit-border-radius: 3px; 
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 	color: #444;
-	font: bold 11px/1 "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+	font-size: 11px;
+	font: Arial, sans-serif;
 	font-weight: bold;
-	padding: 5px 0;
+	padding: 3px 0;
 	text-align: center;
+	cursor: default;
 	min-width: 54px;
 }
 
 .gwt-Button:hover {
 	border: 1px solid #bbb;
 	border-bottom: 1px solid #777;
-	cursor: pointer;
+	cursor: default;
 	color: #222;
+}
+
+.gwt-Button[disabled] {
+	color: #999999;
+	border: 1px outset #ccc;
+}
+
+.gwt-Button[disabled]:hover {
+	color: #999999;
+	border: 1px outset #ccc;
 }
     
 .gwt-Button:active {
