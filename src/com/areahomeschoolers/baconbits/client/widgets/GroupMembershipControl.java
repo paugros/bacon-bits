@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
@@ -53,22 +54,66 @@ public class GroupMembershipControl {
 		});
 	}
 
+	public Widget createApprovalWidget(final Command onUpdate) {
+		if (userGroup.getGroupApproved() && userGroup.getUserApproved()) {
+			return new Label("Approved");
+		}
+
+		// if pending, and you don't have the ability to approve, just display pending
+		if ((!userGroup.getGroupApproved() && !Application.administratorOf(userGroup))
+				|| (!userGroup.getUserApproved() && !user.equals(Application.getCurrentUser()))) {
+			return new Label("Pending");
+		}
+
+		return new ClickLabel("Approve", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				String confirm = "Approve membership for " + user.getFullName() + " in the " + userGroup.getGroupName() + " group?";
+				ConfirmDialog.confirm(confirm, new ConfirmHandler() {
+					@Override
+					public void onConfirm() {
+						userGroup.setGroupApproved(true);
+						userGroup.setUserApproved(true);
+						user.setGroupApproved(true);
+						user.setUserApproved(true);
+						GroupData gd = new GroupData();
+						gd.setOrganization(userGroup.getOrganization());
+						gd.setOrganizationId(userGroup.getOwningOrgId());
+						user.getGroups().put(userGroup.getId(), gd);
+
+						onUpdate.execute();
+						userService.updateUserGroupRelation(user, userGroup, true, new Callback<Void>(false) {
+							@Override
+							protected void doOnSuccess(Void item) {
+							}
+						});
+					}
+				});
+			}
+		});
+	}
+
 	public Widget createMemberWidget(final Command onUpdate) {
-		if (!Application.administratorOf(userGroup)) {
+		if (!Application.administratorOf(userGroup) && !user.equals(Application.getCurrentUser())) {
 			return new Label("");
 		}
 
 		return new ClickLabel("X", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				String confirm = "Remove " + user.getFullName() + " from the " + userGroup.getGroupName() + " group?";
+				String confirm = "";
+				if (user.equals(Application.getCurrentUser())) {
+					confirm = "Are you sure you want to leave the " + userGroup.getGroupName() + " group?";
+				} else {
+					confirm = "Remove " + user.getFullName() + " from the " + userGroup.getGroupName() + " group?";
+				}
 				ConfirmDialog.confirm(confirm, new ConfirmHandler() {
 					@Override
 					public void onConfirm() {
-						onUpdate.execute();
 						userService.updateUserGroupRelation(user, userGroup, false, new Callback<Void>(false) {
 							@Override
 							protected void doOnSuccess(Void item) {
+								onUpdate.execute();
 							}
 						});
 					}

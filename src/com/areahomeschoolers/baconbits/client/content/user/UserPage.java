@@ -330,7 +330,8 @@ public class UserPage implements Page {
 						final UserGroupTable groupsTable = new UserGroupTable(userArgs);
 						groupsTable.setUser(user);
 						groupsTable.setTitle("Group Membership");
-						groupsTable.setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR);
+						groupsTable.setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.DESCRIPTION, UserGroupColumn.ADMINISTRATOR,
+								UserGroupColumn.APPROVAL);
 						groupsTable.getTitleBar().addExcelControl();
 						if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 							groupsTable.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
@@ -346,11 +347,12 @@ public class UserPage implements Page {
 										@Override
 										public void execute() {
 											final UserGroup group = selector.getSelectedItem();
+											group.setGroupApproved(true);
 
 											userService.updateUserGroupRelation(user, group, true, new Callback<Void>() {
 												@Override
 												protected void doOnSuccess(Void item) {
-													groupsTable.addItem(group);
+													groupsTable.populate();
 													selector.getCellTable().removeItem(group);
 												}
 											});
@@ -366,7 +368,7 @@ public class UserPage implements Page {
 
 						groupsTable.populate();
 
-						tabBody.add(WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH750PX));
+						tabBody.add(WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH900PX));
 						tabPanel.selectTabNow(tabBody);
 					}
 				});

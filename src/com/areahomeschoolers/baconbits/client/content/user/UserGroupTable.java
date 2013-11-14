@@ -15,7 +15,6 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
-import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -31,7 +30,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupArg, UserGroupColumn> {
 	public enum UserGroupColumn implements EntityCellTableColumn<UserGroupColumn> {
-		GROUP("Group"), ORGANIZATION("Organization"), DESCRIPTION("Description"), START_DATE("Start"), END_DATE("End"), ADMINISTRATOR("Administrator");
+		GROUP("Group"), ORGANIZATION("Organization"), DESCRIPTION("Description"), START_DATE("Start"), END_DATE("End"), ADMINISTRATOR("Administrator"), APPROVAL(
+				"Approval");
 
 		private String title;
 
@@ -149,6 +149,28 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 					}
 				});
 				break;
+			case APPROVAL:
+				if (user != null) {
+					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
+						@Override
+						protected Widget createWidget(UserGroup item) {
+							return new GroupMembershipControl(user, item).createApprovalWidget(new Command() {
+								@Override
+								public void execute() {
+									refresh();
+								}
+							});
+						}
+					});
+				} else {
+					addTextColumn(col, new ValueGetter<String, UserGroup>() {
+						@Override
+						public String get(UserGroup item) {
+							return (item.getGroupApproved() && item.getUserApproved()) ? "Approved" : "Pending";
+						}
+					});
+				}
+				break;
 			case ADMINISTRATOR:
 				if (user != null) {
 					addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
@@ -165,13 +187,6 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 						@Override
 						public Boolean get(UserGroup item) {
 							return item.getAdministrator();
-						}
-					});
-				} else {
-					addTextColumn(col, new ValueGetter<String, UserGroup>() {
-						@Override
-						public String get(UserGroup item) {
-							return Common.yesNo(item.getAdministrator());
 						}
 					});
 				}
@@ -199,7 +214,7 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 		}
 
 		if (user != null && Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
-			addCompositeWidgetColumn("Delete", new WidgetCellCreator<UserGroup>() {
+			addCompositeWidgetColumn("Remove", new WidgetCellCreator<UserGroup>() {
 				@Override
 				protected Widget createWidget(final UserGroup group) {
 					return new GroupMembershipControl(user, group).createMemberWidget(new Command() {

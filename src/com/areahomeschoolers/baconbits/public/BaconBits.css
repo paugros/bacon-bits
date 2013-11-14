@@ -180,7 +180,7 @@ img {
 }
 
 .selectedWidget {
-	background-color: #b0d5f2;
+	background-color: #ffffcc;
 }
 
 .cellLabel {
@@ -278,14 +278,6 @@ img {
 
 .FormField-emancipated {
 	width: 400px;
-}
-
-.FormField-emancipated:hover {
-	background-color: #ecf5ef;
-}
-
-.FormField-editing {
-	background-color: #ecf5ef;
 }
 
 .GoogleMap {

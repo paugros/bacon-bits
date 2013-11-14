@@ -67,7 +67,6 @@ public interface UserDao {
 	@PreAuthorize("hasRole('ORGANIZATION_ADMINISTRATORS')")
 	public void updateMenuOrdinals(ArrayList<MainMenuItem> items);
 
-	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void updateUserGroupRelation(User u, UserGroup g, boolean add);
 
 	public List<String> validatePassword(String password);

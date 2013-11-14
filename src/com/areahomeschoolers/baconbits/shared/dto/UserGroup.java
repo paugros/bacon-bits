@@ -133,6 +133,8 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	// for membership records
 	private boolean isAdministrator;
+	private boolean groupApproved;
+	private boolean userApproved;
 
 	public UserGroup() {
 
@@ -176,6 +178,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 			return null;
 		}
 		return generalPolicyId;
+	}
+
+	public boolean getGroupApproved() {
+		return groupApproved;
 	}
 
 	@Override
@@ -258,6 +264,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return startDate;
 	}
 
+	public boolean getUserApproved() {
+		return userApproved;
+	}
+
 	public boolean isActive() {
 		return Common.isActive(new Date(), endDate);
 	}
@@ -300,6 +310,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public void setGeneralPolicyId(Integer generalPolicyId) {
 		this.generalPolicyId = generalPolicyId;
+	}
+
+	public void setGroupApproved(boolean groupApproved) {
+		this.groupApproved = groupApproved;
 	}
 
 	@Override
@@ -370,6 +384,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
+	}
+
+	public void setUserApproved(boolean userApproved) {
+		this.userApproved = userApproved;
 	}
 
 }

@@ -28,6 +28,7 @@ import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
 import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.dao.TagDao;
@@ -90,6 +91,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		public UserGroup mapRow(ResultSet rs, int rowNum) throws SQLException {
 			UserGroup g = createUserGroup(rs);
 			g.setAdministrator(rs.getBoolean("isAdministrator"));
+			g.setGroupApproved(rs.getBoolean("groupApproved"));
+			g.setUserApproved(rs.getBoolean("userApproved"));
+
 			return g;
 		}
 	}
@@ -105,6 +109,17 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		@Override
 		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return createUser(rs, true);
+		}
+	}
+
+	// used only on the members tab of the group page
+	private final class SpecialGroupUserMapper implements RowMapper<User> {
+		@Override
+		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+			User u = createUser(rs, true);
+			u.setGroupApproved(rs.getBoolean("groupApproved"));
+			u.setUserApproved(rs.getBoolean("userApproved"));
+			return u;
 		}
 	}
 
@@ -435,6 +450,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int parentId = args.getInt(UserArg.PARENT_ID);
 		int registrationId = args.getInt(UserArg.NOT_ON_REGISTRATION_ID);
 		int groupId = args.getInt(UserArg.GROUP_ID);
+		int adminOfId = args.getInt(UserArg.ADMIN_OF_GROUP_ID);
 		int activeNumber = args.getInt(UserArg.ACTIVE_NUMBER);
 		int newNumber = args.getInt(UserArg.NEW_NUMBER);
 		boolean onlyParents = args.getBoolean(UserArg.PARENTS);
@@ -448,7 +464,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int withinMiles = args.getInt(UserArg.WITHIN_MILES);
 		String withinLat = args.getString(UserArg.WITHIN_LAT);
 		String withinLng = args.getString(UserArg.WITHIN_LNG);
-		String distanceCol = null;
+		String distanceCols = "";
+		String groupCols = "";
 		int minAge = 0;
 		int maxAge = 0;
 
@@ -458,15 +475,24 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
-			distanceCol = "(3959 * acos( cos( radians(" + withinLat + ") ) * cos( radians( u.lat ) ) * cos( radians( u.lng ) - radians(" + withinLng + ") ) ";
-			distanceCol += "+ sin( radians(" + withinLat + ") ) * sin( radians( u.lat ) ) ) ) as distance, ";
+			distanceCols += "(3959 * acos( cos( radians(" + withinLat + ") ) * cos( radians( u.lat ) ) * cos( radians( u.lng ) - radians(" + withinLng + ") ) ";
+			distanceCols += "+ sin( radians(" + withinLat + ") ) * sin( radians( u.lat ) ) ) ) as distance, ";
 		}
 
-		String sql = createSqlBase(distanceCol);
+		if (groupId > 0) {
+			groupCols += "ugm.userApproved, ugm.groupApproved, ";
+		}
+
+		String sql = createSqlBase(distanceCols + groupCols);
 
 		if (groupId > 0) {
 			sql += "join userGroupMembers ugm on ugm.userId = u.id and ugm.groupId = ? \n";
 			sqlArgs.add(groupId);
+		}
+
+		if (adminOfId > 0) {
+			sql += "join userGroupMembers ugm on ugm.userId = u.id and ugm.groupId = ? and ugm.isAdministrator = 1 \n";
+			sqlArgs.add(adminOfId);
 		}
 
 		if (registrationId > 0) {
@@ -552,7 +578,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			}
 		}
 
-		if (distanceCol != null) {
+		if (!Common.isNullOrBlank(distanceCols)) {
 			sql += "having distance < " + withinMiles + " ";
 		}
 
@@ -563,9 +589,12 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		} else {
 			sql += "order by u.lastName, u.firstName";
 		}
-		ArrayList<User> data = query(sql, new SecureUserMapper(), sqlArgs.toArray());
 
-		return data;
+		if (groupId > 0) {
+			return query(sql, new SpecialGroupUserMapper(), sqlArgs.toArray());
+		}
+
+		return query(sql, new SecureUserMapper(), sqlArgs.toArray());
 	}
 
 	@Override
@@ -587,7 +616,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		if (userAdminId > 0) {
-			sql += "join userGroupMembers augm on augm.groupId = g.id and augm.isAdministrator = 1 and augm.userId = ? ";
+			sql += "join userGroupMembers augm on augm.groupId = g.id and augm.isAdministrator = 1 ";
+			sql += "and augm.groupApproved = 1 and augm.userApproved = 1 and augm.userId = ? ";
 			sqlArgs.add(userAdminId);
 		}
 
@@ -603,7 +633,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		if (userNotMemberId > 0) {
-			sql += "and nugm.id is null ";
+			sql += "and nugm.id is null or (nugm.userApproved != 1 or nugm.groupApproved != 1) ";
 		}
 
 		if (id > 0) {
@@ -704,6 +734,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			user.setPassword(null);
 		}
 
+		boolean adding = !user.isSaved();
+
 		if (user.isSaved()) {
 			sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, email = :email, ";
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
@@ -736,9 +768,34 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			user.setId(ServerUtils.getIdFromKeys(keys));
 		}
 
-		User returnUser = getById(user.getId());
+		boolean secureMapper = true;
+		// if you're not authenticated, it's because this user you just added is for yourself. no need for secure mapper.
+		if (!ServerContext.isAuthenticated() || ServerContext.getCurrentUser().administratorOf(user)) {
+			secureMapper = false;
+		}
+
+		User returnUser = getById(user.getId(), secureMapper);
 
 		retData.setData(returnUser);
+
+		// auto-request membership in current org, whether user self-added, or an admin added them
+		if (adding) {
+			ArgMap<UserGroupArg> args = new ArgMap<>();
+			args.put(UserGroupArg.ID, ServerContext.getCurrentOrgId());
+			UserGroup group = listGroups(args).get(0);
+
+			if (!ServerContext.isAuthenticated()) {
+				group.setUserApproved(true);
+				if (ServerContext.isCitrus()) {
+					// auto-approve members of main citrus site
+					group.setGroupApproved(true);
+				}
+			} else {
+				group.setGroupApproved(true);
+			}
+
+			updateUserGroupRelation(returnUser, group, true);
+		}
 
 		// update the user cache (using insecure mapper to ensure all data is present)
 		if (ServerContext.getCache().contains("user_" + user.getId())) {
@@ -907,21 +964,70 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	@Override
 	public void updateUserGroupRelation(User u, UserGroup g, boolean add) {
 		if (add) {
+			Mailer m = new Mailer();
+			m.setHtmlMail(true);
 			// Check if relation already exists
 			String sql = "select count(*) from userGroupMembers where userId = ? and groupId = ?";
 			if (queryForInt(sql, u.getId(), g.getId()) > 0) {
-				sql = "update userGroupMembers set isAdministrator = ? where userId = ? and groupId = ?";
-				update(sql, g.getAdministrator(), u.getId(), g.getId());
+				sql = "update userGroupMembers set isAdministrator = ?, groupApproved = ?, userApproved = ? where userId = ? and groupId = ?";
+				update(sql, g.getAdministrator(), g.getGroupApproved(), g.getUserApproved(), u.getId(), g.getId());
+
+				ServerContext.updateUserCache(getById(u.getId(), false));
+
+				// send approval granted emails to user or group here
 				return;
 			}
 
 			// associate to org if needed
 			sql = "select count(*) from userGroupMembers where userId = ? and groupId = ?";
 			if (g.getOrganization() || (!g.getOrganization() && queryForInt(sql, u.getId(), g.getOwningOrgId()) == 0)) {
-				addToOrganization(u.getId(), g.getOwningOrgId());
-			} else {
-				sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, ?, ?)";
-				update(sql, u.getId(), g.getId(), g.getAdministrator());
+				addToOrganization(u.getId(), g);
+			}
+
+			if (!g.getOrganization()) {
+				sql = "insert into userGroupMembers (userId, groupId, isAdministrator, groupApproved, userApproved) values(?, ?, ?, ?, ?)";
+				update(sql, u.getId(), g.getId(), g.getAdministrator(), g.getGroupApproved(), g.getUserApproved());
+			}
+
+			if (!g.getUserApproved()) {
+				// email the user
+				m.addTo(u);
+				m.setSubject("Invitation from " + g.getGroupName());
+				String body = "You have been invited to join the " + g.getGroupName() + " ";
+				if (!g.getOrganization()) {
+					body += "group, within the " + g.getOrganizationName() + " ";
+				}
+				body += "homeschool organization, a member of <a href=\"" + Constants.CG_URL + "\">Citrus Groups</a> homeschool network.<br><br>";
+				body += "<a href=\"" + ServerContext.getBaseUrlWithCodeServer() + "#" + PageUrl.user(u.getId()) + "&tab=2\">";
+				body += "Click here</a> to view the invitation on the group membership tab of your profile, ";
+				body += "then click \"Approve\" if you wish to accept.<br><br>";
+				body += "Regards,<br>" + ServerContext.getCurrentUser().getFullName() + "<br>";
+				body += "<a mailto:\"" + ServerContext.getCurrentUser().getEmail() + "\">" + ServerContext.getCurrentUser().getEmail() + "</a><br><br>";
+				body += "NOTE: This is a system-generated email, please do not reply.";
+
+				m.setBody(body);
+				m.send();
+			} else if (!g.getGroupApproved()) {
+				// email the group admins
+				ArgMap<UserArg> args = new ArgMap<>();
+				args.setStatus(Status.ACTIVE);
+				args.put(UserArg.ADMIN_OF_GROUP_ID, g.getId());
+				m.addTo(list(args));
+
+				m.setSubject("Membership request from " + u.getFullName());
+				String body = u.getFullName() + " (<a mailto:\"" + u.getEmail() + "\">" + u.getEmail() + "</a>) ";
+				body += "has asked to join the " + g.getGroupName() + " ";
+				if (!g.getOrganization()) {
+					body += "group, within the " + g.getOrganizationName() + " ";
+				}
+				body += "homeschool organization.<br><br>";
+				body += "<a href=\"" + ServerContext.getBaseUrlWithCodeServer() + "#" + PageUrl.userGroup(g.getId()) + "&tab=1\">";
+				body += "Click here</a> to view the request on the members tab of the group page, ";
+				body += "then click \"Approve\" if you wish to accept.<br><br>";
+				body += "NOTE: This is a system-generated email, please do not reply.";
+
+				m.setBody(body);
+				m.send();
 			}
 		} else {
 			String sql = "delete from userGroupMembers where ";
@@ -1025,11 +1131,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		return new ArrayList<String>();
 	}
 
-	private void addToOrganization(int userId, int orgId) {
+	private void addToOrganization(int userId, UserGroup g) {
 		// children too
-		String sql = "insert into userGroupMembers (userId, groupId, isAdministrator) ";
-		sql += "select id, ?, ? from users where (parentId = ? or id = ?)";
-		update(sql, orgId, false, userId, userId);
+		String sql = "insert into userGroupMembers (userId, groupId, isAdministrator, groupApproved, userApproved) ";
+		sql += "select id, ?, ?, ?, ? from users where (parentId = ? or id = ?)";
+		update(sql, g.getOwningOrgId(), false, g.getGroupApproved(), g.getUserApproved(), userId, userId);
 	}
 
 	private String createSqlBase() {
@@ -1041,12 +1147,12 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String sql = "select isActive(u.startDate, u.endDate) as isEnabled, u.*, uu.firstName as parentFirstName, uu.lastName as parentLastName, \n";
 		sql += "case when u.birthDate < date_add(now(), interval -18 year) then 0 else 1 end as isChild, i.commonInterests, \n";
 		sql += "floor(datediff(now(), u.birthDate) / 365.25) as age, \n";
-		if (specialCols != null) {
+		if (!Common.isNullOrBlank(specialCols)) {
 			sql += specialCols;
 		}
 		// groups
 		sql += "(select group_concat(concat(g.id, ':', g.groupName, ':', gm.isAdministrator, ':', g.organizationId) separator '\n') ";
-		sql += "from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id \n";
+		sql += "from groups g join userGroupMembers gm on gm.groupId = g.id where gm.userId = u.id and gm.groupApproved = 1 and gm.userApproved = 1 \n";
 		sql += "and isActive(g.startDate, g.endDate) = 1) as groups, \n";
 		// privacy prefs
 		sql += "(select group_concat(concat(p.id, ':', p.preferenceType, ':', p.visibilityLevelId, ':', ifnull(p.groupId, '0'), ':', ifnull(gg.organizationId, '0')) separator '\n') \n";
