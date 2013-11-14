@@ -25,6 +25,7 @@ import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
@@ -86,11 +87,17 @@ public class UserGroupPage implements Page {
 						return;
 					}
 
+					VerticalPanel head = new VerticalPanel();
 					userGroup = result.get(0);
 					Label heading = new Label(userGroup.getGroupName());
 					heading.addStyleName("hugeText");
-					page.add(heading);
+					head.add(heading);
 
+					if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(userGroup.getId()) == null) {
+						head.add(new RequestMembershipLink(userGroup));
+					}
+
+					page.add(head);
 					initializePage();
 				}
 			});
@@ -319,11 +326,11 @@ public class UserGroupPage implements Page {
 					userTable.getTitleBar().addSearchControl();
 					userTable.getTitleBar().addExcelControl();
 					userTable.setDisplayColumns(UserColumn.PICTURE, UserColumn.ACTIVITY, UserColumn.NAME, UserColumn.EMAIL, UserColumn.PHONE,
-							UserColumn.ADMINISTRATOR, UserColumn.DELETE);
+							UserColumn.ADMINISTRATOR, UserColumn.APPROVAL, UserColumn.DELETE);
 					userTable.addDataReturnHandler(new DataReturnHandler() {
 						@Override
 						public void onDataReturn() {
-							tabBody.add(WidgetFactory.newSection(userTable, ContentWidth.MAXWIDTH1000PX));
+							tabBody.add(WidgetFactory.newSection(userTable, ContentWidth.MAXWIDTH1100PX));
 							tabPanel.selectTabNow(tabBody);
 						}
 					});

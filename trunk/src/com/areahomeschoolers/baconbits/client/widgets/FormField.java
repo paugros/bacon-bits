@@ -612,8 +612,6 @@ public class FormField extends Composite {
 			}
 
 			if (setVisible) {
-				addStyleDependentName("editing");
-
 				editLabelText = editLabel.getText();
 				editLabel.setText("Cancel");
 				// focus on the input widget if we can
@@ -628,8 +626,6 @@ public class FormField extends Composite {
 					}
 				});
 			} else {
-				removeStyleDependentName("editing");
-
 				editLabel.setText(editLabelText);
 				if (errorLabel != null) {
 					errorLabel.removeFromParent();

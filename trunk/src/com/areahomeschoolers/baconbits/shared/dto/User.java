@@ -54,6 +54,9 @@ public final class User extends EntityDto<User> {
 	private boolean isChild;
 	private int age;
 	private boolean addressChanged;
+	// only for group membership listings
+	private boolean userApproved;
+	private boolean groupApproved;
 
 	private HashMap<Integer, GroupData> groups = new HashMap<Integer, GroupData>();
 	private HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences = new HashMap<PrivacyPreferenceType, PrivacyPreference>();
@@ -168,6 +171,10 @@ public final class User extends EntityDto<User> {
 
 	public boolean getGeneratePassword() {
 		return generatePassword;
+	}
+
+	public boolean getGroupApproved() {
+		return groupApproved;
 	}
 
 	public HashMap<Integer, GroupData> getGroups() {
@@ -295,6 +302,10 @@ public final class User extends EntityDto<User> {
 		return systemAdministrator;
 	}
 
+	public boolean getUserApproved() {
+		return userApproved;
+	}
+
 	public String getUserName() {
 		return email;
 	}
@@ -402,6 +413,10 @@ public final class User extends EntityDto<User> {
 		}
 	}
 
+	public void setGroupApproved(boolean groupApproved) {
+		this.groupApproved = groupApproved;
+	}
+
 	public void setGroups(HashMap<Integer, GroupData> groups) {
 		this.groups = groups;
 	}
@@ -500,6 +515,10 @@ public final class User extends EntityDto<User> {
 
 	public void setSystemAdministrator(boolean systemAdministrator) {
 		this.systemAdministrator = systemAdministrator;
+	}
+
+	public void setUserApproved(boolean userApproved) {
+		this.userApproved = userApproved;
 	}
 
 	public void setZip(String zip) {

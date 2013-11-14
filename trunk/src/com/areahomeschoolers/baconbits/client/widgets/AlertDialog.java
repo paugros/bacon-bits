@@ -5,8 +5,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -22,7 +22,7 @@ public class AlertDialog extends DefaultDialog {
 	}
 
 	public static void alert(String caption, String labelText, int pixelWidth) {
-		Label label = new Label(labelText);
+		HTML label = new HTML(labelText);
 
 		if (pixelWidth > 0) {
 			label.setWidth(pixelWidth + "px");

@@ -16,6 +16,7 @@ import javax.mail.internet.MimeMessage;
 
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
+import com.areahomeschoolers.baconbits.shared.dto.User;
 
 public class Mailer {
 	private final List<String> tos = new ArrayList<String>();
@@ -57,10 +58,20 @@ public class Mailer {
 		tos.addAll(addresses);
 	}
 
+	public void addTo(List<User> users) {
+		for (User u : users) {
+			addTo(u);
+		}
+	}
+
 	public void addTo(String... addresses) {
 		for (String address : addresses) {
 			tos.add(address);
 		}
+	}
+
+	public void addTo(User u) {
+		addTo(u.getFullName() + " <" + u.getEmail() + ">");
 	}
 
 	public void clearCc() {
@@ -72,7 +83,7 @@ public class Mailer {
 	}
 
 	public String getFrom() {
-		return "admin@wearehomeeducators.com";
+		return "admin@citrusgroups.com";
 		// String from = this.from;
 		//
 		// if (from == null) {

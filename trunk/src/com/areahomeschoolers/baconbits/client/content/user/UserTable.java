@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.Widget;
 public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
 		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS(
-				"Same Interests"), AGE("Age"), ADMINISTRATOR("Administrator"), DELETE("Delete");
+				"Same Interests"), AGE("Age"), ADMINISTRATOR("Administrator"), APPROVAL("Approval"), DELETE("Delete");
 
 		private String title;
 
@@ -234,9 +234,26 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 					}
 				});
 				break;
+			case APPROVAL:
+				if (userGroup != null) {
+					addCompositeWidgetColumn(col, new WidgetCellCreator<User>() {
+						@Override
+						protected Widget createWidget(final User user) {
+							userGroup.setGroupApproved(user.getGroupApproved());
+							userGroup.setUserApproved(user.getUserApproved());
+							return new GroupMembershipControl(user, userGroup).createApprovalWidget(new Command() {
+								@Override
+								public void execute() {
+									refresh();
+								}
+							});
+						}
+					});
+				}
+				break;
 			case ADMINISTRATOR:
 				if (userGroup != null) {
-					addCompositeWidgetColumn("Administrator", new WidgetCellCreator<User>() {
+					addCompositeWidgetColumn(col, new WidgetCellCreator<User>() {
 						@Override
 						protected Widget createWidget(final User user) {
 							return new GroupMembershipControl(user, userGroup).createAdminWidget(new Command() {
@@ -256,7 +273,7 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 				break;
 			case DELETE:
 				if (userGroup != null && Application.administratorOf(userGroup)) {
-					addCompositeWidgetColumn("Delete", new WidgetCellCreator<User>() {
+					addCompositeWidgetColumn(col, new WidgetCellCreator<User>() {
 						@Override
 						protected Widget createWidget(final User user) {
 							return new GroupMembershipControl(user, userGroup).createMemberWidget(new Command() {

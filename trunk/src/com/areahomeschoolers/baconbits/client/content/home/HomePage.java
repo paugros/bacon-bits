@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedVerticalPanel;
+import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.GenericCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
@@ -29,6 +30,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -154,6 +156,12 @@ public class HomePage implements Page {
 
 				// upcoming
 				rightPanel.add(new UpcomingEventsMiniModule(pageData.getUpcomingEvents()));
+
+				UserGroup org = Application.getCurrentOrg();
+
+				if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(org.getId()) == null) {
+					centerPanel.add(new RequestMembershipLink(org));
+				}
 
 				// introduction
 				centerPanel.add(new ArticleWidget(pageData.getIntro()));
