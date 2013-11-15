@@ -927,7 +927,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			body += "If you didn't initiate the request, you don't need to take any further action and can safely disregard this email.\n\n";
 			body += "If you have any questions, please contact Kristin Augros at kaugros@gmail.com.\n\n";
 			body += "Thank you for using " + sn + " services.\n\n";
-			body += "This is a post-only mailing.  Replies to this message are not monitored or answered.";
 			mailer.setBody(body);
 
 			mailer.send();
@@ -967,14 +966,36 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			Mailer m = new Mailer();
 			m.setHtmlMail(true);
 			// Check if relation already exists
-			String sql = "select count(*) from userGroupMembers where userId = ? and groupId = ?";
-			if (queryForInt(sql, u.getId(), g.getId()) > 0) {
+			String sql = "select * from userGroupMembers where userId = ? and groupId = ?";
+			Data existing = queryForObject(sql, ServerUtils.getGenericRowMapper(), u.getId(), g.getId());
+			if (existing != null) {
 				sql = "update userGroupMembers set isAdministrator = ?, groupApproved = ?, userApproved = ? where userId = ? and groupId = ?";
 				update(sql, g.getAdministrator(), g.getGroupApproved(), g.getUserApproved(), u.getId(), g.getId());
 
 				ServerContext.updateUserCache(getById(u.getId(), false));
 
 				// send approval granted emails to user or group here
+				if (g.getGroupApproved() && g.getUserApproved() && !(existing.getBoolean("groupApproved") && existing.getBoolean("userApproved"))) {
+					String subject = "Membership Approved: ";
+					String body = "";
+					if (!existing.getBoolean("groupApproved")) {
+						// email user
+						m.addTo(u);
+						subject += g.getGroupName();
+						body += "Your request to join ";
+						body += "<a href=\"" + ServerContext.getBaseUrlWithCodeServer() + "\">";
+						body += g.getGroupName() + "</a> has been approved.";
+					} else {
+						// email group
+						m.addTo(getAdminsForGroup(g));
+						subject += u.getFullName();
+						body += u.getFullName() + " has accepted the invitation to join " + g.getGroupName() + ".";
+					}
+
+					m.setSubject(subject);
+					m.setBody(body);
+					m.send();
+				}
 				return;
 			}
 
@@ -1002,17 +1023,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				body += "Click here</a> to view the invitation on the group membership tab of your profile, ";
 				body += "then click \"Approve\" if you wish to accept.<br><br>";
 				body += "Regards,<br>" + ServerContext.getCurrentUser().getFullName() + "<br>";
-				body += "<a mailto:\"" + ServerContext.getCurrentUser().getEmail() + "\">" + ServerContext.getCurrentUser().getEmail() + "</a><br><br>";
-				body += "NOTE: This is a system-generated email, please do not reply.";
+				body += "<a mailto:\"" + ServerContext.getCurrentUser().getEmail() + "\">" + ServerContext.getCurrentUser().getEmail() + "</a>";
 
 				m.setBody(body);
 				m.send();
 			} else if (!g.getGroupApproved()) {
 				// email the group admins
-				ArgMap<UserArg> args = new ArgMap<>();
-				args.setStatus(Status.ACTIVE);
-				args.put(UserArg.ADMIN_OF_GROUP_ID, g.getId());
-				m.addTo(list(args));
+				m.addTo(getAdminsForGroup(g));
 
 				m.setSubject("Membership request from " + u.getFullName());
 				String body = u.getFullName() + " (<a mailto:\"" + u.getEmail() + "\">" + u.getEmail() + "</a>) ";
@@ -1023,8 +1040,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				body += "homeschool organization.<br><br>";
 				body += "<a href=\"" + ServerContext.getBaseUrlWithCodeServer() + "#" + PageUrl.userGroup(g.getId()) + "&tab=1\">";
 				body += "Click here</a> to view the request on the members tab of the group page, ";
-				body += "then click \"Approve\" if you wish to accept.<br><br>";
-				body += "NOTE: This is a system-generated email, please do not reply.";
+				body += "then click \"Approve\" if you wish to accept.";
 
 				m.setBody(body);
 				m.send();
@@ -1319,6 +1335,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setLogoId(rs.getInt("logoId"));
 		group.setFaviconId(rs.getInt("faviconId"));
 		return group;
+	}
+
+	private List<User> getAdminsForGroup(UserGroup g) {
+		ArgMap<UserArg> args = new ArgMap<>();
+		args.setStatus(Status.ACTIVE);
+		args.put(UserArg.ADMIN_OF_GROUP_ID, g.getId());
+
+		return list(args);
 	}
 
 }
