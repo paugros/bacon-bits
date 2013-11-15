@@ -27,6 +27,8 @@ public class Mailer {
 	private final Properties properties = new Properties();
 	private boolean isHtmlMail = false;
 	private final Message message;
+	private boolean includeDoNotReply = true;
+	private static final String DO_NOT_REPLY = "NOTE: This is a post-only mailing.  Replies to this message are not monitored or answered.";
 
 	public Mailer() {
 		Session session = Session.getDefaultInstance(properties, null);
@@ -79,7 +81,12 @@ public class Mailer {
 	}
 
 	public String getBody() {
-		return body;
+		String b = body;
+		if (includeDoNotReply) {
+			b += isHtmlMail ? "<br><br>" : "\n\n";
+			b += DO_NOT_REPLY;
+		}
+		return b;
 	}
 
 	public String getFrom() {
@@ -137,7 +144,7 @@ public class Mailer {
 				}
 
 				subjectText = subject;
-				bodyText = body;
+				bodyText = getBody();
 
 				message.setSubject(subjectText);
 				message.setSentDate(new Date());
@@ -164,7 +171,7 @@ public class Mailer {
 				}
 				bodyText += "/*** HEADERS ***/" + newLine + newLine;
 
-				bodyText += body;
+				bodyText += getBody();
 
 				System.out.println(subjectText + "\n\n" + bodyText);
 			}
@@ -190,6 +197,10 @@ public class Mailer {
 		this.isHtmlMail = isHtmlMail;
 	}
 
+	public void setIncludeDoNotReply(boolean includeDoNotReply) {
+		this.includeDoNotReply = includeDoNotReply;
+	}
+
 	public void setSubject(String subject) {
 		if (subject != null) {
 			// strip non-ascii chars from subject, because they will break the email
@@ -204,7 +215,7 @@ public class Mailer {
 		ret += "\ncc: " + ccs;
 		ret += "\nfrom: " + getFrom();
 		ret += "\nsubject: " + subject;
-		ret += "\nbody: " + body;
+		ret += "\nbody: " + getBody();
 
 		return ret;
 	}
