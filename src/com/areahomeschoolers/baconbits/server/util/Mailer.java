@@ -90,7 +90,7 @@ public class Mailer {
 	}
 
 	public String getFrom() {
-		return "admin@citrusgroups.com";
+		return "kaugros@citrusgroups.com";
 		// String from = this.from;
 		//
 		// if (from == null) {
