@@ -58,6 +58,7 @@ public class FieldTable extends Composite {
 		int newRowNumber = flexTable.getRowCount() - 1;
 		Element element = flexTable.getRowFormatter().getElement(newRowNumber);
 		parentRows.put(field, (TableRowElement) element);
+		field.setParentFieldTable(this);
 	}
 
 	public void addField(FormField field, int insertBefore) {
@@ -66,6 +67,7 @@ public class FieldTable extends Composite {
 
 		Element element = flexTable.getRowFormatter().getElement(insertBefore);
 		parentRows.put(field, (TableRowElement) element);
+		field.setParentFieldTable(this);
 	}
 
 	public void addField(Label label, String value) {
@@ -92,6 +94,13 @@ public class FieldTable extends Composite {
 		flexTable.insertRow(0);
 		flexTable.setWidget(0, 0, linkPanel);
 		flexTable.getFlexCellFormatter().setColSpan(0, 0, 2);
+	}
+
+	public void addRowStyle(FormField field, String style) {
+		TableRowElement element = parentRows.get(field);
+		if (element != null && element.getRowIndex() >= 0) {
+			flexTable.getRowFormatter().addStyleName(element.getRowIndex(), style);
+		}
 	}
 
 	public void addSpanningWidget(Widget widget) {
@@ -135,6 +144,13 @@ public class FieldTable extends Composite {
 	public void removeAllRows() {
 		if (flexTable.getRowCount() > 0) {
 			flexTable.removeAllRows();
+		}
+	}
+
+	public void removeRowStyle(FormField field, String style) {
+		TableRowElement element = parentRows.get(field);
+		if (element != null && element.getRowIndex() >= 0) {
+			flexTable.getRowFormatter().removeStyleName(element.getRowIndex(), style);
 		}
 	}
 

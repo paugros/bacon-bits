@@ -114,6 +114,7 @@ public class FormField extends Composite {
 	private final Set<FormField> subFields = new LinkedHashSet<FormField>();
 	private FieldTable subFieldTable;
 	private WidgetCreator inputCreator;
+	private FieldTable parentFieldTable;
 	private LinkPanel linkPanel;
 
 	public FormField(String label, Widget inputWidget, Widget displayWidget) {
@@ -614,6 +615,9 @@ public class FormField extends Composite {
 			if (setVisible) {
 				editLabelText = editLabel.getText();
 				editLabel.setText("Cancel");
+				if (parentFieldTable != null) {
+					parentFieldTable.addRowStyle(this, "editing");
+				}
 				// focus on the input widget if we can
 				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 					@Override
@@ -629,6 +633,9 @@ public class FormField extends Composite {
 				editLabel.setText(editLabelText);
 				if (errorLabel != null) {
 					errorLabel.removeFromParent();
+				}
+				if (parentFieldTable != null) {
+					parentFieldTable.removeRowStyle(this, "editing");
 				}
 			}
 		}
@@ -706,6 +713,10 @@ public class FormField extends Composite {
 
 	public void setLabelText(String text) {
 		fieldLabel.setText(text);
+	}
+
+	public void setParentFieldTable(FieldTable parentFieldTable) {
+		this.parentFieldTable = parentFieldTable;
 	}
 
 	/**
