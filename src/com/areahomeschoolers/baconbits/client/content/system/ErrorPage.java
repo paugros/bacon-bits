@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.shared.Common;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -41,7 +42,7 @@ public final class ErrorPage {
 		pageTitles.put(PageError.INVALID_ACTION, "Invalid Action");
 		pageTitles.put(PageError.SYSTEM_ERROR, "System Error");
 
-		errorPanel.setStyleName("largeText heavyPadding homePageModule");
+		errorPanel.setStyleName("largeText heavyPadding module");
 
 		if (customMessage != null) {
 			errorPanel.add(new Label(customMessage));
@@ -77,6 +78,10 @@ public final class ErrorPage {
 		vp.add(new HTML("You are not authorized to view this page or perform the requested action.<br><br>"));
 		vp.add(new Image(MainImageBundle.INSTANCE.waggingFinger()));
 		errorPanel.add(vp);
+
+		if (!Application.isAuthenticated()) {
+			LoginDialog.showLogin();
+		}
 	}
 
 	private void pageNotFound() {
