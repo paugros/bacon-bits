@@ -115,6 +115,7 @@ public class EmailDialog extends DefaultDialog {
 			if (allowEditRecipients) {
 				PaddedPanel tp = new PaddedPanel();
 				tp.add(new Label("To:"));
+				email.addTo(Application.getCurrentUser().getEmail());
 				final ClickLabel uc = new ClickLabel("Click to choose recipients");
 
 				ArgMap<UserArg> ua = new ArgMap<UserArg>(Status.ACTIVE);
@@ -181,7 +182,7 @@ public class EmailDialog extends DefaultDialog {
 						email.setSubject(subjectBox.getText());
 					}
 
-					if (email.getTos().isEmpty()) {
+					if (email.getBccs().isEmpty()) {
 						AlertDialog.alert("Please specify at least one recipient.");
 						return;
 					}
