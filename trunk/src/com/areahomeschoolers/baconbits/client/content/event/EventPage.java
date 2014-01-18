@@ -164,6 +164,18 @@ public class EventPage implements Page {
 		});
 	}
 
+	private String createEmailHtml() {
+		String h = "<div style=\"padding: 10px; font-family: arial, helvetica; font-size: 12px;\">";
+		h += "<span style=\"font-size: 25px;\">" + calendarEvent.getTitle() + "</span><br>";
+		h += "<div style=\"padding: 7px;\"><b>Date/time: </b>";
+		h += Formatter.formatDateTime(calendarEvent.getStartDate()) + " to " + Formatter.formatDateTime(calendarEvent.getEndDate()) + "<br>";
+		h += "<b>Address: </b>";
+		h += calendarEvent.getAddress() + "</div><br><br>";
+		h += calendarEvent.getDescription();
+		h += "</div>";
+		return h;
+	}
+
 	private void createFieldTable() {
 		fieldTable.setWidth("100%");
 
@@ -655,6 +667,20 @@ public class EventPage implements Page {
 								}
 							}));
 						}
+
+						tb.addLink(new ClickLabel("Email", new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								EmailDialog dialog = new EmailDialog();
+								dialog.setShowSubjectBox(true);
+								dialog.setAllowEditRecipients(true);
+								dialog.setSubject(calendarEvent.getTitle());
+								dialog.insertHtml(createEmailHtml());
+
+								dialog.center();
+							}
+						}));
+
 					}
 
 					if (pageData.getRegistration() != null) {

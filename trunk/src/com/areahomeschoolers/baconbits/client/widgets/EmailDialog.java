@@ -2,16 +2,23 @@ package com.areahomeschoolers.baconbits.client.widgets;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.user.UserSelector;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
+import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -31,6 +38,8 @@ public class EmailDialog extends DefaultDialog {
 	private String fromEmail;
 	private String hiddenAboveText;
 	private String hiddenBelowText;
+	private String insertHtml;
+	private boolean allowEditRecipients;
 
 	public EmailDialog() {
 		setModal(false);
@@ -48,6 +57,14 @@ public class EmailDialog extends DefaultDialog {
 
 	public void addTo(String toEmail) {
 		email.addTo(toEmail);
+	}
+
+	public void insertHtml(String html) {
+		this.insertHtml = html;
+	}
+
+	public void setAllowEditRecipients(boolean allow) {
+		this.allowEditRecipients = allow;
 	}
 
 	public void setFrom(String fromEmail) {
@@ -95,6 +112,43 @@ public class EmailDialog extends DefaultDialog {
 			fp.add(fromPanel);
 			vp.add(fp);
 
+			if (allowEditRecipients) {
+				PaddedPanel tp = new PaddedPanel();
+				tp.add(new Label("To:"));
+				final ClickLabel uc = new ClickLabel("Click to choose recipients");
+
+				ArgMap<UserArg> ua = new ArgMap<UserArg>(Status.ACTIVE);
+				ua.put(UserArg.ORGANIZATION_ID, Application.getCurrentOrgId());
+				ua.put(UserArg.HAS_EMAIL, true);
+
+				final UserSelector us = new UserSelector(ua);
+				us.setMultiSelect(true);
+				us.addSubmitCommand(new Command() {
+					@Override
+					public void execute() {
+						email.getBccs().clear();
+						for (User u : us.getSelectedItems()) {
+							if (!Common.isNullOrBlank(u.getEmail())) {
+								email.addBcc(u.getEmail());
+							}
+						}
+
+						uc.setText(email.getBccs().size() + " recipients");
+					}
+				});
+
+				uc.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						us.center();
+					}
+				});
+
+				tp.add(uc);
+
+				vp.add(tp);
+			}
+
 			if (showSubjectBox) {
 				subjectBox.setVisibleLength(68);
 				subjectBox.addStyleName("largeText");
@@ -125,6 +179,11 @@ public class EmailDialog extends DefaultDialog {
 
 					if (showSubjectBox) {
 						email.setSubject(subjectBox.getText());
+					}
+
+					if (email.getTos().isEmpty()) {
+						AlertDialog.alert("Please specify at least one recipient.");
+						return;
 					}
 
 					send.setEnabled(false);
@@ -167,6 +226,24 @@ public class EmailDialog extends DefaultDialog {
 					subjectBox.setFocus(true);
 				} else {
 					textArea.getTextArea().setFocus(true);
+				}
+
+				if (insertHtml != null) {
+					textArea.getTextArea().setFocus(true);
+
+					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+						@Override
+						public void execute() {
+							Timer t = new Timer() {
+								@Override
+								public void run() {
+									textArea.insertHtml(insertHtml);
+								}
+							};
+
+							t.schedule(500);
+						}
+					});
 				}
 			}
 		});
