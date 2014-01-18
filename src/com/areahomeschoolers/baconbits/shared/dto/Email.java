@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -23,7 +24,7 @@ public class Email implements IsSerializable {
 		}
 	}
 
-	public void addCc(Collection<String> addresses) {
+	public void addCc(ArrayList<String> addresses) {
 		ccs.addAll(addresses);
 	}
 
@@ -33,7 +34,7 @@ public class Email implements IsSerializable {
 		}
 	}
 
-	public void addTo(Collection<String> addresses) {
+	public void addTo(ArrayList<String> addresses) {
 		tos.addAll(addresses);
 	}
 

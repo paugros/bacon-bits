@@ -458,6 +458,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		boolean parentsOfBoys = args.getBoolean(UserArg.PARENTS_OF_BOYS);
 		boolean parentsOfGirls = args.getBoolean(UserArg.PARENTS_OF_GIRLS);
 		boolean onlyCommonInterests = args.getBoolean(UserArg.ONLY_COMMON_INTERESTS);
+		boolean hasEmail = args.getBoolean(UserArg.HAS_EMAIL);
 		String sex = args.getString(UserArg.SEX);
 		List<Integer> ages = args.getIntList(UserArg.AGES);
 		String addressSearch = args.getString(UserArg.ADDRESS_SEARCH);
@@ -500,6 +501,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sqlArgs.add(registrationId);
 		}
 		sql += createSqlWhere();
+
+		if (hasEmail) {
+			sql += "and u.email is not null and u.email != '' \n";
+		}
 
 		// start directory logic //
 		if (onlyParents) {

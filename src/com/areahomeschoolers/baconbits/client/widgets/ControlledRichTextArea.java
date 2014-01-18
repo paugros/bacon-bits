@@ -454,6 +454,10 @@ public class ControlledRichTextArea extends Composite {
 		return toolbar;
 	}
 
+	public void insertHtml(String html) {
+		textArea.getFormatter().insertHTML(html);
+	}
+
 	public void setTextArea(RichTextArea textArea) {
 		this.textArea = textArea;
 	}
