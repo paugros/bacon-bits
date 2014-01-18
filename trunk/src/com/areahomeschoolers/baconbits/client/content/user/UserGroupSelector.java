@@ -19,6 +19,7 @@ public final class UserGroupSelector extends EntityCellSelector<UserGroup, UserG
 
 	private UserGroupSelector() {
 		setModal(false);
+		setMinSelect(1);
 		setText("Select a User Group");
 	}
 
