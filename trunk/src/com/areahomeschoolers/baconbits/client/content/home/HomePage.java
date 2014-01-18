@@ -189,7 +189,7 @@ public class HomePage implements Page {
 					@Override
 					protected Widget createWidget(Data item) {
 						String url = "http://www." + item.get("orgDomain");
-						if (Constants.CG_DOMAIN.equals(item.get("orgDomain"))) {
+						if (Constants.CG_DOMAIN.equals(item.get("orgDomain")) || "myhomeschoolgroups.com".equals(item.get("orgDomain"))) {
 							url = "http://" + item.get("orgSubDomain") + "." + item.get("orgDomain");
 						}
 						Anchor link = new Anchor(item.get("groupName"), url);
