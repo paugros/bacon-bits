@@ -1,12 +1,15 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ButtonPanel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -55,6 +58,11 @@ public class BookDetailsDialog extends DefaultDialog {
 			Label notes = new Label(book.getNotes());
 			dt.add(notes);
 		}
+
+		dt.add(new HTML("&nbsp;"));
+
+		Hyperlink link = new Hyperlink("See all from this seller", PageUrl.bookSearch() + "&sellerId=" + book.getUserId());
+		dt.add(link);
 
 		pp.add(dt);
 		vp.add(pp);

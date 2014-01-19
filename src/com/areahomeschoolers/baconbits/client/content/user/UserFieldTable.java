@@ -1,8 +1,5 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
@@ -13,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
+import com.areahomeschoolers.baconbits.client.widgets.AddressFormField;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
@@ -22,10 +20,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldDisplayLink;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
-import com.areahomeschoolers.baconbits.client.widgets.GoogleMapWidget;
 import com.areahomeschoolers.baconbits.client.widgets.MonthYearPicker;
-import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
@@ -37,7 +32,6 @@ import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -46,65 +40,8 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.maps.gwt.client.Geocoder;
-import com.google.maps.gwt.client.GeocoderAddressComponent;
-import com.google.maps.gwt.client.GeocoderRequest;
-import com.google.maps.gwt.client.GeocoderResult;
-import com.google.maps.gwt.client.GeocoderStatus;
 
 public class UserFieldTable extends FieldTable {
-	public static void validateUserAddress(final User u, final Command saveCommand) {
-		if (!u.getAddressChanged()) {
-			saveCommand.execute();
-			return;
-		}
-
-		u.setAddressChanged(false);
-
-		if (Common.isNullOrBlank(u.getAddress()) && Common.isNullOrBlank(u.getStreet()) && Common.isNullOrBlank(u.getZip())) {
-			saveCommand.execute();
-			return;
-		}
-
-		GoogleMapWidget.runMapsCommand(new Command() {
-			@Override
-			public void execute() {
-				String address = u.getAddress();
-				if (!Common.isNullOrBlank(u.getStreet()) || !Common.isNullOrBlank(u.getZip())) {
-					address = u.getStreet() + " " + u.getZip();
-				}
-
-				GeocoderRequest request = GeocoderRequest.create();
-				request.setAddress(address);
-				GoogleMapWidget.getGeoCoder().geocode(request, new Geocoder.Callback() {
-					@Override
-					public void handle(JsArray<GeocoderResult> results, GeocoderStatus status) {
-						if (status == GeocoderStatus.OK) {
-							GeocoderResult location = results.get(0);
-							Map<String, String> parts = new HashMap<String, String>();
-							for (int i = 0; i < location.getAddressComponents().length(); i++) {
-								GeocoderAddressComponent c = location.getAddressComponents().get(i);
-								parts.put(c.getTypes().get(0), c.getShortName());
-							}
-							// https://developers.google.com/maps/documentation/geocoding/#Types
-							u.setAddress(location.getFormattedAddress());
-							u.setStreet(parts.get("street_number") + " " + parts.get("route"));
-							u.setCity(parts.get("locality"));
-							u.setState(parts.get("administrative_area_level_1"));
-							u.setZip(parts.get("postal_code"));
-							u.setLat(location.getGeometry().getLocation().lat());
-							u.setLng(location.getGeometry().getLocation().lng());
-						}
-
-						saveCommand.execute();
-					}
-				});
-			}
-		});
-	}
-
 	private User user;
 	private final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private final Label passwordLabel = new Label();
@@ -431,49 +368,8 @@ public class UserFieldTable extends FieldTable {
 		}
 
 		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.ADDRESS)) {
-			final FieldDisplayLink addressDisplay = new FieldDisplayLink();
-			addressDisplay.setTarget("_blank");
-			PaddedPanel addressInput = new PaddedPanel();
-			// street input
-			final TextBox street = new TextBox();
-			street.setMaxLength(100);
-			Label streetLabel = new Label("Number and street");
-			streetLabel.addStyleName("smallText");
-			VerticalPanel streetPanel = new VerticalPanel();
-			streetPanel.add(streetLabel);
-			streetPanel.add(street);
-
-			// zip input
-			final NumericTextBox zip = new NumericTextBox();
-			zip.setMaxLength(5);
-			zip.setVisibleLength(5);
-			Label zipLabel = new Label("Zip");
-			zipLabel.addStyleName("smallText");
-			VerticalPanel zipPanel = new VerticalPanel();
-			zipPanel.add(zipLabel);
-			zipPanel.add(zip);
-
-			addressInput.add(streetPanel);
-			addressInput.add(zipPanel);
-
-			FormField addressField = form.createFormField("Address:", addressInput, addressDisplay);
-			addressField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					addressDisplay.setText(Common.getDefaultIfNull(user.getAddress()));
-					addressDisplay.setHref("http://maps.google.com/maps?q=" + user.getAddress());
-					street.setText(user.getStreet());
-					zip.setText(user.getZip());
-				}
-			});
-			addressField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					user.setStreet(street.getText());
-					user.setZip(zip.getText());
-					user.setAddressChanged(true);
-				}
-			});
+			FormField addressField = new AddressFormField(user).getFormField();
+			form.addField(addressField);
 			addField(addressField);
 		} else if (!Common.isNullOrBlank(user.getCity())) {
 			String address = user.getCity();

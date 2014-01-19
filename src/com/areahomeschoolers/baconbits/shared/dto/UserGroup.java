@@ -8,10 +8,11 @@ import java.util.Map;
 
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
+import com.areahomeschoolers.baconbits.shared.HasAddress;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership {
+public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership, HasAddress {
 
 	public enum AccessLevel implements IsSerializable, Serializable {
 		PUBLIC(1, "Public"), SITE_MEMBERS(2, "Site members"), GROUP_MEMBERS(3, "Group members"), GROUP_ADMINISTRATORS(4, "Group administrators"), ORGANIZATION_ADMINISTRATORS(
@@ -127,6 +128,17 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private String payPalEmail;
 	private Integer logoId;
 	private Integer faviconId;
+	private boolean religious;
+
+	// address
+	private String address;
+	private String street;
+	private String city;
+	private String state;
+	private String zip;
+	private double lat;
+	private double lng;
+	private boolean addressChanged;
 
 	// aux
 	private String organizationName;
@@ -140,8 +152,23 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	}
 
+	@Override
+	public String getAddress() {
+		return address;
+	}
+
+	@Override
+	public boolean getAddressChanged() {
+		return addressChanged;
+	}
+
 	public boolean getAdministrator() {
 		return isAdministrator;
+	}
+
+	@Override
+	public String getCity() {
+		return city;
 	}
 
 	public Integer getCoopPolicyId() {
@@ -191,6 +218,16 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public String getGroupName() {
 		return groupName;
+	}
+
+	@Override
+	public double getLat() {
+		return lat;
+	}
+
+	@Override
+	public double getLng() {
+		return lng;
 	}
 
 	public Integer getLogoId() {
@@ -256,6 +293,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return publicGreetingId;
 	}
 
+	public boolean getReligious() {
+		return religious;
+	}
+
 	public String getShortName() {
 		return shortName;
 	}
@@ -264,8 +305,23 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return startDate;
 	}
 
+	@Override
+	public String getState() {
+		return state;
+	}
+
+	@Override
+	public String getStreet() {
+		return street;
+	}
+
 	public boolean getUserApproved() {
 		return userApproved;
+	}
+
+	@Override
+	public String getZip() {
+		return zip;
 	}
 
 	public boolean isActive() {
@@ -284,8 +340,23 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return isOrganization;
 	}
 
+	@Override
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	@Override
+	public void setAddressChanged(boolean changed) {
+		this.addressChanged = changed;
+	}
+
 	public void setAdministrator(boolean isAdministrator) {
 		this.isAdministrator = isAdministrator;
+	}
+
+	@Override
+	public void setCity(String city) {
+		this.city = city;
 	}
 
 	public void setCoopPolicyId(Integer coopPolicyId) {
@@ -323,6 +394,16 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	@Override
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	@Override
+	public void setLng(double lng) {
+		this.lng = lng;
 	}
 
 	public void setLogoId(Integer logoId) {
@@ -378,6 +459,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		this.publicGreetingId = publicGreetingId;
 	}
 
+	public void setReligious(boolean religious) {
+		this.religious = religious;
+	}
+
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
 	}
@@ -386,8 +471,23 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		this.startDate = startDate;
 	}
 
+	@Override
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	@Override
+	public void setStreet(String street) {
+		this.street = street;
+	}
+
 	public void setUserApproved(boolean userApproved) {
 		this.userApproved = userApproved;
+	}
+
+	@Override
+	public void setZip(String zip) {
+		this.zip = zip;
 	}
 
 }

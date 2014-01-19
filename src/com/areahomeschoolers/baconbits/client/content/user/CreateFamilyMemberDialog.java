@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.widgets.AddressFormField;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
@@ -35,7 +36,7 @@ public class CreateFamilyMemberDialog extends EntityEditDialog<User> {
 		form.addFormSubmitHandler(new FormSubmitHandler() {
 			@Override
 			public void onFormSubmit(FormField formField) {
-				UserFieldTable.validateUserAddress(entity, new Command() {
+				AddressFormField.validateAddress(entity, new Command() {
 					@Override
 					public void execute() {
 						userService.save(entity, new Callback<ServerResponseData<User>>() {

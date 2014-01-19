@@ -744,9 +744,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (user.isSaved()) {
 			sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, email = :email, ";
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
-			sql += "address = :address, birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex, showUserAgreement = :showUserAgreement, ";
-			sql += "street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, directoryOptOut = :directoryOptOut ";
-			sql += "where id = :id";
+			sql += "birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex, showUserAgreement = :showUserAgreement, ";
+			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
+			sql += "directoryOptOut = :directoryOptOut where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (user.getStartDate() == null) {
@@ -761,11 +761,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				user.setImageId(Constants.BLANK_PROFILE_FEMALE_LARGE);
 			}
 			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
-			sql += "address, isSystemAdministrator, resetPassword, birthDate, parentId, sex, ";
-			sql += "street, city, state, zip, lat, lng, imageId, smallImageId, directoryOptOut, showUserAgreement) values ";
+			sql += "isSystemAdministrator, resetPassword, birthDate, parentId, sex, ";
+			sql += "address, street, city, state, zip, lat, lng, ";
+			sql += "imageId, smallImageId, directoryOptOut, showUserAgreement) values ";
 			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
-			sql += ":address, :systemAdministrator, :resetPassword, :birthDate, :parentId, :sex, ";
-			sql += ":street, :city, :state, :zip, :lat, :lng, :imageId, :smallImageId, :directoryOptOut, :showUserAgreement)";
+			sql += ":systemAdministrator, :resetPassword, :birthDate, :parentId, :sex, ";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
+			sql += ":imageId, :smallImageId, :directoryOptOut, :showUserAgreement)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -870,7 +872,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (group.isSaved()) {
 			String sql = "update groups set groupName = :groupName, description = :description, startDate = :startDate, ";
 			sql += "publicGreetingId = :publicGreetingId, privateGreetingId = :privateGreetingId, generalPolicyId = :generalPolicyId, ";
-			sql += "eventPolicyId = :eventPolicyId, coopPolicyId = :coopPolicyId, payPalEmail = :payPalEmail, ";
+			sql += "eventPolicyId = :eventPolicyId, coopPolicyId = :coopPolicyId, payPalEmail = :payPalEmail, religious = :religious, ";
+			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
 			sql += "shortName = :shortName, orgDomain = :orgDomain, orgSubDomain = :orgSubDomain, endDate = :endDate where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -878,15 +881,17 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				group.setStartDate(new Date());
 			}
 
-			String sql = "insert into groups (groupName, description, isOrganization, startDate, ";
+			String sql = "insert into groups (groupName, description, isOrganization, startDate, religious, ";
 			if (group.getOwningOrgId() > 0) {
 				sql += "organizationId, ";
 			}
+			sql += "address, street, city, state, zip, lat, lng, ";
 			sql += "shortName, orgDomain, orgSubDomain, payPalEmail, endDate) ";
-			sql += "values(:groupName, :description, :organization, :startDate, ";
+			sql += "values(:groupName, :description, :organization, :startDate, :religious, ";
 			if (group.getOwningOrgId() > 0) {
 				sql += ":owningOrgId, ";
 			}
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
 			sql += ":shortName, :orgDomain, :orgSubDomain, :payPalEmail, :endDate)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
@@ -1339,6 +1344,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setPayPalEmail(rs.getString("payPalEmail"));
 		group.setLogoId(rs.getInt("logoId"));
 		group.setFaviconId(rs.getInt("faviconId"));
+		group.setCity(rs.getString("city"));
+		group.setZip(rs.getString("zip"));
+		group.setState(rs.getString("state"));
+		group.setAddress(rs.getString("address"));
+		group.setStreet(rs.getString("street"));
+		group.setLat(rs.getDouble("lat"));
+		group.setLng(rs.getDouble("lng"));
+		group.setReligious(rs.getBoolean("religious"));
 		return group;
 	}
 

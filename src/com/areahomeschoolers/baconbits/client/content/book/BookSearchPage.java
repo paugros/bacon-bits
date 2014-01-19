@@ -9,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -32,10 +33,15 @@ public final class BookSearchPage implements Page {
 	private ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 	private BookTable table = new BookTable(args);
 	private PaddedPanel optionsPanel = new PaddedPanel(15);
+	private int sellerId = Url.getIntegerParameter("sellerId");
 
 	public BookSearchPage(final VerticalPanel page) {
 		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			args.put(BookArg.ONLINE_ONLY);
+		}
+
+		if (sellerId > 0) {
+			args.put(BookArg.USER_ID, sellerId);
 		}
 
 		optionsPanel.addStyleName("boxedBlurb");
@@ -46,6 +52,11 @@ public final class BookSearchPage implements Page {
 		Hyperlink conditionLink = new Hyperlink("Click here", PageUrl.article(64));
 		String text = conditionLink + " for a description of book conditions.";
 		page.add(new HTML(text));
+
+		if (sellerId > 0) {
+			Hyperlink all = new Hyperlink("Books for single seller. Click to see all books.", PageUrl.bookSearch());
+			page.add(all);
+		}
 
 		bookService.getPageData(0, new Callback<BookPageData>() {
 			@Override
