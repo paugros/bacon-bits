@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.content.minimodules.FindPeopleMini
 import com.areahomeschoolers.baconbits.client.content.minimodules.LinksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.MyEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewEventsMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.NewUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.UpcomingEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -146,6 +147,9 @@ public class HomePage implements Page {
 
 				// links
 				rightPanel.add(new LinksMiniModule());
+
+				// new users
+				rightPanel.add(new NewUsersMiniModule());
 
 				// my events
 				if (Application.isAuthenticated()) {
