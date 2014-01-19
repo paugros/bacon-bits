@@ -149,7 +149,9 @@ public class HomePage implements Page {
 				rightPanel.add(new LinksMiniModule());
 
 				// new users
-				rightPanel.add(new NewUsersMiniModule());
+				if (Application.isAuthenticated()) {
+					rightPanel.add(new NewUsersMiniModule());
+				}
 
 				// my events
 				if (Application.isAuthenticated()) {

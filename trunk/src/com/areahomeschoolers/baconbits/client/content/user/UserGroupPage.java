@@ -21,11 +21,13 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
+import com.areahomeschoolers.baconbits.client.widgets.AddressFormField;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
+import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
@@ -47,15 +49,20 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class UserGroupPage implements Page {
+	private UserGroup group = new UserGroup();
 	private Form form = new Form(new FormSubmitHandler() {
 		@Override
-		public void onFormSubmit(FormField formField) {
-			save(formField);
+		public void onFormSubmit(final FormField formField) {
+			AddressFormField.validateAddress(group, new Command() {
+				@Override
+				public void execute() {
+					save(formField);
+				}
+			});
 		}
 	});
 	private VerticalPanel page;
 	private FieldTable fieldTable = new FieldTable();
-	private UserGroup userGroup = new UserGroup();
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private FormField subDomainField;
 	private FormField domainField;
@@ -88,13 +95,13 @@ public class UserGroupPage implements Page {
 					}
 
 					VerticalPanel head = new VerticalPanel();
-					userGroup = result.get(0);
-					Label heading = new Label(userGroup.getGroupName());
+					group = result.get(0);
+					Label heading = new Label(group.getGroupName());
 					heading.addStyleName("hugeText");
 					head.add(heading);
 
-					if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(userGroup.getId()) == null) {
-						head.add(new RequestMembershipLink(userGroup));
+					if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(group.getId()) == null) {
+						head.add(new RequestMembershipLink(group));
 					}
 
 					page.add(head);
@@ -116,14 +123,14 @@ public class UserGroupPage implements Page {
 		nameField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				nameDisplay.setText(userGroup.getGroupName());
-				nameInput.setText(userGroup.getGroupName());
+				nameDisplay.setText(group.getGroupName());
+				nameInput.setText(group.getGroupName());
 			}
 		});
 		nameField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				userGroup.setGroupName(nameInput.getText());
+				group.setGroupName(nameInput.getText());
 			}
 		});
 		fieldTable.addField(nameField);
@@ -131,7 +138,7 @@ public class UserGroupPage implements Page {
 		if (Application.isSystemAdministrator()) {
 			final CheckBox orgInput = new CheckBox("This group is an organization");
 
-			if (!userGroup.isSaved()) {
+			if (!group.isSaved()) {
 				orgInput.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 					@Override
 					public void onValueChange(ValueChangeEvent<Boolean> event) {
@@ -143,8 +150,8 @@ public class UserGroupPage implements Page {
 					@Override
 					public void execute() {
 						boolean isOrg = orgInput.getValue();
-						userGroup.setOrganization(isOrg);
-						userGroup.setOwningOrgId(isOrg ? 0 : Application.getCurrentOrgId());
+						group.setOrganization(isOrg);
+						group.setOwningOrgId(isOrg ? 0 : Application.getCurrentOrgId());
 					}
 				});
 				fieldTable.addField(orgField);
@@ -157,14 +164,14 @@ public class UserGroupPage implements Page {
 			subDomainField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					subDomainDisplay.setText(userGroup.getOrgSubDomain());
-					subDomainInput.setText(userGroup.getOrgSubDomain());
+					subDomainDisplay.setText(group.getOrgSubDomain());
+					subDomainInput.setText(group.getOrgSubDomain());
 				}
 			});
 			subDomainField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					userGroup.setOrgSubDomain(subDomainInput.getText());
+					group.setOrgSubDomain(subDomainInput.getText());
 				}
 			});
 			fieldTable.addField(subDomainField);
@@ -177,14 +184,14 @@ public class UserGroupPage implements Page {
 			domainField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					domainDisplay.setText(userGroup.getOrgDomain());
-					domainInput.setText(userGroup.getOrgDomain());
+					domainDisplay.setText(group.getOrgDomain());
+					domainInput.setText(group.getOrgDomain());
 				}
 			});
 			domainField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					userGroup.setOrgDomain(domainInput.getText());
+					group.setOrgDomain(domainInput.getText());
 				}
 			});
 			fieldTable.addField(domainField);
@@ -197,14 +204,14 @@ public class UserGroupPage implements Page {
 			shortNameField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					shortNameDisplay.setText(userGroup.getShortName());
-					shortNameInput.setText(userGroup.getShortName());
+					shortNameDisplay.setText(group.getShortName());
+					shortNameInput.setText(group.getShortName());
 				}
 			});
 			shortNameField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					userGroup.setShortName(shortNameInput.getText());
+					group.setShortName(shortNameInput.getText());
 				}
 			});
 			fieldTable.addField(shortNameField);
@@ -218,22 +225,22 @@ public class UserGroupPage implements Page {
 			payPalEmailField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					payPalEmailDisplay.setText(userGroup.getPayPalEmail());
-					payPalEmailInput.setText(userGroup.getPayPalEmail());
+					payPalEmailDisplay.setText(group.getPayPalEmail());
+					payPalEmailInput.setText(group.getPayPalEmail());
 				}
 			});
 			payPalEmailField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					userGroup.setPayPalEmail(payPalEmailInput.getText());
+					group.setPayPalEmail(payPalEmailInput.getText());
 				}
 			});
 			fieldTable.addField(payPalEmailField);
 
-			if (!userGroup.isSaved()) {
-				orgInput.setValue(userGroup.isOrganization());
+			if (!group.isSaved()) {
+				orgInput.setValue(group.isOrganization());
 			}
-			toggleOrgFields(userGroup.isOrganization());
+			toggleOrgFields(group.isOrganization());
 		}
 
 		final TextBox descriptionInput = new TextBox();
@@ -244,17 +251,41 @@ public class UserGroupPage implements Page {
 		descriptionField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				descriptionDisplay.setText(Common.getDefaultIfNull(userGroup.getDescription()));
-				descriptionInput.setText(userGroup.getDescription());
+				descriptionDisplay.setText(Common.getDefaultIfNull(group.getDescription()));
+				descriptionInput.setText(group.getDescription());
 			}
 		});
 		descriptionField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				userGroup.setDescription(descriptionInput.getText());
+				group.setDescription(descriptionInput.getText());
 			}
 		});
 		fieldTable.addField(descriptionField);
+
+		FormField addressField = new AddressFormField(group).getFormField();
+		form.addField(addressField);
+		fieldTable.addField(addressField);
+
+		final Label religiousDisplay = new Label();
+		final RequiredListBox religiousInput = new RequiredListBox();
+		religiousInput.addItem("This is a religious group");
+		religiousInput.addItem("This is a secular group");
+		FormField religiousField = form.createFormField("Religious affiliation:", religiousInput, religiousDisplay);
+		religiousField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				religiousInput.setSelectedIndex(group.getReligious() ? 1 : 2);
+				religiousDisplay.setText(religiousInput.getSelectedText());
+			}
+		});
+		religiousField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				group.setReligious(religiousInput.getSelectedIndex() == 1);
+			}
+		});
+		fieldTable.addField(religiousField);
 
 		final ValidatorDateBox startInput = new ValidatorDateBox();
 		final Label startDateDisplay = new Label();
@@ -262,14 +293,14 @@ public class UserGroupPage implements Page {
 		startField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				startDateDisplay.setText(Formatter.formatDate(userGroup.getStartDate()));
-				startInput.setValue(userGroup.getStartDate());
+				startDateDisplay.setText(Formatter.formatDate(group.getStartDate()));
+				startInput.setValue(group.getStartDate());
 			}
 		});
 		startField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				userGroup.setStartDate(startInput.getValue());
+				group.setStartDate(startInput.getValue());
 			}
 		});
 		fieldTable.addField(startField);
@@ -281,25 +312,25 @@ public class UserGroupPage implements Page {
 		endField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				endDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(userGroup.getEndDate())));
-				endInput.setValue(userGroup.getEndDate());
+				endDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(group.getEndDate())));
+				endInput.setValue(group.getEndDate());
 			}
 		});
 		endField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				userGroup.setEndDate(endInput.getValue());
+				group.setEndDate(endInput.getValue());
 			}
 		});
 		fieldTable.addField(endField);
 	}
 
 	private void initializePage() {
-		final String title = userGroup.isSaved() ? userGroup.getGroupName() : "New Group";
+		final String title = group.isSaved() ? group.getGroupName() : "New Group";
 		createFieldTable();
 		form.initialize();
 
-		if (!userGroup.isSaved()) {
+		if (!group.isSaved()) {
 			form.configureForAdd(fieldTable);
 			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH900PX));
 		} else {
@@ -318,9 +349,9 @@ public class UserGroupPage implements Page {
 				@Override
 				public void execute(final VerticalPanel tabBody) {
 					ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
-					args.put(UserArg.GROUP_ID, userGroup.getId());
+					args.put(UserArg.GROUP_ID, group.getId());
 					final UserTable userTable = new UserTable(args);
-					userTable.setUserGroup(userGroup);
+					userTable.setUserGroup(group);
 					userTable.disablePaging();
 					userTable.setTitle("Members");
 					userTable.getTitleBar().addSearchControl();
@@ -338,7 +369,7 @@ public class UserGroupPage implements Page {
 				}
 			});
 
-			if (!Application.administratorOf(userGroup)) {
+			if (!Application.administratorOf(group)) {
 				form.setEnabled(false);
 			}
 			page.add(tabPanel);
@@ -349,13 +380,13 @@ public class UserGroupPage implements Page {
 	}
 
 	private void save(final FormField field) {
-		userService.saveUserGroup(userGroup, new Callback<UserGroup>() {
+		userService.saveUserGroup(group, new Callback<UserGroup>() {
 			@Override
 			protected void doOnSuccess(UserGroup a) {
 				if (!Url.isParamValidId("userGroupId")) {
 					HistoryToken.set(PageUrl.userGroup(a.getId()));
 				} else {
-					userGroup = a;
+					group = a;
 					form.setDto(a);
 					field.setInputVisibility(false);
 				}
@@ -369,7 +400,7 @@ public class UserGroupPage implements Page {
 		fieldTable.setFieldVisibility(shortNameField, visible);
 		fieldTable.setFieldVisibility(payPalEmailField, visible);
 
-		if (!userGroup.isSaved() && visible) {
+		if (!group.isSaved() && visible) {
 			form.configureForAdd();
 		}
 	}

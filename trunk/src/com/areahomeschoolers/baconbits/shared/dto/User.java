@@ -6,10 +6,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import com.areahomeschoolers.baconbits.shared.HasAddress;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
-public final class User extends EntityDto<User> {
+public final class User extends EntityDto<User> implements HasAddress {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
@@ -21,6 +22,8 @@ public final class User extends EntityDto<User> {
 	private String lastName;
 	private String passwordDigest;
 	private String homePhone;
+
+	// address
 	private String address;
 	private String street;
 	private String city;
@@ -28,6 +31,8 @@ public final class User extends EntityDto<User> {
 	private String zip;
 	private double lat;
 	private double lng;
+	private boolean addressChanged;
+
 	private boolean directoryOptOut = true;
 
 	// password is only for setting
@@ -53,7 +58,6 @@ public final class User extends EntityDto<User> {
 	private HashSet<AccessLevel> accessLevels;
 	private boolean isChild;
 	private int age;
-	private boolean addressChanged;
 	// only for group membership listings
 	private boolean userApproved;
 	private boolean groupApproved;
@@ -125,10 +129,12 @@ public final class User extends EntityDto<User> {
 		return addedDate;
 	}
 
+	@Override
 	public String getAddress() {
 		return address;
 	}
 
+	@Override
 	public boolean getAddressChanged() {
 		return addressChanged;
 	}
@@ -141,6 +147,7 @@ public final class User extends EntityDto<User> {
 		return birthDate;
 	}
 
+	@Override
 	public String getCity() {
 		return city;
 	}
@@ -201,10 +208,12 @@ public final class User extends EntityDto<User> {
 		return lastName;
 	}
 
+	@Override
 	public double getLat() {
 		return lat;
 	}
 
+	@Override
 	public double getLng() {
 		return lng;
 	}
@@ -290,10 +299,12 @@ public final class User extends EntityDto<User> {
 		return startDate;
 	}
 
+	@Override
 	public String getState() {
 		return state;
 	}
 
+	@Override
 	public String getStreet() {
 		return street;
 	}
@@ -310,6 +321,7 @@ public final class User extends EntityDto<User> {
 		return email;
 	}
 
+	@Override
 	public String getZip() {
 		return zip;
 	}
@@ -362,10 +374,12 @@ public final class User extends EntityDto<User> {
 		this.addedDate = addedDate;
 	}
 
+	@Override
 	public void setAddress(String address) {
 		this.address = address;
 	}
 
+	@Override
 	public void setAddressChanged(boolean addressChanged) {
 		this.addressChanged = addressChanged;
 	}
@@ -382,6 +396,7 @@ public final class User extends EntityDto<User> {
 		this.isChild = isChild;
 	}
 
+	@Override
 	public void setCity(String city) {
 		this.city = city;
 	}
@@ -441,10 +456,12 @@ public final class User extends EntityDto<User> {
 		this.lastName = lastName;
 	}
 
+	@Override
 	public void setLat(double lat) {
 		this.lat = lat;
 	}
 
+	@Override
 	public void setLng(double lng) {
 		this.lng = lng;
 	}
@@ -501,10 +518,12 @@ public final class User extends EntityDto<User> {
 		this.startDate = startDate;
 	}
 
+	@Override
 	public void setState(String state) {
 		this.state = state;
 	}
 
+	@Override
 	public void setStreet(String street) {
 		this.street = street;
 	}
@@ -521,6 +540,7 @@ public final class User extends EntityDto<User> {
 		this.userApproved = userApproved;
 	}
 
+	@Override
 	public void setZip(String zip) {
 		this.zip = zip;
 	}
