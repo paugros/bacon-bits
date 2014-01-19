@@ -200,7 +200,7 @@ public class UserGroupPage implements Page {
 			shortNameInput.setMaxLength(10);
 			shortNameInput.setVisibleLength(10);
 			final Label shortNameDisplay = new Label();
-			shortNameField = form.createFormField("Short name:", shortNameInput, shortNameDisplay);
+			shortNameField = form.createFormField("Abbreviation/short name:", shortNameInput, shortNameDisplay);
 			shortNameField.setInitializer(new Command() {
 				@Override
 				public void execute() {
