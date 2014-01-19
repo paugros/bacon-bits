@@ -171,7 +171,7 @@ public class UserGroupPage implements Page {
 			subDomainField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					group.setOrgSubDomain(subDomainInput.getText());
+					group.setOrgSubDomain(subDomainInput.getText().toLowerCase());
 				}
 			});
 			fieldTable.addField(subDomainField);
@@ -191,7 +191,7 @@ public class UserGroupPage implements Page {
 			domainField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
-					group.setOrgDomain(domainInput.getText());
+					group.setOrgDomain(domainInput.getText().toLowerCase());
 				}
 			});
 			fieldTable.addField(domainField);
