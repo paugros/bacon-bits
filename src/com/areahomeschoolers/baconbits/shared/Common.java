@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.areahomeschoolers.baconbits.client.util.Formatter;
-import com.areahomeschoolers.baconbits.shared.dto.EntityDto;
 
 /**
  * A repository of useful static methods, constants, etc. for use on both the client and server side
@@ -63,18 +60,6 @@ public abstract class Common {
 		return text;
 	}
 
-	/**
-	 * Pads a list with nulls until the specified index.
-	 * 
-	 * @param list
-	 * @param colIndex
-	 */
-	public static void addNullsUntil(List<?> list, int colIndex) {
-		for (int nullIndex = list.size(); nullIndex <= colIndex; nullIndex++) {
-			list.add(null);
-		}
-	}
-
 	public final static <T> ArrayList<T> asArrayList(List<T> list) {
 		if (list instanceof ArrayList) {
 			return (ArrayList<T>) list;
@@ -97,14 +82,6 @@ public abstract class Common {
 		return list;
 	}
 
-	public final static <K, V> HashMap<K, V> asHashMap(Map<K, V> map) {
-		if (map instanceof HashMap) {
-			return (HashMap<K, V>) map;
-		}
-
-		return new HashMap<K, V>(map);
-	}
-
 	public final static <T> List<T> asList(T object) {
 		List<T> list = new ArrayList<T>();
 		list.add(object);
@@ -120,12 +97,9 @@ public abstract class Common {
 		return list;
 	}
 
-	public static String byteToHex(byte b) {
-		return Integer.toString((b & 0xff) + 0x100, 16).substring(1).toUpperCase();
-	}
-
 	public static double calculateEventMarkup(double price) {
-		// 2.9% to PayPal, then 2.5% and 50 cents to us
+		// 2.9% and 30 to PayPal, then 2.5% and 20 cents to us
+		// 5.4% and 50 cents total
 		return 0;
 		// return (price * 0.054) + 0.5;
 	}
@@ -232,43 +206,8 @@ public abstract class Common {
 		return fileName.substring(fileName.lastIndexOf('.') + 1);
 	}
 
-	public static <T extends EntityDto<?>> List<Integer> getIdList(List<T> list) {
-		List<Integer> idList = new ArrayList<Integer>();
-
-		for (T entity : list) {
-			idList.add(entity.getId());
-		}
-
-		return idList;
-	}
-
 	public static String getSimpleClassName(Class<?> c) {
 		return c.getName().substring(c.getName().lastIndexOf(".") + 1);
-	}
-
-	/**
-	 * This gets a string between two identifier strings within a string. Returns null if any string isn't found or something is out of order.
-	 * 
-	 * Example: getTextBetween( "asdf PHONENUMBER(603-555-1234) asdf", "PHONENUMBER(", ")" ) = "603-555-1234"
-	 * 
-	 * @param fullText
-	 * @param leadingText
-	 * @param postText
-	 * @return
-	 */
-	public static String getTextBetween(String full, String leading, String post) {
-		if (full == null || leading == null || post == null) {
-			return null;
-		}
-
-		int startPos = full.indexOf(leading) + leading.length();
-		int endPos = full.indexOf(post, startPos);
-
-		if (startPos < 0 || startPos > endPos) {
-			return null;
-		}
-
-		return full.substring(startPos, endPos);
 	}
 
 	/**
@@ -344,26 +283,6 @@ public abstract class Common {
 		}
 
 		return true;
-	}
-
-	public static boolean isIn(Integer value, Integer... list) {
-		for (Integer i : list) {
-			if (value == i) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public static boolean isIn(String value, String... list) {
-		for (String compare : list) {
-			if (value.equals(compare)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -520,26 +439,6 @@ public abstract class Common {
 		return str.replaceAll("[^A-Za-z]+", "");
 	}
 
-	/**
-	 * Removes all non-alphanumeric characters, except spaces
-	 * 
-	 * @param str
-	 * @return
-	 */
-	public static String stripNonAlphaNumericChars(String str) {
-		return str.replaceAll("[^0-9A-Za-z\\ ]+", "");
-	}
-
-	/**
-	 * Removes all non-alphanumeric characters, except spaces
-	 * 
-	 * @param str
-	 * @return
-	 */
-	public static String stripNonAlphaNumericChars(String str, String replace) {
-		return str.replaceAll("[^0-9A-Za-z\\ ]+", replace);
-	}
-
 	public static String stripNonNumericChars(String str) {
 		return str.replaceAll("[^0-9]+", "");
 	}
@@ -552,21 +451,6 @@ public abstract class Common {
 	 */
 	public static String stripWhiteSpace(String str) {
 		return str.replaceAll("\\s", "");
-	}
-
-	/**
-	 * Cuts a string down to the specified length (if neccessary) and appends "..." The length of the return string will never be longer than the length
-	 * 
-	 * @param string
-	 * @param length
-	 * @return
-	 */
-	public static String truncate(String string, int length) {
-		if (string.length() <= length) {
-			return string;
-		}
-
-		return string.substring(0, length - 3) + "...";
 	}
 
 	/**
@@ -617,10 +501,6 @@ public abstract class Common {
 		}
 
 		return ret + zeroPad(Formatter.formatDoubleForSorting(input), size);
-	}
-
-	public static String zeroPad(int input) {
-		return zeroPad(input, 10);
 	}
 
 	public static String zeroPad(int input, int size) {
