@@ -40,6 +40,8 @@ public class EmailDialog extends DefaultDialog {
 	private String hiddenBelowText;
 	private String insertHtml;
 	private boolean allowEditRecipients;
+	private UserSelector userSelector;
+	private EmailTextBox emailTextBox;
 
 	public EmailDialog() {
 		setModal(false);
@@ -122,13 +124,13 @@ public class EmailDialog extends DefaultDialog {
 				ua.put(UserArg.ORGANIZATION_ID, Application.getCurrentOrgId());
 				ua.put(UserArg.HAS_EMAIL, true);
 
-				final UserSelector us = new UserSelector(ua);
-				us.setMultiSelect(true);
-				us.addSubmitCommand(new Command() {
+				userSelector = new UserSelector(ua);
+				userSelector.setMultiSelect(true);
+				userSelector.addSubmitCommand(new Command() {
 					@Override
 					public void execute() {
 						email.getBccs().clear();
-						for (User u : us.getSelectedItems()) {
+						for (User u : userSelector.getSelectedItems()) {
 							if (!Common.isNullOrBlank(u.getEmail())) {
 								email.addBcc(u.getEmail());
 							}
@@ -141,13 +143,21 @@ public class EmailDialog extends DefaultDialog {
 				uc.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
-						us.center();
+						userSelector.center();
 					}
 				});
 
 				tp.add(uc);
 
+				PaddedPanel op = new PaddedPanel();
+				op.add(new Label("Other recipients:"));
+				emailTextBox = new EmailTextBox();
+				emailTextBox.setVisibleLength(50);
+				emailTextBox.setMultiEmail(true);
+				op.add(emailTextBox);
+
 				vp.add(tp);
+				vp.add(op);
 			}
 
 			if (showSubjectBox) {
@@ -182,9 +192,12 @@ public class EmailDialog extends DefaultDialog {
 						email.setSubject(subjectBox.getText());
 					}
 
-					if (email.getBccs().isEmpty()) {
-						AlertDialog.alert("Please specify at least one recipient.");
-						return;
+					if (allowEditRecipients) {
+						email.addBcc(emailTextBox.getEmailSet());
+						if (email.getBccs().isEmpty()) {
+							AlertDialog.alert("Please specify at least one recipient.");
+							return;
+						}
 					}
 
 					send.setEnabled(false);
