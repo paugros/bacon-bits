@@ -22,6 +22,7 @@ public final class User extends EntityDto<User> implements HasAddress {
 	private String lastName;
 	private String passwordDigest;
 	private String homePhone;
+	private String facebookUrl;
 
 	// address
 	private String address;
@@ -156,6 +157,11 @@ public final class User extends EntityDto<User> implements HasAddress {
 		return commonInterestCount;
 	}
 
+	@Override
+	public String getDescriptor() {
+		return firstName + " " + lastName;
+	}
+
 	public boolean getDirectoryOptOut() {
 		return directoryOptOut;
 	}
@@ -166,6 +172,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public Date getEndDate() {
 		return endDate;
+	}
+
+	public String getFacebookUrl() {
+		return facebookUrl;
 	}
 
 	public String getFirstName() {
@@ -415,6 +425,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public void setFacebookUrl(String facebookUrl) {
+		this.facebookUrl = facebookUrl;
 	}
 
 	public void setFirstName(String firstName) {

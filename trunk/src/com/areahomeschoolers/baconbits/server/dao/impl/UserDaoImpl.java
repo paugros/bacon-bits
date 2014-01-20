@@ -612,8 +612,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String domain = args.getString(UserGroupArg.ORG_DOMAIN);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
-		String sql = "select *, o.groupName as organizationName from groups g ";
+		String sql = "select g.*, concat(u.firstName, ' ', u.lastName) as contact, o.groupName as organizationName from groups g ";
 		sql += "join groups o on o.id = g.organizationId ";
+		sql += "left join users u on u.id = g.contactId ";
 
 		if (userId > 0) {
 			sql += "join userGroupMembers uugm on uugm.groupId = g.id and uugm.userId = ? ";
@@ -746,7 +747,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
 			sql += "birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex, showUserAgreement = :showUserAgreement, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
-			sql += "directoryOptOut = :directoryOptOut where id = :id";
+			sql += "directoryOptOut = :directoryOptOut, facebookUrl = :facebookUrl where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (user.getStartDate() == null) {
@@ -870,10 +871,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(group);
 
 		if (group.isSaved()) {
-			String sql = "update groups set groupName = :groupName, description = :description, startDate = :startDate, ";
+			String sql = "update groups set groupName = :groupName, description = :description, startDate = :startDate, contactId = :contactId, ";
 			sql += "publicGreetingId = :publicGreetingId, privateGreetingId = :privateGreetingId, generalPolicyId = :generalPolicyId, ";
 			sql += "eventPolicyId = :eventPolicyId, coopPolicyId = :coopPolicyId, payPalEmail = :payPalEmail, religious = :religious, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
+			sql += "membershipFee = :membershipFee, facebookUrl = :facebookUrl, ";
 			sql += "shortName = :shortName, orgDomain = :orgDomain, orgSubDomain = :orgSubDomain, endDate = :endDate where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -881,13 +883,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				group.setStartDate(new Date());
 			}
 
-			String sql = "insert into groups (groupName, description, isOrganization, startDate, religious, ";
+			String sql = "insert into groups (groupName, description, isOrganization, startDate, religious, membershipFee, facebookUrl, ";
 			if (group.getOwningOrgId() > 0) {
 				sql += "organizationId, ";
 			}
 			sql += "address, street, city, state, zip, lat, lng, ";
 			sql += "shortName, orgDomain, orgSubDomain, payPalEmail, endDate) ";
-			sql += "values(:groupName, :description, :organization, :startDate, :religious, ";
+			sql += "values(:groupName, :description, :organization, :startDate, :religious, :membershipFee, :facebookUrl, ";
 			if (group.getOwningOrgId() > 0) {
 				sql += ":owningOrgId, ";
 			}
@@ -1298,6 +1300,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		user.setResetPassword(rs.getBoolean("resetPassword"));
 		user.setAddedDate(rs.getTimestamp("addedDate"));
 		user.setLastLoginDate(rs.getTimestamp("lastLoginDate"));
+		user.setFacebookUrl(rs.getString("facebookUrl"));
 		user.setActive(rs.getBoolean("isEnabled"));
 		user.setBirthDate(rs.getTimestamp("birthDate"));
 		user.setShowUserAgreement(rs.getBoolean("showUserAgreement"));
@@ -1352,6 +1355,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setLat(rs.getDouble("lat"));
 		group.setLng(rs.getDouble("lng"));
 		group.setReligious(rs.getBoolean("religious"));
+		group.setContact(rs.getString("contact"));
+		group.setMembershipFee(rs.getDouble("membershipFee"));
+		group.setFacebookUrl(rs.getString("facebookUrl"));
 		return group;
 	}
 

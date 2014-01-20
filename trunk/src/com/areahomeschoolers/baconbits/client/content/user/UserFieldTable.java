@@ -40,6 +40,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
+import com.google.gwt.user.client.ui.TextBox;
 
 public class UserFieldTable extends FieldTable {
 	private User user;
@@ -378,6 +379,46 @@ public class UserFieldTable extends FieldTable {
 			}
 			addField("Address:", address);
 		}
+
+		final FieldDisplayLink facebookDisplay = new FieldDisplayLink();
+		final TextBox facebookInput = new TextBox();
+		facebookInput.setMaxLength(200);
+		facebookInput.setVisibleLength(40);
+		FormField facebookField = form.createFormField("Facebook URL:", facebookInput, facebookDisplay);
+		facebookField.setValidator(new Validator(facebookInput, new ValidatorCommand() {
+			@Override
+			public void validate(Validator validator) {
+				String url = facebookInput.getText();
+				if (Common.isNullOrBlank(url)) {
+					return;
+				}
+
+				if (!url.matches("https?://(www.)?facebook.com/?.*")) {
+					validator.setError(true);
+				}
+			}
+		}));
+		facebookField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				facebookDisplay.setText(Common.getDefaultIfNull(user.getFacebookUrl()));
+				if (user.getFacebookUrl() != null) {
+					facebookDisplay.setHref(user.getFacebookUrl());
+					facebookDisplay.setText("Click to view");
+				}
+				facebookInput.setText(user.getFacebookUrl());
+				if (user.getFacebookUrl() == null) {
+					facebookInput.setText("https://www.facebook.com/");
+				}
+			}
+		});
+		facebookField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				user.setFacebookUrl(facebookInput.getText());
+			}
+		});
+		addField(facebookField);
 
 		if (user.isSaved() && user.getParentId() != null && user.getParentId() > 0) {
 			addField("Parent:", new Hyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId())));

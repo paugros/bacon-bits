@@ -21,11 +21,15 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
+import com.areahomeschoolers.baconbits.client.validation.Validator;
+import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.AddressFormField;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.FieldDisplayLink;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
@@ -225,7 +229,7 @@ public class UserGroupPage implements Page {
 			payPalEmailField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					payPalEmailDisplay.setText(group.getPayPalEmail());
+					payPalEmailDisplay.setText(Common.getDefaultIfNull(group.getPayPalEmail()));
 					payPalEmailInput.setText(group.getPayPalEmail());
 				}
 			});
@@ -241,6 +245,29 @@ public class UserGroupPage implements Page {
 				orgInput.setValue(group.isOrganization());
 			}
 			toggleOrgFields(group.isOrganization());
+
+			final Label feeDisplay = new Label();
+			final NumericTextBox feeInput = new NumericTextBox(2);
+			feeInput.setMaxLength(50);
+			FormField feeField = form.createFormField("Membership fee:", feeInput, feeDisplay);
+			feeField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					String display = "None";
+					if (group.getMembershipFee() > 0) {
+						display = Formatter.formatCurrency(group.getMembershipFee());
+					}
+					feeDisplay.setText(display);
+					feeInput.setValue(group.getMembershipFee());
+				}
+			});
+			feeField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					group.setMembershipFee(feeInput.getDouble());
+				}
+			});
+			fieldTable.addField(feeField);
 		}
 
 		final TextBox descriptionInput = new TextBox();
@@ -286,6 +313,71 @@ public class UserGroupPage implements Page {
 			}
 		});
 		fieldTable.addField(religiousField);
+
+		if (group.isSaved()) {
+			ArgMap<UserArg> contactArgs = new ArgMap<UserArg>();
+			final UserPicker contactInput = new UserPicker(contactArgs);
+			final FieldDisplayLink contactDisplay = new FieldDisplayLink();
+			FormField contactField = form.createFormField("Group contact:", contactInput, contactDisplay);
+			contactField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					contactDisplay.setText(Common.getDefaultIfNull(group.getContact()));
+					if (group.getContactId() != null) {
+						contactInput.setValueById(group.getContactId());
+						contactInput.getTextBox().setText(group.getContact());
+						contactDisplay.setHref(PageUrl.user(group.getContactId()));
+					}
+				}
+			});
+			contactField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					group.setContactId(contactInput.getValueId());
+				}
+			});
+			fieldTable.addField(contactField);
+		}
+
+		final FieldDisplayLink facebookDisplay = new FieldDisplayLink();
+		final TextBox facebookInput = new TextBox();
+		facebookInput.setMaxLength(200);
+		facebookInput.setVisibleLength(40);
+		FormField facebookField = form.createFormField("Facebook URL:", facebookInput, facebookDisplay);
+		facebookField.setValidator(new Validator(facebookInput, new ValidatorCommand() {
+			@Override
+			public void validate(Validator validator) {
+				String url = facebookInput.getText();
+				if (Common.isNullOrBlank(url)) {
+					return;
+				}
+
+				if (!url.matches("https?://(www.)?facebook.com/?.*")) {
+					validator.setError(true);
+				}
+			}
+		}));
+		facebookField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				facebookDisplay.setText(Common.getDefaultIfNull(group.getFacebookUrl()));
+				if (group.getFacebookUrl() != null) {
+					facebookDisplay.setHref(group.getFacebookUrl());
+					facebookDisplay.setText("Click to view");
+				}
+				facebookInput.setText(group.getFacebookUrl());
+				if (group.getFacebookUrl() == null) {
+					facebookInput.setText("https://www.facebook.com/");
+				}
+			}
+		});
+		facebookField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				group.setFacebookUrl(facebookInput.getText());
+			}
+		});
+		fieldTable.addField(facebookField);
 
 		final ValidatorDateBox startInput = new ValidatorDateBox();
 		final Label startDateDisplay = new Label();
