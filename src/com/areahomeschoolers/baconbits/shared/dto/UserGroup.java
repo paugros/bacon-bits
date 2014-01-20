@@ -129,6 +129,9 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private Integer logoId;
 	private Integer faviconId;
 	private boolean religious;
+	private Integer contactId;
+	private double membershipFee;
+	private String facebookUrl;
 
 	// address
 	private String address;
@@ -142,6 +145,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	// aux
 	private String organizationName;
+	private String contact;
 
 	// for membership records
 	private boolean isAdministrator;
@@ -171,8 +175,19 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return city;
 	}
 
+	public String getContact() {
+		return contact;
+	}
+
+	public Integer getContactId() {
+		if (contactId == null || contactId == 0) {
+			return null;
+		}
+		return contactId;
+	}
+
 	public Integer getCoopPolicyId() {
-		if (coopPolicyId == 0) {
+		if (coopPolicyId == null || coopPolicyId == 0) {
 			return null;
 		}
 		return coopPolicyId;
@@ -187,21 +202,25 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	}
 
 	public Integer getEventPolicyId() {
-		if (eventPolicyId == 0) {
+		if (eventPolicyId == null || eventPolicyId == 0) {
 			return null;
 		}
 		return eventPolicyId;
 	}
 
+	public String getFacebookUrl() {
+		return facebookUrl;
+	}
+
 	public Integer getFaviconId() {
-		if (faviconId == 0) {
+		if (faviconId == null || faviconId == 0) {
 			return null;
 		}
 		return faviconId;
 	}
 
 	public Integer getGeneralPolicyId() {
-		if (generalPolicyId == 0) {
+		if (generalPolicyId == null || generalPolicyId == 0) {
 			return null;
 		}
 		return generalPolicyId;
@@ -231,10 +250,14 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	}
 
 	public Integer getLogoId() {
-		if (logoId == 0) {
+		if (logoId == null || logoId == 0) {
 			return null;
 		}
 		return logoId;
+	}
+
+	public double getMembershipFee() {
+		return membershipFee;
 	}
 
 	public boolean getOrganization() {
@@ -280,14 +303,14 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	}
 
 	public Integer getPrivateGreetingId() {
-		if (privateGreetingId == 0) {
+		if (privateGreetingId == null || privateGreetingId == 0) {
 			return null;
 		}
 		return privateGreetingId;
 	}
 
 	public Integer getPublicGreetingId() {
-		if (publicGreetingId == 0) {
+		if (publicGreetingId == null || publicGreetingId == 0) {
 			return null;
 		}
 		return publicGreetingId;
@@ -359,6 +382,14 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		this.city = city;
 	}
 
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+
+	public void setContactId(Integer contactId) {
+		this.contactId = contactId;
+	}
+
 	public void setCoopPolicyId(Integer coopPolicyId) {
 		this.coopPolicyId = coopPolicyId;
 	}
@@ -373,6 +404,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public void setEventPolicyId(Integer eventPolicyId) {
 		this.eventPolicyId = eventPolicyId;
+	}
+
+	public void setFacebookUrl(String facebookUrl) {
+		this.facebookUrl = facebookUrl;
 	}
 
 	public void setFaviconId(Integer faviconId) {
@@ -408,6 +443,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public void setLogoId(Integer logoId) {
 		this.logoId = logoId;
+	}
+
+	public void setMembershipFee(double membershipFee) {
+		this.membershipFee = membershipFee;
 	}
 
 	public void setOrganization(boolean isOrganization) {
