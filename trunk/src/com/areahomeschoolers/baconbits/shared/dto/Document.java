@@ -65,6 +65,10 @@ public final class Document extends EntityDto<Document> {
 		return isExtension(extension, Common.asList(imageExtensions));
 	}
 
+	public static String toUrl(int id) {
+		return "/baconbits/service/file?id=" + id;
+	}
+
 	private static boolean isExtension(String extension, List<String> allowedExtensions) {
 		if (extension == null) {
 			return false;

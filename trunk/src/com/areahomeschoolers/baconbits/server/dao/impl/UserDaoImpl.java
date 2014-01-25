@@ -612,7 +612,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String domain = args.getString(UserGroupArg.ORG_DOMAIN);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
-		String sql = "select g.*, concat(u.firstName, ' ', u.lastName) as contact, o.groupName as organizationName from groups g ";
+		String sql = "select g.*, concat(u.firstName, ' ', u.lastName) as contact, ";
+		if (userId > 0) {
+			sql += "uugm.isAdministrator, uugm.groupApproved, uugm.userApproved, ";
+		}
+		sql += "o.groupName as organizationName from groups g ";
 		sql += "join groups o on o.id = g.organizationId ";
 		sql += "left join users u on u.id = g.contactId ";
 

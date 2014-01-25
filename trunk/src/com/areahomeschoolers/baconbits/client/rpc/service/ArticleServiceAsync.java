@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
+import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -14,4 +15,8 @@ public interface ArticleServiceAsync {
 	public void list(ArgMap<ArticleArg> args, AsyncCallback<ArrayList<Article>> callback);
 
 	public void save(Article article, AsyncCallback<Article> callback);
+
+	void getComments(ArgMap<ArticleArg> args, AsyncCallback<ArrayList<NewsBulletinComment>> callback);
+
+	void saveComment(NewsBulletinComment comment, AsyncCallback<NewsBulletinComment> callback);
 }

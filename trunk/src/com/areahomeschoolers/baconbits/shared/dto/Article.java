@@ -20,6 +20,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	private Integer groupId;
 	private int visibilityLevelId;
 	private int owningOrgId;
+	private boolean newsItem;
 
 	// auxiliary
 	private String addedByFirstName;
@@ -29,6 +30,9 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	private int documentCount;
 	private int tagCount;
 	private GroupPolicy groupPolicy;
+	private int imageDocumentId;
+	private int commentCount;
+	private Date lastCommentDate;
 
 	public Article() {
 
@@ -52,6 +56,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 
 	public String getArticle() {
 		return article;
+	}
+
+	public int getCommentCount() {
+		return commentCount;
 	}
 
 	@Override
@@ -82,6 +90,18 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 
 	public GroupPolicy getGroupPolicy() {
 		return groupPolicy;
+	}
+
+	public int getImageDocumentId() {
+		return imageDocumentId;
+	}
+
+	public Date getLastCommentDate() {
+		return lastCommentDate;
+	}
+
+	public boolean getNewsItem() {
+		return newsItem;
 	}
 
 	@Override
@@ -142,6 +162,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		this.article = article;
 	}
 
+	public void setCommentCount(int commentCount) {
+		this.commentCount = commentCount;
+	}
+
 	public void setDocumentCount(int documentCount) {
 		this.documentCount = documentCount;
 	}
@@ -161,6 +185,18 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 
 	public void setGroupPolicy(GroupPolicy groupPolicy) {
 		this.groupPolicy = groupPolicy;
+	}
+
+	public void setImageDocumentId(int imageDocumentId) {
+		this.imageDocumentId = imageDocumentId;
+	}
+
+	public void setLastCommentDate(Date lastCommentDate) {
+		this.lastCommentDate = lastCommentDate;
+	}
+
+	public void setNewsItem(boolean newsItem) {
+		this.newsItem = newsItem;
 	}
 
 	@Override

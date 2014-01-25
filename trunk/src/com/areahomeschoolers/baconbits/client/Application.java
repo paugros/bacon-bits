@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.content.Layout;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleGroupPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleListPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
+import com.areahomeschoolers.baconbits.client.content.article.NewsPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookManagementPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookReceiptPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookSearchPage;
@@ -26,11 +27,14 @@ import com.areahomeschoolers.baconbits.client.content.user.UserGroupPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserStatusIndicator;
+import com.areahomeschoolers.baconbits.client.event.CancelHandler;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.client.widgets.UserAgreementDialog;
 import com.areahomeschoolers.baconbits.shared.Constants;
@@ -78,6 +82,8 @@ public final class Application implements ValueChangeHandler<String> {
 	private static final int inactivityInterval = pollInterval * 2 + 1;
 	private static InactivityManager inactivityManager = new InactivityManager(inactivityInterval);
 	private static UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
+	private static String confirmNavigationPreviousUrl;
+	private static Command confirmNavigatonCommand;
 	private static PollUpdateData pollUpdateData = null;
 	private static List<HistoryEntry> historyEntries = new ArrayList<HistoryEntry>();
 
@@ -229,6 +235,16 @@ public final class Application implements ValueChangeHandler<String> {
 		createNewPage(HistoryToken.getElement("page"));
 	}
 
+	public static void setConfirmNavigation(boolean confirm) {
+		setConfirmNavigation(confirm, null);
+	}
+
+	public static void setConfirmNavigation(boolean confirm, Command confirmCommand) {
+		confirmNavigation = confirm;
+		confirmNavigationPreviousUrl = confirm ? History.getToken() : null;
+		confirmNavigatonCommand = confirmCommand;
+	}
+
 	public static void setRpcFailureCommand(Command command) {
 		rpcFailureCommand = command;
 	}
@@ -241,6 +257,13 @@ public final class Application implements ValueChangeHandler<String> {
 	}
 
 	private static void createNewPage(String page) {
+		if (confirmNavigatonCommand != null) {
+			confirmNavigatonCommand.execute();
+			confirmNavigatonCommand = null;
+		}
+		confirmNavigation = false;
+		confirmNavigationPreviousUrl = null;
+
 		VerticalPanel vp = layout.getNewPagePanel();
 
 		// create new page
@@ -276,6 +299,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new RegistrationManagementPage(vp);
 		} else if ("ArticleList".equals(page)) {
 			new ArticleListPage(vp);
+		} else if ("News".equals(page)) {
+			new NewsPage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}
@@ -386,7 +411,34 @@ public final class Application implements ValueChangeHandler<String> {
 		HistoryToken.createMapFromToken(token);
 		final String page = HistoryToken.getElement("page") == null ? "Home" : HistoryToken.getElement("page");
 
-		createNewPage(page);
+		if (confirmNavigation) {
+			GWT.runAsync(new RunAsyncCallback() {
+				@Override
+				public void onFailure(Throwable reason) {
+				}
+
+				@Override
+				public void onSuccess() {
+					ConfirmDialog dialog = new ConfirmDialog("Really leave this page? Data you have entered will not be saved.", new ConfirmHandler() {
+						@Override
+						public void onConfirm() {
+							createNewPage(page);
+						}
+					});
+					dialog.addCancelHandler(new CancelHandler() {
+						@Override
+						public void onCancel() {
+							HistoryToken.set(confirmNavigationPreviousUrl, false);
+						}
+					});
+					dialog.setConfirmButtonText("Leave Page");
+					dialog.setCancelButtonText("Stay on Page");
+					dialog.center();
+				}
+			});
+		} else {
+			createNewPage(page);
+		}
 
 		boolean viewingPolicies = false;
 		int articleId = Url.getIntegerParameter("articleId");
