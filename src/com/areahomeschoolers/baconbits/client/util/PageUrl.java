@@ -44,6 +44,11 @@ public class PageUrl {
 		return "page=Home";
 	}
 
+	public static String news(int id) {
+		String url = "page=News";
+		return (id == 0) ? url : url + "&newsId=" + id;
+	}
+
 	public static String payment() {
 		return "page=Payment";
 	}

@@ -9,6 +9,9 @@ import java.util.Set;
 
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
+
 /**
  * A repository of useful static methods, constants, etc. for use on both the client and server side
  */
@@ -391,6 +394,42 @@ public abstract class Common {
 	 */
 	public static <T> String join(T[] array, String token) {
 		return join(Arrays.asList(array), token);
+	}
+
+	/**
+	 * This wraps URLs in plain text with anchor tags so that they can be clicked when shown as HTML.
+	 * 
+	 * @param text
+	 * @return
+	 */
+	public static String makeUrlsClickable(String text) {
+		if (text == null) {
+			return null;
+		}
+
+		String clickableText = text;
+		List<String> replacedUrls = new ArrayList<String>();
+
+		String urlRegex = "\\b(https?://|www\\.|dash\\.)+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*\\b";
+		RegExp regExp = RegExp.compile(urlRegex, "gi");
+
+		for (MatchResult matcher = regExp.exec(text); matcher != null; matcher = regExp.exec(text)) {
+			String rawUrl = matcher.getGroup(0);
+			if (replacedUrls.contains(rawUrl)) {
+				// If the same URL is in the text twice, we've already made the replacement in the replaceAll below.
+				continue;
+			}
+
+			String url = rawUrl;
+			if (!url.toLowerCase().startsWith("http")) {
+				url = "http://" + rawUrl;
+			}
+
+			clickableText = clickableText.replace(rawUrl, "<a href=\"" + url + "\">" + rawUrl + "</a>");
+			replacedUrls.add(rawUrl);
+		}
+
+		return clickableText;
 	}
 
 	/**

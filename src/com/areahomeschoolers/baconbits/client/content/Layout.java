@@ -292,6 +292,10 @@ public final class Layout {
 		}
 	}
 
+	public ScrollPanel getBodyPanel() {
+		return bodyPanel;
+	}
+
 	/**
 	 * @return Returns a new {@link VerticalPanel} queued to be displayed as the current page once it is shown by a call to
 	 *         <code>Application.getLayout().setPage(panel)</code>, unless preempted by another call to getNewPagePanel

@@ -69,6 +69,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource pixel();
 
+	ImageResource plus();
+
 	ImageResource refresh();
 
 	ImageResource search();
