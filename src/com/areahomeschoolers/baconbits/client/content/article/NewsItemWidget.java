@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeBox;
@@ -93,7 +94,9 @@ public class NewsItemWidget extends Composite {
 			HorizontalPanel hp = new HorizontalPanel();
 			hp.setWidth(NEWS_ITEM_WIDTH + "px");
 			HorizontalPanel userPanel = new PaddedPanel(3);
-			userPanel.add(new Label("By " + item.getAddedByFirstName() + " " + item.getAddedByLastName()));
+			Hyperlink userLink = new Hyperlink(item.getAddedByFirstName() + " " + item.getAddedByLastName(), PageUrl.user(item.getAddedById()));
+			userPanel.add(new Label("By "));
+			userPanel.add(userLink);
 			hp.add(userPanel);
 
 			PaddedPanel commentsPanel = new PaddedPanel();
@@ -129,7 +132,7 @@ public class NewsItemWidget extends Composite {
 			body.getElement().getStyle().setPadding(5, Unit.PX);
 			vp.add(body);
 
-			if (Application.isAuthenticated()) {
+			if (Application.isAuthenticated() && Url.getIntegerParameter("comment") != 1) {
 				vp.add(new Hyperlink("Add comment", PageUrl.news(item.getId()) + "&comment=1"));
 				vp.add(new Spacer(1));
 			}
@@ -318,7 +321,7 @@ public class NewsItemWidget extends Composite {
 		if (!Application.isAuthenticated()) {
 			return false;
 		}
-		return Application.getCurrentUser().getId() == item.getAddedById() || Application.administratorOf(Application.getCurrentOrg());
+		return Application.getCurrentUser().getId() == item.getAddedById() || Application.administratorOfCurrentOrg();
 	}
 
 }

@@ -230,6 +230,7 @@ public final class MainMenu extends MenuBar {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Event Listing", PageUrl.eventList());
 		addLinkToMenu(menu, "Calendar", PageUrl.eventCalendar());
+		addLinkToMenu(menu, "News", PageUrl.news(0));
 
 		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));

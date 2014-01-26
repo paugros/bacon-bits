@@ -163,7 +163,7 @@ public class NewsPage implements Page {
 		checkBoxPanel.add(i);
 
 		filterVerticalPanel.add(filterHorizontalPanel);
-		if (Application.administratorOf(Application.getCurrentOrg())) {
+		if (Application.administratorOfCurrentOrg()) {
 			filterVerticalPanel.add(checkBoxPanel);
 		}
 		outerGrayPanel.setWidget(filterVerticalPanel);
@@ -221,7 +221,7 @@ public class NewsPage implements Page {
 		}));
 
 		// Add post
-		if (Application.administratorOf(Application.getCurrentOrg())) {
+		if (Application.administratorOfCurrentOrg()) {
 			PaddedPanel pp = new PaddedPanel(3);
 			Image edit = new Image(MainImageBundle.INSTANCE.plus());
 			edit.addStyleName("pointer");

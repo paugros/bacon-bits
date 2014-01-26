@@ -18,5 +18,7 @@ public interface ArticleServiceAsync {
 
 	void getComments(ArgMap<ArticleArg> args, AsyncCallback<ArrayList<NewsBulletinComment>> callback);
 
+	void hideComment(int commentId, AsyncCallback<Void> callback);
+
 	void saveComment(NewsBulletinComment comment, AsyncCallback<NewsBulletinComment> callback);
 }

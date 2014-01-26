@@ -27,7 +27,7 @@ public class Fader {
 	private Timer fadeOutTimer;
 	private Timer fadeInTimer;
 	private double fadeStep = 0.05;
-	private int fadeDelay = 10;
+	private int fadeDelay = 15;
 	private double currentOpacity = 1.0;
 	private int commandDelay;
 	private Command onCompleteCommand;
