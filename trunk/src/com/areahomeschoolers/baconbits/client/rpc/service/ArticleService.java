@@ -19,6 +19,8 @@ public interface ArticleService extends RemoteService {
 
 	public ArrayList<NewsBulletinComment> getComments(ArgMap<ArticleArg> args);
 
+	public void hideComment(int commentId);
+
 	public ArrayList<Article> list(ArgMap<ArticleArg> args);
 
 	public Article save(Article article);

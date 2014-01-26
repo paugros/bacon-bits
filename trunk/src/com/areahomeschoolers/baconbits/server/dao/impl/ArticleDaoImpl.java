@@ -52,6 +52,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 			article.setAddedByLastName(rs.getString("lastName"));
 			article.setCommentCount(rs.getInt("commentCount"));
 			article.setLastCommentDate(rs.getTimestamp("lastCommentDate"));
+			article.setImageDocumentId(rs.getInt("smallImageId"));
 			return article;
 		}
 	}
@@ -79,7 +80,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 	}
 
 	public String createSqlBase() {
-		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, \n";
+		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, u.smallImageId, \n";
 		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
 		sql += "(select count(id) from comments where articleId = a.id) as commentCount, \n";
 		sql += "(select addedDate from comments where articleId = a.id order by addedDate desc limit 1) as lastCommentDate, \n";
@@ -124,7 +125,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		String sql = "select c.*, concat(u.firstName, ' ', u.LastName) as addedBy, u.smallImageId ";
 		sql += "from comments c ";
 		sql += "join users u on u.id = c.userId ";
-		sql += "where 1 = 1 ";
+		sql += "where 1 = 1 and c.endDate is null ";
 		if (newsId > 0) {
 			sql += "and c.articleId = ? ";
 			sqlArgs.add(newsId);
@@ -136,6 +137,12 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		sql += "order by c.addedDate desc";
 
 		return query(sql, new NewsBulletinCommentMapper(), sqlArgs.toArray());
+	}
+
+	@Override
+	public void hideComment(int commentId) {
+		String sql = "update comments set endDate = now(), hiddenById = ? where id = ?";
+		update(sql, commentId, ServerContext.getCurrentUserId());
 	}
 
 	@Override

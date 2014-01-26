@@ -38,6 +38,11 @@ public class ArticleServiceImpl extends GwtController implements ArticleService 
 	}
 
 	@Override
+	public void hideComment(int commentId) {
+		dao.hideComment(commentId);
+	}
+
+	@Override
 	public ArrayList<Article> list(ArgMap<ArticleArg> args) {
 		return dao.list(args);
 	}
