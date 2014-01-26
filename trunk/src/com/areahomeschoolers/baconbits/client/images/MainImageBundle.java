@@ -11,6 +11,10 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource arrowRight();
 
+	ImageResource article();
+
+	ImageResource book();
+
 	ImageResource cancel();
 
 	ImageResource checkMark();
@@ -26,6 +30,8 @@ public interface MainImageBundle extends ClientBundle {
 	ImageResource collapse();
 
 	ImageResource edit();
+
+	ImageResource event();
 
 	ImageResource expand();
 
@@ -84,6 +90,8 @@ public interface MainImageBundle extends ClientBundle {
 	ImageResource sortDescending();
 
 	ImageResource swap();
+
+	ImageResource user();
 
 	ImageResource verticalDragHandle();
 

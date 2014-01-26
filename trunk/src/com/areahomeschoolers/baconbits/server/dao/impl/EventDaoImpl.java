@@ -23,6 +23,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.server.dao.ArticleDao;
 import com.areahomeschoolers.baconbits.server.dao.EventDao;
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
+import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.dao.TagDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.util.Mailer;
@@ -51,13 +52,14 @@ import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 @Repository
-public class EventDaoImpl extends SpringWrapper implements EventDao {
+public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible {
 	private final class EventMapper implements RowMapper<Event> {
 		@Override
 		public Event mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -584,6 +586,20 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 	}
 
 	@Override
+	public ArrayList<ServerSuggestion> getSuggestions(String token, int limit, Data options) {
+		String sql = "select e.id, e.title as Suggestion, 'Event' as entityType ";
+		sql += "from events e ";
+		sql += createWhere();
+		sql += "and e.endDate > now() and e.active = 1 ";
+		sql += "and e.title like ? ";
+		sql += "order by e.title ";
+		sql += "limit " + Integer.toString(limit + 1);
+
+		String search = "%" + token + "%";
+		return query(sql, ServerUtils.getSuggestionMapper(), search);
+	}
+
+	@Override
 	public ArrayList<Data> getVolunteers(ArgMap<EventArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		int eventId = args.getInt(EventArg.EVENT_ID);
@@ -988,7 +1004,15 @@ public class EventDaoImpl extends SpringWrapper implements EventDao {
 		sql += "join users u on u.id = e.addedById \n";
 		sql += "join itemVisibilityLevels l on l.id = e.visibilityLevelId \n";
 
-		sql += "left join userGroupMembers ugm on ugm.groupId = e.groupId and ugm.userId = " + userId + " \n";
+		sql += createWhere();
+
+		return sql;
+	}
+
+	private String createWhere() {
+		int userId = ServerContext.getCurrentUserId();
+
+		String sql = "left join userGroupMembers ugm on ugm.groupId = e.groupId and ugm.userId = " + userId + " \n";
 		sql += "left join userGroupMembers org on org.groupId = e.owningOrgId and org.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
 

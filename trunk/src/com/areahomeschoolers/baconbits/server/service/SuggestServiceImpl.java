@@ -19,18 +19,21 @@ public final class SuggestServiceImpl extends GwtController implements SuggestSe
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public ArrayList<ServerSuggestion> getSuggestions(String token, String suggestType, int limit, Data options) {
+	public ArrayList<ServerSuggestion> getSuggestions(String token, ArrayList<String> suggestTypes, int limit, Data options) {
 		ArrayList<ServerSuggestion> matches = new ArrayList<ServerSuggestion>();
 
-		try {
-			ApplicationContext ctx = ServerContext.getApplicationContext();
-			Suggestible suggester = (Suggestible) ctx.getBean(suggestType.substring(0, 1).toLowerCase() + suggestType.substring(1) + "DaoImpl");
+		for (String type : suggestTypes) {
+			try {
+				ApplicationContext ctx = ServerContext.getApplicationContext();
+				Suggestible suggester = (Suggestible) ctx.getBean(type.substring(0, 1).toLowerCase() + type.substring(1) + "DaoImpl");
 
-			matches = suggester.getSuggestions(token, limit, options);
+				matches.addAll(suggester.getSuggestions(token, limit, options));
 
-		} catch (Exception e) {
-			e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+
 		return matches;
 	}
 }

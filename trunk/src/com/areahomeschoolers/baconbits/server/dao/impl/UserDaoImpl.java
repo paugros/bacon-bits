@@ -420,6 +420,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		sql += "from users u ";
 		sql += "where u.email is not null and u.email != '' ";
 		sql += "and (concat(u.firstName, ' ', u.lastName) like ? or u.email like ?) and isActive(u.startDate, u.endDate) = 1 ";
+		if (ServerContext.isAuthenticated() && !ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
+			sql += "and u.directoryOptOut = 0 ";
+		}
 		sql += "order by concat(u.firstName, ' ', u.lastName) ";
 		sql += "limit " + Integer.toString(limit + 1);
 

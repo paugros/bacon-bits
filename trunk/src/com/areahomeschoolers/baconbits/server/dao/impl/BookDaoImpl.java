@@ -24,6 +24,7 @@ import org.springframework.stereotype.Repository;
 import com.areahomeschoolers.baconbits.server.dao.BookDao;
 import com.areahomeschoolers.baconbits.server.dao.DocumentDao;
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
+import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.util.Mailer;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
@@ -39,12 +40,13 @@ import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 
 import com.google.appengine.api.images.Image;
 import com.google.appengine.api.images.ImagesServiceFactory;
 
 @Repository
-public class BookDaoImpl extends SpringWrapper implements BookDao {
+public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 	private final class BookMapper implements RowMapper<Book> {
 		@Override
@@ -127,6 +129,18 @@ public class BookDaoImpl extends SpringWrapper implements BookDao {
 		pd.setStatuses(query(sql, ServerUtils.getGenericRowMapper()));
 
 		return pd;
+	}
+
+	@Override
+	public ArrayList<ServerSuggestion> getSuggestions(String token, int limit, Data options) {
+		String sql = "select b.id, b.title as Suggestion, 'Book' as entityType ";
+		sql += "from books b ";
+		sql += "where b.statusId = 1 and b.title like ? ";
+		sql += "order by b.title ";
+		sql += "limit " + Integer.toString(limit + 1);
+
+		String search = "%" + token + "%";
+		return query(sql, ServerUtils.getSuggestionMapper(), search);
 	}
 
 	@Override

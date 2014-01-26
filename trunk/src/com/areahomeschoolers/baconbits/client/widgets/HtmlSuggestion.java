@@ -1,8 +1,15 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
+import com.areahomeschoolers.baconbits.client.rpc.service.SuggestService;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 
+import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
 /**
@@ -14,6 +21,14 @@ public class HtmlSuggestion implements Suggestion {
 	private final String entityType;
 	private int entityId;
 	private static HTML convertMe = new HTML();
+	private static Map<String, Image> imageMap = new HashMap<String, Image>();
+
+	static {
+		imageMap.put("User", new Image(MainImageBundle.INSTANCE.user()));
+		imageMap.put("Event", new Image(MainImageBundle.INSTANCE.event()));
+		imageMap.put("Article", new Image(MainImageBundle.INSTANCE.article()));
+		imageMap.put("Book", new Image(MainImageBundle.INSTANCE.book()));
+	}
 
 	public HtmlSuggestion(ServerSuggestion suggestion, String token) {
 		this.token = token;
@@ -34,18 +49,29 @@ public class HtmlSuggestion implements Suggestion {
 		int cursor = 0;
 
 		StringBuffer accum = new StringBuffer();
+		if (imageMap.containsKey(entityType)) {
+			Image image = imageMap.get(entityType);
+			image.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
+			accum.append(image + "&nbsp;");
+		}
+
+		String text = displayString;
+		if (text.length() > 60) {
+			text = text.substring(0, 60);
+		}
+
 		token = token.toLowerCase();
-		index = displayString.toLowerCase().indexOf(token, index);
+		index = text.toLowerCase().indexOf(token, index);
 
 		if (index != -1) {
 			int endIndex = index + token.length();
-			String part1 = escapeText(displayString.substring(cursor, index));
-			String part2 = escapeText(displayString.substring(index, endIndex));
+			String part1 = escapeText(text.substring(cursor, index));
+			String part2 = escapeText(text.substring(index, endIndex));
 			cursor = endIndex;
 			accum.append(part1).append("<strong>").append(part2).append("</strong>");
 		}
 
-		String end = displayString.substring(cursor);
+		String end = text.substring(cursor);
 		accum.append(escapeText(end));
 
 		return accum.toString();

@@ -10,5 +10,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("service/names")
 public interface SuggestService extends RemoteService {
-	public ArrayList<ServerSuggestion> getSuggestions(String token, String suggestType, int limit, Data options);
+	public ArrayList<ServerSuggestion> getSuggestions(String token, ArrayList<String> suggestTypes, int limit, Data options);
 }
