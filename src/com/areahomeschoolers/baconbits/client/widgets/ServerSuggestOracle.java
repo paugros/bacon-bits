@@ -7,6 +7,7 @@ import java.util.List;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.rpc.service.SuggestService;
 import com.areahomeschoolers.baconbits.client.rpc.service.SuggestServiceAsync;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 
@@ -130,7 +131,7 @@ public class ServerSuggestOracle extends SuggestOracle {
 	/**
 	 * What kind of thing the suggestion is for.
 	 */
-	private String suggestType;
+	private List<String> suggestTypes;
 
 	private Data options = new Data();
 
@@ -140,15 +141,12 @@ public class ServerSuggestOracle extends SuggestOracle {
 	 * @param suggestType
 	 *            The kind of thing being suggested
 	 */
-	public ServerSuggestOracle(String suggestType) {
-		this.suggestType = suggestType;
+	public ServerSuggestOracle(List<String> types) {
+		suggestTypes = types;
 	}
 
-	/**
-	 * What kind of thing is being suggested?
-	 */
-	public String getSuggestType() {
-		return suggestType;
+	public ServerSuggestOracle(String suggestType) {
+		this(Common.asArrayList(suggestType));
 	}
 
 	@Override
@@ -185,13 +183,6 @@ public class ServerSuggestOracle extends SuggestOracle {
 	}
 
 	/**
-	 * Sets the kind of thing being suggested.
-	 */
-	public void setSuggestType(String suggestType) {
-		this.suggestType = suggestType;
-	}
-
-	/**
 	 * Send a request to the server.
 	 * 
 	 * @param request
@@ -205,27 +196,28 @@ public class ServerSuggestOracle extends SuggestOracle {
 		}
 
 		requestInProgress = true;
-		namesService.getSuggestions(request.getQuery(), suggestType, numberOfServerSuggestions, options, new AsyncCallback<ArrayList<ServerSuggestion>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				requestInProgress = false;
-			}
+		namesService.getSuggestions(request.getQuery(), Common.asArrayList(suggestTypes), numberOfServerSuggestions, options,
+				new AsyncCallback<ArrayList<ServerSuggestion>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						requestInProgress = false;
+					}
 
-			@Override
-			public void onSuccess(ArrayList<ServerSuggestion> suggestions) {
-				String query = request.getQuery();
-				// convert ServerSuggestions (dto) to HtmlSuggestions (has
-				// highlighting capability)
-				requestInProgress = false;
-				List<HtmlSuggestion> htmlSuggestions = new ArrayList<HtmlSuggestion>();
-				for (ServerSuggestion suggestion : suggestions) {
-					htmlSuggestions.add(new HtmlSuggestion(suggestion, query));
-				}
+					@Override
+					public void onSuccess(ArrayList<ServerSuggestion> suggestions) {
+						String query = request.getQuery();
+						// convert ServerSuggestions (dto) to HtmlSuggestions (has
+						// highlighting capability)
+						requestInProgress = false;
+						List<HtmlSuggestion> htmlSuggestions = new ArrayList<HtmlSuggestion>();
+						for (ServerSuggestion suggestion : suggestions) {
+							htmlSuggestions.add(new HtmlSuggestion(suggestion, query));
+						}
 
-				mostRecentServerResponse = new ServerResponse(request, numberOfServerSuggestions, htmlSuggestions);
-				ServerSuggestOracle.this.returnSuggestions(callback);
-			}
-		});
+						mostRecentServerResponse = new ServerResponse(request, numberOfServerSuggestions, htmlSuggestions);
+						ServerSuggestOracle.this.returnSuggestions(callback);
+					}
+				});
 	}
 
 	/**

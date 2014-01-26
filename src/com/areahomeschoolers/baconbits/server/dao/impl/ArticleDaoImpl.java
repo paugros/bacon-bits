@@ -17,6 +17,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.server.dao.ArticleDao;
+import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
@@ -24,12 +25,14 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
 @Repository
-public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
+public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggestible {
 
 	private final class ArticleMapper implements RowMapper<Article> {
 		@Override
@@ -90,22 +93,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		sql += "left join groups g on g.id = a.groupId \n";
 		sql += "join itemVisibilityLevels l on l.id = a.visibilityLevelId \n";
 
-		int userId = ServerContext.getCurrentUserId();
-		sql += "left join userGroupMembers ugm on ugm.groupId = a.groupId and ugm.userId = " + userId + " \n";
-		sql += "left join userGroupMembers org on org.groupId = a.owningOrgId and org.userId = " + userId + " \n";
-		sql += "where 1 = 1 \n";
-
-		sql += "and a.owningOrgId = " + ServerContext.getCurrentOrgId() + " \n";
-
-		int auth = ServerContext.isAuthenticated() ? 1 : 0;
-		if (!ServerContext.isSystemAdministrator()) {
-			sql += "and case a.visibilityLevelId ";
-			sql += "when 1 then 1 ";
-			sql += "when 2 then " + auth + " \n";
-			sql += "when 4 then (ugm.id > 0 or org.isAdministrator) \n";
-			sql += "else 0 end > 0 \n";
-		}
-
+		sql += createWhere();
 		return sql;
 	}
 
@@ -137,6 +125,21 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		sql += "order by c.addedDate desc";
 
 		return query(sql, new NewsBulletinCommentMapper(), sqlArgs.toArray());
+	}
+
+	@Override
+	public ArrayList<ServerSuggestion> getSuggestions(String token, int limit, Data options) {
+		String sql = "select a.id, a.title as Suggestion, 'Article' as entityType ";
+		sql += "from articles a ";
+		sql += createWhere();
+		sql += "and isActive(a.startDate, a.endDate) = 1 ";
+		sql += "and a.title like ? ";
+		sql += "and a.newsItem = 0 ";
+		sql += "order by a.title ";
+		sql += "limit " + Integer.toString(limit + 1);
+
+		String search = "%" + token + "%";
+		return query(sql, ServerUtils.getSuggestionMapper(), search);
 	}
 
 	@Override
@@ -273,6 +276,26 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao {
 		}
 
 		return comment;
+	}
+
+	private String createWhere() {
+		int userId = ServerContext.getCurrentUserId();
+		String sql = "left join userGroupMembers ugm on ugm.groupId = a.groupId and ugm.userId = " + userId + " \n";
+		sql += "left join userGroupMembers org on org.groupId = a.owningOrgId and org.userId = " + userId + " \n";
+		sql += "where 1 = 1 \n";
+
+		sql += "and a.owningOrgId = " + ServerContext.getCurrentOrgId() + " \n";
+
+		int auth = ServerContext.isAuthenticated() ? 1 : 0;
+		if (!ServerContext.isSystemAdministrator()) {
+			sql += "and case a.visibilityLevelId ";
+			sql += "when 1 then 1 ";
+			sql += "when 2 then " + auth + " \n";
+			sql += "when 4 then (ugm.id > 0 or org.isAdministrator) \n";
+			sql += "else 0 end > 0 \n";
+		}
+
+		return sql;
 	}
 
 }

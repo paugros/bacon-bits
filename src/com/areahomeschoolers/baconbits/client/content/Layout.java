@@ -117,14 +117,13 @@ public final class Layout {
 				}
 			}
 		});
-		// headerPanel.add(logoDiv);
 
 		SimplePanel spacer = new SimplePanel();
 		headerPanel.add(spacer);
 		headerPanel.setCellWidth(spacer, "100%");
 
 		searchBox = new SearchBox();
-		// headerPanel.add(searchBox);
+		headerPanel.add(searchBox);
 
 		LinkPanel sessionPanel = new LinkPanel();
 		sessionPanel.addStyleName("sessionPanel");
