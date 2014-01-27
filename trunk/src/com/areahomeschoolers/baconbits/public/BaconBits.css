@@ -141,6 +141,10 @@ img {
 	border-bottom: 1px dotted #000000;
 }
 
+.grayUnderline {
+	border-bottom: 1px solid #cccccc;
+}
+
 .DropDownMenu {
 	font-weight: bold;
 	cursor: hand;
@@ -329,6 +333,21 @@ img {
 	font-size: 18px;
 	font-weight: bold;
 	color: #333333;
+}
+
+.searchBox {
+	padding: 3px;
+	padding-left: 23px;
+  	border: 1px solid #ccc;
+	border-top: 1px solid #999;
+	width: 223px;
+	font-size: 100%;
+	font-family: Arial Unicode MS, Arial, sans-serif;
+	background-image: url(images/search.png);
+	background-repeat: no-repeat;
+/* 	background-attachment: fixed; */
+	/* left top */
+	background-position: 3px 5px;
 }
 
 .headerPanel {
@@ -889,4 +908,24 @@ img {
 
 .gwt-SuggestBox {
 	padding: 3px;
+}
+
+.gwt-SuggestBoxPopup .suggestPopupTopCenter {
+  border-top: 1px solid #bbb;
+  background: white;
+}
+
+.gwt-SuggestBoxPopup .suggestPopupBottomCenter {
+  border-bottom: 1px solid #bbb;
+  background: white;
+}
+
+.gwt-SuggestBoxPopup .suggestPopupMiddleLeft {
+  border-left: 1px solid #bbb;
+  background: white;
+}
+
+.gwt-SuggestBoxPopup .suggestPopupMiddleRight {
+  border-right: 1px solid #bbb;
+  background: white;
 }

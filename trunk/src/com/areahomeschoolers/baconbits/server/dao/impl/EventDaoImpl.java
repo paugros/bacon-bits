@@ -587,7 +587,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 	@Override
 	public ArrayList<ServerSuggestion> getSuggestions(String token, int limit, Data options) {
-		String sql = "select e.id, e.title as Suggestion, 'Event' as entityType ";
+		String sql = "select e.id, concat(e.title, ' - ', date_format(e.startDate, '%b %e')) as Suggestion, 'Event' as entityType ";
 		sql += "from events e ";
 		sql += createWhere();
 		sql += "and e.endDate > now() and e.active = 1 ";

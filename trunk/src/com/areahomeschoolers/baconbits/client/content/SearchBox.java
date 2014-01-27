@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
 import com.areahomeschoolers.baconbits.client.widgets.ServerSuggestOracle;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.FontStyle;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -22,15 +23,17 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestBox.DefaultSuggestionDisplay;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.ValueBoxBase;
 
 public final class SearchBox extends Composite {
 	private final SuggestBox searchSuggestBox;
 	private HtmlSuggestion currentSuggestion;
+	private String defaultSearchText = "Search...";
+	private TextBox textBox;
 
 	public SearchBox() {
 		HorizontalPanel hPanel = new HorizontalPanel();
@@ -46,12 +49,28 @@ public final class SearchBox extends Composite {
 		types.add("Article");
 		types.add("Book");
 		final ServerSuggestOracle oracle = new ServerSuggestOracle(types);
-		searchSuggestBox = new SuggestBox(oracle);
-		searchSuggestBox.setWidth("200px");
+
+		textBox = new TextBox();
+		searchSuggestBox = new SuggestBox(oracle, textBox);
+		textBox.setStyleName("searchBox");
+
+		textBox.addFocusHandler(new FocusHandler() {
+			@Override
+			public void onFocus(FocusEvent event) {
+				textBox.setText("");
+				textBox.getElement().getStyle().setColor("#000000");
+				textBox.getElement().getStyle().setFontStyle(FontStyle.NORMAL);
+			}
+		});
+		textBox.addBlurHandler(new BlurHandler() {
+			@Override
+			public void onBlur(BlurEvent event) {
+				reset();
+			}
+		});
 		searchSuggestBox.setAutoSelectEnabled(false);
 
 		final ValueBoxBase<String> textBox = searchSuggestBox.getValueBox();
-		// textBox.getElement().getStyle().setPadding(3, Unit.PX);
 		textBox.addFocusHandler(new FocusHandler() {
 			@Override
 			public void onFocus(FocusEvent event) {
@@ -93,15 +112,13 @@ public final class SearchBox extends Composite {
 			}
 		});
 
-		Image icon = new Image(MainImageBundle.INSTANCE.search());
-		hPanel.add(icon);
-		icon.getElement().getStyle().setMarginTop(4, Unit.PX);
 		hPanel.add(searchSuggestBox);
-		hPanel.setCellVerticalAlignment(icon, HasVerticalAlignment.ALIGN_MIDDLE);
 	}
 
 	public void reset() {
-		searchSuggestBox.setText("");
+		searchSuggestBox.setText(defaultSearchText);
+		textBox.getElement().getStyle().setColor("#666666");
+		textBox.getElement().getStyle().setFontStyle(FontStyle.ITALIC);
 	}
 
 	private void hideSuggestions() {
