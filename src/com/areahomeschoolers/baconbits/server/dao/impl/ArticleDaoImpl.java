@@ -85,8 +85,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	public String createSqlBase() {
 		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, u.smallImageId, \n";
 		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
-		sql += "(select count(id) from comments where articleId = a.id) as commentCount, \n";
-		sql += "(select addedDate from comments where articleId = a.id order by addedDate desc limit 1) as lastCommentDate, \n";
+		sql += "(select count(id) from comments where articleId = a.id and endDate is null) as commentCount, \n";
+		sql += "(select addedDate from comments where articleId = a.id and endDate is null order by addedDate desc limit 1) as lastCommentDate, \n";
 		sql += "(select count(id) from tagArticleMapping where articleId = a.id) as tagCount \n";
 		sql += "from articles a \n";
 		sql += "join users u on u.id = a.addedById \n";
