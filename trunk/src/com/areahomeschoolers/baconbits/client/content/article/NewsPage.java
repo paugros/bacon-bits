@@ -60,6 +60,7 @@ public class NewsPage implements Page {
 		page.getElement().getStyle().setPaddingLeft(20, Unit.PX);
 
 		args = new ArgMap<ArticleArg>(ArticleArg.OWNING_ORG_ID, Application.getCurrentOrgId());
+		args.put(ArticleArg.MOST_RECENT, 15);
 		args.setStatus(Status.ACTIVE);
 		args.put(ArticleArg.NEWS_ONLY);
 		if (newsId > 0) {
