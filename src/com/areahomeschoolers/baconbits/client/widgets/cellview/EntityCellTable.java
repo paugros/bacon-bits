@@ -1967,12 +1967,11 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		if (sort) {
 			sort();
 		}
+
 		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 			@Override
 			public void execute() {
-				if (titleBar == null || (titleBar != null && !titleBar.isPaging())) {
-					setVisibleRange(0, visibleItems.size());
-				}
+				setVisibleRange(0, visibleItems.size());
 				if (EntityCellTable.this instanceof HasDisableCriteria<?>) {
 					((HasDisableCriteria<?>) EntityCellTable.this).applyDisableCriteria();
 				}
@@ -1980,6 +1979,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 				refresh();
 			}
 		});
+
 		for (EntityCellTable<T, U, C> partner : partners) {
 			if (partner.hasBeenPopulated) {
 				partner.hiddenItems = hiddenItems;
