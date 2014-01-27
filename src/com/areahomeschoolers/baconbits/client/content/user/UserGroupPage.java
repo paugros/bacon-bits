@@ -315,8 +315,12 @@ public class UserGroupPage implements Page {
 		fieldTable.addField(religiousField);
 
 		if (group.isSaved()) {
-			ArgMap<UserArg> contactArgs = new ArgMap<UserArg>();
+			ArgMap<UserArg> contactArgs = new ArgMap<UserArg>(Status.ACTIVE);
+			contactArgs.put(UserArg.GROUP_ID, group.getId());
+			contactArgs.put(UserArg.PARENTS);
+			contactArgs.put(UserArg.HAS_EMAIL);
 			final UserPicker contactInput = new UserPicker(contactArgs);
+			contactInput.getSelector().getCellTable().setDisplayColumns(UserColumn.EMAIL, UserColumn.NAME, UserColumn.PHONE);
 			final FieldDisplayLink contactDisplay = new FieldDisplayLink();
 			FormField contactField = form.createFormField("Group contact:", contactInput, contactDisplay);
 			contactField.setInitializer(new Command() {
