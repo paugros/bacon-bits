@@ -360,7 +360,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 		args.remove(UserGroupArg.ORG_SUB_DOMAIN);
 		args.remove(UserGroupArg.ORG_DOMAIN);
-		args.put(UserGroupArg.ID, Constants.DEFAULT_ORG_ID);
+		args.put(UserGroupArg.ID, Constants.CG_ORG_ID);
 
 		return listGroups(args).get(0);
 	}
@@ -880,6 +880,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (group.isSaved()) {
 			String sql = "update groups set groupName = :groupName, description = :description, startDate = :startDate, contactId = :contactId, ";
 			sql += "publicGreetingId = :publicGreetingId, privateGreetingId = :privateGreetingId, generalPolicyId = :generalPolicyId, ";
+			sql += "markupOverride = :markupOverride, markupPercent = :markupPercent, markupDollars = :markupDollars, ";
 			sql += "eventPolicyId = :eventPolicyId, coopPolicyId = :coopPolicyId, payPalEmail = :payPalEmail, religious = :religious, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
 			sql += "membershipFee = :membershipFee, facebookUrl = :facebookUrl, ";
@@ -895,12 +896,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				sql += "organizationId, ";
 			}
 			sql += "address, street, city, state, zip, lat, lng, ";
+			sql += "markupOverride, markupPercent, markupDollars, ";
 			sql += "shortName, orgDomain, orgSubDomain, payPalEmail, endDate) ";
 			sql += "values(:groupName, :description, :organization, :startDate, :religious, :membershipFee, :facebookUrl, ";
 			if (group.getOwningOrgId() > 0) {
 				sql += ":owningOrgId, ";
 			}
 			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
+			sql += ":markupOverride, :markupPercent, :markupDollars, ";
 			sql += ":shortName, :orgDomain, :orgSubDomain, :payPalEmail, :endDate)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
@@ -1365,6 +1368,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		group.setContact(rs.getString("contact"));
 		group.setMembershipFee(rs.getDouble("membershipFee"));
 		group.setFacebookUrl(rs.getString("facebookUrl"));
+		group.setMarkupDollars(rs.getDouble("markupDollars"));
+		group.setMarkupPercent(rs.getDouble("markupPercent"));
+		group.setMarkupOverride(rs.getBoolean("markupOverride"));
+
 		return group;
 	}
 

@@ -37,6 +37,7 @@ import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.GoogleMapWidget;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
+import com.areahomeschoolers.baconbits.client.widgets.MarkupTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
@@ -115,7 +116,6 @@ public class EventPage implements Page {
 	private AgeGroupEditDialog ageDialog;
 	private EmailDialog emailDialog;
 	private FormField priceField;
-	private Label priceLabel = new Label();
 
 	public EventPage(final VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -136,7 +136,7 @@ public class EventPage implements Page {
 
 				calendarEvent = result.getEvent();
 				pageData = result;
-				ageDialog = new AgeGroupEditDialog(pageData.getAgeGroups(), new Command() {
+				ageDialog = new AgeGroupEditDialog(pageData.getAgeGroups(), calendarEvent, new Command() {
 					@Override
 					public void execute() {
 						populateAgeGroups();
@@ -318,38 +318,40 @@ public class EventPage implements Page {
 				populateAgeGroups();
 
 				fieldTable.addField("Pricing:", ageTable);
+
+				if (Application.isSystemAdministrator()) {
+					FormField markupField = new MarkupField(calendarEvent).getFormField();
+					form.addField(markupField);
+					fieldTable.addField(markupField);
+				}
 			}
 
 			if (Common.isNullOrEmpty(pageData.getAgeGroups())) {
-				if (Application.administratorOf(calendarEvent)) {
-					final Label priceDisplay = new Label();
-					// final MarkupTextBox priceInput = new MarkupTextBox();
-					final NumericTextBox priceInput = new NumericTextBox(2);
-					priceField = form.createFormField("Price:", priceInput, priceDisplay);
-					priceField.setInitializer(new Command() {
-						@Override
-						public void execute() {
-							String text = Formatter.formatCurrency(calendarEvent.getPrice());
-							if (calendarEvent.getPrice() == 0) {
-								text = "Free";
-							}
-							priceDisplay.setText(text);
-							priceInput.setValue(calendarEvent.getPrice());
+				final Label priceDisplay = new Label();
+				final MarkupTextBox priceInput = new MarkupTextBox(calendarEvent);
+				priceField = form.createFormField("Price:", priceInput, priceDisplay);
+				priceField.setInitializer(new Command() {
+					@Override
+					public void execute() {
+						String text = Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
+						if (calendarEvent.getPrice() == 0) {
+							text = "Free";
 						}
-					});
-					priceField.setDtoUpdater(new Command() {
-						@Override
-						public void execute() {
-							calendarEvent.setPrice(priceInput.getDouble());
-						}
-					});
-					fieldTable.addField(priceField);
-				}
+						priceDisplay.setText(text);
+						priceInput.setValue(calendarEvent.getPrice());
 
-				// if (calendarEvent.isSaved()) {
-				// updatePriceDisplay();
-				// fieldTable.addField("Price:", priceLabel);
-				// }
+						if (!Application.administratorOf(calendarEvent)) {
+							priceField.setEnabled(false);
+						}
+					}
+				});
+				priceField.setDtoUpdater(new Command() {
+					@Override
+					public void execute() {
+						calendarEvent.setPrice(priceInput.getDouble());
+					}
+				});
+				fieldTable.addField(priceField);
 			}
 		}
 
@@ -1016,19 +1018,11 @@ public class EventPage implements Page {
 					field.setInputVisibility(false);
 
 					if (field.equals(priceField)) {
-						updatePriceDisplay();
+						priceField.initialize();
 					}
 				}
 			}
 		});
 	}
 
-	private void updatePriceDisplay() {
-		String text = Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
-		if (calendarEvent.getAdjustedPrice() == 0) {
-			text = "Free";
-		}
-
-		priceLabel.setText(text);
-	}
 }

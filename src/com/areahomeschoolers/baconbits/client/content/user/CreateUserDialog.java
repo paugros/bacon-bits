@@ -17,7 +17,7 @@ import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
-import com.areahomeschoolers.baconbits.client.widgets.AddressFormField;
+import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
@@ -64,7 +64,7 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 					return;
 				}
 
-				AddressFormField.validateAddress(entity, new Command() {
+				AddressField.validateAddress(entity, new Command() {
 					@Override
 					public void execute() {
 						userService.save(entity, new Callback<ServerResponseData<User>>() {

@@ -10,7 +10,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
-import com.areahomeschoolers.baconbits.client.widgets.AddressFormField;
+import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
@@ -369,7 +369,7 @@ public class UserFieldTable extends FieldTable {
 		}
 
 		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.ADDRESS)) {
-			FormField addressField = new AddressFormField(user).getFormField();
+			FormField addressField = new AddressField(user).getFormField();
 			form.addField(addressField);
 			addField(addressField);
 		} else if (!Common.isNullOrBlank(user.getCity())) {

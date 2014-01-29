@@ -105,6 +105,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setRequiredInSeries(rs.getBoolean("requiredInSeries"));
 			event.setNewlyAdded(rs.getBoolean("newlyAdded"));
 			event.setOwningOrgId(rs.getInt("owningOrgId"));
+			event.setMarkupDollars(rs.getDouble("markupDollars"));
+			event.setMarkupPercent(rs.getDouble("markupPercent"));
+			event.setMarkupOverride(rs.getBoolean("markupOverride"));
+			event.setGroupMarkupDollars(rs.getDouble("groupMarkupDollars"));
+			event.setGroupMarkupPercent(rs.getDouble("groupMarkupPercent"));
+			event.setGroupMarkupOverride(rs.getBoolean("groupMarkupOverride"));
 			return event;
 		}
 	}
@@ -753,12 +759,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(event);
 
 		if (event.getPrice() > 0 && event.getCategoryId() != 6) {
-			event.setMarkup(Common.calculateEventMarkup(event.getPrice()));
+			event.setMarkup(Common.applyEventMarkup(event.getPrice(), event));
 		}
 
 		if (event.isSaved()) {
 			String sql = "update events set title = :title, description = :description, startDate = :startDate, endDate = :endDate, visibilityLevelId = :visibilityLevelId, ";
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, markup = :markup, ";
+			sql += "markupOverride = :markupOverride, markupPercent = :markupPercent, markupDollars = :markupDollars, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, requiresRegistration = :requiresRegistration, ";
 			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, ";
@@ -770,9 +777,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setOwningOrgId(ServerContext.getCurrentOrgId());
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
+			sql += "markupOverride, markupPercent, markupDollars, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, owningOrgId, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, :markup, ";
+			sql += ":markupOverride, :markupPercent, :markupDollars, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, :owningOrgId, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
 
@@ -814,7 +823,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(ageGroup);
 
 		if (ageGroup.getPrice() > 0) {
-			ageGroup.setMarkup(Common.calculateEventMarkup(ageGroup.getPrice()));
+			ageGroup.setMarkup(Common.applyEventMarkup(ageGroup.getPrice(), getById(ageGroup.getEventId())));
 		}
 
 		if (ageGroup.isSaved()) {
@@ -987,6 +996,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	private String createSqlBase() {
 		int userId = ServerContext.getCurrentUserId();
 		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.visibilityLevel, \n";
+		sql += "gg.markupPercent as groupMarkupPercent, gg.markupDollars as groupMarkupDollars, gg.markupOverride as groupMarkupOverride, \n";
 		sql += "(select group_concat(price + markup) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {
@@ -1000,6 +1010,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		sql += "(e.endDate < now()) as finished, isActive(e.registrationStartDate, e.registrationEndDate) as registrationOpen \n";
 		sql += "from events e \n";
 		sql += "left join groups g on g.id = e.groupId \n";
+		sql += "join groups gg on gg.id = e.owningOrgId \n";
 		sql += "join eventCategories c on c.id = e.categoryId \n";
 		sql += "join users u on u.id = e.addedById \n";
 		sql += "join itemVisibilityLevels l on l.id = e.visibilityLevelId \n";

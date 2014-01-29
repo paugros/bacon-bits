@@ -2,6 +2,7 @@ package com.areahomeschoolers.baconbits.client.widgets;
 
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Event;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -16,8 +17,10 @@ public class MarkupTextBox extends Composite {
 	private HorizontalPanel hp = new PaddedPanel();
 	private NumericTextBox input = new NumericTextBox(2);
 	private HTML preview = new HTML("&nbsp;");
+	private Event event;
 
-	public MarkupTextBox() {
+	public MarkupTextBox(Event event) {
+		this.event = event;
 		input.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
@@ -55,7 +58,7 @@ public class MarkupTextBox extends Composite {
 		if (dollars == 0) {
 			preview.setText("Free");
 		} else {
-			preview.setText(Formatter.formatCurrency(dollars + Common.calculateEventMarkup(dollars)) + " with fees");
+			preview.setText(Formatter.formatCurrency(dollars + Common.applyEventMarkup(dollars, event)) + " with fees");
 		}
 	}
 }
