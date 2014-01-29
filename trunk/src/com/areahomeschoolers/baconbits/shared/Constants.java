@@ -30,7 +30,6 @@ public abstract class Constants {
 
 	public static final int CG_ORG_ID = 21;
 	public static final String CG_PAYPAL_EMAIL = "payments@citrusgroups.com";
-	public static final int DEFAULT_ORG_ID = 21;
 	public static final int DEFAULT_LOGO_ID = 1241;
 	public static final int ACCOUNT_CREATION_INSTRUCTIONS_ID = 77;
 	public static final int BOOK_SELLERS_GROUP_ID = 16;
@@ -39,5 +38,11 @@ public abstract class Constants {
 	public static final String TOS_URL = CG_URL + "/#page=Article&articleId=73";
 	public static final String PRIVACY_POLICY_URL = CG_URL + "/#page=Article&articleId=72";
 	public static final String PRODUCTION_VERSION = "production";
+	// 2.9% and 30 to PayPal, then 2.5% and 20 cents to us
+	// 5.4% and 50 cents total
+	public static final double EVENT_PERCENT_MARKUP = 5.4;
+	public static final double EVENT_DOLLARS_MARKUP = 0.5;
+
+	public static final int MAX_DATA_ROWS = 2000;
 
 }

@@ -17,7 +17,7 @@ import com.google.maps.gwt.client.GeocoderRequest;
 import com.google.maps.gwt.client.GeocoderResult;
 import com.google.maps.gwt.client.GeocoderStatus;
 
-public class AddressFormField {
+public class AddressField {
 	public static void validateAddress(final HasAddress item, final Command saveCommand) {
 		if (!item.getAddressChanged()) {
 			saveCommand.execute();
@@ -70,7 +70,7 @@ public class AddressFormField {
 
 	private FormField addressField;
 
-	public AddressFormField(final HasAddress address) {
+	public AddressField(final HasAddress address) {
 		final FieldDisplayLink addressDisplay = new FieldDisplayLink();
 		addressDisplay.setTarget("_blank");
 		PaddedPanel addressInput = new PaddedPanel();

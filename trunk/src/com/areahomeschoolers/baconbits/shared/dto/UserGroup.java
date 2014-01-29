@@ -9,10 +9,11 @@ import java.util.Map;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.HasAddress;
+import com.areahomeschoolers.baconbits.shared.HasMarkup;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership, HasAddress {
+public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership, HasAddress, HasMarkup {
 
 	public enum AccessLevel implements IsSerializable, Serializable {
 		PUBLIC(1, "Public"), SITE_MEMBERS(2, "Site members"), GROUP_MEMBERS(3, "Group members"), GROUP_ADMINISTRATORS(4, "Group administrators"), ORGANIZATION_ADMINISTRATORS(
@@ -132,6 +133,9 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private Integer contactId;
 	private double membershipFee;
 	private String facebookUrl;
+	private double markupPercent;
+	private double markupDollars;
+	private boolean markupOverride;
 
 	// address
 	private String address;
@@ -254,6 +258,21 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 			return null;
 		}
 		return logoId;
+	}
+
+	@Override
+	public double getMarkupDollars() {
+		return markupDollars;
+	}
+
+	@Override
+	public boolean getMarkupOverride() {
+		return markupOverride;
+	}
+
+	@Override
+	public double getMarkupPercent() {
+		return markupPercent;
 	}
 
 	public double getMembershipFee() {
@@ -443,6 +462,21 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public void setLogoId(Integer logoId) {
 		this.logoId = logoId;
+	}
+
+	@Override
+	public void setMarkupDollars(double markupDollars) {
+		this.markupDollars = markupDollars;
+	}
+
+	@Override
+	public void setMarkupOverride(boolean override) {
+		markupOverride = override;
+	}
+
+	@Override
+	public void setMarkupPercent(double markupPercent) {
+		this.markupPercent = markupPercent;
 	}
 
 	public void setMembershipFee(double membershipFee) {

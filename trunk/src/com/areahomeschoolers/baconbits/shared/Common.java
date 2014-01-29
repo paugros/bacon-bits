@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.shared.dto.Event;
 
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
@@ -26,41 +26,23 @@ public abstract class Common {
 		public static final int AFTER = 1;
 	}
 
-	public static enum IpV6Style {
-		NO_LEADING_ZEROS, ABBREV
-	}
-
 	private final static String EMAIL_VALIDATION_REGEX = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
 
-	public static final int MAX_DATA_ROWS = 2000;
+	public static double applyEventMarkup(double price, Event event) {
+		double percent = Constants.EVENT_PERCENT_MARKUP;
+		double dollars = Constants.EVENT_DOLLARS_MARKUP;
 
-	/**
-	 * Ex. 5,500,000 = 5.5M 7,000 = 7K
-	 * 
-	 * @return
-	 */
-	public static String abbreviateNumber(double value) {
-		String text;
-
-		if (value >= 1000000) {
-			long val = Math.round(value / 100000);
-			text = Long.toString(val / 10);
-			if (val % 10 != 0) {
-				text += "." + val % 10;
-			}
-			text += "M";
-		} else if (value >= 1000) {
-			long val = Math.round(value / 100);
-			text = Long.toString(val / 10);
-			if (val % 10 != 0) {
-				text += "." + val % 10;
-			}
-			text += "K";
-		} else {
-			text = Long.toString(Math.round(value));
+		if (event.getGroupMarkupOverride()) {
+			percent = event.getGroupMarkupPercent();
+			dollars = event.getGroupMarkupDollars();
 		}
 
-		return text;
+		if (event.getMarkupOverride()) {
+			percent = event.getMarkupPercent();
+			dollars = event.getMarkupDollars();
+		}
+
+		return (price * (percent / 100)) + dollars;
 	}
 
 	public final static <T> ArrayList<T> asArrayList(List<T> list) {
@@ -98,13 +80,6 @@ public abstract class Common {
 			list.add(object);
 		}
 		return list;
-	}
-
-	public static double calculateEventMarkup(double price) {
-		// 2.9% and 30 to PayPal, then 2.5% and 20 cents to us
-		// 5.4% and 50 cents total
-		return 0;
-		// return (price * 0.054) + 0.5;
 	}
 
 	/**
@@ -526,20 +501,6 @@ public abstract class Common {
 	 */
 	public static String yesNo(boolean bool) {
 		return bool ? "Yes" : "No";
-	}
-
-	public static String zeroPad(double input) {
-		return zeroPad(input, 15);
-	}
-
-	public static String zeroPad(double input, int size) {
-		String ret = "";
-		if (input < 0) {
-			input = 1000000000000.0 + input;
-			ret += "-";
-		}
-
-		return ret + zeroPad(Formatter.formatDoubleForSorting(input), size);
 	}
 
 	public static String zeroPad(int input, int size) {

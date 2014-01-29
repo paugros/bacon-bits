@@ -28,6 +28,7 @@ import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.VariableSizePager.PageSize;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.EntityDto;
@@ -1667,9 +1668,9 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	}
 
 	private void setList(List<T> list) {
-		if (list.size() == (Common.MAX_DATA_ROWS + 1)) {
+		if (list.size() == (Constants.MAX_DATA_ROWS + 1)) {
 			list.remove(list.size() - 1);
-			String message = "More than " + Common.MAX_DATA_ROWS + " results found. Only " + Common.MAX_DATA_ROWS + " shown.";
+			String message = "More than " + Constants.MAX_DATA_ROWS + " results found. Only " + Constants.MAX_DATA_ROWS + " shown.";
 			AlertDialog.alert("Results Exceed Limit", new Label(message));
 		}
 		unfilteredList = new HashSet<T>(list);

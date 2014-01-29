@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.content.document.HasDocuments;
+import com.areahomeschoolers.baconbits.shared.HasMarkup;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 
-public final class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwnership {
+public final class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwnership, HasMarkup {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
@@ -38,8 +39,14 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private Integer seriesId;
 	private boolean requiredInSeries;
 	private int owningOrgId;
+	private double markupPercent;
+	private double markupDollars;
+	private boolean markupOverride;
 
 	// auxilliary
+	private double groupMarkupPercent;
+	private double groupMarkupDollars;
+	private boolean groupMarkupOverride;
 	private boolean newlyAdded;
 	private boolean saveAllInSeries;
 	private int cloneFromId;
@@ -165,12 +172,39 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return groupId;
 	}
 
+	public double getGroupMarkupDollars() {
+		return groupMarkupDollars;
+	}
+
+	public boolean getGroupMarkupOverride() {
+		return groupMarkupOverride;
+	}
+
+	public double getGroupMarkupPercent() {
+		return groupMarkupPercent;
+	}
+
 	public String getGroupName() {
 		return groupName;
 	}
 
 	public double getMarkup() {
 		return markup;
+	}
+
+	@Override
+	public double getMarkupDollars() {
+		return markupDollars;
+	}
+
+	@Override
+	public boolean getMarkupOverride() {
+		return markupOverride;
+	}
+
+	@Override
+	public double getMarkupPercent() {
+		return markupPercent;
 	}
 
 	public int getMaximumParticipants() {
@@ -351,12 +385,39 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		this.groupId = groupId;
 	}
 
+	public void setGroupMarkupDollars(double groupMarkupDollars) {
+		this.groupMarkupDollars = groupMarkupDollars;
+	}
+
+	public void setGroupMarkupOverride(boolean groupMarkupOverride) {
+		this.groupMarkupOverride = groupMarkupOverride;
+	}
+
+	public void setGroupMarkupPercent(double groupMarkupPercent) {
+		this.groupMarkupPercent = groupMarkupPercent;
+	}
+
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}
 
 	public void setMarkup(double markup) {
 		this.markup = markup;
+	}
+
+	@Override
+	public void setMarkupDollars(double markupDollars) {
+		this.markupDollars = markupDollars;
+	}
+
+	@Override
+	public void setMarkupOverride(boolean override) {
+		markupOverride = override;
+	}
+
+	@Override
+	public void setMarkupPercent(double markupPercent) {
+		this.markupPercent = markupPercent;
 	}
 
 	public void setMaximumParticipants(int maximumParticipants) {

@@ -27,7 +27,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
@@ -37,7 +36,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
  */
 public abstract class ServerUtils {
 
-	public static final String SQL_TOP_CLAUSE = "top " + (Common.MAX_DATA_ROWS + 1);
+	public static final String SQL_TOP_CLAUSE = "top " + (Constants.MAX_DATA_ROWS + 1);
 
 	private final static RowMapper<Data> genericRowMapper = new RowMapper<Data>() {
 		@Override

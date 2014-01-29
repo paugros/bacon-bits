@@ -36,7 +36,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
-import com.areahomeschoolers.baconbits.client.widgets.AddressFormField;
+import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.CalendarPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
@@ -114,7 +114,7 @@ public class UserPage implements Page {
 	private final Form form = new Form(new FormSubmitHandler() {
 		@Override
 		public void onFormSubmit(final FormField formField) {
-			AddressFormField.validateAddress(user, new Command() {
+			AddressField.validateAddress(user, new Command() {
 				@Override
 				public void execute() {
 					save(formField);

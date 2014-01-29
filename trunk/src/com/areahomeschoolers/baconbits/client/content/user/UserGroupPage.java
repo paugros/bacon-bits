@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.Sidebar;
 import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
+import com.areahomeschoolers.baconbits.client.content.event.MarkupField;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
@@ -23,7 +24,7 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
-import com.areahomeschoolers.baconbits.client.widgets.AddressFormField;
+import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldDisplayLink;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
@@ -57,7 +58,7 @@ public class UserGroupPage implements Page {
 	private Form form = new Form(new FormSubmitHandler() {
 		@Override
 		public void onFormSubmit(final FormField formField) {
-			AddressFormField.validateAddress(group, new Command() {
+			AddressField.validateAddress(group, new Command() {
 				@Override
 				public void execute() {
 					save(formField);
@@ -72,6 +73,8 @@ public class UserGroupPage implements Page {
 	private FormField domainField;
 	private FormField shortNameField;
 	private FormField payPalEmailField;
+	private FormField feeField;
+	private FormField markupField;
 	private TabPage tabPanel;
 
 	public UserGroupPage(final VerticalPanel page) {
@@ -244,12 +247,11 @@ public class UserGroupPage implements Page {
 			if (!group.isSaved()) {
 				orgInput.setValue(group.isOrganization());
 			}
-			toggleOrgFields(group.isOrganization());
 
 			final Label feeDisplay = new Label();
 			final NumericTextBox feeInput = new NumericTextBox(2);
 			feeInput.setMaxLength(50);
-			FormField feeField = form.createFormField("Membership fee:", feeInput, feeDisplay);
+			feeField = form.createFormField("Membership fee:", feeInput, feeDisplay);
 			feeField.setInitializer(new Command() {
 				@Override
 				public void execute() {
@@ -268,6 +270,12 @@ public class UserGroupPage implements Page {
 				}
 			});
 			fieldTable.addField(feeField);
+
+			markupField = new MarkupField(group).getFormField();
+			form.addField(markupField);
+			fieldTable.addField(markupField);
+
+			toggleOrgFields(group.isOrganization());
 		}
 
 		final TextBox descriptionInput = new TextBox();
@@ -290,7 +298,7 @@ public class UserGroupPage implements Page {
 		});
 		fieldTable.addField(descriptionField);
 
-		FormField addressField = new AddressFormField(group).getFormField();
+		FormField addressField = new AddressField(group).getFormField();
 		form.addField(addressField);
 		fieldTable.addField(addressField);
 
@@ -495,6 +503,8 @@ public class UserGroupPage implements Page {
 		fieldTable.setFieldVisibility(domainField, visible);
 		fieldTable.setFieldVisibility(shortNameField, visible);
 		fieldTable.setFieldVisibility(payPalEmailField, visible);
+		fieldTable.setFieldVisibility(feeField, visible);
+		fieldTable.setFieldVisibility(markupField, visible);
 
 		if (!group.isSaved() && visible) {
 			form.configureForAdd();
