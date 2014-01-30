@@ -390,6 +390,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 		} else {
 			Event e = new Event();
+			UserGroup g = ServerContext.getCurrentOrg();
+			e.setGroupMarkupOverride(g.getMarkupOverride());
+			e.setGroupMarkupDollars(g.getMarkupDollars());
+			e.setGroupMarkupPercent(g.getMarkupPercent());
+
 			Date d = new Date();
 			e.setRegistrationStartDate(DateUtils.setHours(d, 7));
 			e.setPublishDate(new Date());
@@ -759,7 +764,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(event);
 
 		if (event.getPrice() > 0 && event.getCategoryId() != 6) {
-			event.setMarkup(Common.applyEventMarkup(event.getPrice(), event));
+			event.setMarkup(Common.getEventMarkup(event.getPrice(), event));
 		}
 
 		if (event.isSaved()) {
@@ -823,7 +828,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(ageGroup);
 
 		if (ageGroup.getPrice() > 0) {
-			ageGroup.setMarkup(Common.applyEventMarkup(ageGroup.getPrice(), getById(ageGroup.getEventId())));
+			ageGroup.setMarkup(Common.getEventMarkup(ageGroup.getPrice(), getById(ageGroup.getEventId())));
 		}
 
 		if (ageGroup.isSaved()) {

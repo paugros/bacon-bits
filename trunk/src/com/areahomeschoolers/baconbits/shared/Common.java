@@ -28,7 +28,7 @@ public abstract class Common {
 
 	private final static String EMAIL_VALIDATION_REGEX = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
 
-	public static double applyEventMarkup(double price, Event event) {
+	public static double getEventMarkup(double price, Event event) {
 		double percent = Constants.EVENT_PERCENT_MARKUP;
 		double dollars = Constants.EVENT_DOLLARS_MARKUP;
 

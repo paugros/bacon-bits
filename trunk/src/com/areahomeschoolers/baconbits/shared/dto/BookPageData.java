@@ -5,10 +5,16 @@ import java.util.ArrayList;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class BookPageData implements IsSerializable {
+	private Book book;
 	private ArrayList<Data> categories;
 	private ArrayList<Data> gradeLevels;
 	private ArrayList<Data> conditions;
 	private ArrayList<Data> statuses;
+	private ArrayList<Tag> tags;
+
+	public Book getBook() {
+		return book;
+	}
 
 	public ArrayList<Data> getCategories() {
 		return categories;
@@ -26,6 +32,14 @@ public class BookPageData implements IsSerializable {
 		return statuses;
 	}
 
+	public ArrayList<Tag> getTags() {
+		return tags;
+	}
+
+	public void setBook(Book book) {
+		this.book = book;
+	}
+
 	public void setCategories(ArrayList<Data> categories) {
 		this.categories = categories;
 	}
@@ -40,6 +54,10 @@ public class BookPageData implements IsSerializable {
 
 	public void setStatuses(ArrayList<Data> statuses) {
 		this.statuses = statuses;
+	}
+
+	public void setTags(ArrayList<Tag> tags) {
+		this.tags = tags;
 	}
 
 }

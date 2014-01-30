@@ -1,90 +1,36 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
-import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
-import com.areahomeschoolers.baconbits.client.rpc.Callback;
-import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
-import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
-import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
+import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 
-public class BookDialog extends EntityEditDialog<Book> {
-	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
+public class BookFieldTable extends FieldTable {
+	private Book book;
+	private Form form;
 	private BookPageData pageData;
-	private boolean closeAfterSubmit = true;
 
-	public BookDialog(final BookTable cellTable) {
-		setAutoHide(false);
-		addFormSubmitHandler(new FormSubmitHandler() {
-			@Override
-			public void onFormSubmit(FormField formField) {
-				getButtonPanel().setEnabled(false);
-				if (!entity.isSaved()) {
-					entity.setStatusId(1);
-				}
-				bookService.save(entity, new Callback<Book>() {
-					@Override
-					protected void doOnSuccess(Book result) {
-						if (closeAfterSubmit) {
-							hide();
-						} else {
-							closeAfterSubmit = true;
-							setEntity(new Book());
-							form.initialize();
-						}
-						getButtonPanel().setEnabled(true);
-						cellTable.populate();
-					}
-				});
-			}
-		});
+	public BookFieldTable(Form f, Book b, BookPageData pd) {
+		this.book = b;
+		this.form = f;
+		this.pageData = pd;
 
-		getButtonPanel().getCloseButton().setText("Cancel");
-		bookService.getPageData(0, new Callback<BookPageData>() {
-			@Override
-			protected void doOnSuccess(BookPageData result) {
-				pageData = result;
-			}
-		});
-	}
-
-	@Override
-	public void setEntity(Book b) {
-		if (b.isSaved()) {
-			setText("Edit Book");
-		} else {
-			setText("Add Book");
-		}
-
-		super.setEntity(b);
-	}
-
-	@Override
-	protected Widget createContent() {
-		FieldTable ft = new FieldTable();
-		ft.setLabelColumnWidth(LabelColumnWidth.NARROW);
-		ft.setWidth("600px");
+		setWidth("100%");
 
 		final Label titleDisplay = new Label();
 		final RequiredTextBox titleInput = new RequiredTextBox();
@@ -94,17 +40,17 @@ public class BookDialog extends EntityEditDialog<Book> {
 		titleField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				titleDisplay.setText(entity.getTitle());
-				titleInput.setText(entity.getTitle());
+				titleDisplay.setText(book.getTitle());
+				titleInput.setText(book.getTitle());
 			}
 		});
 		titleField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setTitle(titleInput.getText());
+				book.setTitle(titleInput.getText());
 			}
 		});
-		ft.addField(titleField);
+		addField(titleField);
 
 		final Label authorDisplay = new Label();
 		final TextBox authorInput = new TextBox();
@@ -113,17 +59,17 @@ public class BookDialog extends EntityEditDialog<Book> {
 		authorField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				authorDisplay.setText(entity.getAuthor());
-				authorInput.setText(entity.getAuthor());
+				authorDisplay.setText(Common.getDefaultIfNull(book.getAuthor()));
+				authorInput.setText(book.getAuthor());
 			}
 		});
 		authorField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setAuthor(authorInput.getText());
+				book.setAuthor(authorInput.getText());
 			}
 		});
-		ft.addField(authorField);
+		addField(authorField);
 
 		final Label categoryDisplay = new Label();
 		final RequiredListBox categoryInput = new RequiredListBox();
@@ -134,17 +80,17 @@ public class BookDialog extends EntityEditDialog<Book> {
 		categoryField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				categoryDisplay.setText(entity.getCategory());
-				categoryInput.setValue(entity.getCategoryId());
+				categoryDisplay.setText(book.getCategory());
+				categoryInput.setValue(book.getCategoryId());
 			}
 		});
 		categoryField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setCategoryId(categoryInput.getIntValue());
+				book.setCategoryId(categoryInput.getIntValue());
 			}
 		});
-		ft.addField(categoryField);
+		addField(categoryField);
 
 		final Label ageDisplay = new Label();
 		final RequiredListBox ageInput = new RequiredListBox();
@@ -156,17 +102,17 @@ public class BookDialog extends EntityEditDialog<Book> {
 		ageField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				ageDisplay.setText(entity.getGradeLevel());
-				ageInput.setValue(entity.getGradeLevelId());
+				ageDisplay.setText(book.getGradeLevel());
+				ageInput.setValue(book.getGradeLevelId());
 			}
 		});
 		ageField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setGradeLevelId(ageInput.getIntValue());
+				book.setGradeLevelId(ageInput.getIntValue());
 			}
 		});
-		ft.addField(ageField);
+		addField(ageField);
 
 		final Label priceDisplay = new Label();
 		final NumericTextBox priceInput = new NumericTextBox(2);
@@ -175,17 +121,17 @@ public class BookDialog extends EntityEditDialog<Book> {
 		priceField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				priceDisplay.setText(Formatter.formatCurrency(entity.getPrice()));
-				priceInput.setValue(entity.getPrice());
+				priceDisplay.setText(Formatter.formatCurrency(book.getPrice()));
+				priceInput.setValue(book.getPrice());
 			}
 		});
 		priceField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setPrice(priceInput.getDouble());
+				book.setPrice(priceInput.getDouble());
 			}
 		});
-		ft.addField(priceField);
+		addField(priceField);
 
 		// optional fields
 		final Label isbnDisplay = new Label();
@@ -198,17 +144,17 @@ public class BookDialog extends EntityEditDialog<Book> {
 		isbnField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				isbnDisplay.setText(entity.getIsbn());
-				isbnInput.setText(entity.getIsbn());
+				isbnDisplay.setText(Common.getDefaultIfNull(book.getIsbn()));
+				isbnInput.setText(book.getIsbn());
 			}
 		});
 		isbnField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setIsbn(isbnInput.getText());
+				book.setIsbn(isbnInput.getText());
 			}
 		});
-		ft.addField(isbnField);
+		addField(isbnField);
 
 		final Label statusDisplay = new Label();
 		final DefaultListBox statusInput = new DefaultListBox();
@@ -219,17 +165,17 @@ public class BookDialog extends EntityEditDialog<Book> {
 		statusField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				statusDisplay.setText(entity.getStatus());
-				statusInput.setValue(entity.getStatusId());
+				statusDisplay.setText(book.getStatus());
+				statusInput.setValue(book.getStatusId());
 			}
 		});
 		statusField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setStatusId(statusInput.getIntValue());
+				book.setStatusId(statusInput.getIntValue());
 			}
 		});
-		ft.addField(statusField);
+		addField(statusField);
 
 		final Label conditionDisplay = new Label();
 		final DefaultListBox conditionInput = new DefaultListBox();
@@ -243,17 +189,17 @@ public class BookDialog extends EntityEditDialog<Book> {
 		conditionField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				conditionDisplay.setText(entity.getCondition());
-				conditionInput.setValue(entity.getConditionId());
+				conditionDisplay.setText(Common.getDefaultIfNull(book.getCondition()));
+				conditionInput.setValue(book.getConditionId());
 			}
 		});
 		conditionField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setConditionId(conditionInput.getIntValue());
+				book.setConditionId(conditionInput.getIntValue());
 			}
 		});
-		ft.addField(conditionField);
+		addField(conditionField);
 
 		final Label imageDisplay = new Label();
 		final TextBox imageInput = new TextBox();
@@ -263,17 +209,17 @@ public class BookDialog extends EntityEditDialog<Book> {
 		imageField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				imageDisplay.setText(entity.getImageUrl());
-				imageInput.setText(entity.getImageUrl());
+				imageDisplay.setText(Common.getDefaultIfNull(book.getImageUrl()));
+				imageInput.setText(book.getImageUrl());
 			}
 		});
 		imageField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setImageUrl(imageInput.getText());
+				book.setImageUrl(imageInput.getText());
 			}
 		});
-		ft.addField(imageField);
+		addField(imageField);
 
 		final Label notesDisplay = new Label();
 		final TextBox notesInput = new TextBox();
@@ -283,30 +229,18 @@ public class BookDialog extends EntityEditDialog<Book> {
 		notesField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				notesDisplay.setText(entity.getNotes());
-				notesInput.setText(entity.getNotes());
+				notesDisplay.setText(Common.getDefaultIfNull(book.getNotes()));
+				notesInput.setText(book.getNotes());
 			}
 		});
 		notesField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setNotes(notesInput.getText());
+				book.setNotes(notesInput.getText());
 			}
 		});
-		ft.addField(notesField);
+		addField(notesField);
 
-		form.getSubmitButton().setText("Save and Close");
-		final Button save = new Button("Save and Add Another");
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				closeAfterSubmit = false;
-				form.getSubmitButton().click();
-			}
-		});
-		getButtonPanel().addRightButton(save);
-
-		return ft;
 	}
 
 }

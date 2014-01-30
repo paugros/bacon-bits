@@ -15,6 +15,11 @@ public class PageUrl {
 		return "page=ArticleList";
 	}
 
+	public static String book(int id) {
+		String url = "page=Book";
+		return (id == 0) ? url : url + "&bookId=" + id;
+	}
+
 	public static String bookManagement() {
 		return "page=BookManagement";
 	}

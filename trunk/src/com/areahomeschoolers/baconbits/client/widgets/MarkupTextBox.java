@@ -58,7 +58,12 @@ public class MarkupTextBox extends Composite {
 		if (dollars == 0) {
 			preview.setText("Free");
 		} else {
-			preview.setText(Formatter.formatCurrency(dollars + Common.applyEventMarkup(dollars, event)) + " with fees");
+			double markedUp = Common.getEventMarkup(dollars, event) + dollars;
+			if (markedUp == dollars) {
+				preview.setText("");
+			} else {
+				preview.setText(Formatter.formatCurrency(markedUp) + " with fees");
+			}
 		}
 	}
 }

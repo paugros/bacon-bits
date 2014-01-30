@@ -37,6 +37,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> {
@@ -56,12 +57,29 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 		}
 	}
 
-	private BookDialog dialog;
+	public static void showEmailDialog(Book item) {
+		EmailDialog e = new EmailDialog();
+		e.addTo(item.getUserEmail());
+		e.addBcc("admin@wearehomeeducators.com");
+		e.setSubject("Buyer for book: " + item.getTitle());
+		String m = "Hello, someone is interested in buying a book that you have listed for sale. Details appear below.<br><br>";
+		if (Application.isAuthenticated()) {
+			m += "Buyer: " + Application.getCurrentUser().getFullName() + "<br>";
+		}
+		m += "Title: " + item.getTitle() + "<br>";
+		m += "Price: " + Formatter.formatCurrency(item.getPrice()) + "<br><br>";
+		m += "Message from buyer: ";
+		e.setHiddenAboveText(m);
+		e.setText("Email Seller");
+		e.center();
+	}
+
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private Article tc;
 	private boolean agreed = false;
 	private double totalPrice;
+
 	private Command onDelete;
 
 	public BookTable(ArgMap<BookArg> args) {
@@ -127,37 +145,12 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 		}
 	}
 
-	public BookDialog getDialog() {
-		return dialog;
-	}
-
 	public double getTotalPrice() {
 		return totalPrice;
 	}
 
-	public void setDialog(BookDialog dialog) {
-		this.dialog = dialog;
-	}
-
 	public void setOnDelete(Command onDelete) {
 		this.onDelete = onDelete;
-	}
-
-	private void showEmailDialog(Book item) {
-		EmailDialog e = new EmailDialog();
-		e.addTo(item.getUserEmail());
-		e.addBcc("admin@wearehomeeducators.com");
-		e.setSubject("Buyer for book: " + item.getTitle());
-		String m = "Hello, someone is interested in buying a book that you have listed for sale. Details appear below.<br><br>";
-		if (Application.isAuthenticated()) {
-			m += "Buyer: " + Application.getCurrentUser().getFullName() + "<br>";
-		}
-		m += "Title: " + item.getTitle() + "<br>";
-		m += "Price: " + Formatter.formatCurrency(item.getPrice()) + "<br><br>";
-		m += "Message from buyer: ";
-		e.setHiddenAboveText(m);
-		e.setText("Email Seller");
-		e.center();
 	}
 
 	@Override
@@ -173,6 +166,10 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
 					protected Widget createWidget(final Book item) {
+						if (Application.getCurrentUserId() == item.getUserId()) {
+							return new Label("");
+						}
+
 						ClickLabel cl = new ClickLabel("Contact", new ClickHandler() {
 							@Override
 							public void onClick(ClickEvent event) {
@@ -202,14 +199,15 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
 					protected Widget createWidget(final Book item) {
-						boolean editable = Application.getCurrentUserId() == item.getUserId();
-						EditableImage image = new EditableImage(DocumentLinkType.BOOK, item.getId(), item.getSmallImageId(), editable);
+						boolean editable = Application.administratorOf(item);
+						final EditableImage image = new EditableImage(DocumentLinkType.BOOK, item.getId(), item.getSmallImageId(), editable);
 						image.setUploadCompleteHandler(new UploadCompleteHandler() {
 							@Override
 							public void onUploadComplete(int documentId) {
 								populate();
 							}
 						});
+
 						return image.getImage();
 					}
 				});
@@ -276,7 +274,7 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 					@Override
 					protected Widget createWidget(final Book item) {
-						if (Application.getCurrentUserId() != item.getUserId() || dialog == null) {
+						if (Application.getCurrentUserId() != item.getUserId()) {
 							return new ClickLabel(item.getTitle(), new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {
@@ -285,12 +283,7 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 							});
 						}
 
-						return new ClickLabel(item.getTitle(), new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								dialog.center(item);
-							}
-						});
+						return new Hyperlink(item.getTitle(), PageUrl.book(item.getId()));
 					}
 				});
 				break;

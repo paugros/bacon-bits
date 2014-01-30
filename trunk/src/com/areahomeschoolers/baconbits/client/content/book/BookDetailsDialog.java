@@ -3,11 +3,14 @@ package com.areahomeschoolers.baconbits.client.content.book;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ButtonPanel;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -31,7 +34,7 @@ public class BookDetailsDialog extends DefaultDialog {
 		VerticalPanel dt = new VerticalPanel();
 		dt.setSpacing(2);
 
-		Label title = new Label(book.getTitle());
+		Hyperlink title = new Hyperlink(book.getTitle(), PageUrl.book(book.getId()));
 		title.addStyleName("largeText bold");
 		dt.add(title);
 
@@ -60,6 +63,14 @@ public class BookDetailsDialog extends DefaultDialog {
 		}
 
 		dt.add(new HTML("&nbsp;"));
+
+		ClickLabel contact = new ClickLabel("Contact seller", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				BookTable.showEmailDialog(book);
+			}
+		});
+		dt.add(contact);
 
 		Hyperlink link = new Hyperlink("See all from this seller", PageUrl.bookSearch() + "&sellerId=" + book.getUserId());
 		dt.add(link);
