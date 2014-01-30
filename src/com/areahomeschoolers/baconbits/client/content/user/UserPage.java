@@ -10,7 +10,7 @@ import java.util.Set;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.book.BookDialog;
+import com.areahomeschoolers.baconbits.client.content.book.BookEditDialog;
 import com.areahomeschoolers.baconbits.client.content.book.BookTable;
 import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.calendar.Appointment;
@@ -130,7 +130,7 @@ public class UserPage implements Page {
 	private UserPageData pageData;
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private Set<PrivacyPreferenceWidget> privacyPreferenceWidgets = new HashSet<PrivacyPreferenceWidget>();
-	private BookDialog bookDialog;
+	private BookEditDialog bookDialog;
 
 	public UserPage(final VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
@@ -239,6 +239,7 @@ public class UserPage implements Page {
 
 						tabBody.add(tp);
 					}
+
 					TagSection ts = new TagSection(TagMappingType.USER, user.getId(), pageData.getInterests());
 					ts.setEditingEnabled(canEditUser(user));
 					ts.populate();
@@ -435,9 +436,8 @@ public class UserPage implements Page {
 							table.removeColumn(BookColumn.CONTACT);
 						}
 						if (bookDialog == null) {
-							bookDialog = new BookDialog(table);
+							bookDialog = new BookEditDialog(table);
 						}
-						table.setDialog(bookDialog);
 						table.addStatusFilterBox();
 
 						if (canEditUser(user)) {

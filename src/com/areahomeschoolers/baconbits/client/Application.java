@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.content.article.ArticleListPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
 import com.areahomeschoolers.baconbits.client.content.article.NewsPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookManagementPage;
+import com.areahomeschoolers.baconbits.client.content.book.BookPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookReceiptPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookSearchPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventCalendarPage;
@@ -39,6 +40,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.client.widgets.UserAgreementDialog;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
+import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.HasGroupOwnership;
@@ -113,6 +115,10 @@ public final class Application implements ValueChangeHandler<String> {
 				pollReturnHandlers.remove(handler);
 			}
 		};
+	}
+
+	public static boolean administratorOf(Book book) {
+		return isAuthenticated() && (isSystemAdministrator() || book.getUserId() == Application.getCurrentUserId());
 	}
 
 	public static boolean administratorOf(HasGroupOwnership item) {
@@ -271,6 +277,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new HomePage(vp);
 		} else if ("Article".equals(page)) {
 			new ArticlePage(vp);
+		} else if ("Book".equals(page)) {
+			new BookPage(vp);
 		} else if ("Event".equals(page)) {
 			new EventPage(vp);
 		} else if ("User".equals(page)) {

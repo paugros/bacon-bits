@@ -38,35 +38,39 @@ public class EditableImage extends Composite {
 		image.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				final FileUploadDialog uploadDialog = new FileUploadDialog(linkType, entId, false, new UploadCompleteHandler() {
-					@Override
-					public void onUploadComplete(int documentId) {
-						docId = documentId;
-						image.setUrl(Constants.DOCUMENT_URL_PREFIX + documentId);
-						if (uploadCompleteHandler != null) {
-							uploadCompleteHandler.onUploadComplete(documentId);
-						}
-					}
-				});
-
-				uploadDialog.getForm().addFormValidatorCommand(new ValidatorCommand() {
-					@Override
-					public void validate(Validator validator) {
-						String fileName = uploadDialog.getFileName();
-						if (Common.isNullOrBlank(fileName)) {
-							validator.setError(true);
-						}
-
-						if (!Document.hasImageExtension(fileName)) {
-							validator.setError(true);
-							validator.setErrorMessage("Invalid image file.");
-						}
-					}
-				});
-
-				uploadDialog.center();
+				click();
 			}
 		});
+	}
+
+	public void click() {
+		final FileUploadDialog uploadDialog = new FileUploadDialog(linkType, entId, false, new UploadCompleteHandler() {
+			@Override
+			public void onUploadComplete(int documentId) {
+				docId = documentId;
+				image.setUrl(Constants.DOCUMENT_URL_PREFIX + documentId);
+				if (uploadCompleteHandler != null) {
+					uploadCompleteHandler.onUploadComplete(documentId);
+				}
+			}
+		});
+
+		uploadDialog.getForm().addFormValidatorCommand(new ValidatorCommand() {
+			@Override
+			public void validate(Validator validator) {
+				String fileName = uploadDialog.getFileName();
+				if (Common.isNullOrBlank(fileName)) {
+					validator.setError(true);
+				}
+
+				if (!Document.hasImageExtension(fileName)) {
+					validator.setError(true);
+					validator.setErrorMessage("Invalid image file.");
+				}
+			}
+		});
+
+		uploadDialog.center();
 	}
 
 	public Image getImage() {
