@@ -151,6 +151,14 @@ public abstract class ServerUtils {
 		return boolVal;
 	}
 
+	public static String getDistanceSql(String tableAlias, int withinMiles, String withinLat, String withinLng) {
+		String sql = "(3959 * acos( cos( radians(" + withinLat + ") ) * ";
+		sql += "cos( radians( " + tableAlias + ".lat ) ) * cos( radians( " + tableAlias + ".lng ) - radians(" + withinLng + ") ) ";
+		sql += "+ sin( radians(" + withinLat + ") ) * sin( radians( " + tableAlias + ".lat ) ) ) ) as distance, ";
+
+		return sql;
+	}
+
 	public static String getFirstNodeContentByName(Document doc, String name) {
 		NodeList nodes = doc.getElementsByTagName(name);
 		if (nodes.getLength() == 0) {

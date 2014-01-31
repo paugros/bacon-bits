@@ -479,8 +479,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
-			distanceCols += "(3959 * acos( cos( radians(" + withinLat + ") ) * cos( radians( u.lat ) ) * cos( radians( u.lng ) - radians(" + withinLng + ") ) ";
-			distanceCols += "+ sin( radians(" + withinLat + ") ) * sin( radians( u.lat ) ) ) ) as distance, ";
+			distanceCols = ServerUtils.getDistanceSql("u", withinMiles, withinLat, withinLng);
 		}
 
 		if (groupId > 0) {

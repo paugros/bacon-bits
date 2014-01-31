@@ -16,6 +16,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.MonthPicker;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
@@ -64,9 +65,9 @@ public final class EventListPage implements Page {
 
 			PaddedPanel pp = new PaddedPanel(10);
 			VerticalPanel vpp = new VerticalPanel();
+			vpp.setSpacing(8);
 			vpp.add(pp);
 			vp.add(vpp);
-			pp.addStyleName("mediumPadding");
 			categoryBox = new DefaultListBox();
 			categoryBox.addItem("all", 0);
 			categoryBox.addChangeHandler(new ChangeHandler() {
@@ -108,6 +109,57 @@ public final class EventListPage implements Page {
 			pp.add(in);
 			pp.add(monthBox);
 
+			for (int i = 0; i < pp.getWidgetCount(); i++) {
+				pp.setCellVerticalAlignment(pp.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+			}
+
+			PaddedPanel bottom = new PaddedPanel(15);
+			// within miles
+			final DefaultListBox milesInput = new DefaultListBox();
+			final GeocoderTextBox locationInput = new GeocoderTextBox();
+			milesInput.addItem("5", 5);
+			milesInput.addItem("10", 10);
+			milesInput.addItem("25", 25);
+			milesInput.addItem("50", 50);
+			milesInput.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					args.put(EventArg.WITHIN_MILES, milesInput.getIntValue());
+					if (!locationInput.getText().isEmpty()) {
+						table.populate();
+					}
+				}
+			});
+
+			locationInput.setClearCommand(new Command() {
+				@Override
+				public void execute() {
+					args.remove(EventArg.WITHIN_LAT);
+					args.remove(EventArg.WITHIN_LNG);
+					table.populate();
+				}
+			});
+
+			locationInput.setChangeCommand(new Command() {
+				@Override
+				public void execute() {
+					args.put(EventArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
+					args.put(EventArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
+					args.put(EventArg.WITHIN_MILES, milesInput.getIntValue());
+					table.populate();
+				}
+			});
+
+			bottom.add(new Label("within"));
+			bottom.add(milesInput);
+			bottom.add(new Label("miles of"));
+			bottom.add(locationInput);
+
+			for (int i = 0; i < bottom.getWidgetCount(); i++) {
+				bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+			}
+			vpp.add(bottom);
+
 			CheckBox cb = new CheckBox("Only show recently added events");
 			cb.setValue(newlyAdded, false);
 
@@ -127,10 +179,6 @@ public final class EventListPage implements Page {
 			vpp.add(cb);
 
 			vpp.addStyleName("boxedBlurb");
-
-			for (int i = 0; i < pp.getWidgetCount(); i++) {
-				pp.setCellVerticalAlignment(pp.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
-			}
 
 			hp.add(vp);
 
@@ -163,8 +211,7 @@ public final class EventListPage implements Page {
 					return;
 				}
 
-				Sidebar sb = Sidebar.create(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.COMMUNITY_EVENTS, MiniModule.SELL_BOOKS,
-						MiniModule.CITRUS);
+				Sidebar sb = Sidebar.create(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.COMMUNITY_EVENTS, MiniModule.SELL_BOOKS, MiniModule.CITRUS);
 				Application.getLayout().setPage(title, sb, page);
 			}
 		});
