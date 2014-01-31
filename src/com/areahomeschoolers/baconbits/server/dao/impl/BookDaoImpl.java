@@ -86,19 +86,6 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		super(dataSource);
 	}
 
-	public String createSqlBase() {
-		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, u.firstName, u.lastName, u.email, bo.bookCondition \n";
-		sql += "from books b \n";
-		sql += "join users u on u.id = b.userId \n";
-		sql += "join bookStatus bs on bs.id = b.statusId \n";
-		sql += "join bookCategories bc on bc.id = b.categoryId \n";
-		sql += "join bookGradeLevels ba on ba.id = b.gradeLevelId \n";
-		sql += "left join bookConditions bo on bo.id = b.conditionId \n";
-		sql += "where 1 = 1 \n";
-
-		return sql;
-	}
-
 	@Override
 	public void delete(Book book) {
 		String sql = "delete from books where id = ?";
@@ -119,13 +106,15 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	public BookPageData getPageData(int bookId) {
 		BookPageData pd = new BookPageData();
 
-		pd.setBook(getById(bookId));
+		if (bookId > 0) {
+			pd.setBook(getById(bookId));
 
-		// tags
-		TagDao tagDao = ServerContext.getDaoImpl("tag");
-		ArgMap<TagArg> tagArgs = new ArgMap<TagArg>(TagArg.ENTITY_ID, pd.getBook().getId());
-		tagArgs.put(TagArg.MAPPING_TYPE, TagMappingType.BOOK.toString());
-		pd.setTags(tagDao.list(tagArgs));
+			// tags
+			TagDao tagDao = ServerContext.getDaoImpl("tag");
+			ArgMap<TagArg> tagArgs = new ArgMap<TagArg>(TagArg.ENTITY_ID, pd.getBook().getId());
+			tagArgs.put(TagArg.MAPPING_TYPE, TagMappingType.BOOK.toString());
+			pd.setTags(tagDao.list(tagArgs));
+		}
 
 		String sql = "select * from bookCategories order by category";
 		pd.setCategories(query(sql, ServerUtils.getGenericRowMapper()));
@@ -199,8 +188,17 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		boolean hideOffline = args.getBoolean(BookArg.ONLINE_ONLY);
 		int newNumber = args.getInt(BookArg.NEW_NUMBER);
 		List<Integer> ids = args.getIntList(BookArg.IDS);
+		int withinMiles = args.getInt(BookArg.WITHIN_MILES);
+		String withinLat = args.getString(BookArg.WITHIN_LAT);
+		String withinLng = args.getString(BookArg.WITHIN_LNG);
+		String distanceCols = "";
 
-		String sql = createSqlBase();
+		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+			distanceCols = ServerUtils.getDistanceSql("u", withinMiles, withinLat, withinLng);
+		}
+
+		String sql = createSqlBase(distanceCols);
+
 		if (userId > 0) {
 			sql += "and b.userId = ? ";
 			sqlArgs.add(userId);
@@ -240,6 +238,13 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 		if (newNumber > 0) {
 			sql += "and date_add(now(), interval -2 week) < b.addedDate ";
+		}
+
+		if (!Common.isNullOrBlank(distanceCols)) {
+			sql += "having distance < " + withinMiles + " ";
+		}
+
+		if (newNumber > 0) {
 			sql += "order by b.addedDate desc limit " + newNumber;
 		}
 
@@ -385,6 +390,27 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		}
 
 		return p.getPaypalData();
+	}
+
+	private String createSqlBase() {
+		return createSqlBase("");
+	}
+
+	private String createSqlBase(String specialCols) {
+		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, ";
+		if (!Common.isNullOrBlank(specialCols)) {
+			sql += specialCols;
+		}
+		sql += "u.firstName, u.lastName, u.email, bo.bookCondition \n";
+		sql += "from books b \n";
+		sql += "join users u on u.id = b.userId \n";
+		sql += "join bookStatus bs on bs.id = b.statusId \n";
+		sql += "join bookCategories bc on bc.id = b.categoryId \n";
+		sql += "join bookGradeLevels ba on ba.id = b.gradeLevelId \n";
+		sql += "left join bookConditions bo on bo.id = b.conditionId \n";
+		sql += "where 1 = 1 \n";
+
+		return sql;
 	}
 
 }

@@ -68,7 +68,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setActive(rs.getBoolean("active"));
 			event.setAddedDate(rs.getTimestamp("addedDate"));
 			event.setAddedById(rs.getInt("addedById"));
-			event.setAddress(rs.getString("address"));
 			event.setAdultRequired(rs.getBoolean("adultRequired"));
 			event.setCategory(rs.getString("category"));
 			event.setCategoryId(rs.getInt("categoryId"));
@@ -111,6 +110,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setGroupMarkupDollars(rs.getDouble("groupMarkupDollars"));
 			event.setGroupMarkupPercent(rs.getDouble("groupMarkupPercent"));
 			event.setGroupMarkupOverride(rs.getBoolean("groupMarkupOverride"));
+			event.setCity(rs.getString("city"));
+			event.setZip(rs.getString("zip"));
+			event.setState(rs.getString("state"));
+			event.setAddress(rs.getString("address"));
+			event.setStreet(rs.getString("street"));
+			event.setLat(rs.getDouble("lat"));
+			event.setLng(rs.getDouble("lng"));
 			return event;
 		}
 	}
@@ -657,8 +663,16 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		int seriesId = args.getInt(EventArg.SERIES_ID);
 		boolean newlyAdded = args.getBoolean(EventArg.NEWLY_ADDED);
 		int registeredByOrAddedForId = args.getInt(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID);
+		int withinMiles = args.getInt(EventArg.WITHIN_MILES);
+		String withinLat = args.getString(EventArg.WITHIN_LAT);
+		String withinLng = args.getString(EventArg.WITHIN_LNG);
+		String distanceCols = "";
 
-		String sql = createSqlBase();
+		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+			distanceCols = ServerUtils.getDistanceSql("u", withinMiles, withinLat, withinLng);
+		}
+
+		String sql = createSqlBase(distanceCols);
 
 		if (args.getStatus() != Status.ALL) {
 			if (args.getStatus() == Status.ACTIVE) {
@@ -702,6 +716,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 		if (newlyAdded) {
 			sql += "and (e.addedDate >= date_add(now(), interval -2 week) and (e.seriesId = e.id or e.seriesId is null)) \n";
+		}
+
+		if (!Common.isNullOrBlank(distanceCols)) {
+			sql += "having distance < " + withinMiles + " ";
 		}
 
 		sql += "order by e.startDate ";
@@ -772,7 +790,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, markup = :markup, ";
 			sql += "markupOverride = :markupOverride, markupPercent = :markupPercent, markupDollars = :markupDollars, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
-			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, address = :address, requiresRegistration = :requiresRegistration, ";
+			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, requiresRegistration = :requiresRegistration, ";
+			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
 			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, ";
 			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price, phone = :phone, website = :website ";
 			sql += "where id = :id";
@@ -783,11 +802,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
 			sql += "markupOverride, markupPercent, markupDollars, ";
-			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, address, notificationEmail, owningOrgId, ";
+			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, notificationEmail, owningOrgId, ";
+			sql += "address, street, city, state, zip, lat, lng, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, :markup, ";
 			sql += ":markupOverride, :markupPercent, :markupDollars, ";
-			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :address, :notificationEmail, :owningOrgId, ";
+			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :notificationEmail, :owningOrgId, ";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
@@ -999,9 +1020,16 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	}
 
 	private String createSqlBase() {
+		return createSqlBase("");
+	}
+
+	private String createSqlBase(String specialCols) {
 		int userId = ServerContext.getCurrentUserId();
 		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.visibilityLevel, \n";
 		sql += "gg.markupPercent as groupMarkupPercent, gg.markupDollars as groupMarkupDollars, gg.markupOverride as groupMarkupOverride, \n";
+		if (!Common.isNullOrBlank(specialCols)) {
+			sql += specialCols;
+		}
 		sql += "(select group_concat(price + markup) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {

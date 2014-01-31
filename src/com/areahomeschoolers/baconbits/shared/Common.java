@@ -28,23 +28,6 @@ public abstract class Common {
 
 	private final static String EMAIL_VALIDATION_REGEX = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
 
-	public static double getEventMarkup(double price, Event event) {
-		double percent = Constants.EVENT_PERCENT_MARKUP;
-		double dollars = Constants.EVENT_DOLLARS_MARKUP;
-
-		if (event.getGroupMarkupOverride()) {
-			percent = event.getGroupMarkupPercent();
-			dollars = event.getGroupMarkupDollars();
-		}
-
-		if (event.getMarkupOverride()) {
-			percent = event.getMarkupPercent();
-			dollars = event.getMarkupDollars();
-		}
-
-		return (price * (percent / 100)) + dollars;
-	}
-
 	public final static <T> ArrayList<T> asArrayList(List<T> list) {
 		if (list instanceof ArrayList) {
 			return (ArrayList<T>) list;
@@ -146,6 +129,23 @@ public abstract class Common {
 		dist = rad2deg(dist);
 		dist = dist * 60 * 1.1515;
 		return (dist);
+	}
+
+	public static double getEventMarkup(double price, Event event) {
+		double percent = Constants.EVENT_PERCENT_MARKUP;
+		double dollars = Constants.EVENT_DOLLARS_MARKUP;
+
+		if (event.getGroupMarkupOverride()) {
+			percent = event.getGroupMarkupPercent();
+			dollars = event.getGroupMarkupDollars();
+		}
+
+		if (event.getMarkupOverride()) {
+			percent = event.getMarkupPercent();
+			dollars = event.getMarkupDollars();
+		}
+
+		return (price * (percent / 100)) + dollars;
 	}
 
 	/**

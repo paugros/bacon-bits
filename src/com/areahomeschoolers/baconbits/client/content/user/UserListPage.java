@@ -10,7 +10,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.GoogleMapWidget;
+import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SortDirection;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
@@ -18,16 +18,10 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.BlurEvent;
-import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
@@ -39,16 +33,11 @@ import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.maps.gwt.client.Geocoder;
-import com.google.maps.gwt.client.GeocoderRequest;
-import com.google.maps.gwt.client.GeocoderResult;
-import com.google.maps.gwt.client.GeocoderStatus;
 
 public final class UserListPage implements Page {
 	private VerticalPanel optionsPanel = new VerticalPanel();
 	private ArgMap<UserArg> args = getDefaultArgs();
 	private UserTable table;
-	private String lastLocationText;
 	private TextBox searchControl;
 
 	public UserListPage(final VerticalPanel page) {
@@ -180,9 +169,9 @@ public final class UserListPage implements Page {
 			}
 		});
 
+		// within miles
 		final DefaultListBox milesInput = new DefaultListBox();
-		final TextBox locationInput = new TextBox();
-		locationInput.setVisibleLength(30);
+		final GeocoderTextBox locationInput = new GeocoderTextBox();
 		milesInput.addItem("5", 5);
 		milesInput.addItem("10", 10);
 		milesInput.addItem("25", 25);
@@ -197,52 +186,22 @@ public final class UserListPage implements Page {
 			}
 		});
 
-		locationInput.addKeyDownHandler(new KeyDownHandler() {
+		locationInput.setClearCommand(new Command() {
 			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					locationInput.setFocus(false);
-				}
+			public void execute() {
+				args.remove(UserArg.WITHIN_LAT);
+				args.remove(UserArg.WITHIN_LNG);
+				table.populate();
 			}
 		});
-		locationInput.addBlurHandler(new BlurHandler() {
+
+		locationInput.setChangeCommand(new Command() {
 			@Override
-			public void onBlur(BlurEvent event) {
-				if (lastLocationText != null && lastLocationText.equals(locationInput.getText())) {
-					return;
-				}
-
-				if (locationInput.getText().isEmpty()) {
-					if (lastLocationText == null) {
-						return;
-					}
-					args.remove(UserArg.WITHIN_LAT);
-					args.remove(UserArg.WITHIN_LNG);
-					table.populate();
-				}
-
-				lastLocationText = locationInput.getText();
-
-				GoogleMapWidget.runMapsCommand(new Command() {
-					@Override
-					public void execute() {
-						GeocoderRequest request = GeocoderRequest.create();
-						request.setAddress(locationInput.getText());
-						GoogleMapWidget.getGeoCoder().geocode(request, new Geocoder.Callback() {
-							@Override
-							public void handle(JsArray<GeocoderResult> results, GeocoderStatus status) {
-								if (status == GeocoderStatus.OK) {
-									GeocoderResult location = results.get(0);
-
-									args.put(UserArg.WITHIN_LAT, Double.toString(location.getGeometry().getLocation().lat()));
-									args.put(UserArg.WITHIN_LNG, Double.toString(location.getGeometry().getLocation().lng()));
-									args.put(UserArg.WITHIN_MILES, milesInput.getIntValue());
-									table.populate();
-								}
-							}
-						});
-					}
-				});
+			public void execute() {
+				args.put(UserArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
+				args.put(UserArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
+				args.put(UserArg.WITHIN_MILES, milesInput.getIntValue());
+				table.populate();
 			}
 		});
 

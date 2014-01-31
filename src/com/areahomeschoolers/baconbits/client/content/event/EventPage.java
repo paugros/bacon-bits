@@ -24,6 +24,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
+import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
@@ -78,35 +79,20 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class EventPage implements Page {
+	private Event calendarEvent = new Event();
 	private final Form form = new Form(new FormSubmitHandler() {
 		@Override
 		public void onFormSubmit(final FormField formField) {
-			// if (calendarEvent.isSaved() && calendarEvent.getSeriesId() != null) {
-			// ConfirmDialog confirm = new ConfirmDialog(null, null)
-			// confirm.confirm(ConfirmDialogType.YES_NO, "Make this change to all events in series?", new ConfirmHandler() {
-			// @Override
-			// public void onConfirm() {
-			// calendarEvent.setSaveAllInSeries(true);
-			// save(formField);
-			// }
-			// });
-			//
-			// confirm.addCancelHandler(new CancelHandler() {
-			// @Override
-			// public void onCancel() {
-			// calendarEvent.setSaveAllInSeries(false);
-			// save(formField);
-			// }
-			// });
-			// } else {
-			// save(formField);
-			// }
-			save(formField);
+			AddressField.validateAddress(calendarEvent, new Command() {
+				@Override
+				public void execute() {
+					save(formField);
+				}
+			});
 		}
 	});
 	private VerticalPanel page;
 	private final FieldTable fieldTable = new FieldTable();
-	private Event calendarEvent = new Event();
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private EventPageData pageData;
 	private TabPage tabPanel;
@@ -223,26 +209,8 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(eventDatesField);
 
-		final Hyperlink addressDisplay = new Hyperlink();
-		final MaxLengthTextArea addressInput = new MaxLengthTextArea(200);
-		addressInput.setVisibleLines(2);
-		addressInput.setCharacterWidth(50);
-		FormField addressField = form.createFormField("Address:", addressInput, addressDisplay);
-		addressField.setRequired(true);
-		addressField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				addressDisplay.setText(calendarEvent.getAddress());
-				addressDisplay.setTargetHistoryToken(PageUrl.event(calendarEvent.getId()) + "&tab=5");
-				addressInput.setText(calendarEvent.getAddress());
-			}
-		});
-		addressField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				calendarEvent.setAddress(addressInput.getText().trim());
-			}
-		});
+		FormField addressField = new AddressField(calendarEvent).getFormField();
+		form.addField(addressField);
 		fieldTable.addField(addressField);
 
 		if (Application.administratorOf(calendarEvent) || !Common.isNullOrBlank(calendarEvent.getWebsite())) {

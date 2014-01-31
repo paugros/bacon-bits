@@ -13,6 +13,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -22,6 +23,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -32,7 +34,9 @@ public final class BookSearchPage implements Page {
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 	private BookTable table = new BookTable(args);
-	private PaddedPanel optionsPanel = new PaddedPanel(15);
+	private VerticalPanel optionsPanel = new VerticalPanel();
+	private PaddedPanel top = new PaddedPanel(15);
+	private PaddedPanel bottom = new PaddedPanel(15);
 	private int sellerId = Url.getIntegerParameter("sellerId");
 
 	public BookSearchPage(final VerticalPanel page) {
@@ -45,9 +49,9 @@ public final class BookSearchPage implements Page {
 		}
 
 		optionsPanel.addStyleName("boxedBlurb");
-		Label label = new Label("Filter for:");
-		label.addStyleName("bold");
-		optionsPanel.add(label);
+		optionsPanel.setSpacing(8);
+		Label label = new Label("Show");
+		top.add(label);
 
 		Hyperlink conditionLink = new Hyperlink("Click here", PageUrl.article(64));
 		String text = conditionLink + " for a description of book conditions.";
@@ -69,7 +73,7 @@ public final class BookSearchPage implements Page {
 						table.populate();
 					}
 				});
-				category.addItem("All categories", 0);
+				category.addItem("all categories", 0);
 				for (Data item : result.getCategories()) {
 					category.addItem(item.get("category"), item.getId());
 				}
@@ -82,7 +86,7 @@ public final class BookSearchPage implements Page {
 						table.populate();
 					}
 				});
-				grade.addItem("All grades", 0);
+				grade.addItem("all grades", 0);
 				for (Data item : result.getGradeLevels()) {
 					grade.addItem(item.get("gradeLevel"), item.getId());
 				}
@@ -99,21 +103,68 @@ public final class BookSearchPage implements Page {
 						table.populate();
 					}
 				});
-				price.addItem("All prices");
+				price.addItem("all prices");
 				price.addItem("< $1", "0-0.99");
 				price.addItem("$1 - $5", "1-5");
 				price.addItem("$5 - $10", "5-10");
 				price.addItem("$10 - $20", "10-20");
 				price.addItem("> $20", "20.01-1000");
 
-				optionsPanel.add(category);
-				optionsPanel.add(grade);
-				optionsPanel.add(price);
+				top.add(category);
+				top.add(grade);
+				top.add(price);
 
-				for (int i = 0; i < optionsPanel.getWidgetCount(); i++) {
-					optionsPanel.setCellVerticalAlignment(optionsPanel.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+				for (int i = 0; i < top.getWidgetCount(); i++) {
+					top.setCellVerticalAlignment(top.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
 				}
 
+				// within miles
+				final DefaultListBox milesInput = new DefaultListBox();
+				final GeocoderTextBox locationInput = new GeocoderTextBox();
+				milesInput.addItem("5", 5);
+				milesInput.addItem("10", 10);
+				milesInput.addItem("25", 25);
+				milesInput.addItem("50", 50);
+				milesInput.addChangeHandler(new ChangeHandler() {
+					@Override
+					public void onChange(ChangeEvent event) {
+						args.put(BookArg.WITHIN_MILES, milesInput.getIntValue());
+						if (!locationInput.getText().isEmpty()) {
+							table.populate();
+						}
+					}
+				});
+
+				locationInput.setClearCommand(new Command() {
+					@Override
+					public void execute() {
+						args.remove(BookArg.WITHIN_LAT);
+						args.remove(BookArg.WITHIN_LNG);
+						table.populate();
+					}
+				});
+
+				locationInput.setChangeCommand(new Command() {
+					@Override
+					public void execute() {
+						args.put(BookArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
+						args.put(BookArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
+						args.put(BookArg.WITHIN_MILES, milesInput.getIntValue());
+						table.populate();
+					}
+				});
+
+				bottom.add(new Label("within"));
+				bottom.add(milesInput);
+				bottom.add(new Label("miles of"));
+				bottom.add(locationInput);
+
+				for (int i = 0; i < bottom.getWidgetCount(); i++) {
+					bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+				}
+
+				optionsPanel.add(top);
+				optionsPanel.add(bottom);
 				page.insert(optionsPanel, 0);
 			}
 		});

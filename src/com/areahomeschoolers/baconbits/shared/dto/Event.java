@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.content.document.HasDocuments;
+import com.areahomeschoolers.baconbits.shared.HasAddress;
 import com.areahomeschoolers.baconbits.shared.HasMarkup;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 
-public final class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwnership, HasMarkup {
+public final class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwnership, HasMarkup, HasAddress {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
@@ -24,7 +25,6 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private double cost;
 	private double price;
 	private double markup;
-	private String address;
 	private boolean adultRequired = false;
 	private boolean active = true;
 	private boolean finished, registrationOpen;
@@ -42,6 +42,15 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private double markupPercent;
 	private double markupDollars;
 	private boolean markupOverride;
+	// address
+	private String address;
+	private String street;
+	private String city;
+	private String state;
+	private String zip;
+	private double lat;
+	private double lng;
+	private boolean addressChanged;
 
 	// auxilliary
 	private double groupMarkupPercent;
@@ -49,6 +58,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private boolean groupMarkupOverride;
 	private boolean newlyAdded;
 	private boolean saveAllInSeries;
+
 	private int cloneFromId;
 	private int currentUserParticipantCount;
 	private String agePrices;
@@ -56,9 +66,9 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private int documentCount;
 	private String category;
 	private String groupName;
+
 	private String visibilityLevel;
 	private String addedByFullName;
-
 	// used to create a series
 	private ArrayList<Pair<Date, Date>> createSeriesDates;
 
@@ -102,8 +112,14 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return addedDate;
 	}
 
+	@Override
 	public String getAddress() {
 		return address;
+	}
+
+	@Override
+	public boolean getAddressChanged() {
+		return addressChanged;
 	}
 
 	public double getAdjustedPrice() {
@@ -128,6 +144,11 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public int getCategoryId() {
 		return categoryId;
+	}
+
+	@Override
+	public String getCity() {
+		return city;
 	}
 
 	public int getCloneFromId() {
@@ -186,6 +207,16 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public String getGroupName() {
 		return groupName;
+	}
+
+	@Override
+	public double getLat() {
+		return lat;
+	}
+
+	@Override
+	public double getLng() {
+		return lng;
 	}
 
 	public double getMarkup() {
@@ -283,6 +314,16 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return startDate;
 	}
 
+	@Override
+	public String getState() {
+		return state;
+	}
+
+	@Override
+	public String getStreet() {
+		return street;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -297,6 +338,11 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public String getWebsite() {
 		return website;
+	}
+
+	@Override
+	public String getZip() {
+		return zip;
 	}
 
 	@Override
@@ -328,8 +374,14 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		this.addedDate = addedDate;
 	}
 
+	@Override
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	@Override
+	public void setAddressChanged(boolean changed) {
+		this.addressChanged = changed;
 	}
 
 	public void setAdultRequired(boolean adultRequired) {
@@ -350,6 +402,11 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public void setCategoryId(int categoryId) {
 		this.categoryId = categoryId;
+	}
+
+	@Override
+	public void setCity(String city) {
+		this.city = city;
 	}
 
 	public void setCloneFromId(int cloneFromId) {
@@ -399,6 +456,16 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	@Override
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	@Override
+	public void setLng(double lng) {
+		this.lng = lng;
 	}
 
 	public void setMarkup(double markup) {
@@ -493,6 +560,16 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		this.startDate = startDate;
 	}
 
+	@Override
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	@Override
+	public void setStreet(String street) {
+		this.street = street;
+	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -507,6 +584,11 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public void setWebsite(String website) {
 		this.website = website;
+	}
+
+	@Override
+	public void setZip(String zip) {
+		this.zip = zip;
 	}
 
 }
