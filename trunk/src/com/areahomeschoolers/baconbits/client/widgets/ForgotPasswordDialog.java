@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.shared.Constants;
 
@@ -35,11 +36,14 @@ public class ForgotPasswordDialog extends DialogBox {
 		vp.setSpacing(10);
 		vp.setWidth("360px");
 		Integer documentId = Application.getCurrentOrg().getLogoId();
-		if (documentId == null) {
-			documentId = Constants.DEFAULT_LOGO_ID;
-		}
 
-		Image logo = new Image(Constants.DOCUMENT_URL_PREFIX + documentId);
+		Image logo;
+
+		if (documentId == null) {
+			logo = new Image(MainImageBundle.INSTANCE.logo());
+		} else {
+			logo = new Image(Constants.DOCUMENT_URL_PREFIX + documentId);
+		}
 
 		vp.add(logo);
 		vp.setCellHorizontalAlignment(logo, HasHorizontalAlignment.ALIGN_CENTER);
