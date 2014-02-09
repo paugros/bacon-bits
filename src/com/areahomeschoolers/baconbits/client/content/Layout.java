@@ -338,11 +338,13 @@ public final class Layout {
 	}
 
 	public void setLogo(Integer documentId) {
-		if (documentId == null) {
-			documentId = Constants.DEFAULT_LOGO_ID;
-		}
+		Image logo;
 
-		Image logo = new Image(Constants.DOCUMENT_URL_PREFIX + documentId);
+		if (documentId == null) {
+			logo = new Image(MainImageBundle.INSTANCE.logo());
+		} else {
+			logo = new Image(Constants.DOCUMENT_URL_PREFIX + documentId);
+		}
 
 		logoDiv.setHTML("<a href=\"#" + PageUrl.home() + "\">" + logo + "</a>");
 	}
