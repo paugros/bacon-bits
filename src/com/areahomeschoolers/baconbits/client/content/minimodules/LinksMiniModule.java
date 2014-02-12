@@ -43,7 +43,7 @@ public class LinksMiniModule extends Composite {
 		vp.add(new Hyperlink("Event Listing", PageUrl.eventList()));
 		vp.add(new Hyperlink("Event Calendar", PageUrl.eventCalendar()));
 		vp.add(new Hyperlink("News", PageUrl.news(0)));
-		vp.add(new Hyperlink("Book Store", PageUrl.bookSearch()));
+		// vp.add(new Hyperlink("Book Store", PageUrl.bookSearch()));
 
 		if (Application.isAuthenticated()) {
 			vp.add(new Hyperlink("My Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));

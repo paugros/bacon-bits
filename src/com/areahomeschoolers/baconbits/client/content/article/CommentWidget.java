@@ -60,7 +60,11 @@ public class CommentWidget extends Composite {
 		headerLabel.addStyleName("bold");
 		userLink.addStyleName("bold");
 		userLink.getElement().getStyle().setColor("#333333");
-		pp.add(userLink);
+		if (Application.isAuthenticated()) {
+			pp.add(userLink);
+		} else {
+			pp.add(new Label(comment.getAddedBy()));
+		}
 		pp.add(headerLabel);
 		mugVP.add(pp);
 

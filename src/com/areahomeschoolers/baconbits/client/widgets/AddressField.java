@@ -3,6 +3,8 @@ package com.areahomeschoolers.baconbits.client.widgets;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.areahomeschoolers.baconbits.client.validation.Validator;
+import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.HasAddress;
 
@@ -114,6 +116,12 @@ public class AddressField {
 				address.setAddressChanged(true);
 			}
 		});
+		addressField.setValidator(new Validator(street, new ValidatorCommand() {
+			@Override
+			public void validate(Validator validator) {
+				validator.setError(addressField.isRequired() && street.getText().isEmpty() && zip.getText().isEmpty());
+			}
+		}));
 	}
 
 	public FormField getFormField() {

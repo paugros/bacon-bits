@@ -210,6 +210,7 @@ public class EventPage implements Page {
 		fieldTable.addField(eventDatesField);
 
 		FormField addressField = new AddressField(calendarEvent).getFormField();
+		addressField.setRequired(true);
 		form.addField(addressField);
 		fieldTable.addField(addressField);
 
