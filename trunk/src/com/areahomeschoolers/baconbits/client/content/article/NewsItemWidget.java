@@ -94,9 +94,13 @@ public class NewsItemWidget extends Composite {
 			HorizontalPanel hp = new HorizontalPanel();
 			hp.setWidth(NEWS_ITEM_WIDTH + "px");
 			HorizontalPanel userPanel = new PaddedPanel(3);
-			Hyperlink userLink = new Hyperlink(item.getAddedByFirstName() + " " + item.getAddedByLastName(), PageUrl.user(item.getAddedById()));
+			String name = item.getAddedByFirstName() + " " + item.getAddedByLastName();
 			userPanel.add(new Label("By "));
-			userPanel.add(userLink);
+			if (Application.isAuthenticated()) {
+				userPanel.add(new Hyperlink(name, PageUrl.user(item.getAddedById())));
+			} else {
+				userPanel.add(new Label(name));
+			}
 			hp.add(userPanel);
 
 			PaddedPanel commentsPanel = new PaddedPanel();

@@ -1,8 +1,11 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Style.FontStyle;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -21,9 +24,24 @@ public class GeocoderTextBox extends Composite {
 	private double lng;
 	private Command clearCommand;
 	private Command changeCommand;
+	private static final String defaultSearchText = "Address, city, or zip";
 
 	public GeocoderTextBox() {
 		input.setVisibleLength(30);
+
+		input.addFocusHandler(new FocusHandler() {
+			@Override
+			public void onFocus(FocusEvent event) {
+				if (!input.getText().equals(defaultSearchText)) {
+					return;
+				}
+				input.setText("");
+				input.getElement().getStyle().setColor("#000000");
+				input.getElement().getStyle().setFontStyle(FontStyle.NORMAL);
+			}
+		});
+
+		reset();
 
 		input.addKeyDownHandler(new KeyDownHandler() {
 			@Override
@@ -42,6 +60,8 @@ public class GeocoderTextBox extends Composite {
 				}
 
 				if (input.getText().isEmpty()) {
+					reset();
+
 					if (lastLocationText == null) {
 						return;
 					}
@@ -95,6 +115,15 @@ public class GeocoderTextBox extends Composite {
 
 	public void setClearCommand(Command command) {
 		clearCommand = command;
+	}
+
+	private void reset() {
+		if (!input.getText().isEmpty()) {
+			return;
+		}
+		input.setText(defaultSearchText);
+		input.getElement().getStyle().setColor("#666666");
+		input.getElement().getStyle().setFontStyle(FontStyle.ITALIC);
 	}
 
 }

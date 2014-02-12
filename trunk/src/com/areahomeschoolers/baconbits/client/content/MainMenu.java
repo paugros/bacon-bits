@@ -81,7 +81,7 @@ public final class MainMenu extends MenuBar {
 		addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this, null, 0);
 
 		addItem("Events", getEventsMenu());
-		addItem("Book Store", getBooksMenu());
+		// addItem("Book Store", getBooksMenu());
 		if (Application.isAuthenticated()) {
 			addItem("People", getPeopleMenu());
 		}
