@@ -11,7 +11,6 @@ import com.areahomeschoolers.baconbits.client.content.minimodules.LinksMiniModul
 import com.areahomeschoolers.baconbits.client.content.minimodules.MyEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewUsersMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.UpcomingEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -126,7 +125,7 @@ public class HomePage implements Page {
 
 				// book promo
 				if (!Application.memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
-					leftPanel.add(new SellBooksMiniModule());
+					// leftPanel.add(new SellBooksMiniModule());
 				}
 
 				// find people promo
