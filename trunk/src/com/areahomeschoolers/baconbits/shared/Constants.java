@@ -38,10 +38,10 @@ public abstract class Constants {
 	public static final String TOS_URL = CG_URL + "/#page=Article&articleId=73";
 	public static final String PRIVACY_POLICY_URL = CG_URL + "/#page=Article&articleId=72";
 	public static final String PRODUCTION_VERSION = "production";
-	// 2.9% and 30 to PayPal, then 2.5% and 20 cents to us
-	// 5.4% and 50 cents total
-	public static final double EVENT_PERCENT_MARKUP = 5.4;
-	public static final double EVENT_DOLLARS_MARKUP = 0.5;
+	// 2.9% and 30 to PayPal, then 3% and 69 cents to us
+	// 5.9% and 99 cents total
+	public static final double EVENT_PERCENT_MARKUP = 5.9;
+	public static final double EVENT_DOLLARS_MARKUP = 0.99;
 
 	public static final int MAX_DATA_ROWS = 2000;
 
