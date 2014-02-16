@@ -77,6 +77,12 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			book.setSoldAtBookSale(rs.getBoolean("soldAtBookSale"));
 			book.setAuthor(rs.getString("author"));
 			book.setSoldDate(rs.getTimestamp("soldDate"));
+			book.setSubTitle(rs.getString("subTitle"));
+			book.setPublisher(rs.getString("publisher"));
+			book.setPublishDate(rs.getTimestamp("publishDate"));
+			book.setDescription(rs.getString("description"));
+			book.setPageCount(rs.getInt("pageCount"));
+			book.setGoogleCategories(rs.getString("googleCategories"));
 			return book;
 		}
 	}
@@ -104,6 +110,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 	@Override
 	public BookPageData getPageData(int bookId) {
+		// Book b = new Book();
+		// b.setIsbn("0440335701");
+		// populateGoogleInfo(b);
+
 		BookPageData pd = new BookPageData();
 
 		if (bookId > 0) {
@@ -263,7 +273,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 		if (book.isSaved()) {
 			String sql = "update books set title = :title, userId = :userId, categoryId = :categoryId, statusId = :statusId, price = :price, gradeLevelId = :gradeLevelId, ";
-			sql += "isbn = :isbn, notes = :notes, conditionId = :conditionId, imageId = :imageId, smallImageId = :smallImageId, author = :author, soldDate = :soldDate ";
+			sql += "isbn = :isbn, notes = :notes, conditionId = :conditionId, imageId = :imageId, smallImageId = :smallImageId, author = :author, soldDate = :soldDate, ";
+			sql += "subTitle = :subTitle, publisher = :publisher, publishDate = :publishDate, description = :description, pageCount = :pageCount, googleCategories = :googleCategories ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -271,8 +282,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 			book.setImageId(Constants.BLANK_BOOK_IMAGE);
 			book.setSmallImageId(Constants.BLANK_BOOK_IMAGE_SMALL);
-			String sql = "insert into books (userId, title, categoryId, gradeLevelId, statusId, price, isbn, notes, conditionId, imageId, smallImageId, author) values ";
-			sql += "(:userId, :title, :categoryId, :gradeLevelId, :statusId, :price, :isbn, :notes, :conditionId, :imageId, :smallImageId, :author)";
+			String sql = "insert into books (userId, title, categoryId, gradeLevelId, statusId, price, isbn, notes, conditionId, imageId, smallImageId, author, ";
+			sql += "subTitle, publisher, publishDate, description, pageCount, googleCategories) values ";
+			sql += "(:userId, :title, :categoryId, :gradeLevelId, :statusId, :price, :isbn, :notes, :conditionId, :imageId, :smallImageId, :author, ";
+			sql += ":subTitle, :publisher, :publishDate, :description, :pageCount, :googleCategories)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -412,5 +425,31 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 		return sql;
 	}
+
+	// private void populateGoogleInfo(Book b) {
+	// try {
+	// URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn:" + b.getIsbn());
+	// BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+	// String line;
+	//
+	// StringBuffer buffer = new StringBuffer();
+	// while ((line = reader.readLine()) != null) {
+	// buffer.append(line);
+	// }
+	// reader.close();
+	//
+	// JsonElement jelement = new JsonParser().parse(buffer.toString());
+	// JsonObject book = jelement.getAsJsonObject().getAsJsonArray("items").get(0).getAsJsonObject();
+	// JsonObject volumeInfo = book.getAsJsonObject("volumeInfo");
+	//
+	// String title = volumeInfo.get("title").getAsString();
+	// if (title != null && title.length() > 200) {
+	// title = title.substring(0, 199);
+	// }
+	// b.setTitle(title);
+	// } catch (MalformedURLException e) {
+	// } catch (IOException e) {
+	// }
+	// }
 
 }

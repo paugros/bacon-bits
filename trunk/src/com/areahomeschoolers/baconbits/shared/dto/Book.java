@@ -24,6 +24,12 @@ public final class Book extends EntityDto<Book> {
 	private boolean soldAtBookSale;
 	private String author;
 	private Date soldDate;
+	private String subTitle;
+	private String publisher;
+	private Date publishDate;
+	private String description;
+	private int pageCount;
+	private String googleCategories;
 
 	// auxillary
 	private String userFirstName, userLastName;
@@ -61,6 +67,14 @@ public final class Book extends EntityDto<Book> {
 		return conditionId;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public String getGoogleCategories() {
+		return googleCategories;
+	}
+
 	public String getGradeLevel() {
 		return gradeLevel;
 	}
@@ -89,8 +103,20 @@ public final class Book extends EntityDto<Book> {
 		return notes;
 	}
 
+	public int getPageCount() {
+		return pageCount;
+	}
+
 	public double getPrice() {
 		return price;
+	}
+
+	public Date getPublishDate() {
+		return publishDate;
+	}
+
+	public String getPublisher() {
+		return publisher;
 	}
 
 	public Integer getSmallImageId() {
@@ -115,6 +141,10 @@ public final class Book extends EntityDto<Book> {
 
 	public int getStatusId() {
 		return statusId;
+	}
+
+	public String getSubTitle() {
+		return subTitle;
 	}
 
 	public String getTitle() {
@@ -161,6 +191,14 @@ public final class Book extends EntityDto<Book> {
 		this.conditionId = conditionId;
 	}
 
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setGoogleCategories(String googleCategories) {
+		this.googleCategories = googleCategories;
+	}
+
 	public void setGradeLevel(String gradeLevel) {
 		this.gradeLevel = gradeLevel;
 	}
@@ -185,8 +223,20 @@ public final class Book extends EntityDto<Book> {
 		this.notes = notes;
 	}
 
+	public void setPageCount(int pageCount) {
+		this.pageCount = pageCount;
+	}
+
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void setPublishDate(Date publishDate) {
+		this.publishDate = publishDate;
+	}
+
+	public void setPublisher(String publisher) {
+		this.publisher = publisher;
 	}
 
 	public void setSmallImageId(Integer smallImageId) {
@@ -207,6 +257,10 @@ public final class Book extends EntityDto<Book> {
 
 	public void setStatusId(int statusId) {
 		this.statusId = statusId;
+	}
+
+	public void setSubTitle(String subTitle) {
+		this.subTitle = subTitle;
 	}
 
 	public void setTitle(String title) {
