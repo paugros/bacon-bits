@@ -34,6 +34,11 @@ public class BookServiceImpl extends GwtController implements BookService {
 	}
 
 	@Override
+	public Book fetchGoogleData(Book b) {
+		return dao.fetchGoogleData(b);
+	}
+
+	@Override
 	public Book getById(int bookId) {
 		return dao.getById(bookId);
 	}

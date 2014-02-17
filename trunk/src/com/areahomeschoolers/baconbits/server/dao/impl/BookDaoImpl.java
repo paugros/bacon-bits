@@ -1,12 +1,19 @@
 package com.areahomeschoolers.baconbits.server.dao.impl;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,6 +54,10 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.appengine.api.images.Image;
 import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @Repository
 public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
@@ -102,6 +113,11 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	@Override
+	public Book fetchGoogleData(Book b) {
+		return populateGoogleInfo(b);
+	}
+
+	@Override
 	public Book getById(int bookId) {
 		String sql = createSqlBase() + "and b.id = ?";
 
@@ -110,10 +126,6 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 	@Override
 	public BookPageData getPageData(int bookId) {
-		// Book b = new Book();
-		// b.setIsbn("0440335701");
-		// populateGoogleInfo(b);
-
 		BookPageData pd = new BookPageData();
 
 		if (bookId > 0) {
@@ -293,7 +305,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			book.setId(ServerUtils.getIdFromKeys(keys));
 		}
 
-		if (!Common.isNullOrBlank(book.getImageUrl().trim())) {
+		if (!Common.isNullOrBlank(book.getImageUrl())) {
 			String text = book.getImageUrl().trim();
 			if (!text.matches("^https?://.*")) {
 				text = "http://" + text;
@@ -426,30 +438,102 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		return sql;
 	}
 
-	// private void populateGoogleInfo(Book b) {
-	// try {
-	// URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn:" + b.getIsbn());
-	// BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-	// String line;
-	//
-	// StringBuffer buffer = new StringBuffer();
-	// while ((line = reader.readLine()) != null) {
-	// buffer.append(line);
-	// }
-	// reader.close();
-	//
-	// JsonElement jelement = new JsonParser().parse(buffer.toString());
-	// JsonObject book = jelement.getAsJsonObject().getAsJsonArray("items").get(0).getAsJsonObject();
-	// JsonObject volumeInfo = book.getAsJsonObject("volumeInfo");
-	//
-	// String title = volumeInfo.get("title").getAsString();
-	// if (title != null && title.length() > 200) {
-	// title = title.substring(0, 199);
-	// }
-	// b.setTitle(title);
-	// } catch (MalformedURLException e) {
-	// } catch (IOException e) {
-	// }
-	// }
+	private Integer getIntegerFromJsonObject(JsonObject obj, String key) {
+		JsonElement item = obj.get(key);
+		if (item != null) {
+			return item.getAsInt();
+		}
+
+		return null;
+	}
+
+	private String getStringFromJsonObject(JsonObject obj, String key, int maxLength) {
+		JsonElement item = obj.get(key);
+		if (item != null) {
+			String text = item.getAsString();
+			if (maxLength > 0 && text.length() > maxLength) {
+				text = text.substring(0, maxLength);
+			}
+			return text;
+		}
+
+		return null;
+	}
+
+	private Book populateGoogleInfo(Book b) {
+		try {
+			URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn:" + b.getIsbn());
+			BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			String line;
+
+			StringBuffer buffer = new StringBuffer();
+			while ((line = reader.readLine()) != null) {
+				buffer.append(line);
+			}
+			reader.close();
+
+			JsonElement jelement = new JsonParser().parse(buffer.toString());
+			if (jelement == null) {
+				return b;
+			}
+
+			JsonArray items = jelement.getAsJsonObject().getAsJsonArray("items");
+
+			if (items == null) {
+				return b;
+			}
+
+			JsonObject book = items.get(0).getAsJsonObject();
+			JsonObject volumeInfo = book.getAsJsonObject("volumeInfo");
+			if (volumeInfo == null) {
+				return b;
+			}
+
+			b.setTitle(getStringFromJsonObject(volumeInfo, "title", 200));
+			b.setSubTitle(getStringFromJsonObject(volumeInfo, "subtitle", 200));
+			b.setPublisher(getStringFromJsonObject(volumeInfo, "publisher", 200));
+			b.setDescription(getStringFromJsonObject(volumeInfo, "description", 1000));
+			b.setPageCount(getIntegerFromJsonObject(volumeInfo, "pageCount"));
+
+			String dateText = getStringFromJsonObject(volumeInfo, "publishedDate", 0);
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			try {
+				b.setPublishDate(df.parse(dateText));
+			} catch (ParseException e) {
+			}
+
+			JsonArray authors = volumeInfo.getAsJsonArray("authors");
+
+			if (authors != null) {
+				String authorText = "";
+				for (int i = 0; i < authors.size(); i++) {
+					authorText += authors.get(i).getAsString() + "\n";
+				}
+				b.setAuthor(authorText);
+			}
+
+			JsonArray categories = volumeInfo.getAsJsonArray("categories");
+
+			if (categories != null) {
+				String categoryText = "";
+				for (int i = 0; i < categories.size(); i++) {
+					categoryText += categories.get(i).getAsString() + "\n";
+				}
+				b.setGoogleCategories(categoryText);
+			}
+
+			JsonObject images = volumeInfo.getAsJsonObject("imageLinks");
+
+			if (images != null) {
+				String imageLink = getStringFromJsonObject(images, "thumbnail", 0);
+				b.setImageUrl(imageLink);
+			}
+
+		} catch (MalformedURLException e) {
+		} catch (IOException e) {
+		}
+
+		return b;
+	}
 
 }

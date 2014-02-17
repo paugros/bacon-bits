@@ -19,6 +19,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 public interface BookService extends RemoteService {
 	public void delete(Book book);
 
+	public Book fetchGoogleData(Book b);
+
 	public Book getById(int bookId);
 
 	public BookPageData getPageData(int bookId);

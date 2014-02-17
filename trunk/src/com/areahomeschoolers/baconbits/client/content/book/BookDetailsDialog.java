@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ButtonPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultDialog;
+import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -20,6 +21,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class BookDetailsDialog extends DefaultDialog {
 	private PaddedPanel pp = new PaddedPanel();
 	private VerticalPanel vp = new VerticalPanel();
+	private VerticalPanel vvp = new VerticalPanel();
 	private Book book;
 	private ButtonPanel bp = new ButtonPanel(this);
 
@@ -38,18 +40,35 @@ public class BookDetailsDialog extends DefaultDialog {
 		title.addStyleName("largeText bold");
 		dt.add(title);
 
+		if (!Common.isNullOrBlank(book.getSubTitle())) {
+			dt.add(new Label(book.getSubTitle()));
+		}
+
 		Label price = new Label(Formatter.formatCurrency(book.getPrice()));
 		price.addStyleName("hugeText bold");
 		dt.add(price);
 
 		if (!Common.isNullOrBlank(book.getAuthor())) {
-			Label author = new Label("Author: " + book.getAuthor());
+			Label author = new HTML("Author: " + book.getAuthor());
 			dt.add(author);
 		}
 
 		if (!Common.isNullOrBlank(book.getIsbn())) {
 			Label isbn = new Label("ISBN: " + book.getIsbn());
 			dt.add(isbn);
+		}
+
+		if (book.getPublishDate() != null) {
+			String ptext = Formatter.formatDate(book.getPublishDate());
+			if (!Common.isNullOrBlank(book.getPublisher())) {
+				ptext += " by " + book.getPublisher();
+			}
+			Label published = new Label("Published: " + ptext);
+			dt.add(published);
+		}
+
+		if (book.getPageCount() > 0) {
+			dt.add(new Label(book.getPageCount() + " pages"));
 		}
 
 		if (!Common.isNullOrBlank(book.getCondition())) {
@@ -76,10 +95,20 @@ public class BookDetailsDialog extends DefaultDialog {
 		dt.add(link);
 
 		pp.add(dt);
-		vp.add(pp);
-		vp.add(bp);
 
-		vp.setWidth("600px");
-		setWidget(vp);
+		vp.add(pp);
+
+		if (!Common.isNullOrBlank(book.getDescription())) {
+			vp.add(new HTML(book.getDescription()));
+		}
+
+		vvp.setWidth("600px");
+		vp.setWidth("100%");
+
+		MaxHeightScrollPanel sp = new MaxHeightScrollPanel(vp);
+
+		vvp.add(sp);
+		vvp.add(bp);
+		setWidget(vvp);
 	}
 }

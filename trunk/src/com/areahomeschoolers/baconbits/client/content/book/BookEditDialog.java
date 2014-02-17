@@ -6,7 +6,6 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
-import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -24,6 +23,8 @@ public class BookEditDialog extends EntityEditDialog<Book> {
 
 	public BookEditDialog(final BookTable cellTable) {
 		setAutoHide(false);
+		setModal(false);
+
 		addFormSubmitHandler(new FormSubmitHandler() {
 			@Override
 			public void onFormSubmit(FormField formField) {
@@ -70,7 +71,8 @@ public class BookEditDialog extends EntityEditDialog<Book> {
 
 	@Override
 	protected Widget createContent() {
-		FieldTable ft = new BookFieldTable(form, entity, pageData);
+		BookFieldTable ft = new BookFieldTable(form, entity, pageData);
+		ft.setDialog(this);
 		ft.setLabelColumnWidth(LabelColumnWidth.NARROW);
 		ft.setWidth("600px");
 
