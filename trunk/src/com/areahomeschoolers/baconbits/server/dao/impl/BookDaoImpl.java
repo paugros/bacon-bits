@@ -463,6 +463,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	private Book populateGoogleInfo(Book b) {
+		logger.info("Attempting to fetch Google Book data.");
 		try {
 			URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn:" + b.getIsbn());
 			BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
