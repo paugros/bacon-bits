@@ -12,6 +12,8 @@ import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 public interface BookDao {
 	public void delete(Book book);
 
+	public Book fetchGoogleData(Book b);
+
 	public Book getById(int bookId);
 
 	public BookPageData getPageData(int bookId);

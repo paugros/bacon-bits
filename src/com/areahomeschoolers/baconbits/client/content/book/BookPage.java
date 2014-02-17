@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.Sidebar;
 import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
@@ -130,8 +131,19 @@ public class BookPage implements Page {
 		Application.getLayout().setPage(title, sb, page);
 	}
 
-	private void save(FormField field) {
-
+	private void save(final FormField field) {
+		bookService.save(book, new Callback<Book>() {
+			@Override
+			protected void doOnSuccess(Book result) {
+				if (!Url.isParamValidId("bookId")) {
+					HistoryToken.set(PageUrl.book(result.getId()));
+				} else {
+					book = result;
+					form.setDto(result);
+					field.setInputVisibility(false);
+				}
+			}
+		});
 	}
 
 }

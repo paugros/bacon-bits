@@ -129,6 +129,11 @@ public class MaxLengthTextArea extends Composite implements HasValue<String>, Ha
 		textArea.setFocus(focused);
 	}
 
+	@Override
+	public void setHeight(String height) {
+		textArea.setHeight(height);
+	}
+
 	public void setMaxLength(int maxLength) {
 		this.maxLength = maxLength;
 	}

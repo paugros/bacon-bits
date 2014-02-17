@@ -1,5 +1,9 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
+import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
+import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
@@ -7,6 +11,7 @@ import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
@@ -15,8 +20,11 @@ import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 
@@ -24,6 +32,9 @@ public class BookFieldTable extends FieldTable {
 	private Book book;
 	private Form form;
 	private BookPageData pageData;
+	private String lastIsbn = "";
+	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
+	private BookEditDialog dialog;
 
 	public BookFieldTable(Form f, Book b, BookPageData pd) {
 		this.book = b;
@@ -31,6 +42,56 @@ public class BookFieldTable extends FieldTable {
 		this.pageData = pd;
 
 		setWidth("100%");
+
+		// optional fields
+		final Label isbnDisplay = new Label();
+		final TextBox isbnInput = new TextBox();
+		isbnInput.setMaxLength(13);
+		Anchor isbnLink = new Anchor("ISBN:", "http://en.wikipedia.org/wiki/International_Standard_Book_Number");
+		isbnLink.setTarget("_blank");
+
+		if (!book.isSaved()) {
+			isbnInput.addBlurHandler(new BlurHandler() {
+				@Override
+				public void onBlur(BlurEvent event) {
+					String isbn = isbnInput.getText();
+					if (lastIsbn.equals(isbn) || isbn.isEmpty()) {
+						return;
+					}
+
+					lastIsbn = isbn;
+
+					book.setIsbn(isbn);
+					bookService.fetchGoogleData(book, new Callback<Book>() {
+
+						@Override
+						protected void doOnSuccess(Book result) {
+							book = result;
+							form.setDto(result);
+							if (dialog != null) {
+								dialog.setEntity(result);
+							}
+							form.initialize();
+						}
+					});
+				}
+			});
+		}
+		FormField isbnField = form.createFormField(isbnLink, isbnInput, isbnDisplay);
+		isbnField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				isbnDisplay.setText(Common.getDefaultIfNull(book.getIsbn()));
+				isbnInput.setText(book.getIsbn());
+			}
+		});
+		isbnField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				book.setIsbn(isbnInput.getText());
+			}
+		});
+		addField(isbnField);
 
 		final Label titleDisplay = new Label();
 		final RequiredTextBox titleInput = new RequiredTextBox();
@@ -52,14 +113,34 @@ public class BookFieldTable extends FieldTable {
 		});
 		addField(titleField);
 
-		final Label authorDisplay = new Label();
-		final TextBox authorInput = new TextBox();
-		authorInput.setMaxLength(100);
-		FormField authorField = form.createFormField("Author:", authorInput, authorDisplay);
+		final Label subTitleDisplay = new Label();
+		final TextBox subTitleInput = new TextBox();
+		subTitleInput.setVisibleLength(50);
+		subTitleInput.setMaxLength(200);
+		FormField subTitleField = form.createFormField("Subtitle:", subTitleInput, subTitleDisplay);
+		subTitleField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				subTitleDisplay.setText(Common.getDefaultIfNull(book.getSubTitle()));
+				subTitleInput.setText(book.getSubTitle());
+			}
+		});
+		subTitleField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				book.setSubTitle(subTitleInput.getText());
+			}
+		});
+		addField(subTitleField);
+
+		final HTML authorDisplay = new HTML();
+		final MaxLengthTextArea authorInput = new MaxLengthTextArea(500);
+		authorInput.setHeight("40px");
+		FormField authorField = form.createFormField("Author(s):", authorInput, authorDisplay);
 		authorField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				authorDisplay.setText(Common.getDefaultIfNull(book.getAuthor()));
+				authorDisplay.setHTML(Formatter.formatNoteText(Common.getDefaultIfNull(book.getAuthor())));
 				authorInput.setText(book.getAuthor());
 			}
 		});
@@ -70,6 +151,45 @@ public class BookFieldTable extends FieldTable {
 			}
 		});
 		addField(authorField);
+
+		final HTML descriptionDisplay = new HTML();
+		final MaxLengthTextArea descriptionInput = new MaxLengthTextArea(1000);
+		descriptionInput.setHeight("40px");
+		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
+		descriptionField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				descriptionDisplay.setHTML(Formatter.formatNoteText(Common.getDefaultIfNull(book.getDescription())));
+				descriptionInput.setText(book.getDescription());
+			}
+		});
+		descriptionField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				book.setDescription(descriptionInput.getText());
+			}
+		});
+		addField(descriptionField);
+
+		final Label publisherDisplay = new Label();
+		final TextBox publisherInput = new TextBox();
+		publisherInput.setVisibleLength(50);
+		publisherInput.setMaxLength(200);
+		FormField publisherField = form.createFormField("Publisher:", publisherInput, publisherDisplay);
+		publisherField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				publisherDisplay.setText(Common.getDefaultIfNull(book.getPublisher()));
+				publisherInput.setText(book.getPublisher());
+			}
+		});
+		publisherField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				book.setPublisher(publisherInput.getText());
+			}
+		});
+		addField(publisherField);
 
 		final Label categoryDisplay = new Label();
 		final RequiredListBox categoryInput = new RequiredListBox();
@@ -133,29 +253,6 @@ public class BookFieldTable extends FieldTable {
 		});
 		addField(priceField);
 
-		// optional fields
-		final Label isbnDisplay = new Label();
-		final NumericTextBox isbnInput = new NumericTextBox();
-		isbnInput.setMaxLength(13);
-		isbnInput.setMinumumLength(9);
-		Anchor isbnLink = new Anchor("ISBN:", "http://en.wikipedia.org/wiki/International_Standard_Book_Number");
-		isbnLink.setTarget("_blank");
-		FormField isbnField = form.createFormField(isbnLink, isbnInput, isbnDisplay);
-		isbnField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				isbnDisplay.setText(Common.getDefaultIfNull(book.getIsbn()));
-				isbnInput.setText(book.getIsbn());
-			}
-		});
-		isbnField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				book.setIsbn(isbnInput.getText());
-			}
-		});
-		addField(isbnField);
-
 		final Label statusDisplay = new Label();
 		final DefaultListBox statusInput = new DefaultListBox();
 		for (Data item : pageData.getStatuses()) {
@@ -204,7 +301,7 @@ public class BookFieldTable extends FieldTable {
 		final Label imageDisplay = new Label();
 		final TextBox imageInput = new TextBox();
 		imageInput.setMaxLength(256);
-		imageInput.setVisibleLength(20);
+		imageInput.setVisibleLength(50);
 		FormField imageField = form.createFormField("Image URL:", imageInput, imageDisplay);
 		imageField.setInitializer(new Command() {
 			@Override
@@ -241,6 +338,10 @@ public class BookFieldTable extends FieldTable {
 		});
 		addField(notesField);
 
+	}
+
+	public void setDialog(BookEditDialog dialog) {
+		this.dialog = dialog;
 	}
 
 }
