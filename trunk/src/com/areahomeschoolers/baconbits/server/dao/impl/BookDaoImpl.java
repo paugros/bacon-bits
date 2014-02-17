@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -61,7 +62,6 @@ import com.google.gson.JsonParser;
 
 @Repository
 public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
-
 	private final class BookMapper implements RowMapper<Book> {
 		@Override
 		public Book mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -97,6 +97,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			return book;
 		}
 	}
+
+	private final Logger logger = Logger.getLogger(this.getClass().toString());
 
 	@Autowired
 	public BookDaoImpl(DataSource dataSource) {
@@ -474,18 +476,21 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 			JsonElement jelement = new JsonParser().parse(buffer.toString());
 			if (jelement == null) {
+				logger.info("Root element was null when looking up Google Book info.");
 				return b;
 			}
 
 			JsonArray items = jelement.getAsJsonObject().getAsJsonArray("items");
 
 			if (items == null) {
+				logger.info("Items element was null when looking up Google Book info.");
 				return b;
 			}
 
 			JsonObject book = items.get(0).getAsJsonObject();
 			JsonObject volumeInfo = book.getAsJsonObject("volumeInfo");
 			if (volumeInfo == null) {
+				logger.info("Volume Information was null when looking up Google Book info.");
 				return b;
 			}
 
@@ -530,7 +535,9 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			}
 
 		} catch (MalformedURLException e) {
+			logger.warning("MalformedURLException:" + e.getMessage());
 		} catch (IOException e) {
+			logger.warning("IOException:" + e.getMessage());
 		}
 
 		return b;
