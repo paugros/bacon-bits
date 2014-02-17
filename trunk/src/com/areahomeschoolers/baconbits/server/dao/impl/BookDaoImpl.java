@@ -463,9 +463,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	private Book populateGoogleInfo(Book b) {
-		logger.info("Attempting to fetch Google Book data.");
 		try {
-			URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn:" + b.getIsbn());
+			URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn:" + b.getIsbn() + "&country=US");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
 			String line;
 
@@ -477,21 +476,21 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 			JsonElement jelement = new JsonParser().parse(buffer.toString());
 			if (jelement == null) {
-				logger.info("Root element was null when looking up Google Book info.");
+				logger.warning("Root element was null when looking up Google Book info.");
 				return b;
 			}
 
 			JsonArray items = jelement.getAsJsonObject().getAsJsonArray("items");
 
 			if (items == null) {
-				logger.info("Items element was null when looking up Google Book info.");
+				logger.warning("Items element was null when looking up Google Book info.");
 				return b;
 			}
 
 			JsonObject book = items.get(0).getAsJsonObject();
 			JsonObject volumeInfo = book.getAsJsonObject("volumeInfo");
 			if (volumeInfo == null) {
-				logger.info("Volume Information was null when looking up Google Book info.");
+				logger.warning("Volume Information was null when looking up Google Book info.");
 				return b;
 			}
 
