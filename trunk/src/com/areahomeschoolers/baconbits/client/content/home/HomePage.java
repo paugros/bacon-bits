@@ -123,6 +123,9 @@ public class HomePage implements Page {
 			protected void doOnSuccess(HomePageData result) {
 				pageData = result;
 
+				// citrus link
+				leftPanel.add(new CitrusMiniModule());
+
 				// book promo
 				if (!Application.memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
 					// leftPanel.add(new SellBooksMiniModule());
@@ -135,9 +138,6 @@ public class HomePage implements Page {
 
 				// community
 				leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
-
-				// citrus link
-				leftPanel.add(new CitrusMiniModule());
 
 				// new
 				if (!Common.isNullOrEmpty(pageData.getNewlyAddedEvents())) {
@@ -174,6 +174,9 @@ public class HomePage implements Page {
 				if (Application.isCitrus()) {
 					centerPanel.add(createGroupsTable());
 				}
+
+				// news
+				centerPanel.add(new NewsModule());
 
 				Application.getLayout().setPage("Home", page);
 			}

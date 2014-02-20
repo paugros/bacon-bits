@@ -448,14 +448,16 @@ public class UserPage implements Page {
 								}
 							}));
 
-							table.getTitleBar().addLink(new ClickLabel("Print labels - all", new ClickHandler() {
+							table.getTitleBar().addLinkWidget(new Label("Print labels:"));
+
+							table.getTitleBar().addLink(new ClickLabel("all", new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {
 									printLabels(table.getFullList());
 								}
 							}));
 
-							table.getTitleBar().addLink(new ClickLabel("Print labels - selected", new ClickHandler() {
+							table.getTitleBar().addLink(new ClickLabel("selected", new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {
 									printLabels(table.getSelectedItems());

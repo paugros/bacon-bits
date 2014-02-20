@@ -1,12 +1,13 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
+import com.areahomeschoolers.baconbits.shared.dto.EntityDto;
 
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public abstract class EntityEditDialog<T> extends DefaultDialog {
+public abstract class EntityEditDialog<T extends EntityDto<?>> extends DefaultDialog {
 	private VerticalPanel vp = new VerticalPanel();
 	private SimplePanel contentPanel = new SimplePanel();
 	private VerticalPanel belowPanel = new VerticalPanel();
@@ -121,6 +122,7 @@ public abstract class EntityEditDialog<T> extends DefaultDialog {
 
 	protected void setEntity(T entity) {
 		this.entity = entity;
+		form.setDto(entity);
 	}
 
 	protected void showContent() {
