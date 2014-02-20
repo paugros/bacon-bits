@@ -171,12 +171,13 @@ public class HomePage implements Page {
 				// introduction
 				centerPanel.add(new ArticleWidget(pageData.getIntro()));
 
+				// news
+				centerPanel.add(new NewsModule());
+
+				// our groups
 				if (Application.isCitrus()) {
 					centerPanel.add(createGroupsTable());
 				}
-
-				// news
-				centerPanel.add(new NewsModule());
 
 				Application.getLayout().setPage("Home", page);
 			}
