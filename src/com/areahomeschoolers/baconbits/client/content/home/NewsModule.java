@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.dom.client.Style.FontWeight;
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.user.client.ui.Composite;
@@ -82,6 +83,7 @@ public class NewsModule extends Composite {
 			Hyperlink body = new InlineHyperlink("- " + text, PageUrl.news(item.getId()));
 			body.getElement().getStyle().setHeight(2.83, Unit.EX);
 			body.getElement().getStyle().setColor("#777777");
+			body.getElement().getStyle().setOverflow(Overflow.HIDDEN);
 
 			body.setStyleName("newsModuleBody");
 
