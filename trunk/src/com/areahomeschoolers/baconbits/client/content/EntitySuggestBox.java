@@ -28,7 +28,7 @@ public class EntitySuggestBox extends Composite {
 	private final SuggestBox suggestBox;
 	private final ServerSuggestOracle oracle;
 	private boolean selecting, clearOnFocus;
-	private ParameterHandler<Integer> selectionHandler;
+	private ParameterHandler<HtmlSuggestion> selectionHandler;
 	private ParameterHandler<SuggestBox> resetHandler;
 	private Command submitWithoutSelectionCommand;
 
@@ -47,7 +47,7 @@ public class EntitySuggestBox extends Composite {
 				HtmlSuggestion suggestion = (HtmlSuggestion) event.getSelectedItem();
 
 				if (selectionHandler != null) {
-					selectionHandler.execute(suggestion.getEntityId());
+					selectionHandler.execute(suggestion);
 				}
 
 				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
@@ -133,8 +133,20 @@ public class EntitySuggestBox extends Composite {
 		this.clearOnFocus = clearOnFocus;
 	}
 
+	public void setDisplayLimit(int limit) {
+		suggestBox.setLimit(limit);
+	}
+
+	public void setFontSize(int fontSize) {
+		oracle.setFontSize(fontSize);
+	}
+
 	public void setOptions(Data options) {
 		oracle.setOptions(options);
+	}
+
+	public void setRequestLimit(int limit) {
+		oracle.setNumberOfServerSuggestions(limit);
 	}
 
 	public void setResetHandler(ParameterHandler<SuggestBox> handler) {
@@ -142,7 +154,7 @@ public class EntitySuggestBox extends Composite {
 		reset();
 	}
 
-	public void setSelectionHandler(ParameterHandler<Integer> handler) {
+	public void setSelectionHandler(ParameterHandler<HtmlSuggestion> handler) {
 		selectionHandler = handler;
 	}
 

@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -51,6 +52,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.appengine.api.images.Image;
@@ -99,6 +101,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	private final Logger logger = Logger.getLogger(this.getClass().toString());
+	private static final String GOOGLE_QUERY_URL = "https://www.googleapis.com/books/v1/volumes?country=US&printType=books&maxResults=12&key=AIzaSyBPxbeFCFBNAUxprA4_FSRcJ6AOVAQJr9A&q=";
 
 	@Autowired
 	public BookDaoImpl(DataSource dataSource) {
@@ -156,7 +159,14 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	@Override
-	public ArrayList<ServerSuggestion> getSuggestions(String token, int limit, Data options) {
+	public ServerSuggestionData getSuggestionData(String token, int limit, Data options) {
+		ServerSuggestionData data = new ServerSuggestionData();
+		boolean googleLookup = options.getBoolean("googleLookup");
+
+		if (googleLookup) {
+			return getGoogleBookSuggestions(token);
+		}
+
 		String sql = "select b.id, b.title as Suggestion, 'Book' as entityType ";
 		sql += "from books b ";
 		sql += "where b.statusId = 1 and b.title like ? ";
@@ -164,7 +174,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		sql += "limit " + Integer.toString(limit + 1);
 
 		String search = "%" + token + "%";
-		return query(sql, ServerUtils.getSuggestionMapper(), search);
+		data.setSuggestions(query(sql, ServerUtils.getSuggestionMapper(), search));
+		return data;
 	}
 
 	@Override
@@ -440,6 +451,118 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		return sql;
 	}
 
+	private String getGoogleBookQueryResults(String query) throws IOException {
+		URL url = new URL(GOOGLE_QUERY_URL + query);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+		String line;
+
+		StringBuffer buffer = new StringBuffer();
+		while ((line = reader.readLine()) != null) {
+			buffer.append(line);
+		}
+		reader.close();
+
+		return buffer.toString();
+	}
+
+	private ServerSuggestionData getGoogleBookSuggestions(String token) {
+		ServerSuggestionData sdata = new ServerSuggestionData();
+		ArrayList<ServerSuggestion> results = new ArrayList<ServerSuggestion>();
+		sdata.setSuggestions(results);
+
+		try {
+			String data = getGoogleBookQueryResults("intitle:" + URLEncoder.encode(token, "UTF-8"));
+			JsonElement jelement = new JsonParser().parse(data);
+
+			if (jelement == null) {
+				return sdata;
+			}
+
+			JsonArray items = jelement.getAsJsonObject().getAsJsonArray("items");
+
+			Integer totalItems = getIntegerFromJsonObject(jelement.getAsJsonObject(), "totalItems");
+			sdata.setTotalMatches(totalItems);
+
+			if (items == null) {
+				System.out.println("items null: " + data);
+				return sdata;
+			}
+
+			for (int i = 0; i < items.size(); i++) {
+				JsonObject book = items.get(i).getAsJsonObject();
+				JsonObject volumeInfo = book.getAsJsonObject("volumeInfo");
+				if (volumeInfo == null) {
+					continue;
+				}
+
+				String title = getStringFromJsonObject(volumeInfo, "title", 60);
+				String date = getStringFromJsonObject(volumeInfo, "publishedDate", 0);
+				String publisher = getStringFromJsonObject(volumeInfo, "publisher", 40);
+				JsonArray authors = volumeInfo.getAsJsonArray("authors");
+
+				String extra = "";
+
+				if (date != null) {
+					extra += date.substring(0, 4);
+				}
+
+				if (authors != null) {
+					String authorText = " - by " + authors.get(0).getAsString();
+					if (authorText.length() > 30) {
+						authorText = authorText.substring(0, 30);
+					}
+					extra += authorText;
+				}
+
+				if (publisher != null) {
+					if (!extra.isEmpty()) {
+						extra += " - ";
+					}
+					extra += publisher;
+				}
+
+				if (!extra.isEmpty()) {
+					title += "\n" + extra;
+				}
+
+				JsonArray isbns = volumeInfo.getAsJsonArray("industryIdentifiers");
+
+				if (isbns == null) {
+					continue;
+				}
+
+				String isbn = null;
+
+				for (int j = 0; j < isbns.size(); j++) {
+					JsonObject item = isbns.get(j).getAsJsonObject();
+					String type = getStringFromJsonObject(item, "type", 0);
+					if (type == null) {
+						continue;
+					}
+
+					if (type.startsWith("ISBN")) {
+						isbn = getStringFromJsonObject(item, "identifier", 0);
+					}
+				}
+
+				if (isbn == null) {
+					continue;
+				}
+
+				ServerSuggestion ss = new ServerSuggestion(title, i);
+				ss.setStringId(isbn);
+
+				results.add(ss);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		sdata.setSuggestions(results);
+		return sdata;
+	}
+
 	private Integer getIntegerFromJsonObject(JsonObject obj, String key) {
 		JsonElement item = obj.get(key);
 		if (item != null) {
@@ -464,19 +587,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 	private Book populateGoogleInfo(Book b) {
 		try {
-			URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn:" + b.getIsbn() + "&country=US");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-			String line;
 			Book deadBook = new Book();
 			deadBook.setIsbn(b.getIsbn());
 
-			StringBuffer buffer = new StringBuffer();
-			while ((line = reader.readLine()) != null) {
-				buffer.append(line);
-			}
-			reader.close();
-
-			JsonElement jelement = new JsonParser().parse(buffer.toString());
+			JsonElement jelement = new JsonParser().parse(getGoogleBookQueryResults("isbn:" + b.getIsbn()));
 			if (jelement == null) {
 				logger.warning("Root element was null when looking up Google Book info.");
 				return deadBook;
@@ -499,8 +613,11 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			b.setTitle(getStringFromJsonObject(volumeInfo, "title", 200));
 			b.setSubTitle(getStringFromJsonObject(volumeInfo, "subtitle", 200));
 			b.setPublisher(getStringFromJsonObject(volumeInfo, "publisher", 200));
-			b.setDescription(getStringFromJsonObject(volumeInfo, "description", 1000));
-			b.setPageCount(getIntegerFromJsonObject(volumeInfo, "pageCount"));
+			b.setDescription(getStringFromJsonObject(volumeInfo, "description", 10000));
+			Integer pageCount = getIntegerFromJsonObject(volumeInfo, "pageCount");
+			if (pageCount != null) {
+				b.setPageCount(pageCount);
+			}
 
 			String dateText = getStringFromJsonObject(volumeInfo, "publishedDate", 0);
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");

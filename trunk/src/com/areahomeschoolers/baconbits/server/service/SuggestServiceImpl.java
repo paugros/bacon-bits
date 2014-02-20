@@ -11,7 +11,7 @@ import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
-import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 
 @Controller
 @RequestMapping("/names")
@@ -19,21 +19,21 @@ public final class SuggestServiceImpl extends GwtController implements SuggestSe
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public ArrayList<ServerSuggestion> getSuggestions(String token, ArrayList<String> suggestTypes, int limit, Data options) {
-		ArrayList<ServerSuggestion> matches = new ArrayList<ServerSuggestion>();
+	public ServerSuggestionData getSuggestionData(String token, ArrayList<String> suggestTypes, int limit, Data options) {
+		ServerSuggestionData data = new ServerSuggestionData();
 
 		for (String type : suggestTypes) {
 			try {
 				ApplicationContext ctx = ServerContext.getApplicationContext();
 				Suggestible suggester = (Suggestible) ctx.getBean(type.substring(0, 1).toLowerCase() + type.substring(1) + "DaoImpl");
 
-				matches.addAll(suggester.getSuggestions(token, limit, options));
+				data = suggester.getSuggestionData(token, limit, options);
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		return matches;
+		return data;
 	}
 }

@@ -1,6 +1,8 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.EntitySuggestBox;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
@@ -12,8 +14,10 @@ import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -38,6 +42,7 @@ public class BookFieldTable extends FieldTable {
 	private String lastIsbn = "";
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private BookEditDialog dialog;
+	private FormField isbnField;
 
 	public BookFieldTable(Form f, Book b, BookPageData pd) {
 		this.book = b;
@@ -46,6 +51,10 @@ public class BookFieldTable extends FieldTable {
 
 		setWidth("100%");
 
+		if (!book.isSaved()) {
+			addField("", "Save typing by doing a book lookup using one of the two fields below.");
+		}
+
 		// optional fields
 		final Label isbnDisplay = new Label();
 		final TextBox isbnInput = new TextBox();
@@ -53,7 +62,7 @@ public class BookFieldTable extends FieldTable {
 		Anchor isbnLink = new Anchor("ISBN:", "http://en.wikipedia.org/wiki/International_Standard_Book_Number");
 		isbnLink.setTarget("_blank");
 
-		final FormField isbnField = form.createFormField(isbnLink, isbnInput, isbnDisplay);
+		isbnField = form.createFormField(isbnLink, isbnInput, isbnDisplay);
 		isbnField.setInitializer(new Command() {
 			@Override
 			public void execute() {
@@ -84,32 +93,31 @@ public class BookFieldTable extends FieldTable {
 			isbnInput.addBlurHandler(new BlurHandler() {
 				@Override
 				public void onBlur(BlurEvent event) {
-					isbnField.updateDto();
-					String isbn = book.getIsbn();
-					if (lastIsbn.equals(isbn) || isbn.isEmpty()) {
-						return;
-					}
-
-					lastIsbn = isbn;
-
-					bookService.fetchGoogleData(book, new Callback<Book>() {
-						@Override
-						protected void doOnSuccess(Book result) {
-							book = result;
-							if (book.getTitle() == null) {
-								AlertDialog.alert("Could not find book data for that ISBN.");
-							}
-							form.setDto(result);
-							if (dialog != null) {
-								dialog.setEntity(result);
-							}
-							form.initialize();
-						}
-					});
+					lookupByIsbn();
 				}
 			});
 		}
 		addField(isbnField);
+
+		if (!book.isSaved()) {
+			final EntitySuggestBox titleSearchBox = new EntitySuggestBox("Book");
+			titleSearchBox.setFontSize(11);
+			titleSearchBox.setRequestLimit(12);
+			Data options = new Data("googleLookup", true);
+			titleSearchBox.setOptions(options);
+			titleSearchBox.setSelectionHandler(new ParameterHandler<HtmlSuggestion>() {
+				@Override
+				public void execute(HtmlSuggestion sug) {
+					isbnInput.setText(sug.getStringId());
+					lookupByIsbn();
+				}
+			});
+			PaddedPanel tp = new PaddedPanel();
+			tp.add(titleSearchBox);
+			tp.add(new Label("(whole words)"));
+			addField("Title search:", tp);
+			addField("", new Label());
+		}
 
 		final Label titleDisplay = new Label();
 		final RequiredTextBox titleInput = new RequiredTextBox();
@@ -150,64 +158,6 @@ public class BookFieldTable extends FieldTable {
 			}
 		});
 		addField(subTitleField);
-
-		final HTML authorDisplay = new HTML();
-		final MaxLengthTextArea authorInput = new MaxLengthTextArea(500);
-		authorInput.setHeight("40px");
-		FormField authorField = form.createFormField("Author(s):", authorInput, authorDisplay);
-		authorField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				authorDisplay.setHTML(Formatter.formatNoteText(Common.getDefaultIfNull(book.getAuthor())));
-				authorInput.setText(book.getAuthor());
-			}
-		});
-		authorField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				book.setAuthor(authorInput.getText());
-			}
-		});
-		addField(authorField);
-
-		final HTML descriptionDisplay = new HTML();
-		final MaxLengthTextArea descriptionInput = new MaxLengthTextArea(1000);
-		descriptionInput.setHeight("40px");
-		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
-		descriptionField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				descriptionDisplay.setHTML(Formatter.formatNoteText(Common.getDefaultIfNull(book.getDescription())));
-				descriptionInput.setText(book.getDescription());
-			}
-		});
-		descriptionField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				book.setDescription(descriptionInput.getText());
-			}
-		});
-		addField(descriptionField);
-
-		final Label publisherDisplay = new Label();
-		final TextBox publisherInput = new TextBox();
-		publisherInput.setVisibleLength(50);
-		publisherInput.setMaxLength(200);
-		FormField publisherField = form.createFormField("Publisher:", publisherInput, publisherDisplay);
-		publisherField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				publisherDisplay.setText(Common.getDefaultIfNull(book.getPublisher()));
-				publisherInput.setText(book.getPublisher());
-			}
-		});
-		publisherField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				book.setPublisher(publisherInput.getText());
-			}
-		});
-		addField(publisherField);
 
 		final Label categoryDisplay = new Label();
 		final RequiredListBox categoryInput = new RequiredListBox();
@@ -270,6 +220,69 @@ public class BookFieldTable extends FieldTable {
 			}
 		});
 		addField(priceField);
+
+		final HTML authorDisplay = new HTML();
+		final MaxLengthTextArea authorInput = new MaxLengthTextArea(500);
+		if (!book.isSaved()) {
+			authorInput.setHeight("20px");
+		}
+		FormField authorField = form.createFormField("Author(s):", authorInput, authorDisplay);
+		authorField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				authorDisplay.setHTML(Formatter.formatNoteText(Common.getDefaultIfNull(book.getAuthor())));
+				authorInput.setText(book.getAuthor());
+			}
+		});
+		authorField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				book.setAuthor(authorInput.getText());
+			}
+		});
+		addField(authorField);
+
+		final HTML descriptionDisplay = new HTML();
+		descriptionDisplay.addStyleName("bookDescription");
+		final MaxLengthTextArea descriptionInput = new MaxLengthTextArea(10000);
+		if (!book.isSaved()) {
+			descriptionInput.setHeight("40px");
+		}
+		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
+		descriptionField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				descriptionDisplay.setHTML(Formatter.formatNoteText(Common.getDefaultIfNull(book.getDescription())));
+				descriptionInput.setText(book.getDescription());
+			}
+		});
+		descriptionField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				book.setDescription(descriptionInput.getText());
+			}
+		});
+		addField(descriptionField);
+
+		final Label publisherDisplay = new Label();
+		final TextBox publisherInput = new TextBox();
+		publisherInput.setVisibleLength(50);
+		publisherInput.setMaxLength(200);
+		FormField publisherField = form.createFormField("Publisher:", publisherInput, publisherDisplay);
+		publisherField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				publisherDisplay.setText(Common.getDefaultIfNull(book.getPublisher()));
+				publisherInput.setText(book.getPublisher());
+			}
+		});
+		publisherField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				book.setPublisher(publisherInput.getText());
+			}
+		});
+		addField(publisherField);
 
 		final Label statusDisplay = new Label();
 		final DefaultListBox statusInput = new DefaultListBox();
@@ -364,6 +377,31 @@ public class BookFieldTable extends FieldTable {
 
 	public void setDialog(BookEditDialog dialog) {
 		this.dialog = dialog;
+	}
+
+	private void lookupByIsbn() {
+		isbnField.updateDto();
+		String isbn = book.getIsbn();
+		if (lastIsbn.equals(isbn) || isbn.isEmpty()) {
+			return;
+		}
+
+		lastIsbn = isbn;
+
+		bookService.fetchGoogleData(book, new Callback<Book>() {
+			@Override
+			protected void doOnSuccess(Book result) {
+				book = result;
+				if (book.getTitle() == null) {
+					AlertDialog.alert("Could not find book data for that ISBN.");
+				}
+				form.setDto(result);
+				if (dialog != null) {
+					dialog.setEntity(result);
+				}
+				form.initialize();
+			}
+		});
 	}
 
 }

@@ -24,7 +24,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
-import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -90,7 +90,9 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 	}
 
 	@Override
-	public ArrayList<ServerSuggestion> getSuggestions(String token, int limit, Data options) {
+	public ServerSuggestionData getSuggestionData(String token, int limit, Data options) {
+		ServerSuggestionData data = new ServerSuggestionData();
+
 		String sql = "select t.id, t.name as Suggestion, 'Tag' as entityType ";
 		sql += "from tags t ";
 		sql += "where t.name like ? ";
@@ -98,7 +100,9 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		sql += "limit " + Integer.toString(limit + 1);
 
 		String search = "%" + token + "%";
-		return query(sql, ServerUtils.getSuggestionMapper(), search);
+		data.setSuggestions(query(sql, ServerUtils.getSuggestionMapper(), search));
+
+		return data;
 	}
 
 	@Override

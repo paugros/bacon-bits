@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.SuggestServiceAsync;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -18,7 +19,6 @@ import com.google.gwt.user.client.ui.SuggestOracle;
  * A SuggestOracle that uses a server side source of suggestions. Instances of this class can not be shared between SuggestBox instances.
  */
 public class ServerSuggestOracle extends SuggestOracle {
-
 	/**
 	 * Class to hold a response from the server.
 	 */
@@ -32,8 +32,12 @@ public class ServerSuggestOracle extends SuggestOracle {
 		/**
 		 * The number of suggestions the server was asked for
 		 */
-		private final int serverSuggestionsLimit;
+		private final int requestedNumber;
 
+		/**
+		 * The total number of items that matched, according to the server
+		 */
+		private Integer matchedNumber;
 		/**
 		 * Suggestions returned by the server in response to the request.
 		 */
@@ -44,15 +48,16 @@ public class ServerSuggestOracle extends SuggestOracle {
 		 * 
 		 * @param request
 		 *            Request from the SuggestBox.
-		 * @param serverSuggestionsLimit
+		 * @param requestedNumber
 		 *            The number of suggestions we asked the server for.
 		 * @param suggestions
 		 *            The suggestions returned by the server.
 		 */
-		private ServerResponse(Request request, int serverSuggestionsLimit, List<HtmlSuggestion> suggestions) {
+		private ServerResponse(Request request, int requestedNumber, List<HtmlSuggestion> suggestions, Integer matchedNumber) {
 			this.request = request;
-			this.serverSuggestionsLimit = serverSuggestionsLimit;
+			this.requestedNumber = requestedNumber;
 			this.suggestions = suggestions;
+			this.matchedNumber = matchedNumber;
 		}
 
 		/**
@@ -97,16 +102,22 @@ public class ServerSuggestOracle extends SuggestOracle {
 		 * @return True or false.
 		 */
 		private boolean isComplete() {
-			return suggestions.size() <= serverSuggestionsLimit;
+			if (matchedNumber != null) {
+				return requestedNumber == matchedNumber;
+			}
+
+			return suggestions.size() <= requestedNumber;
 		}
 	}
+
+	private int fontSize;
 
 	private boolean enabled = true;
 
 	/**
 	 * Number of suggestions to request from the server.
 	 */
-	private static final int numberOfServerSuggestions = 200;
+	private int requestedNumber = 200;
 
 	/**
 	 * The remote service that is the source of names.
@@ -175,6 +186,14 @@ public class ServerSuggestOracle extends SuggestOracle {
 		this.enabled = enabled;
 	}
 
+	public void setFontSize(int fontSize) {
+		this.fontSize = fontSize;
+	}
+
+	public void setNumberOfServerSuggestions(int number) {
+		requestedNumber = number;
+	}
+
 	public void setOptions(Data options) {
 		if (options == null) {
 			options = new Data();
@@ -196,25 +215,25 @@ public class ServerSuggestOracle extends SuggestOracle {
 		}
 
 		requestInProgress = true;
-		namesService.getSuggestions(request.getQuery(), Common.asArrayList(suggestTypes), numberOfServerSuggestions, options,
-				new AsyncCallback<ArrayList<ServerSuggestion>>() {
+		namesService.getSuggestionData(request.getQuery(), Common.asArrayList(suggestTypes), requestedNumber, options,
+				new AsyncCallback<ServerSuggestionData>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						requestInProgress = false;
 					}
 
 					@Override
-					public void onSuccess(ArrayList<ServerSuggestion> suggestions) {
+					public void onSuccess(ServerSuggestionData data) {
 						String query = request.getQuery();
 						// convert ServerSuggestions (dto) to HtmlSuggestions (has
 						// highlighting capability)
 						requestInProgress = false;
 						List<HtmlSuggestion> htmlSuggestions = new ArrayList<HtmlSuggestion>();
-						for (ServerSuggestion suggestion : suggestions) {
-							htmlSuggestions.add(new HtmlSuggestion(suggestion, query));
+						for (ServerSuggestion suggestion : data.getSuggestions()) {
+							htmlSuggestions.add(new HtmlSuggestion(suggestion, query, fontSize));
 						}
 
-						mostRecentServerResponse = new ServerResponse(request, numberOfServerSuggestions, htmlSuggestions);
+						mostRecentServerResponse = new ServerResponse(request, requestedNumber, htmlSuggestions, data.getTotalMatches());
 						ServerSuggestOracle.this.returnSuggestions(callback);
 					}
 				});

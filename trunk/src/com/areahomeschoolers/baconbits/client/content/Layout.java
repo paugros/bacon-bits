@@ -18,6 +18,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
 import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
@@ -139,10 +140,10 @@ public final class Layout {
 			if (Application.canSwitchUser()) {
 				final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 				final EntitySuggestBox userSearchBox = new EntitySuggestBox("User");
-				userSearchBox.setSelectionHandler(new ParameterHandler<Integer>() {
+				userSearchBox.setSelectionHandler(new ParameterHandler<HtmlSuggestion>() {
 					@Override
-					public void execute(Integer userId) {
-						userService.switchToUser(userId, new Callback<Void>() {
+					public void execute(HtmlSuggestion sug) {
+						userService.switchToUser(sug.getEntityId(), new Callback<Void>() {
 							@Override
 							protected void doOnSuccess(Void result) {
 								Window.Location.reload();
