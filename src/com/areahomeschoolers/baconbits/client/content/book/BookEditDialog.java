@@ -20,6 +20,7 @@ public class BookEditDialog extends EntityEditDialog<Book> {
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private BookPageData pageData;
 	private boolean closeAfterSubmit = true;
+	private BookFieldTable fieldTable;
 
 	public BookEditDialog(final BookTable cellTable) {
 		setAutoHide(false);
@@ -35,12 +36,13 @@ public class BookEditDialog extends EntityEditDialog<Book> {
 				bookService.save(entity, new Callback<Book>() {
 					@Override
 					protected void doOnSuccess(Book result) {
+						setEntity(new Book());
+						form.initialize();
+
 						if (closeAfterSubmit) {
 							hide();
 						} else {
 							closeAfterSubmit = true;
-							setEntity(new Book());
-							form.initialize();
 						}
 						getButtonPanel().setEnabled(true);
 						cellTable.populate();
@@ -66,15 +68,18 @@ public class BookEditDialog extends EntityEditDialog<Book> {
 			setText("Add Book");
 		}
 
+		if (fieldTable != null) {
+			fieldTable.setBook(b);
+		}
 		super.setEntity(b);
 	}
 
 	@Override
 	protected Widget createContent() {
-		BookFieldTable ft = new BookFieldTable(form, entity, pageData);
-		ft.setDialog(this);
-		ft.setLabelColumnWidth(LabelColumnWidth.NARROW);
-		ft.setWidth("600px");
+		fieldTable = new BookFieldTable(form, entity, pageData);
+		fieldTable.setDialog(this);
+		fieldTable.setLabelColumnWidth(LabelColumnWidth.NARROW);
+		fieldTable.setWidth("600px");
 
 		form.getSubmitButton().setText("Save and Close");
 		final Button save = new Button("Save and Add Another");
@@ -87,7 +92,7 @@ public class BookEditDialog extends EntityEditDialog<Book> {
 		});
 		getButtonPanel().addRightButton(save);
 
-		return ft;
+		return fieldTable;
 	}
 
 }

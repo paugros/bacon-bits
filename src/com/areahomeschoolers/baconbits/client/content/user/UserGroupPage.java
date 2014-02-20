@@ -479,7 +479,7 @@ public class UserGroupPage implements Page {
 			page.add(tabPanel);
 		}
 
-		Sidebar sb = Sidebar.create(MiniModule.ACTIVE_USERS, MiniModule.NEW_USERS, MiniModule.UPCOMING_EVENTS, MiniModule.CITRUS);
+		Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.ACTIVE_USERS, MiniModule.NEW_USERS, MiniModule.UPCOMING_EVENTS);
 		Application.getLayout().setPage(title, sb, page);
 	}
 

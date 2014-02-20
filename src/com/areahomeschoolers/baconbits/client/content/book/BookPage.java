@@ -127,7 +127,7 @@ public class BookPage implements Page {
 
 		form.setEnabled(Application.administratorOf(book));
 
-		Sidebar sb = Sidebar.create(MiniModule.NEW_BOOKS, MiniModule.SELL_BOOKS, MiniModule.CITRUS);
+		Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.NEW_BOOKS, MiniModule.SELL_BOOKS);
 		Application.getLayout().setPage(title, sb, page);
 	}
 

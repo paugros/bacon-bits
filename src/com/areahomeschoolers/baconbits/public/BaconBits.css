@@ -61,7 +61,7 @@ pre {
 	font-family: monospace
 }
 
-a,a:visited {
+a, a:visited {
 	color: #1a4da0;
 	text-decoration: none;
 }
@@ -318,6 +318,17 @@ img {
 .moduleEventPanel {
 	min-width: 250px;
 	min-height: 310px;
+}
+
+.newsModuleBody, .newsModuleBody:hover, .newsModuleBody:visited {
+	color: #777777;
+	text-decoration: none;
+	overflow: hidden;
+	cursor: pointer;
+	display: block;
+	padding: 3px 0 1px;
+	height: 2.83ex;
+	vertical-align: middle;
 }
 
 .module {
@@ -578,7 +589,7 @@ img {
 }
 
 .grayText {
-	color: #aaaaaa
+	color: #999999;
 }
 
 .italic {

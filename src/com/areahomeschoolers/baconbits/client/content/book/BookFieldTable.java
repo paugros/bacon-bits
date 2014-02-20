@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
@@ -20,6 +21,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.user.client.Command;
@@ -50,23 +53,52 @@ public class BookFieldTable extends FieldTable {
 		Anchor isbnLink = new Anchor("ISBN:", "http://en.wikipedia.org/wiki/International_Standard_Book_Number");
 		isbnLink.setTarget("_blank");
 
+		final FormField isbnField = form.createFormField(isbnLink, isbnInput, isbnDisplay);
+		isbnField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				isbnDisplay.setText(Common.getDefaultIfNull(book.getIsbn()));
+				isbnInput.setText(book.getIsbn());
+				if (!book.isSaved()) {
+					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+						@Override
+						public void execute() {
+							isbnInput.setFocus(true);
+						}
+					});
+				}
+			}
+		});
+
+		isbnField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				String isbn = isbnInput.getText();
+				isbn = isbn.replaceAll("[^0-9xX]+", "");
+				isbnInput.setText(isbn);
+				book.setIsbn(isbn);
+			}
+		});
+
 		if (!book.isSaved()) {
 			isbnInput.addBlurHandler(new BlurHandler() {
 				@Override
 				public void onBlur(BlurEvent event) {
-					String isbn = isbnInput.getText();
+					isbnField.updateDto();
+					String isbn = book.getIsbn();
 					if (lastIsbn.equals(isbn) || isbn.isEmpty()) {
 						return;
 					}
 
 					lastIsbn = isbn;
 
-					book.setIsbn(isbn);
 					bookService.fetchGoogleData(book, new Callback<Book>() {
-
 						@Override
 						protected void doOnSuccess(Book result) {
 							book = result;
+							if (book.getTitle() == null) {
+								AlertDialog.alert("Could not find book data for that ISBN.");
+							}
 							form.setDto(result);
 							if (dialog != null) {
 								dialog.setEntity(result);
@@ -77,20 +109,6 @@ public class BookFieldTable extends FieldTable {
 				}
 			});
 		}
-		FormField isbnField = form.createFormField(isbnLink, isbnInput, isbnDisplay);
-		isbnField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				isbnDisplay.setText(Common.getDefaultIfNull(book.getIsbn()));
-				isbnInput.setText(book.getIsbn());
-			}
-		});
-		isbnField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				book.setIsbn(isbnInput.getText());
-			}
-		});
 		addField(isbnField);
 
 		final Label titleDisplay = new Label();
@@ -338,6 +356,10 @@ public class BookFieldTable extends FieldTable {
 		});
 		addField(notesField);
 
+	}
+
+	public void setBook(Book b) {
+		this.book = b;
 	}
 
 	public void setDialog(BookEditDialog dialog) {

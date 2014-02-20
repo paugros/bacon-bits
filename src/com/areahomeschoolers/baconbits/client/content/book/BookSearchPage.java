@@ -58,7 +58,8 @@ public final class BookSearchPage implements Page {
 		page.add(new HTML(text));
 
 		if (sellerId > 0) {
-			Hyperlink all = new Hyperlink("Books for single seller. Click to see all books.", PageUrl.bookSearch());
+			Hyperlink all = new Hyperlink(">>> Books below are for a single seller. Click here to see all books.", PageUrl.bookSearch());
+			all.addStyleName("largeText bold mediumPadding");
 			page.add(all);
 		}
 

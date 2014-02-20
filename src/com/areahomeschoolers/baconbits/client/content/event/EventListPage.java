@@ -211,7 +211,7 @@ public final class EventListPage implements Page {
 					return;
 				}
 
-				Sidebar sb = Sidebar.create(MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.COMMUNITY_EVENTS, MiniModule.SELL_BOOKS, MiniModule.CITRUS);
+				Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.COMMUNITY_EVENTS, MiniModule.SELL_BOOKS);
 				Application.getLayout().setPage(title, sb, page);
 			}
 		});

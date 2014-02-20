@@ -467,6 +467,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn:" + b.getIsbn() + "&country=US");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
 			String line;
+			Book deadBook = new Book();
+			deadBook.setIsbn(b.getIsbn());
 
 			StringBuffer buffer = new StringBuffer();
 			while ((line = reader.readLine()) != null) {
@@ -477,21 +479,21 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			JsonElement jelement = new JsonParser().parse(buffer.toString());
 			if (jelement == null) {
 				logger.warning("Root element was null when looking up Google Book info.");
-				return b;
+				return deadBook;
 			}
 
 			JsonArray items = jelement.getAsJsonObject().getAsJsonArray("items");
 
 			if (items == null) {
 				logger.warning("Items element was null when looking up Google Book info.");
-				return b;
+				return deadBook;
 			}
 
 			JsonObject book = items.get(0).getAsJsonObject();
 			JsonObject volumeInfo = book.getAsJsonObject("volumeInfo");
 			if (volumeInfo == null) {
 				logger.warning("Volume Information was null when looking up Google Book info.");
-				return b;
+				return deadBook;
 			}
 
 			b.setTitle(getStringFromJsonObject(volumeInfo, "title", 200));
@@ -505,6 +507,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			try {
 				b.setPublishDate(df.parse(dateText));
 			} catch (ParseException e) {
+				b.setPublishDate(null);
 			}
 
 			JsonArray authors = volumeInfo.getAsJsonArray("authors");
@@ -515,6 +518,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 					authorText += authors.get(i).getAsString() + "\n";
 				}
 				b.setAuthor(authorText);
+			} else {
+				b.setAuthor(null);
 			}
 
 			JsonArray categories = volumeInfo.getAsJsonArray("categories");
@@ -525,6 +530,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 					categoryText += categories.get(i).getAsString() + "\n";
 				}
 				b.setGoogleCategories(categoryText);
+			} else {
+				b.setGoogleCategories(null);
 			}
 
 			JsonObject images = volumeInfo.getAsJsonObject("imageLinks");
@@ -532,6 +539,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			if (images != null) {
 				String imageLink = getStringFromJsonObject(images, "thumbnail", 0);
 				b.setImageUrl(imageLink);
+			} else {
+				b.setImageUrl(null);
 			}
 
 		} catch (MalformedURLException e) {

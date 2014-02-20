@@ -140,6 +140,10 @@ public class TitleBar extends Composite {
 		linkPanel.add(link);
 	}
 
+	public void addLinkWidget(Widget w) {
+		linkPanel.add(w);
+	}
+
 	public void addTotalWidget(Widget w) {
 		totalWidgets.add(w);
 	}
