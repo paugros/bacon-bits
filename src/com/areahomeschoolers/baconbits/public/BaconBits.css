@@ -497,6 +497,11 @@ img {
 	border-color: #6bc95a;
 }
 
+.bookDescription {
+	max-height: 250px;
+	overflow: auto;
+}
+
 .boxedBlurb {
 	background-color: #c5eabf;
 	border: 1px solid #a5c99e;

@@ -53,7 +53,7 @@ import com.areahomeschoolers.baconbits.shared.dto.PollUpdateData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
-import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -418,7 +418,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
-	public ArrayList<ServerSuggestion> getSuggestions(String token, int limit, Data options) {
+	public ServerSuggestionData getSuggestionData(String token, int limit, Data options) {
+		ServerSuggestionData data = new ServerSuggestionData();
 		String sql = "select u.id, concat(u.firstName, ' ', u.lastName, ' - ', u.email) as Suggestion, 'User' as entityType ";
 		sql += "from users u ";
 		sql += "where u.email is not null and u.email != '' ";
@@ -430,7 +431,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		sql += "limit " + Integer.toString(limit + 1);
 
 		String search = "%" + token + "%";
-		return query(sql, ServerUtils.getSuggestionMapper(), search, search);
+		data.setSuggestions(query(sql, ServerUtils.getSuggestionMapper(), search, search));
+
+		return data;
 	}
 
 	@Override

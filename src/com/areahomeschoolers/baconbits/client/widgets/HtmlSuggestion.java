@@ -20,8 +20,10 @@ public class HtmlSuggestion implements Suggestion {
 	private String token;
 	private final String entityType;
 	private int entityId;
+	private String stringId;
 	private static HTML convertMe = new HTML();
 	private static Map<String, Image> imageMap = new HashMap<String, Image>();
+	private int fontSize;
 
 	static {
 		imageMap.put("User", new Image(MainImageBundle.INSTANCE.user()));
@@ -30,10 +32,12 @@ public class HtmlSuggestion implements Suggestion {
 		imageMap.put("Book", new Image(MainImageBundle.INSTANCE.book()));
 	}
 
-	public HtmlSuggestion(ServerSuggestion suggestion, String token) {
+	public HtmlSuggestion(ServerSuggestion suggestion, String token, int fontSize) {
 		this.token = token;
-		this.displayString = suggestion.getDisplayString();
+		this.fontSize = fontSize;
+		displayString = suggestion.getDisplayString();
 		entityType = suggestion.getEntityType();
+		stringId = suggestion.getStringId();
 		setEntityId(suggestion.getId());
 	}
 
@@ -56,7 +60,7 @@ public class HtmlSuggestion implements Suggestion {
 		}
 
 		String text = displayString;
-		if (text.length() > 60) {
+		if (!text.contains("\n") && text.length() > 60) {
 			text = text.substring(0, 60);
 		}
 
@@ -74,7 +78,16 @@ public class HtmlSuggestion implements Suggestion {
 		String end = text.substring(cursor);
 		accum.append(escapeText(end));
 
-		return accum.toString();
+		String html = accum.toString();
+		if (html.contains("\n")) {
+			html = html.replaceAll("\\\n", "<br/>");
+		}
+
+		if (fontSize > 0) {
+			html = "<div style=\"font-size: " + fontSize + "px;\">" + html + "</div>";
+		}
+
+		return html;
 	}
 
 	/**
@@ -97,6 +110,10 @@ public class HtmlSuggestion implements Suggestion {
 	@Override
 	public String getReplacementString() {
 		return displayString;
+	}
+
+	public String getStringId() {
+		return stringId;
 	}
 
 	/**

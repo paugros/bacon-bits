@@ -5,7 +5,8 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 public final class ServerSuggestion extends EntityDto<ServerSuggestion> implements Suggestion {
 	private static final long serialVersionUID = 1L;
 	private String displayString;
-	private String entityType; // Added to distinguish between the Customers and Accounts for the Customer/Account search
+	private String entityType;
+	private String stringId;
 
 	public ServerSuggestion() {
 
@@ -34,7 +35,15 @@ public final class ServerSuggestion extends EntityDto<ServerSuggestion> implemen
 		return displayString;
 	}
 
+	public String getStringId() {
+		return stringId;
+	}
+
 	public void setEntityType(String entityType) {
 		this.entityType = entityType;
+	}
+
+	public void setStringId(String stringId) {
+		this.stringId = stringId;
 	}
 }

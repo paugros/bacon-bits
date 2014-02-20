@@ -27,7 +27,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
-import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
@@ -128,7 +128,9 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	}
 
 	@Override
-	public ArrayList<ServerSuggestion> getSuggestions(String token, int limit, Data options) {
+	public ServerSuggestionData getSuggestionData(String token, int limit, Data options) {
+		ServerSuggestionData data = new ServerSuggestionData();
+
 		String sql = "select a.id, a.title as Suggestion, 'Article' as entityType ";
 		sql += "from articles a ";
 		sql += createWhere();
@@ -139,7 +141,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		sql += "limit " + Integer.toString(limit + 1);
 
 		String search = "%" + token + "%";
-		return query(sql, ServerUtils.getSuggestionMapper(), search);
+		data.setSuggestions(query(sql, ServerUtils.getSuggestionMapper(), search));
+		return data;
 	}
 
 	@Override

@@ -52,7 +52,7 @@ import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
-import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
+import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -603,7 +603,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	}
 
 	@Override
-	public ArrayList<ServerSuggestion> getSuggestions(String token, int limit, Data options) {
+	public ServerSuggestionData getSuggestionData(String token, int limit, Data options) {
+		ServerSuggestionData data = new ServerSuggestionData();
 		String sql = "select e.id, concat(e.title, ' - ', date_format(e.startDate, '%b %e')) as Suggestion, 'Event' as entityType ";
 		sql += "from events e ";
 		sql += createWhere();
@@ -613,7 +614,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		sql += "limit " + Integer.toString(limit + 1);
 
 		String search = "%" + token + "%";
-		return query(sql, ServerUtils.getSuggestionMapper(), search);
+		data.setSuggestions(query(sql, ServerUtils.getSuggestionMapper(), search));
+		return data;
 	}
 
 	@Override

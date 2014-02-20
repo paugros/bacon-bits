@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Fader;
+import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -144,11 +145,11 @@ public class TagSection extends Composite {
 				addNewTag();
 			}
 		});
-		suggestBox.setSelectionHandler(new ParameterHandler<Integer>() {
+		suggestBox.setSelectionHandler(new ParameterHandler<HtmlSuggestion>() {
 			@Override
-			public void execute(Integer tagId) {
+			public void execute(HtmlSuggestion sug) {
 				Tag tag = new Tag();
-				tag.setId(tagId);
+				tag.setId(sug.getEntityId());
 				tag.setMappingType(mappingType);
 				tag.setEntityId(entityId);
 				suggestBox.reset();
