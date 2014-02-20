@@ -80,6 +80,9 @@ public class NewsModule extends Composite {
 			text = text.replaceAll("\\.", ". ");
 
 			Hyperlink body = new InlineHyperlink("- " + text, PageUrl.news(item.getId()));
+			body.getElement().getStyle().setHeight(2.83, Unit.EX);
+			body.getElement().getStyle().setColor("#777777");
+
 			body.setStyleName("newsModuleBody");
 
 			pp.add(title);
