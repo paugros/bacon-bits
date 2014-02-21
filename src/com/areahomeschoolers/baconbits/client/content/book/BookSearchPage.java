@@ -172,12 +172,13 @@ public final class BookSearchPage implements Page {
 
 		final String title = "Books";
 
-		table.setDisplayColumns(BookColumn.IMAGE, BookColumn.USER, BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.GRADE_LEVEL, BookColumn.CONDITION,
-				BookColumn.PRICE, BookColumn.CONTACT);
+		table.setDisplayColumns(BookColumn.IMAGE, BookColumn.USER, BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.GRADE_LEVEL, BookColumn.PRICE,
+				BookColumn.CONTACT);
 		table.setTitle(title);
 		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addSearchControl();
-		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1300PX));
+		ContentWidth width = Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS) ? ContentWidth.MAXWIDTH1200PX : ContentWidth.MAXWIDTH1000PX;
+		page.add(WidgetFactory.newSection(table, width));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override

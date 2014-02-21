@@ -140,6 +140,7 @@ public class BookPage implements Page {
 				} else {
 					book = result;
 					form.setDto(result);
+					fieldTable.setBook(result);
 					field.setInputVisibility(false);
 				}
 			}
