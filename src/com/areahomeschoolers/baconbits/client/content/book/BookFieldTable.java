@@ -356,6 +356,14 @@ public class BookFieldTable extends FieldTable {
 		addField(publisherField);
 
 		if (book.isSaved()) {
+			if (book.getPublishDate() != null) {
+				addField("Published date:", Formatter.formatDate(book.getPublishDate()));
+			}
+
+			if (book.getPageCount() > 0) {
+				addField("Pages:", Integer.toString(book.getPageCount()));
+			}
+
 			final Label statusDisplay = new Label();
 			final DefaultListBox statusInput = new DefaultListBox();
 			for (Data item : pageData.getStatuses()) {
