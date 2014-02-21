@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.LazyLoadDialog;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 
@@ -16,9 +17,9 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
 
-public class BookEditDialog extends EntityEditDialog<Book> {
+public class BookEditDialog extends EntityEditDialog<Book> implements LazyLoadDialog {
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
-	private BookPageData pageData;
+	private static BookPageData pageData;
 	private boolean closeAfterSubmit = true;
 	private BookFieldTable fieldTable;
 
@@ -52,10 +53,20 @@ public class BookEditDialog extends EntityEditDialog<Book> {
 		});
 
 		getButtonPanel().getCloseButton().setText("Cancel");
+	}
+
+	@Override
+	public void loadData() {
+		if (pageData != null) {
+			showContent();
+			return;
+		}
+
 		bookService.getPageData(0, new Callback<BookPageData>() {
 			@Override
 			protected void doOnSuccess(BookPageData result) {
 				pageData = result;
+				showContent();
 			}
 		});
 	}
