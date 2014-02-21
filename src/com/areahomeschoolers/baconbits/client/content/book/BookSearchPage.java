@@ -2,6 +2,8 @@ package com.areahomeschoolers.baconbits.client.content.book;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.Sidebar;
+import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -183,7 +185,11 @@ public final class BookSearchPage implements Page {
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
 			public void onDataReturn() {
-				Application.getLayout().setPage(title, page);
+				Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.NEW_BOOKS, MiniModule.SELL_BOOKS);
+				if (Application.isAuthenticated()) {
+					sb.add(MiniModule.ACTIVE_USERS);
+				}
+				Application.getLayout().setPage(title, sb, page);
 			}
 		});
 

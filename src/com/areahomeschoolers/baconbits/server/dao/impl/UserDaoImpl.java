@@ -581,13 +581,15 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sqlArgs.add(parentId);
 		}
 
-		if (ServerContext.isAuthenticated() && (activeNumber > 0 || newNumber > 0)) {
-			sql += "and u.id != ? ";
-			sqlArgs.add(ServerContext.getCurrentUserId());
+		if (activeNumber > 0 || newNumber > 0) {
+			if (ServerContext.isAuthenticated()) {
+				sql += "and u.id != ? ";
+				sqlArgs.add(ServerContext.getCurrentUserId());
+			}
 			if (newNumber > 0) {
 				sql += "and u.passwordDigest is not null and date_add(now(), interval -2 week) < u.addedDate ";
 			} else if (activeNumber > 0) {
-				sql += "and date_add(now(), interval 5 minute) < u.lastActivityDate ";
+				sql += "and date_add(now(), interval -5 minute) < u.lastActivityDate ";
 			}
 		}
 
