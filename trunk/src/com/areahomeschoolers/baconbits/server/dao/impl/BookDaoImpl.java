@@ -274,7 +274,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		}
 
 		if (newNumber > 0) {
-			sql += "and date_add(now(), interval -2 week) < b.addedDate ";
+			sql += "and date_add(now(), interval -2 week) < b.addedDate and statusId = 1 ";
 		}
 
 		if (!Common.isNullOrBlank(distanceCols)) {
