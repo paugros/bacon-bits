@@ -29,11 +29,15 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class BookFieldTable extends FieldTable {
 	private Book book;
@@ -96,6 +100,15 @@ public class BookFieldTable extends FieldTable {
 					lookupByIsbn();
 				}
 			});
+
+			isbnInput.addKeyDownHandler(new KeyDownHandler() {
+				@Override
+				public void onKeyDown(KeyDownEvent event) {
+					if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+						lookupByIsbn();
+					}
+				}
+			});
 		}
 		addField(isbnField);
 
@@ -139,25 +152,27 @@ public class BookFieldTable extends FieldTable {
 		});
 		addField(titleField);
 
-		final Label subTitleDisplay = new Label();
-		final TextBox subTitleInput = new TextBox();
-		subTitleInput.setVisibleLength(50);
-		subTitleInput.setMaxLength(200);
-		FormField subTitleField = form.createFormField("Subtitle:", subTitleInput, subTitleDisplay);
-		subTitleField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				subTitleDisplay.setText(Common.getDefaultIfNull(book.getSubTitle()));
-				subTitleInput.setText(book.getSubTitle());
-			}
-		});
-		subTitleField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				book.setSubTitle(subTitleInput.getText());
-			}
-		});
-		addField(subTitleField);
+		if (book.isSaved()) {
+			final Label subTitleDisplay = new Label();
+			final TextBox subTitleInput = new TextBox();
+			subTitleInput.setVisibleLength(50);
+			subTitleInput.setMaxLength(200);
+			FormField subTitleField = form.createFormField("Subtitle:", subTitleInput, subTitleDisplay);
+			subTitleField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					subTitleDisplay.setText(Common.getDefaultIfNull(book.getSubTitle()));
+					subTitleInput.setText(book.getSubTitle());
+				}
+			});
+			subTitleField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					book.setSubTitle(subTitleInput.getText());
+				}
+			});
+			addField(subTitleField);
+		}
 
 		final Label categoryDisplay = new Label();
 		final RequiredListBox categoryInput = new RequiredListBox();
@@ -202,15 +217,71 @@ public class BookFieldTable extends FieldTable {
 		});
 		addField(ageField);
 
+		final Label conditionDisplay = new Label();
+		final DefaultListBox conditionInput = new DefaultListBox();
+		Anchor conditionLink = new Anchor("Condition:", Url.getBaseUrl() + "#" + PageUrl.article(64));
+		conditionLink.setTarget("_blank");
+		for (Data item : pageData.getConditions()) {
+			conditionInput.addItem(item.get("bookCondition"), item.getId());
+		}
+		FormField conditionField = form.createFormField(conditionLink, conditionInput, conditionDisplay);
+		conditionField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				conditionDisplay.setText(Common.getDefaultIfNull(book.getCondition()));
+				conditionInput.setValue(book.getConditionId() == null ? 3 : book.getConditionId());
+			}
+		});
+		conditionField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				book.setConditionId(conditionInput.getIntValue());
+			}
+		});
+		addField(conditionField);
+
 		final Label priceDisplay = new Label();
 		final NumericTextBox priceInput = new NumericTextBox(2);
 		priceInput.setRequired(true);
-		FormField priceField = form.createFormField("Price:", priceInput, priceDisplay);
+		VerticalPanel pricePanel = new VerticalPanel();
+		pricePanel.add(priceInput);
+		final HTML amazonPriceBox = new HTML();
+		pricePanel.add(amazonPriceBox);
+		priceInput.setRequired(true);
+		FormField priceField = form.createFormField("Price:", pricePanel, priceDisplay);
+		priceField.setValidator(priceInput.getValidator());
+		// priceField.setValidator(new Validator(priceInput, new ValidatorCommand() {
+		// @Override
+		// public void validate(Validator validator) {
+		// if (priceInput.getText().isEmpty()) {
+		// validator.setError(true);
+		// }
+		// }
+		// }));
+		priceField.setRequired(true);
 		priceField.setInitializer(new Command() {
 			@Override
 			public void execute() {
 				priceDisplay.setText(Formatter.formatCurrency(book.getPrice()));
-				priceInput.setValue(book.getPrice());
+				if (book.isSaved() || book.getPrice() > 0) {
+					priceInput.setValue(book.getPrice());
+				}
+				amazonPriceBox.setHTML("");
+
+				if (book.getAmazonUrl() != null) {
+					String html = "<a href=\"" + book.getAmazonUrl() + "\">Amazon prices:</a>&nbsp;";
+					if (book.getAmazonNewPrice() != null) {
+						html += book.getAmazonNewPrice() + "&nbsp;new";
+					}
+					if (book.getAmazonUsedPrice() != null) {
+						if (book.getAmazonNewPrice() != null) {
+							html += ",&nbsp;";
+						}
+						html += book.getAmazonUsedPrice() + "&nbsp;used";
+					}
+
+					amazonPriceBox.setHTML(html);
+				}
 			}
 		});
 		priceField.setDtoUpdater(new Command() {
@@ -284,50 +355,28 @@ public class BookFieldTable extends FieldTable {
 		});
 		addField(publisherField);
 
-		final Label statusDisplay = new Label();
-		final DefaultListBox statusInput = new DefaultListBox();
-		for (Data item : pageData.getStatuses()) {
-			statusInput.addItem(item.get("status"), item.getId());
+		if (book.isSaved()) {
+			final Label statusDisplay = new Label();
+			final DefaultListBox statusInput = new DefaultListBox();
+			for (Data item : pageData.getStatuses()) {
+				statusInput.addItem(item.get("status"), item.getId());
+			}
+			FormField statusField = form.createFormField("Status:", statusInput, statusDisplay);
+			statusField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					statusDisplay.setText(book.getStatus());
+					statusInput.setValue(book.getStatusId());
+				}
+			});
+			statusField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					book.setStatusId(statusInput.getIntValue());
+				}
+			});
+			addField(statusField);
 		}
-		FormField statusField = form.createFormField("Status:", statusInput, statusDisplay);
-		statusField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				statusDisplay.setText(book.getStatus());
-				statusInput.setValue(book.getStatusId());
-			}
-		});
-		statusField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				book.setStatusId(statusInput.getIntValue());
-			}
-		});
-		addField(statusField);
-
-		final Label conditionDisplay = new Label();
-		final DefaultListBox conditionInput = new DefaultListBox();
-		Anchor conditionLink = new Anchor("Condition:", Url.getBaseUrl() + "#" + PageUrl.article(64));
-		conditionLink.setTarget("_blank");
-		conditionInput.addItem("", 0);
-		for (Data item : pageData.getConditions()) {
-			conditionInput.addItem(item.get("bookCondition"), item.getId());
-		}
-		FormField conditionField = form.createFormField(conditionLink, conditionInput, conditionDisplay);
-		conditionField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				conditionDisplay.setText(Common.getDefaultIfNull(book.getCondition()));
-				conditionInput.setValue(book.getConditionId());
-			}
-		});
-		conditionField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				book.setConditionId(conditionInput.getIntValue());
-			}
-		});
-		addField(conditionField);
 
 		final Label imageDisplay = new Label();
 		final TextBox imageInput = new TextBox();

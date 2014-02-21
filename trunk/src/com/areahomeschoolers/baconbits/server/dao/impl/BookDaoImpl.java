@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -484,7 +486,6 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			sdata.setTotalMatches(totalItems);
 
 			if (items == null) {
-				System.out.println("items null: " + data);
 				return sdata;
 			}
 
@@ -585,10 +586,54 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		return null;
 	}
 
+	private void populateAmazonPrices(Book b) throws Exception {
+		String amazonUrl = "http://www.amazon.com/gp/search/?search-alias=stripbooks&field-isbn=" + b.getIsbn();
+		b.setAmazonUrl(amazonUrl);
+
+		URL url = new URL(amazonUrl);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+		String line;
+
+		StringBuffer buffer = new StringBuffer();
+		while ((line = reader.readLine()) != null) {
+			buffer.append(line);
+		}
+		reader.close();
+
+		String newPrice = "";
+		String usedPrice = "";
+
+		Pattern p = Pattern.compile("<td class=\"toeNewPrice\">(.*?)</td>", Pattern.DOTALL);
+		// Pattern p = Pattern.compile("new from <span>(.*?)</span>", Pattern.DOTALL);
+		Matcher m = p.matcher(buffer.toString());
+		if (m.find()) {
+			newPrice = m.group(1);
+		}
+
+		m.usePattern(Pattern.compile("<td class=\"toeUsedPrice\">(.*?)</td>", Pattern.DOTALL));
+		// m.usePattern(Pattern.compile("used from <span>(.*?)</span>", Pattern.DOTALL));
+
+		if (m.find()) {
+			usedPrice = m.group(1);
+		}
+
+		if (!newPrice.isEmpty() && newPrice.contains("$")) {
+			b.setAmazonNewPrice(newPrice);
+		}
+
+		if (!usedPrice.isEmpty() && usedPrice.contains("$")) {
+			b.setAmazonUsedPrice(usedPrice);
+		}
+	}
+
 	private Book populateGoogleInfo(Book b) {
 		try {
 			Book deadBook = new Book();
 			deadBook.setIsbn(b.getIsbn());
+
+			if (b.getIsbn() == null || b.getIsbn().isEmpty()) {
+				return deadBook;
+			}
 
 			JsonElement jelement = new JsonParser().parse(getGoogleBookQueryResults("isbn:" + b.getIsbn()));
 			if (jelement == null) {
@@ -664,6 +709,12 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			logger.warning("MalformedURLException:" + e.getMessage());
 		} catch (IOException e) {
 			logger.warning("IOException:" + e.getMessage());
+		}
+
+		try {
+			populateAmazonPrices(b);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return b;

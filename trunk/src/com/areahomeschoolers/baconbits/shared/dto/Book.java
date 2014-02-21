@@ -32,6 +32,8 @@ public final class Book extends EntityDto<Book> {
 	private String googleCategories;
 
 	// auxillary
+	private String amazonNewPrice, amazonUsedPrice;
+	private String amazonUrl;
 	private String userFirstName, userLastName;
 	private String userEmail;
 	private String status;
@@ -41,6 +43,18 @@ public final class Book extends EntityDto<Book> {
 
 	public Book() {
 
+	}
+
+	public String getAmazonNewPrice() {
+		return amazonNewPrice;
+	}
+
+	public String getAmazonUrl() {
+		return amazonUrl;
+	}
+
+	public String getAmazonUsedPrice() {
+		return amazonUsedPrice;
 	}
 
 	public String getAuthor() {
@@ -169,6 +183,18 @@ public final class Book extends EntityDto<Book> {
 
 	public boolean isActive() {
 		return true;
+	}
+
+	public void setAmazonNewPrice(String amazonNewPrice) {
+		this.amazonNewPrice = amazonNewPrice;
+	}
+
+	public void setAmazonUrl(String amazonUrl) {
+		this.amazonUrl = amazonUrl;
+	}
+
+	public void setAmazonUsedPrice(String amazonUsedPrice) {
+		this.amazonUsedPrice = amazonUsedPrice;
 	}
 
 	public void setAuthor(String author) {
