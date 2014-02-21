@@ -2,6 +2,7 @@ package com.areahomeschoolers.baconbits.client.content.minimodules;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.user.CreateUserDialog;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.shared.Constants;
@@ -11,7 +12,11 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -21,12 +26,28 @@ public class LinksMiniModule extends Composite {
 		VerticalPanel sp = new VerticalPanel();
 		sp.setSpacing(8);
 		VerticalPanel vp = new VerticalPanel();
+		vp.setWidth("100%");
 		sp.setStyleName("module");
 		sp.add(vp);
 		Label linkLabel = new Label("LINKS");
 		linkLabel.addStyleName("moduleTitle");
 		linkLabel.getElement().getStyle().setMarginBottom(4, Unit.PX);
-		vp.add(linkLabel);
+
+		if (Application.getCurrentOrg().getFacebookUrl() != null) {
+			HorizontalPanel hp = new HorizontalPanel();
+			hp.setWidth("100%");
+			hp.add(linkLabel);
+
+			Image icon = new Image(MainImageBundle.INSTANCE.faceBook());
+			String fbText = "<a href=\"" + Application.getCurrentOrg().getFacebookUrl() + "\">" + icon + "</a>";
+			HTML fbLink = new HTML(fbText);
+			hp.add(fbLink);
+			hp.setCellHorizontalAlignment(fbLink, HasHorizontalAlignment.ALIGN_RIGHT);
+
+			vp.add(hp);
+		} else {
+			vp.add(linkLabel);
+		}
 
 		if (Application.isAuthenticated()) {
 			vp.add(new Hyperlink("Find People", PageUrl.userList()));
