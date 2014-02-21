@@ -221,7 +221,7 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 				});
 				break;
 			case USER:
-				if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+				if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
 					addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 						@Override
 						protected Widget createWidget(Book item) {
