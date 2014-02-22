@@ -90,19 +90,7 @@ public class Mailer {
 	}
 
 	public String getFrom() {
-		return "kaugros@citrusgroups.com";
-		// String from = this.from;
-		//
-		// if (from == null) {
-		// User curUser = getUser();
-		// if (Common.isValidEmail(curUser.getEmail())) {
-		// from = curUser.getFullName() + " <" + curUser.getEmail() + ">";
-		// } else {
-		// from = sysFrom;
-		// }
-		// }
-		//
-		// return from;
+		return "info@citrusgroups.com";
 	}
 
 	public Message getMessage() {
