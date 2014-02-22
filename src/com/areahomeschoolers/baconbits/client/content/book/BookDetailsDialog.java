@@ -10,8 +10,12 @@ import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -24,6 +28,7 @@ public class BookDetailsDialog extends DefaultDialog {
 	private VerticalPanel vvp = new VerticalPanel();
 	private Book book;
 	private ButtonPanel bp = new ButtonPanel(this);
+	private MaxHeightScrollPanel sp = new MaxHeightScrollPanel(vp);
 
 	public BookDetailsDialog(Book b) {
 		this.book = b;
@@ -31,7 +36,19 @@ public class BookDetailsDialog extends DefaultDialog {
 		setModal(false);
 		vp.setSpacing(10);
 
-		pp.add(new Image("/baconbits/service/file?id=" + book.getImageId()));
+		Image cover = new Image("/baconbits/service/file?id=" + book.getImageId());
+		cover.addLoadHandler(new LoadHandler() {
+			@Override
+			public void onLoad(LoadEvent event) {
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+					@Override
+					public void execute() {
+						sp.adjustHeightNow();
+					}
+				});
+			}
+		});
+		pp.add(cover);
 
 		VerticalPanel dt = new VerticalPanel();
 		dt.setSpacing(2);
@@ -104,8 +121,6 @@ public class BookDetailsDialog extends DefaultDialog {
 
 		vvp.setWidth("600px");
 		vp.setWidth("100%");
-
-		MaxHeightScrollPanel sp = new MaxHeightScrollPanel(vp);
 
 		vvp.add(sp);
 		vvp.add(bp);
