@@ -250,14 +250,6 @@ public class BookFieldTable extends FieldTable {
 		priceInput.setRequired(true);
 		FormField priceField = form.createFormField("Price:", pricePanel, priceDisplay);
 		priceField.setValidator(priceInput.getValidator());
-		// priceField.setValidator(new Validator(priceInput, new ValidatorCommand() {
-		// @Override
-		// public void validate(Validator validator) {
-		// if (priceInput.getText().isEmpty()) {
-		// validator.setError(true);
-		// }
-		// }
-		// }));
 		priceField.setRequired(true);
 		priceField.setInitializer(new Command() {
 			@Override
