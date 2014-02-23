@@ -32,7 +32,8 @@ public abstract class Constants {
 	public static final String CG_PAYPAL_EMAIL = "payments@citrusgroups.com";
 	public static final int DEFAULT_LOGO_ID = 1241;
 	public static final int ACCOUNT_CREATION_INSTRUCTIONS_ID = 77;
-	public static final int BOOK_SELLERS_GROUP_ID = 16;
+	public static final int ONLINE_BOOK_SELLERS_GROUP_ID = 16;
+	public static final int PHYSICAL_BOOK_SELLERS_GROUP_ID = 17;
 	public static final String CG_DOMAIN = "myhomeschoolgroups.com";
 	public static final String CG_URL = "http://www." + CG_DOMAIN;
 	public static final String TOS_URL = CG_URL + "/#page=Article&articleId=73";

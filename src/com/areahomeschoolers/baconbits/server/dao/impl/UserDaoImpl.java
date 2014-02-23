@@ -626,6 +626,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		if (userId > 0) {
 			sql += "uugm.isAdministrator, uugm.groupApproved, uugm.userApproved, ";
 		}
+		if (userAdminId > 0) {
+			sql += "augm.isAdministrator, augm.groupApproved, augm.userApproved, ";
+		}
 		sql += "o.groupName as organizationName from groups g ";
 		sql += "join groups o on o.id = g.organizationId ";
 		sql += "left join users u on u.id = g.contactId ";
@@ -673,7 +676,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 		sql += "order by o.groupName, g.isOrganization desc, g.groupName";
 
-		if (userId > 0 || userAdminId > 0 || userNotMemberId > 0) {
+		if (userId > 0 || userAdminId > 0) {
 			return query(sql, new GroupMemberMapper(), sqlArgs.toArray());
 		}
 

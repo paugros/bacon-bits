@@ -81,9 +81,7 @@ public final class MainMenu extends MenuBar {
 		addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this, null, 0);
 
 		addItem("Events", getEventsMenu());
-		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
-			addItem("Book Store", getBooksMenu());
-		}
+		addItem("Book Store", getBooksMenu());
 
 		if (Application.isAuthenticated()) {
 			addItem("People", getPeopleMenu());
@@ -250,7 +248,7 @@ public final class MainMenu extends MenuBar {
 		if (!Application.getCurrentUser().isChild()) {
 			addLinkToMenu(menu, "Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=3");
 		}
-		if (Application.getCurrentUser().memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
+		if (Application.getCurrentUser().memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
 			addLinkToMenu(menu, "Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
 		}
 		if (!Application.getCurrentUser().isChild()) {

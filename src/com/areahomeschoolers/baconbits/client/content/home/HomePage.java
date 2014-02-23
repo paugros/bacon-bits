@@ -87,7 +87,7 @@ public class HomePage implements Page {
 			Application.refreshSecurityGroups(new Command() {
 				@Override
 				public void execute() {
-					if (Application.memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
+					if (Application.memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
 						String text = "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>Book Store -> My Books</b> meu option.";
 						text += "<br><br><b>NOTE: You may need to log out and log back in before you can see the My Books menu option.</b>";
 						HTML label = new HTML(text);
@@ -127,7 +127,7 @@ public class HomePage implements Page {
 				leftPanel.add(new CitrusMiniModule());
 
 				// book promo
-				if (!Application.memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
+				if (!Application.memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
 					// leftPanel.add(new SellBooksMiniModule());
 				}
 
