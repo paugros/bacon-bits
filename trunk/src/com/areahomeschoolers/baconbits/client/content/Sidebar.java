@@ -102,7 +102,7 @@ public class Sidebar extends Composite {
 			add(module, new NewEventsMiniModule());
 			break;
 		case SELL_BOOKS:
-			if (!Application.memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
+			if (!Application.memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
 				// add(module, new SellBooksMiniModule());
 			}
 			break;

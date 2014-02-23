@@ -413,7 +413,7 @@ public class UserPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			if (user.memberOf(Constants.BOOK_SELLERS_GROUP_ID)) {
+			if (user.memberOfAny(Constants.ONLINE_BOOK_SELLERS_GROUP_ID, Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID)) {
 				tabPanel.add("Books", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
