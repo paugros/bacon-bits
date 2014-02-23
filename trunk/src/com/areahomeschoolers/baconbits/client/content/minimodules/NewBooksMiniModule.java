@@ -12,6 +12,7 @@ public class NewBooksMiniModule extends BookMiniModule {
 
 	public NewBooksMiniModule() {
 		ArgMap<BookArg> args = new ArgMap<BookArg>(Status.ACTIVE);
+		args.put(BookArg.ONLINE_ONLY);
 		args.put(BookArg.NEW_NUMBER, 10);
 		populate(title, args);
 	}

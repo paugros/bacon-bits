@@ -257,6 +257,8 @@ public class BookFieldTable extends FieldTable {
 				priceDisplay.setText(Formatter.formatCurrency(book.getPrice()));
 				if (book.isSaved() || book.getPrice() > 0) {
 					priceInput.setValue(book.getPrice());
+				} else {
+					priceInput.setText("");
 				}
 				amazonPriceBox.setHTML("");
 

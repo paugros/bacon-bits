@@ -4,13 +4,16 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
+import com.areahomeschoolers.baconbits.client.content.minimodules.ActiveUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CommunityEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.FindPeopleMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.LinksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.MyEventsMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.NewBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewUsersMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.UpcomingEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -128,16 +131,18 @@ public class HomePage implements Page {
 
 				// book promo
 				if (!Application.memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
-					// leftPanel.add(new SellBooksMiniModule());
+					leftPanel.add(new SellBooksMiniModule());
 				}
+
+				leftPanel.add(new NewBooksMiniModule());
+
+				// community
+				leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
 
 				// find people promo
 				if (Application.isAuthenticated()) {
 					leftPanel.add(new FindPeopleMiniModule());
 				}
-
-				// community
-				leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
 
 				// new
 				if (!Common.isNullOrEmpty(pageData.getNewlyAddedEvents())) {
@@ -150,6 +155,11 @@ public class HomePage implements Page {
 				// new users
 				if (Application.isAuthenticated()) {
 					rightPanel.add(new NewUsersMiniModule());
+				}
+
+				// active users
+				if (Application.isAuthenticated()) {
+					rightPanel.add(new ActiveUsersMiniModule());
 				}
 
 				// my events

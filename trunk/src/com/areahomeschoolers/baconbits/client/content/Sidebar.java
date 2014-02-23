@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.content.minimodules.MyEventsMiniMo
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewUsersMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.UpcomingEventsMiniModule;
 import com.areahomeschoolers.baconbits.shared.Constants;
 
@@ -103,7 +104,7 @@ public class Sidebar extends Composite {
 			break;
 		case SELL_BOOKS:
 			if (!Application.memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
-				// add(module, new SellBooksMiniModule());
+				add(module, new SellBooksMiniModule());
 			}
 			break;
 		case UPCOMING_EVENTS:

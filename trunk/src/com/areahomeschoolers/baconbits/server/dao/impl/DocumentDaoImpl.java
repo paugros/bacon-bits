@@ -282,6 +282,9 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 	}
 
 	private String getGcsFileName(Document d) {
+		if (d == null) {
+			return "";
+		}
 		return GCS_DOCUMENT_FOLDER + "/" + Integer.toString(d.getId()) + "." + d.getFileExtension();
 	}
 

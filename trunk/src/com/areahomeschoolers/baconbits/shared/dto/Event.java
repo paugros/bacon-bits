@@ -51,6 +51,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private double lat;
 	private double lng;
 	private boolean addressChanged;
+	private String facilityName;
 
 	// auxilliary
 	private double groupMarkupPercent;
@@ -179,6 +180,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	@Override
 	public EntityType getEntityType() {
 		return EntityType.EVENT;
+	}
+
+	public String getFacilityName() {
+		return facilityName;
 	}
 
 	public boolean getFinished() {
@@ -431,6 +436,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public void setFacilityName(String facilityName) {
+		this.facilityName = facilityName;
 	}
 
 	public void setFinished(boolean finished) {
