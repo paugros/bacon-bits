@@ -7,7 +7,6 @@ import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class FindPeopleMiniModule extends Composite {
@@ -21,9 +20,6 @@ public class FindPeopleMiniModule extends Composite {
 
 		PaddedPanel pp = new PaddedPanel();
 		pp.add(h);
-		Label l = new Label("NEW!");
-		l.addStyleName("errorText bold smallText");
-		pp.add(l);
 
 		vp.add(pp);
 		Hyperlink priv = new Hyperlink("privacy preferences", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");

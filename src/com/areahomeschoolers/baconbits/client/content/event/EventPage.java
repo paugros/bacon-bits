@@ -63,6 +63,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -209,6 +211,25 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(eventDatesField);
 
+		final Label facilityDisplay = new Label();
+		final TextBox facilityInput = new TextBox();
+		facilityInput.setMaxLength(200);
+		FormField facilityField = form.createFormField("Facility name:", facilityInput, facilityDisplay);
+		facilityField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				facilityDisplay.setText(Common.getDefaultIfNull(calendarEvent.getFacilityName()));
+				facilityInput.setText(calendarEvent.getFacilityName());
+			}
+		});
+		facilityField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				calendarEvent.setFacilityName(facilityInput.getText());
+			}
+		});
+		fieldTable.addField(facilityField);
+
 		FormField addressField = new AddressField(calendarEvent).getFormField();
 		addressField.setRequired(true);
 		form.addField(addressField);
@@ -278,6 +299,40 @@ public class EventPage implements Page {
 				}
 			});
 			fieldTable.addField(costField);
+
+			final Label categoryDisplay = new Label();
+			final RequiredListBox categoryInput = new RequiredListBox();
+			for (Data item : pageData.getCategories()) {
+				categoryInput.addItem(item.get("category"), item.getId());
+			}
+			categoryInput.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					int categoryId = categoryInput.getIntValue();
+					if (categoryId == 6) {
+						calendarEvent.setMarkupOverride(true);
+						calendarEvent.setMarkupDollars(0);
+						calendarEvent.setMarkupPercent(0);
+					} else {
+						calendarEvent.setMarkupOverride(false);
+					}
+				}
+			});
+			FormField categoryField = form.createFormField("Category:", categoryInput, categoryDisplay);
+			categoryField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					categoryDisplay.setText(calendarEvent.getCategory());
+					categoryInput.setValue(calendarEvent.getCategoryId());
+				}
+			});
+			categoryField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setCategoryId(categoryInput.getIntValue());
+				}
+			});
+			fieldTable.addField(categoryField);
 		}
 
 		if (calendarEvent.getRequiresRegistration()) {
@@ -333,27 +388,6 @@ public class EventPage implements Page {
 		}
 
 		if (Application.administratorOf(calendarEvent)) {
-			final Label categoryDisplay = new Label();
-			final RequiredListBox categoryInput = new RequiredListBox();
-			for (Data item : pageData.getCategories()) {
-				categoryInput.addItem(item.get("category"), item.getId());
-			}
-			FormField categoryField = form.createFormField("Category:", categoryInput, categoryDisplay);
-			categoryField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					categoryDisplay.setText(calendarEvent.getCategory());
-					categoryInput.setValue(calendarEvent.getCategoryId());
-				}
-			});
-			categoryField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setCategoryId(categoryInput.getIntValue());
-				}
-			});
-			fieldTable.addField(categoryField);
-
 			final Label instructionsDisplay = new Label();
 			final MaxLengthTextArea instructionsInput = new MaxLengthTextArea(300);
 			instructionsInput.setVisibleLines(2);
@@ -404,6 +438,7 @@ public class EventPage implements Page {
 					}
 
 					registrationDatesInput.setEndDate(ClientDateUtils.addHours(d, (-14 * 24) + 3));
+					registrationDatesInput.setStartDate(ClientDateUtils.addHours(d, (-28 * 24) + 3));
 				}
 			});
 

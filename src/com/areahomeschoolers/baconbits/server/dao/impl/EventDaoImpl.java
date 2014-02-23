@@ -110,6 +110,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setGroupMarkupDollars(rs.getDouble("groupMarkupDollars"));
 			event.setGroupMarkupPercent(rs.getDouble("groupMarkupPercent"));
 			event.setGroupMarkupOverride(rs.getBoolean("groupMarkupOverride"));
+			event.setFacilityName(rs.getString("facilityName"));
 			event.setCity(rs.getString("city"));
 			event.setZip(rs.getString("zip"));
 			event.setState(rs.getString("state"));
@@ -790,7 +791,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		if (event.isSaved()) {
 			String sql = "update events set title = :title, description = :description, startDate = :startDate, endDate = :endDate, visibilityLevelId = :visibilityLevelId, ";
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, markup = :markup, ";
-			sql += "markupOverride = :markupOverride, markupPercent = :markupPercent, markupDollars = :markupDollars, ";
+			sql += "markupOverride = :markupOverride, markupPercent = :markupPercent, markupDollars = :markupDollars, facilityName = :facilityName, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, requiresRegistration = :requiresRegistration, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
@@ -803,12 +804,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setOwningOrgId(ServerContext.getCurrentOrgId());
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
-			sql += "markupOverride, markupPercent, markupDollars, ";
+			sql += "markupOverride, markupPercent, markupDollars, facilityName, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, notificationEmail, owningOrgId, ";
 			sql += "address, street, city, state, zip, lat, lng, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, :markup, ";
-			sql += ":markupOverride, :markupPercent, :markupDollars, ";
+			sql += ":markupOverride, :markupPercent, :markupDollars, :facilityName, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :notificationEmail, :owningOrgId, ";
 			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";

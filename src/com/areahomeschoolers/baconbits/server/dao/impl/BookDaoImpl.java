@@ -270,7 +270,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		}
 
 		if (hideOffline) {
-			sql += "and b.userId in(select userId from userGroupMembers where groupId = 16) ";
+			sql += "and b.userId in(select userId from userGroupMembers where groupId = 16) and isActive(u.startDate, u.endDate) = 1 ";
 		}
 
 		if (newNumber > 0) {
@@ -603,15 +603,20 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		String newPrice = "";
 		String usedPrice = "";
 
-		Pattern p = Pattern.compile("<td class=\"toeNewPrice\">(.*?)</td>", Pattern.DOTALL);
-		// Pattern p = Pattern.compile("new from <span>(.*?)</span>", Pattern.DOTALL);
+		Pattern p = Pattern.compile("<td class=\"toeOurPrice\">(.*?)</td>", Pattern.DOTALL);
 		Matcher m = p.matcher(buffer.toString());
 		if (m.find()) {
 			newPrice = m.group(1);
 		}
 
+		if (newPrice.isEmpty() || !newPrice.contains("$")) {
+			m.usePattern(Pattern.compile("<td class=\"toeNewPrice\">(.*?)</td>", Pattern.DOTALL));
+			if (m.find()) {
+				newPrice = m.group(1);
+			}
+		}
+
 		m.usePattern(Pattern.compile("<td class=\"toeUsedPrice\">(.*?)</td>", Pattern.DOTALL));
-		// m.usePattern(Pattern.compile("used from <span>(.*?)</span>", Pattern.DOTALL));
 
 		if (m.find()) {
 			usedPrice = m.group(1);
@@ -665,10 +670,14 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			}
 
 			String dateText = getStringFromJsonObject(volumeInfo, "publishedDate", 0);
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-			try {
-				b.setPublishDate(df.parse(dateText));
-			} catch (ParseException e) {
+			if (dateText != null) {
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+				try {
+					b.setPublishDate(df.parse(dateText));
+				} catch (ParseException e) {
+					b.setPublishDate(null);
+				}
+			} else {
 				b.setPublishDate(null);
 			}
 
