@@ -216,7 +216,7 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getBooksMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Search Books", PageUrl.bookSearch());
-		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
+		if (Application.isAuthenticated() && Application.getCurrentUser().administratorOf(Application.getCurrentOrgId())) {
 			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
 		}
 

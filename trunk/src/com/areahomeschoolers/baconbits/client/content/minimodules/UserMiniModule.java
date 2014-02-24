@@ -3,10 +3,12 @@ package com.areahomeschoolers.baconbits.client.content.minimodules;
 import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.user.UserStatusIndicator;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -58,8 +60,11 @@ public class UserMiniModule extends Composite {
 		vp.add(label);
 
 		for (User u : users) {
-			VerticalPanel mhp = new VerticalPanel();
+			PaddedPanel mhp = new PaddedPanel();
 
+			UserStatusIndicator usi = new UserStatusIndicator(u.getId());
+			usi.setTextVisible(false);
+			mhp.add(usi);
 			Hyperlink link = new Hyperlink(u.getFirstName() + " " + u.getLastName(), PageUrl.user(u.getId()));
 			link.addStyleName("mediumText");
 			mhp.add(link);

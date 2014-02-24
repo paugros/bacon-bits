@@ -15,6 +15,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -90,7 +91,7 @@ public class Mailer {
 	}
 
 	public String getFrom() {
-		return "info@citrusgroups.com";
+		return Constants.SYSTEM_FROM_EMAIL;
 	}
 
 	public Message getMessage() {

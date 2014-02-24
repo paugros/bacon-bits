@@ -134,8 +134,6 @@ public class HomePage implements Page {
 					leftPanel.add(new SellBooksMiniModule());
 				}
 
-				leftPanel.add(new NewBooksMiniModule());
-
 				// community
 				leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
 
@@ -151,6 +149,9 @@ public class HomePage implements Page {
 
 				// links
 				rightPanel.add(new LinksMiniModule());
+
+				// new books
+				rightPanel.add(new NewBooksMiniModule());
 
 				// new users
 				if (Application.isAuthenticated()) {
