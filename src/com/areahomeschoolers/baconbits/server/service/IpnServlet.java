@@ -169,7 +169,7 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 					break;
 				}
 
-				sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, 16, 0)";
+				sql = "insert into userGroupMembers (userId, groupId, isAdministrator, userApproved, groupApproved) values(?, 16, 0, 1, 1)";
 				template.update(sql, userId);
 				break;
 			default:
