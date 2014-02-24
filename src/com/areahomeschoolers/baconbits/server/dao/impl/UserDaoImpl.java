@@ -950,14 +950,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 			Mailer mailer = new Mailer();
 			mailer.addTo(username);
-			String sn = ServerContext.getCurrentOrg().getShortName();
+			String sn = ServerContext.getCurrentOrg().getGroupName();
 			mailer.setSubject(sn + " Password Assistance");
 			String body = "To initiate the password reset process for your " + username + " " + sn + " account, click the link below: \n\n";
 			body += ServerContext.getBaseUrlWithCodeServer() + "#rr=" + u.getPasswordDigest() + "&uu=" + u.getId() + "\n\n";
 			body += "If clicking the link above doesn't work, please copy and paste the URL in a new browser window instead.\n\n";
 			body += "If you've received this mail in error, it's likely that another user entered your email address by mistake while trying to reset a password. ";
 			body += "If you didn't initiate the request, you don't need to take any further action and can safely disregard this email.\n\n";
-			body += "If you have any questions, please contact Kristin Augros at kaugros@gmail.com.\n\n";
+			body += "If you have any questions, please contact site support at " + Constants.SYSTEM_FROM_EMAIL + ".\n\n";
 			body += "Thank you for using " + sn + " services.\n\n";
 			mailer.setBody(body);
 

@@ -161,6 +161,8 @@ public final class BookSearchPage implements Page {
 				bottom.add(milesInput);
 				bottom.add(new Label("miles of"));
 				bottom.add(locationInput);
+				bottom.add(new Label("with text"));
+				bottom.add(table.getTitleBar().extractSearchControl());
 
 				for (int i = 0; i < bottom.getWidgetCount(); i++) {
 					bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);

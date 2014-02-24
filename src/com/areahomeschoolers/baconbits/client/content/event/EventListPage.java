@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class EventListPage implements Page {
@@ -159,6 +160,13 @@ public final class EventListPage implements Page {
 				bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
 			}
 			vpp.add(bottom);
+
+			PaddedPanel searchPanel = new PaddedPanel(15);
+			searchPanel.add(new Label("with text"));
+			TextBox searchControl = table.getTitleBar().extractSearchControl();
+			searchControl.setVisibleLength(50);
+			searchPanel.add(searchControl);
+			vpp.add(searchPanel);
 
 			CheckBox cb = new CheckBox("Only show recently added events");
 			cb.setValue(newlyAdded, false);

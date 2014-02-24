@@ -16,6 +16,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.EntityDto;
 
 import com.google.gwt.dom.client.Style.Cursor;
+import com.google.gwt.dom.client.Style.FontStyle;
 import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -180,7 +181,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 			searchControl = new TextBox();
 			searchControl.getElement().getStyle().setCursor(Cursor.TEXT);
 			searchControl.setHeight("16px");
-			final String defaultColor = "rgb(153, 153, 153)";
+			final String defaultColor = "#666666";
 			final String defaultText = "Search...";
 			if (clearFilter != null) {
 				clearFilter.setEnabled(false);
@@ -191,6 +192,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 					if (searchControl.getElement().getStyle().getColor().equals(defaultColor)) {
 						searchControl.setText("");
 						searchControl.getElement().getStyle().setColor("#000000");
+						searchControl.getElement().getStyle().setFontStyle(FontStyle.NORMAL);
 					}
 				}
 			});
@@ -201,10 +203,12 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 					if (Common.isNullOrBlank(searchControl.getText())) {
 						searchControl.getElement().getStyle().setColor(defaultColor);
 						searchControl.setText(defaultText);
+						searchControl.getElement().getStyle().setFontStyle(FontStyle.ITALIC);
 					}
 				}
 			});
 
+			searchControl.getElement().getStyle().setFontStyle(FontStyle.ITALIC);
 			searchControl.getElement().getStyle().setColor(defaultColor);
 			searchControl.setText(defaultText);
 
@@ -274,6 +278,10 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 	}
 
 	public TextBox extractSearchControl() {
+		if (searchControl == null) {
+			addSearchControl();
+		}
+
 		int index = controlPanel.getWidgetIndex(searchControl);
 		if (index > 0) {
 			controlPanel.remove(index);

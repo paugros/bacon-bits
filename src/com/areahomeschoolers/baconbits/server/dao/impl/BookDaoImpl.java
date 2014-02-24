@@ -193,6 +193,9 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		sql += "(select count(b.id) as total, sum(b.price) as totalPrice, b.userId, u.firstName, u.lastName \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
+		if (!ServerContext.isSystemAdministrator()) {
+			sql += "join userGroupMembers ugm on ugm.userId = u.id and ugm.groupId = " + ServerContext.getCurrentOrgId() + " ";
+		}
 		sql += "where 1 = 1 \n";
 		if (statusId > 0) {
 			sql += "and b.statusId = ? \n";

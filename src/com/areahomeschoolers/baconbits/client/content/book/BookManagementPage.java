@@ -50,7 +50,7 @@ public final class BookManagementPage implements Page {
 				addCompositeWidgetColumn("Seller", new WidgetCellCreator<Data>() {
 					@Override
 					protected Widget createWidget(Data item) {
-						return new Hyperlink(item.get("firstName") + " " + item.get("lastName"), PageUrl.user(item.getInt("userId")) + "&tab=3");
+						return new Hyperlink(item.get("firstName") + " " + item.get("lastName"), PageUrl.user(item.getInt("userId")) + "&tab=4");
 					}
 				});
 
