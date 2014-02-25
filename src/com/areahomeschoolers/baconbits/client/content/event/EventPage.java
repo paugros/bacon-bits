@@ -335,6 +335,12 @@ public class EventPage implements Page {
 			fieldTable.addField(categoryField);
 		}
 
+		if (Application.isSystemAdministrator()) {
+			FormField markupField = new MarkupField(calendarEvent).getFormField();
+			form.addField(markupField);
+			fieldTable.addField(markupField);
+		}
+
 		if (calendarEvent.getRequiresRegistration()) {
 			if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
 				ageTable.setWidth("150px");
@@ -342,12 +348,6 @@ public class EventPage implements Page {
 				populateAgeGroups();
 
 				fieldTable.addField("Pricing:", ageTable);
-
-				if (Application.isSystemAdministrator()) {
-					FormField markupField = new MarkupField(calendarEvent).getFormField();
-					form.addField(markupField);
-					fieldTable.addField(markupField);
-				}
 			}
 
 			if (Common.isNullOrEmpty(pageData.getAgeGroups())) {

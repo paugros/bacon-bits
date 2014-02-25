@@ -7,11 +7,9 @@ import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
 import com.areahomeschoolers.baconbits.client.content.minimodules.ActiveUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CommunityEventsMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.FindPeopleMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.LinksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.MyEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewBooksMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.NewEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.UpcomingEventsMiniModule;
@@ -91,8 +89,7 @@ public class HomePage implements Page {
 				@Override
 				public void execute() {
 					if (Application.memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
-						String text = "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>Book Store -> My Books</b> meu option.";
-						text += "<br><br><b>NOTE: You may need to log out and log back in before you can see the My Books menu option.</b>";
+						String text = "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>Book Store -> My Books</b> menu option.";
 						HTML label = new HTML(text);
 						label.setWidth("300px");
 						AlertDialog dialog = new AlertDialog("Thanks!", label);
@@ -130,33 +127,34 @@ public class HomePage implements Page {
 				leftPanel.add(new CitrusMiniModule());
 
 				// book promo
-				if (!Application.memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
+				if (!Application.isAuthenticated()
+						|| !Application.getCurrentUser().memberOfAny(Constants.ONLINE_BOOK_SELLERS_GROUP_ID, Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID)) {
+					leftPanel.add(new SellBooksMiniModule());
+				} else {
 					leftPanel.add(new SellBooksMiniModule());
 				}
 
 				// community
 				leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
 
-				// find people promo
-				if (Application.isAuthenticated()) {
-					leftPanel.add(new FindPeopleMiniModule());
-				}
-
-				// new
-				if (!Common.isNullOrEmpty(pageData.getNewlyAddedEvents())) {
-					rightPanel.add(new NewEventsMiniModule(pageData.getNewlyAddedEvents()));
-				}
+				// partner logos/links
+				HTML logos = new HTML(pageData.getPartners().getArticle());
+				leftPanel.add(logos);
+				leftPanel.setCellHorizontalAlignment(logos, HasHorizontalAlignment.ALIGN_CENTER);
 
 				// links
 				rightPanel.add(new LinksMiniModule());
 
-				// new books
-				rightPanel.add(new NewBooksMiniModule());
+				// upcoming
+				rightPanel.add(new UpcomingEventsMiniModule(pageData.getUpcomingEvents()));
 
 				// new users
 				if (Application.isAuthenticated()) {
 					rightPanel.add(new NewUsersMiniModule());
 				}
+
+				// new books
+				rightPanel.add(new NewBooksMiniModule());
 
 				// active users
 				if (Application.isAuthenticated()) {
@@ -169,9 +167,6 @@ public class HomePage implements Page {
 						rightPanel.add(new MyEventsMiniModule(pageData.getMyUpcomingEvents()));
 					}
 				}
-
-				// upcoming
-				rightPanel.add(new UpcomingEventsMiniModule(pageData.getUpcomingEvents()));
 
 				UserGroup org = Application.getCurrentOrg();
 

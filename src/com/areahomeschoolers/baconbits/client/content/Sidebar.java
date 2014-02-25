@@ -8,7 +8,6 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.minimodules.ActiveUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CommunityEventsMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.FindPeopleMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.LinksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.MyEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewBooksMiniModule;
@@ -27,7 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class Sidebar extends Composite {
 	public enum MiniModule {
-		COMMUNITY_EVENTS, UPCOMING_EVENTS, FIND_PEOPLE, LINKS, SELL_BOOKS, NEW_EVENTS, MY_EVENTS, CITRUS, NEW_USERS, NEW_BOOKS, ACTIVE_USERS;
+		COMMUNITY_EVENTS, UPCOMING_EVENTS, LINKS, SELL_BOOKS, NEW_EVENTS, MY_EVENTS, CITRUS, NEW_USERS, NEW_BOOKS, ACTIVE_USERS;
 	}
 
 	private static Map<MiniModule, Widget> cache = new HashMap<MiniModule, Widget>();
@@ -82,11 +81,6 @@ public class Sidebar extends Composite {
 		switch (module) {
 		case COMMUNITY_EVENTS:
 			add(module, new CommunityEventsMiniModule());
-			break;
-		case FIND_PEOPLE:
-			if (Application.isAuthenticated()) {
-				add(module, new FindPeopleMiniModule());
-			}
 			break;
 		case LINKS:
 			add(module, new LinksMiniModule());

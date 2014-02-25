@@ -48,7 +48,7 @@ public final class UserListPage implements Page {
 
 		final String title = "Directory";
 
-		Label heading = new Label("Find People");
+		Label heading = new Label("Member Directory");
 		heading.addStyleName("hugeText");
 		page.add(heading);
 
@@ -108,16 +108,16 @@ public final class UserListPage implements Page {
 		Label label = new Label("Show");
 		top.add(label);
 
-		final DefaultListBox peopleInput = new DefaultListBox();
-		peopleInput.addItem("everyone");
-		peopleInput.addItem("children");
-		peopleInput.addItem("children (boys)");
-		peopleInput.addItem("children (girls)");
-		peopleInput.addItem("parents of boys or girls");
-		peopleInput.addItem("parents of boys");
-		peopleInput.addItem("parents of girls");
-		peopleInput.setSelectedIndex(4);
-		peopleInput.addChangeHandler(new ChangeHandler() {
+		final DefaultListBox memberInput = new DefaultListBox();
+		memberInput.addItem("everyone");
+		memberInput.addItem("children");
+		memberInput.addItem("children (boys)");
+		memberInput.addItem("children (girls)");
+		memberInput.addItem("parents of boys or girls");
+		memberInput.addItem("parents of boys");
+		memberInput.addItem("parents of girls");
+		memberInput.setSelectedIndex(4);
+		memberInput.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
 				args.remove(UserArg.PARENTS);
@@ -126,7 +126,7 @@ public final class UserListPage implements Page {
 				args.remove(UserArg.CHILDREN);
 				args.remove(UserArg.SEX);
 
-				switch (peopleInput.getSelectedIndex()) {
+				switch (memberInput.getSelectedIndex()) {
 				case 1:
 					args.put(UserArg.CHILDREN);
 					break;
@@ -205,7 +205,7 @@ public final class UserListPage implements Page {
 			}
 		});
 
-		top.add(peopleInput);
+		top.add(memberInput);
 		top.add(new Label("of"));
 		top.add(ageInput);
 		top.add(new Label("within"));
@@ -227,7 +227,7 @@ public final class UserListPage implements Page {
 		optionsPanel.add(sp);
 
 		if (Application.isAuthenticated()) {
-			CheckBox cb = new CheckBox("Only show people with whom I have interests in common");
+			CheckBox cb = new CheckBox("Only show members with whom I have interests in common");
 			cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 				@Override
 				public void onValueChange(ValueChangeEvent<Boolean> event) {

@@ -195,51 +195,6 @@ public class BookFieldTable extends FieldTable {
 		});
 		addField(categoryField);
 
-		final Label ageDisplay = new Label();
-		final RequiredListBox ageInput = new RequiredListBox();
-		for (Data d : pageData.getGradeLevels()) {
-			ageInput.addItem(d.get("gradeLevel"), d.getId());
-		}
-		FormField ageField = form.createFormField("Grade level:", ageInput, ageDisplay);
-		ageField.getFieldLabel().setWordWrap(false);
-		ageField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				ageDisplay.setText(book.getGradeLevel());
-				ageInput.setValue(book.getGradeLevelId());
-			}
-		});
-		ageField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				book.setGradeLevelId(ageInput.getIntValue());
-			}
-		});
-		addField(ageField);
-
-		final Label conditionDisplay = new Label();
-		final DefaultListBox conditionInput = new DefaultListBox();
-		Anchor conditionLink = new Anchor("Condition:", Url.getBaseUrl() + "#" + PageUrl.article(64));
-		conditionLink.setTarget("_blank");
-		for (Data item : pageData.getConditions()) {
-			conditionInput.addItem(item.get("bookCondition"), item.getId());
-		}
-		FormField conditionField = form.createFormField(conditionLink, conditionInput, conditionDisplay);
-		conditionField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				conditionDisplay.setText(Common.getDefaultIfNull(book.getCondition()));
-				conditionInput.setValue(book.getConditionId() == null ? 3 : book.getConditionId());
-			}
-		});
-		conditionField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				book.setConditionId(conditionInput.getIntValue());
-			}
-		});
-		addField(conditionField);
-
 		final Label priceDisplay = new Label();
 		final NumericTextBox priceInput = new NumericTextBox(2);
 		priceInput.setRequired(true);
@@ -285,6 +240,52 @@ public class BookFieldTable extends FieldTable {
 			}
 		});
 		addField(priceField);
+
+		final Label ageDisplay = new Label();
+		final DefaultListBox ageInput = new DefaultListBox();
+		ageInput.addItem("", 0);
+		for (Data d : pageData.getGradeLevels()) {
+			ageInput.addItem(d.get("gradeLevel"), d.getId());
+		}
+		FormField ageField = form.createFormField("Grade level:", ageInput, ageDisplay);
+		ageField.getFieldLabel().setWordWrap(false);
+		ageField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				ageDisplay.setText(Common.getDefaultIfNull(book.getGradeLevel()));
+				ageInput.setValue(book.getGradeLevelId());
+			}
+		});
+		ageField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				book.setGradeLevelId(ageInput.getIntValue());
+			}
+		});
+		addField(ageField);
+
+		final Label conditionDisplay = new Label();
+		final DefaultListBox conditionInput = new DefaultListBox();
+		Anchor conditionLink = new Anchor("Condition:", Url.getBaseUrl() + "#" + PageUrl.article(64));
+		conditionLink.setTarget("_blank");
+		for (Data item : pageData.getConditions()) {
+			conditionInput.addItem(item.get("bookCondition"), item.getId());
+		}
+		FormField conditionField = form.createFormField(conditionLink, conditionInput, conditionDisplay);
+		conditionField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				conditionDisplay.setText(Common.getDefaultIfNull(book.getCondition()));
+				conditionInput.setValue(book.getConditionId() == null ? 3 : book.getConditionId());
+			}
+		});
+		conditionField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				book.setConditionId(conditionInput.getIntValue());
+			}
+		});
+		addField(conditionField);
 
 		final HTML authorDisplay = new HTML();
 		final MaxLengthTextArea authorInput = new MaxLengthTextArea(500);

@@ -12,7 +12,7 @@ public final class Book extends EntityDto<Book> {
 	private String title;
 	private int userId;
 	private int categoryId;
-	private int gradeLevelId;
+	private Integer gradeLevelId;
 	private int statusId;
 	private double price;
 	private String isbn;
@@ -93,7 +93,10 @@ public final class Book extends EntityDto<Book> {
 		return gradeLevel;
 	}
 
-	public int getGradeLevelId() {
+	public Integer getGradeLevelId() {
+		if (gradeLevelId == null || gradeLevelId == 0) {
+			return null;
+		}
 		return gradeLevelId;
 	}
 
@@ -229,7 +232,7 @@ public final class Book extends EntityDto<Book> {
 		this.gradeLevel = gradeLevel;
 	}
 
-	public void setGradeLevelId(int gradeLevelId) {
+	public void setGradeLevelId(Integer gradeLevelId) {
 		this.gradeLevelId = gradeLevelId;
 	}
 

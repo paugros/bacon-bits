@@ -26,7 +26,7 @@ public final class UserSelector extends EntityCellSelector<User, UserArg, UserCo
 	private UserSelector() {
 		setModal(false);
 		setMinSelect(1);
-		setText("Select People");
+		setText("Select Members");
 	}
 
 	@Override

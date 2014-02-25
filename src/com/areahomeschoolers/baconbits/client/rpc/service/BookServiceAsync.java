@@ -26,7 +26,7 @@ public interface BookServiceAsync {
 
 	public void sellBooks(ArrayList<Book> books, String email, AsyncCallback<Void> callback);
 
-	public void signUpToSell(AsyncCallback<PaypalData> callback);
+	public void signUpToSell(int groupOption, AsyncCallback<PaypalData> callback);
 
 	void fetchGoogleData(Book b, AsyncCallback<Book> callback);
 }

@@ -84,7 +84,7 @@ public final class MainMenu extends MenuBar {
 		addItem("Book Store", getBooksMenu());
 
 		if (Application.isAuthenticated()) {
-			addItem("People", getPeopleMenu());
+			addItem("Members", getMembersMenu());
 		}
 
 		if (Application.isAuthenticated()) {
@@ -241,6 +241,19 @@ public final class MainMenu extends MenuBar {
 		return menu;
 	}
 
+	private MenuBar getMembersMenu() {
+		MenuBar menu = new MenuBar(true);
+
+		addLinkToMenu(menu, "Member Directory", PageUrl.userList());
+		menu.addSeparator();
+		addLinkToMenu(menu, "My Profile", PageUrl.user(Application.getCurrentUserId()));
+		if (!Application.getCurrentUser().isChild()) {
+			addLinkToMenu(menu, "My Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=3");
+		}
+		addLinkToMenu(menu, "Privacy Settings", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
+		return menu;
+	}
+
 	private MenuBar getMyItemsMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Profile", PageUrl.user(Application.getCurrentUserId()));
@@ -292,19 +305,6 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
-		return menu;
-	}
-
-	private MenuBar getPeopleMenu() {
-		MenuBar menu = new MenuBar(true);
-
-		addLinkToMenu(menu, "Find People", PageUrl.userList());
-		menu.addSeparator();
-		addLinkToMenu(menu, "My Profile", PageUrl.user(Application.getCurrentUserId()));
-		if (!Application.getCurrentUser().isChild()) {
-			addLinkToMenu(menu, "My Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=3");
-		}
-		addLinkToMenu(menu, "Privacy Settings", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
 		return menu;
 	}
 

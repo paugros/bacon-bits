@@ -26,5 +26,5 @@ public interface BookDao {
 
 	public void sellBooks(ArrayList<Book> books, String email);
 
-	public PaypalData signUpToSell();
+	public PaypalData signUpToSell(int groupOption);
 }

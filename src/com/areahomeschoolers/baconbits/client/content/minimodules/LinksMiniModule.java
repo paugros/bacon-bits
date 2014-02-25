@@ -50,7 +50,7 @@ public class LinksMiniModule extends Composite {
 		}
 
 		if (Application.isAuthenticated()) {
-			vp.add(new Hyperlink("Find People", PageUrl.userList()));
+			vp.add(new Hyperlink("Member Directory", PageUrl.userList()));
 		} else {
 			ClickLabel cl = new ClickLabel("Create an Account", new ClickHandler() {
 				@Override

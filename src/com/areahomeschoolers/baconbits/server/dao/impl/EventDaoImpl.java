@@ -305,6 +305,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		}
 		pd.setIntro(a);
 
+		pd.setPartners(articleDao.getById(Constants.PARTNER_LOGO_ARTICLE_ID));
+
 		return pd;
 	}
 

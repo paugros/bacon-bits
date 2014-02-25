@@ -27,12 +27,14 @@ import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Grid;
@@ -208,20 +210,20 @@ public final class Layout {
 				public void onClick(ClickEvent event) {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
 
-					// if (!GWT.isProdMode()) {
-					// // loginService.loginAndGetApplicationData("kristin@wearehomeeducators.com", "Redball1", new AsyncCallback<ApplicationData>() {
-					// loginService.loginAndGetApplicationData("paul.augros@gmail.com", "L33nfiatna", new AsyncCallback<ApplicationData>() {
-					// @Override
-					// public void onFailure(Throwable caught) {
-					// }
-					//
-					// @Override
-					// public void onSuccess(ApplicationData result) {
-					// Window.Location.reload();
-					// }
-					// });
-					// return;
-					// }
+					if (!GWT.isProdMode()) {
+						// loginService.loginAndGetApplicationData("kristin@wearehomeeducators.com", "Redball1", new AsyncCallback<ApplicationData>() {
+						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "L33nfiatna", new AsyncCallback<ApplicationData>() {
+							@Override
+							public void onFailure(Throwable caught) {
+							}
+
+							@Override
+							public void onSuccess(ApplicationData result) {
+								Window.Location.reload();
+							}
+						});
+						return;
+					}
 
 					final LoginDialog ld = new LoginDialog(loginService);
 					ld.setLoginHandler(new LoginHandler() {

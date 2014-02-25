@@ -69,8 +69,8 @@ public class BookServiceImpl extends GwtController implements BookService {
 	}
 
 	@Override
-	public PaypalData signUpToSell() {
-		return dao.signUpToSell();
+	public PaypalData signUpToSell(int groupOption) {
+		return dao.signUpToSell(groupOption);
 	}
 
 }
