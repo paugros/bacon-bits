@@ -415,7 +415,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	@Override
-	public PaypalData signUpToSell() {
+	public PaypalData signUpToSell(int groupOption) {
 		PaymentDao paymentDao = ServerContext.getDaoImpl("payment");
 		Payment p = new Payment();
 		p.setUserId(ServerContext.getCurrentUserId());
@@ -426,11 +426,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		p.setMemo("Payment for book selling registration");
 		p = paymentDao.save(p);
 
-		// if negative payment, don't wait for ipn
-		if (p.getPrincipalAmount() <= 0 && !ServerContext.getCurrentUser().memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
-			String sql = "insert into userGroupMembers (userId, groupId, isAdministrator) values(?, 16, 0)";
-			update(sql, ServerContext.getCurrentUserId());
-		}
+		ServerContext.getCache().put(Constants.BOOK_GROUP_OPTION_CACHE_KEY + ServerContext.getCurrentUserId(), groupOption);
 
 		return p.getPaypalData();
 	}
@@ -449,7 +445,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		sql += "join users u on u.id = b.userId \n";
 		sql += "join bookStatus bs on bs.id = b.statusId \n";
 		sql += "join bookCategories bc on bc.id = b.categoryId \n";
-		sql += "join bookGradeLevels ba on ba.id = b.gradeLevelId \n";
+		sql += "left join bookGradeLevels ba on ba.id = b.gradeLevelId \n";
 		sql += "left join bookConditions bo on bo.id = b.conditionId \n";
 		sql += "where 1 = 1 \n";
 

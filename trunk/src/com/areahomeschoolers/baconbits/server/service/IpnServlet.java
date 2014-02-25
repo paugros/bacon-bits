@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.Controller;
 
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 
 @Component
 @RequestMapping("/ipn")
@@ -44,7 +45,7 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 		return servletContext;
 	}
 
-	// sample for testing in dev:
+	// sample for testing in dev. all you should need to change is the pay_key at the end:
 	// http://127.0.0.1:8888/baconbits/service/ipn?mc_gross=19.95&protection_eligibility=Eligible&address_status=confirmed&payer_id=LPLWNMTBWMFAY&tax=0.00&address_street=1+Main+St&payment_date=20%3A12%3A59+Jan+13%2C+2009+PST&transaction[0].status=Completed&charset=windows-1252&address_zip=95131&first_name=Test&mc_fee=0.88&address_country_code=US&address_name=Test+User&notify_version=2.6&custom=&payer_status=verified&address_country=United+States&address_city=San+Jose&quantity=1&verify_sign=AtkOfCXbDm2hu0ZELryHFjY-Vb7PAUvS6nMXgysbElEn9v-1XcmSoGtf&payer_email=gpmac_1231902590_per%40paypal.com&transaction[0].id=9YD72353HT136740A&payment_type=instant&last_name=User&address_state=CA&receiver_email=gpmac_1231902686_biz%40paypal.com&receiver_id=S8XGHLYDW9T3S&txn_type=express_checkout&item_name=&mc_currency=USD&item_number=&residence_country=US&test_ipn=1&handling_amount=0.00&transaction_subject=&payment_gross=19.95&shipping=0.00&pay_key=AP-4NB21378MC347284B
 
 	@Override
@@ -163,14 +164,40 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 			case 2:
 				int userId = template.queryForInt("select userId from payments where payKey = ? limit 1", key);
 
-				int count = template.queryForInt("select count(id) from userGroupMembers where userId = ? and groupId = 16", userId);
-
-				if (count > 0) {
-					break;
+				Integer groupOption = (Integer) ServerContext.getCache().get(Constants.BOOK_GROUP_OPTION_CACHE_KEY + userId);
+				if (groupOption == null) {
+					groupOption = 1;
 				}
 
-				sql = "insert into userGroupMembers (userId, groupId, isAdministrator, userApproved, groupApproved) values(?, 16, 0, 1, 1)";
-				template.update(sql, userId);
+				if (groupOption == 1 || groupOption == 2) {
+					sql = "select count(id) from userGroupMembers where userId = ? and groupId = " + Constants.ONLINE_BOOK_SELLERS_GROUP_ID;
+					int count = template.queryForInt(sql, userId);
+
+					if (count > 0) {
+						break;
+					}
+
+					sql = "insert into userGroupMembers (userId, groupId, isAdministrator, userApproved, groupApproved) ";
+					sql += "values(?, " + Constants.ONLINE_BOOK_SELLERS_GROUP_ID + ", 0, 1, 1)";
+					template.update(sql, userId);
+				}
+
+				if (groupOption == 1 || groupOption == 3) {
+					sql = "select count(id) from userGroupMembers where userId = ? and groupId = " + Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID;
+					int count = template.queryForInt(sql, userId);
+
+					if (count > 0) {
+						break;
+					}
+
+					sql = "insert into userGroupMembers (userId, groupId, isAdministrator, userApproved, groupApproved) ";
+					sql += "values(?, " + Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID + ", 0, 1, 1)";
+					template.update(sql, userId);
+				}
+
+				ServerContext.getCache().delete("user_" + userId);
+				ServerContext.getCache().delete(Constants.BOOK_GROUP_OPTION_CACHE_KEY + userId);
+
 				break;
 			default:
 				break;

@@ -267,45 +267,50 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 	public Payment save(Payment payment) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(payment);
 		PaypalData data = null;
+		String sql = "";
+
+		boolean adjustmentWasUsed = false;
+		double discount = 0;
 
 		if (payment.isSaved()) {
-			String sql = "update payments set statusId = :statusId, ipnDate = :ipnDate, paymentFee = :paymentFee, transactionId = :transactionId, rawData = :rawData ";
+			sql = "update payments set statusId = :statusId, ipnDate = :ipnDate, paymentFee = :paymentFee, transactionId = :transactionId, rawData = :rawData ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
 			// apply any pending adjustments
-			String sql = "select 1 as id, sum(amount) as total from adjustments where userId = ? and statusId = 1";
-			Data sum = queryForObject(sql, ServerUtils.getGenericRowMapper(), ServerContext.getCurrentUserId());
-			boolean adjustmentWasUsed = false;
-			double discount = sum.getDouble("total");
-			if (discount < 0 && payment.getTotalAmount() > 0) {
-				adjustmentWasUsed = true;
-				// apply discounts to principal first
-				payment.setPrincipalAmount(payment.getPrincipalAmount() + discount);
+			if (payment.getPaymentTypeId() == 1) {
+				sql = "select 1 as id, sum(amount) as total from adjustments where userId = ? and statusId = 1";
+				Data sum = queryForObject(sql, ServerUtils.getGenericRowMapper(), ServerContext.getCurrentUserId());
+				discount = sum.getDouble("total");
+				if (discount < 0 && payment.getTotalAmount() > 0) {
+					adjustmentWasUsed = true;
+					// apply discounts to principal first
+					payment.setPrincipalAmount(payment.getPrincipalAmount() + discount);
 
-				// roll over to markup if necessary
-				// we only do this so that we can completely hide our markup from the end user
-				if (payment.getPrincipalAmount() < 0) {
-					payment.setMarkupAmount(payment.getMarkupAmount() + payment.getPrincipalAmount());
-					payment.setPrincipalAmount(0);
-				} else {
-					discount = 0;
+					// roll over to markup if necessary
+					// we only do this so that we can completely hide our markup from the end user
+					if (payment.getPrincipalAmount() < 0) {
+						payment.setMarkupAmount(payment.getMarkupAmount() + payment.getPrincipalAmount());
+						payment.setPrincipalAmount(0);
+					} else {
+						discount = 0;
+					}
+
+					// if there's any left over, put it back in the original discount variable
+					if (payment.getMarkupAmount() < 0) {
+						discount = payment.getMarkupAmount();
+						payment.setMarkupAmount(0);
+					} else {
+						discount = 0;
+					}
 				}
 
-				// if there's any left over, put it back in the original discount variable
-				if (payment.getMarkupAmount() < 0) {
-					discount = payment.getMarkupAmount();
-					payment.setMarkupAmount(0);
-				} else {
-					discount = 0;
+				// no need for pending status if payment amount is zero or less
+				if (payment.getTotalAmount() <= 0) {
+					payment.setStatusId(2);
 				}
-
 			}
 
-			// no need for pending status if payment amount is zero or less
-			if (payment.getTotalAmount() <= 0) {
-				payment.setStatusId(2);
-			}
 			payment.setUserId(ServerContext.getCurrentUser().getId());
 
 			sql = "insert into payments (userId, paymentTypeId, paymentDate, amount, markupAmount, statusId) values ";

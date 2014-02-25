@@ -10,6 +10,7 @@ public class HomePageData implements IsSerializable {
 	private ArrayList<Event> newlyAddedEvents;
 	private ArrayList<Event> myUpcomingEvents;
 	private ArrayList<Data> groups;
+	private Article partners;
 	private Article intro;
 
 	public HomePageData() {
@@ -36,6 +37,10 @@ public class HomePageData implements IsSerializable {
 		return newlyAddedEvents;
 	}
 
+	public Article getPartners() {
+		return partners;
+	}
+
 	public ArrayList<Event> getUpcomingEvents() {
 		return upcomingEvents;
 	}
@@ -58,6 +63,10 @@ public class HomePageData implements IsSerializable {
 
 	public void setNewlyAddedEvents(ArrayList<Event> newlyAddedEvents) {
 		this.newlyAddedEvents = newlyAddedEvents;
+	}
+
+	public void setPartners(Article partners) {
+		this.partners = partners;
 	}
 
 	public void setUpcomingEvents(ArrayList<Event> upcomingEvents) {

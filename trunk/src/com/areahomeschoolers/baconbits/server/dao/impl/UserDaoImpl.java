@@ -696,6 +696,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		User u = getById(ServerContext.getCurrentUserId());
+		ServerContext.updateUserCache(u);
+
 		return u.getGroups();
 	}
 
