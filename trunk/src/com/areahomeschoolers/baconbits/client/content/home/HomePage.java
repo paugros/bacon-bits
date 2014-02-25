@@ -130,8 +130,6 @@ public class HomePage implements Page {
 				if (!Application.isAuthenticated()
 						|| !Application.getCurrentUser().memberOfAny(Constants.ONLINE_BOOK_SELLERS_GROUP_ID, Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID)) {
 					leftPanel.add(new SellBooksMiniModule());
-				} else {
-					leftPanel.add(new SellBooksMiniModule());
 				}
 
 				// community
