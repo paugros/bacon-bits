@@ -166,6 +166,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 
 		String sql = createSqlBase();
 
+		sql += "and a.owningOrgId = " + ServerContext.getCurrentOrgId() + " \n";
+
 		if (orgId > 0) {
 			sql += "and a.owningOrgId = ? ";
 			sqlArgs.add(orgId);
@@ -286,8 +288,6 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		String sql = "left join userGroupMembers ugm on ugm.groupId = a.groupId and ugm.userId = " + userId + " \n";
 		sql += "left join userGroupMembers org on org.groupId = a.owningOrgId and org.userId = " + userId + " \n";
 		sql += "where 1 = 1 \n";
-
-		sql += "and a.owningOrgId = " + ServerContext.getCurrentOrgId() + " \n";
 
 		int auth = ServerContext.isAuthenticated() ? 1 : 0;
 		if (!ServerContext.isSystemAdministrator()) {

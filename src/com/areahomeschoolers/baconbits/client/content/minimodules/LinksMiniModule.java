@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.content.user.CreateUserDialog;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -33,7 +34,7 @@ public class LinksMiniModule extends Composite {
 		linkLabel.addStyleName("moduleTitle");
 		linkLabel.getElement().getStyle().setMarginBottom(4, Unit.PX);
 
-		if (Application.getCurrentOrg().getFacebookUrl() != null) {
+		if (!Common.isNullOrBlank(Application.getCurrentOrg().getFacebookUrl())) {
 			HorizontalPanel hp = new HorizontalPanel();
 			hp.setWidth("100%");
 			hp.add(linkLabel);
