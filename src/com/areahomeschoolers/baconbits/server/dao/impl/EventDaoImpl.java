@@ -258,6 +258,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "where groupId = g.id and isActive(u.startDate, u.endDate) = 1) as memberCount \n";
 			sql += "from groups g \n";
 			sql += "where g.isOrganization = 1 and g.id != " + Constants.CG_ORG_ID + "\n";
+			sql += "and isActive(g.startDate, g.endDate) = 1 \n";
 			sql += "order by g.groupName";
 			pd.setGroups(query(sql, ServerUtils.getGenericRowMapper()));
 		}
