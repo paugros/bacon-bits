@@ -22,13 +22,13 @@ public class AgeGroupEditDialog extends EntityEditDialog<EventAgeGroup> {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private Event event;
 
-	public AgeGroupEditDialog(final List<EventAgeGroup> ageGroups, Event event, final Command refreshCommand) {
-		this.event = event;
+	public AgeGroupEditDialog(final List<EventAgeGroup> ageGroups, Event e, final Command refreshCommand) {
+		this.event = e;
 
 		addFormSubmitHandler(new FormSubmitHandler() {
 			@Override
 			public void onFormSubmit(FormField formField) {
-				eventService.saveAgeGroup(entity, new Callback<EventAgeGroup>() {
+				eventService.saveAgeGroup(entity, event, new Callback<EventAgeGroup>() {
 					@Override
 					protected void doOnSuccess(EventAgeGroup result) {
 						ageGroups.remove(result);

@@ -59,6 +59,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private boolean groupMarkupOverride;
 	private boolean newlyAdded;
 	private boolean saveAllInSeries;
+	private boolean markupChanged;
 
 	private int cloneFromId;
 	private int currentUserParticipantCount;
@@ -226,6 +227,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public double getMarkup() {
 		return markup;
+	}
+
+	public boolean getMarkupChanged() {
+		return markupChanged;
 	}
 
 	@Override
@@ -479,6 +484,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public void setMarkup(double markup) {
 		this.markup = markup;
+	}
+
+	public void setMarkupChanged(boolean markupChanged) {
+		this.markupChanged = markupChanged;
 	}
 
 	@Override

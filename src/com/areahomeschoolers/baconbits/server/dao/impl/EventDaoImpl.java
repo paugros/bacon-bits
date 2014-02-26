@@ -326,6 +326,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			tagArgs.put(TagArg.MAPPING_TYPE, TagMappingType.EVENT.toString());
 			pd.setTags(tagDao.list(tagArgs));
 
+			String sql = "";
+
 			// other events in same series
 			if (pd.getEvent().getSeriesId() != null) {
 				ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.SERIES_ID, pd.getEvent().getSeriesId());
@@ -333,26 +335,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			}
 
 			// age groups
-			String sql = "select a.*, (select count(id) from eventRegistrationParticipants where ageGroupId = a.id) as registerCount, ";
-			sql += "(select count(id) from eventFields where eventAgeGroupId = a.id) as fieldCount ";
-			sql += "from eventAgeGroups a where a.eventId = ? order by a.minimumAge";
-			pd.setAgeGroups(query(sql, new RowMapper<EventAgeGroup>() {
-				@Override
-				public EventAgeGroup mapRow(ResultSet rs, int rowNum) throws SQLException {
-					EventAgeGroup g = new EventAgeGroup();
-					g.setId(rs.getInt("id"));
-					g.setEventId(rs.getInt("eventId"));
-					g.setMaximumAge(rs.getInt("maximumAge"));
-					g.setMinimumAge(rs.getInt("minimumAge"));
-					g.setMaximumParticipants(rs.getInt("maximumParticipants"));
-					g.setMinimumParticipants(rs.getInt("minimumParticipants"));
-					g.setPrice(rs.getDouble("price"));
-					g.setMarkup(rs.getDouble("markup"));
-					g.setRegisterCount(rs.getInt("registerCount"));
-					g.setFieldCount(rs.getInt("fieldCount"));
-					return g;
-				}
-			}, eventId));
+			pd.setAgeGroups(getAgeGroups(eventId));
 
 			// volunteer positions
 			pd.setVolunteerPositions(getVolunteerPositions(eventId, 0));
@@ -802,6 +785,15 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price, phone = :phone, website = :website ";
 			sql += "where id = :id";
 			update(sql, namedParams);
+
+			if (event.getMarkupChanged()) {
+				ArrayList<EventAgeGroup> groups = getAgeGroups(event.getId());
+				if (!Common.isNullOrEmpty(groups)) {
+					for (EventAgeGroup group : groups) {
+						saveAgeGroup(group, event);
+					}
+				}
+			}
 		} else {
 			event.setAddedById(ServerContext.getCurrentUserId());
 			event.setOwningOrgId(ServerContext.getCurrentOrgId());
@@ -851,11 +843,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	}
 
 	@Override
-	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup) {
+	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup, Event event) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(ageGroup);
 
 		if (ageGroup.getPrice() > 0) {
-			ageGroup.setMarkup(Common.getEventMarkup(ageGroup.getPrice(), getById(ageGroup.getEventId())));
+			ageGroup.setMarkup(Common.getEventMarkup(ageGroup.getPrice(), event));
 		}
 
 		if (ageGroup.isSaved()) {
@@ -1083,6 +1075,29 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			return false;
 		}
 		return info.getInt("maxParticipants") > 0 && (info.getInt("participants") >= info.getInt("maxParticipants"));
+	}
+
+	private ArrayList<EventAgeGroup> getAgeGroups(int eventId) {
+		String sql = "select a.*, (select count(id) from eventRegistrationParticipants where ageGroupId = a.id) as registerCount, ";
+		sql += "(select count(id) from eventFields where eventAgeGroupId = a.id) as fieldCount ";
+		sql += "from eventAgeGroups a where a.eventId = ? order by a.minimumAge";
+		return query(sql, new RowMapper<EventAgeGroup>() {
+			@Override
+			public EventAgeGroup mapRow(ResultSet rs, int rowNum) throws SQLException {
+				EventAgeGroup g = new EventAgeGroup();
+				g.setId(rs.getInt("id"));
+				g.setEventId(rs.getInt("eventId"));
+				g.setMaximumAge(rs.getInt("maximumAge"));
+				g.setMinimumAge(rs.getInt("minimumAge"));
+				g.setMaximumParticipants(rs.getInt("maximumParticipants"));
+				g.setMinimumParticipants(rs.getInt("minimumParticipants"));
+				g.setPrice(rs.getDouble("price"));
+				g.setMarkup(rs.getDouble("markup"));
+				g.setRegisterCount(rs.getInt("registerCount"));
+				g.setFieldCount(rs.getInt("fieldCount"));
+				return g;
+			}
+		}, eventId);
 	}
 
 	private ArrayList<EventVolunteerPosition> getVolunteerPositions(int eventId, final int registrationId) {

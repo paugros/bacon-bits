@@ -62,7 +62,7 @@ public interface EventService extends RemoteService {
 
 	public Event save(Event event);
 
-	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup);
+	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup, Event event);
 
 	public EventField saveEventField(EventField field);
 
