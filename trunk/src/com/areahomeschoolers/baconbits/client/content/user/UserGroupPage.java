@@ -373,12 +373,11 @@ public class UserGroupPage implements Page {
 			@Override
 			public void execute() {
 				facebookDisplay.setText(Common.getDefaultIfNull(group.getFacebookUrl()));
-				if (group.getFacebookUrl() != null) {
+				if (!Common.isNullOrBlank(group.getFacebookUrl())) {
 					facebookDisplay.setHref(group.getFacebookUrl());
-					facebookDisplay.setText("Click to view");
-				}
-				facebookInput.setText(group.getFacebookUrl());
-				if (group.getFacebookUrl() == null) {
+					facebookDisplay.setText(group.getFacebookUrl());
+					facebookInput.setText(group.getFacebookUrl());
+				} else {
 					facebookInput.setText("https://www.facebook.com/");
 				}
 			}
