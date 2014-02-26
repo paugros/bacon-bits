@@ -66,11 +66,11 @@ public interface EventDao {
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public PaypalData payForEvents(ArrayList<Integer> participantIds);
 
-	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
+	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public Event save(Event event);
 
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
-	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup);
+	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup, Event event);
 
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
 	public EventField saveField(EventField field);

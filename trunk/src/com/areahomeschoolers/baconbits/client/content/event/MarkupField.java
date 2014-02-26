@@ -7,6 +7,8 @@ import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.HasMarkup;
 
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.Command;
@@ -15,6 +17,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class MarkupField {
 	private FormField markupField;
+	private Command changeCommand;
 
 	public MarkupField(final HasMarkup markup) {
 
@@ -23,6 +26,14 @@ public class MarkupField {
 		final DefaultListBox overrideInput = new DefaultListBox();
 		overrideInput.addItem("Use default");
 		overrideInput.addItem("Specify");
+		overrideInput.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				if (changeCommand != null) {
+					changeCommand.execute();
+				}
+			}
+		});
 
 		inputPanel.add(overrideInput);
 
@@ -34,6 +45,15 @@ public class MarkupField {
 		final NumericTextBox percentInput = new NumericTextBox(2);
 		percentInput.setMaxLength(5);
 		percentInput.setVisibleLength(5);
+		percentInput.addBlurHandler(new BlurHandler() {
+			@Override
+			public void onBlur(BlurEvent event) {
+				if (changeCommand != null) {
+					changeCommand.execute();
+				}
+			}
+		});
+
 		ppp.add(percentInput);
 		ppp.add(new Label("percent"));
 
@@ -42,6 +62,15 @@ public class MarkupField {
 		final NumericTextBox dollarsInput = new NumericTextBox(2);
 		dollarsInput.setMaxLength(5);
 		dollarsInput.setVisibleLength(5);
+		dollarsInput.addBlurHandler(new BlurHandler() {
+			@Override
+			public void onBlur(BlurEvent event) {
+				if (changeCommand != null) {
+					changeCommand.execute();
+				}
+			}
+		});
+
 		dpp.add(dollarsInput);
 		dpp.add(new Label("dollars"));
 
@@ -91,6 +120,10 @@ public class MarkupField {
 
 	public FormField getFormField() {
 		return markupField;
+	}
+
+	public void setChangeCommand(Command changeCommand) {
+		this.changeCommand = changeCommand;
 	}
 
 }

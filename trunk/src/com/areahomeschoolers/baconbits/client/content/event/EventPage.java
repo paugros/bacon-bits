@@ -88,6 +88,9 @@ public class EventPage implements Page {
 			AddressField.validateAddress(calendarEvent, new Command() {
 				@Override
 				public void execute() {
+					if (formField.equals(markupField) && calendarEvent.isSaved()) {
+						calendarEvent.setMarkupChanged(true);
+					}
 					save(formField);
 				}
 			});
@@ -104,6 +107,7 @@ public class EventPage implements Page {
 	private AgeGroupEditDialog ageDialog;
 	private EmailDialog emailDialog;
 	private FormField priceField;
+	private FormField markupField;
 
 	public EventPage(final VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -336,7 +340,19 @@ public class EventPage implements Page {
 		}
 
 		if (Application.isSystemAdministrator()) {
-			FormField markupField = new MarkupField(calendarEvent).getFormField();
+			MarkupField mf = new MarkupField(calendarEvent);
+			markupField = mf.getFormField();
+			if (!calendarEvent.isSaved()) {
+				mf.setChangeCommand(new Command() {
+					@Override
+					public void execute() {
+						markupField.updateDto();
+						priceField.updateDto();
+						priceField.initialize();
+					}
+				});
+			}
+
 			form.addField(markupField);
 			fieldTable.addField(markupField);
 		}
@@ -1023,6 +1039,22 @@ public class EventPage implements Page {
 
 					if (field.equals(priceField)) {
 						priceField.initialize();
+					}
+
+					if (field.equals(markupField)) {
+						if (priceField != null) {
+							priceField.initialize();
+						}
+
+						if (!Common.isNullOrEmpty(pageData.getAgeGroups())) {
+							eventService.getPageData(calendarEvent.getId(), new Callback<EventPageData>() {
+								@Override
+								protected void doOnSuccess(EventPageData result) {
+									pageData = result;
+									populateAgeGroups();
+								}
+							});
+						}
 					}
 				}
 			}

@@ -761,7 +761,9 @@ public class FormField extends Composite {
 					submitButton.setEnabled(true);
 				}
 			});
+
 			updateDto();
+
 			for (FormSubmitHandler handler : submitHandlers) {
 				handler.onFormSubmit(FormField.this);
 			}

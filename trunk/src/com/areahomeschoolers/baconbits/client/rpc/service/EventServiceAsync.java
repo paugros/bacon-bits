@@ -57,7 +57,7 @@ public interface EventServiceAsync {
 
 	public void save(Event event, AsyncCallback<Event> callback);
 
-	public void saveAgeGroup(EventAgeGroup ageGroup, AsyncCallback<EventAgeGroup> callback);
+	public void saveAgeGroup(EventAgeGroup ageGroup, Event event, AsyncCallback<EventAgeGroup> callback);
 
 	public void saveEventField(EventField field, AsyncCallback<EventField> callback);
 

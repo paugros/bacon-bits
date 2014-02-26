@@ -131,8 +131,8 @@ public class EventServiceImpl extends GwtController implements EventService {
 	}
 
 	@Override
-	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup) {
-		return dao.saveAgeGroup(ageGroup);
+	public EventAgeGroup saveAgeGroup(EventAgeGroup ageGroup, Event event) {
+		return dao.saveAgeGroup(ageGroup, event);
 	}
 
 	@Override
