@@ -251,11 +251,17 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		payRequest.setIpnNotificationUrl(ipnUrl);
 		ClientDetailsType cd = new ClientDetailsType();
 		cd.setIpAddress(ServerContext.getRequest().getRemoteAddr());
-		cd.setApplicationId("weare.home.educators");
+		// cd.setApplicationId("weare.home.educators");
 
 		payRequest.setClientDetails(cd);
 		if (!ServerContext.isLive()) {
 			payRequest.setSenderEmail("someone@enduser.com"); // password same as email
+		}
+
+		if (receiverLst.size() == 2) {
+			payRequest.setFeesPayer("SECONDARYONLY");
+		} else {
+			payRequest.setFeesPayer("EACHRECEIVER");
 		}
 
 		PayResponse payResponse = makePayPalApiCall(payRequest);
