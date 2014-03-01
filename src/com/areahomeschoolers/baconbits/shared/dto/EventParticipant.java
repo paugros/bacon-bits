@@ -16,6 +16,7 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	// aux
 	private String status;
+	private int paymentStatusId;
 	private int eventId;
 	private Integer eventGroupId;
 	private Integer eventOrganizationId;
@@ -136,6 +137,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 			return null;
 		}
 		return paymentId;
+	}
+
+	public int getPaymentStatusId() {
+		return paymentStatusId;
 	}
 
 	public double getPrice() {
@@ -272,6 +277,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setPaymentId(Integer paymentId) {
 		this.paymentId = paymentId;
+	}
+
+	public void setPaymentStatusId(int paymentStatusId) {
+		this.paymentStatusId = paymentStatusId;
 	}
 
 	public void setPrice(double price) {
