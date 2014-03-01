@@ -3,9 +3,10 @@ package com.areahomeschoolers.baconbits.client.content.calendar.dayview;
 import com.areahomeschoolers.baconbits.client.content.calendar.Appointment;
 import com.areahomeschoolers.baconbits.client.content.calendar.ThemeAppointmentStyle;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 
+@SuppressWarnings("deprecation")
 public abstract class DayViewStyleManager {
 
 	protected static final String APPOINTMENT_STYLE = "dv-appointment";

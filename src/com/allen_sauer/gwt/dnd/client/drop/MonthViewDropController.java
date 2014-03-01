@@ -24,8 +24,8 @@ import com.areahomeschoolers.baconbits.client.content.calendar.Appointment;
 import com.areahomeschoolers.baconbits.client.content.calendar.DateUtils;
 import com.areahomeschoolers.baconbits.client.content.calendar.monthview.AppointmentWidget;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.FlexTable;
 
@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.FlexTable;
  * @author Brad Rydzewski
  * @author Carlos D. Morales
  */
+@SuppressWarnings("deprecation")
 public class MonthViewDropController extends AbsolutePositionDropController {
 
 	private int daysPerWeek;
