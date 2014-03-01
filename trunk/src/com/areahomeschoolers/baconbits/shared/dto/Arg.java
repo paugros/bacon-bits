@@ -5,6 +5,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public interface Arg {
 	public enum ArticleArg implements Arg, IsSerializable {
 		ARTICLE_ID, MOST_RECENT, IDS, OWNING_ORG_ID, NEWS_ONLY, COMMENT_ID, BEFORE_ID, BEFORE_DATE, AFTER_DATE, SEARCH;
+
 		private ArticleArg() {
 
 		}
