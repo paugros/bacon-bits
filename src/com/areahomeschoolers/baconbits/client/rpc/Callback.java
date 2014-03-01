@@ -48,6 +48,8 @@ public abstract class Callback<T> implements AsyncCallback<T> {
 				GWT.log("RPC call failed", caught);
 			}
 		} else if (caught instanceof IncompatibleRemoteServiceException) {
+			// fyi, the code below is capable of launching a browser into infinite refresh or alert under certain conditions.
+
 			if (GWT.isProdMode()) {
 				Window.Location.reload();
 			} else {
