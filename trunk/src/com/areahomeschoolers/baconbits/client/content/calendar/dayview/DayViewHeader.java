@@ -29,6 +29,7 @@ import com.areahomeschoolers.baconbits.client.content.calendar.event.HasWeekSele
 import com.areahomeschoolers.baconbits.client.content.calendar.event.WeekSelectionEvent;
 import com.areahomeschoolers.baconbits.client.content.calendar.event.WeekSelectionHandler;
 import com.areahomeschoolers.baconbits.client.content.calendar.util.WindowUtils;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -39,186 +40,184 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+@SuppressWarnings("deprecation")
 public class DayViewHeader extends Composite implements HasWeekSelectionHandlers<Date>, HasDaySelectionHandlers<Date> {
-    private FlexTable header = new FlexTable();
-    private VerticalPanel timePanel = new VerticalPanel();
-    private AbsolutePanel dayPanel = new AbsolutePanel();
-    private AbsolutePanel weekPanel = new AbsolutePanel();
-    private AbsolutePanel splitter = new AbsolutePanel();
-    private static final String GWT_CALENDAR_HEADER_STYLE = "gwt-calendar-header";
-    private static final String DAY_CELL_CONTAINER_STYLE = "day-cell-container";
-    private static final String WEEK_CELL_CONTAINER_STYLE = "week-cell-container";
-    private static final String YEAR_CELL_STYLE = "year-cell";
-    private static final String SPLITTER_STYLE = "splitter";
-    private final boolean showWeekNumbers;
-    private final HasSettings settings;
+	private FlexTable header = new FlexTable();
+	private VerticalPanel timePanel = new VerticalPanel();
+	private AbsolutePanel dayPanel = new AbsolutePanel();
+	private AbsolutePanel weekPanel = new AbsolutePanel();
+	private AbsolutePanel splitter = new AbsolutePanel();
+	private static final String GWT_CALENDAR_HEADER_STYLE = "gwt-calendar-header";
+	private static final String DAY_CELL_CONTAINER_STYLE = "day-cell-container";
+	private static final String WEEK_CELL_CONTAINER_STYLE = "week-cell-container";
+	private static final String YEAR_CELL_STYLE = "year-cell";
+	private static final String SPLITTER_STYLE = "splitter";
+	private final boolean showWeekNumbers;
+	private final HasSettings settings;
 
-    public DayViewHeader(HasSettings settings) {
-        initWidget(header);
+	public DayViewHeader(HasSettings settings) {
+		initWidget(header);
 
-        this.settings = settings;
+		this.settings = settings;
 
-        header.setStyleName(GWT_CALENDAR_HEADER_STYLE);
-        dayPanel.setStyleName(DAY_CELL_CONTAINER_STYLE);
-        weekPanel.setStyleName(WEEK_CELL_CONTAINER_STYLE);
-        timePanel.setWidth("100%");
+		header.setStyleName(GWT_CALENDAR_HEADER_STYLE);
+		dayPanel.setStyleName(DAY_CELL_CONTAINER_STYLE);
+		weekPanel.setStyleName(WEEK_CELL_CONTAINER_STYLE);
+		timePanel.setWidth("100%");
 
-        showWeekNumbers = settings.getSettings().isShowingWeekNumbers();
+		showWeekNumbers = settings.getSettings().isShowingWeekNumbers();
 
-        header.insertRow(0);
-        header.insertRow(0);
-        header.insertCell(0, 0);
-        header.insertCell(0, 0);
-        header.insertCell(0, 0);
-        header.setWidget(0, 1, timePanel);
-        header.getCellFormatter().setStyleName(0, 0, YEAR_CELL_STYLE);
-        header.getCellFormatter().setWidth(0, 2,
-                WindowUtils.getScrollBarWidth(true) + "px");
+		header.insertRow(0);
+		header.insertRow(0);
+		header.insertCell(0, 0);
+		header.insertCell(0, 0);
+		header.insertCell(0, 0);
+		header.setWidget(0, 1, timePanel);
+		header.getCellFormatter().setStyleName(0, 0, YEAR_CELL_STYLE);
+		header.getCellFormatter().setWidth(0, 2, WindowUtils.getScrollBarWidth(true) + "px");
 
-        header.getFlexCellFormatter().setColSpan(1, 0, 3);
-        header.setCellPadding(0);
-        header.setBorderWidth(0);
-        header.setCellSpacing(0);
+		header.getFlexCellFormatter().setColSpan(1, 0, 3);
+		header.setCellPadding(0);
+		header.setBorderWidth(0);
+		header.setCellSpacing(0);
 
-        if (showWeekNumbers) {
-            timePanel.add(weekPanel);
-        }
-        timePanel.add(dayPanel);
+		if (showWeekNumbers) {
+			timePanel.add(weekPanel);
+		}
+		timePanel.add(dayPanel);
 
-        splitter.setStylePrimaryName(SPLITTER_STYLE);
-        header.setWidget(1, 0, splitter);
-    }
+		splitter.setStylePrimaryName(SPLITTER_STYLE);
+		header.setWidget(1, 0, splitter);
+	}
 
-    public void setDays(Date date, int days) {
+	@Override
+	public HandlerRegistration addDaySelectionHandler(DaySelectionHandler<Date> handler) {
+		return addHandler(handler, DaySelectionEvent.getType());
+	}
 
-        dayPanel.clear();
-        weekPanel.clear();
+	@Override
+	public HandlerRegistration addWeekSelectionHandler(WeekSelectionHandler<Date> handler) {
+		return addHandler(handler, WeekSelectionEvent.getType());
+	}
 
-        float dayWidth = 100f / days;
-        float dayLeft;
-        int week = DateUtils.calendarWeekIso(date);
-        int previousDayWeek = week;
-        Date previousDate = date;
-        float weekWidth = 0f;
-        float weekLeft = 0f;
+	public void setDays(Date date, int days) {
 
-        for (int i = 0; i < days; i++) {
+		dayPanel.clear();
+		weekPanel.clear();
 
-            // set the left position of the day splitter to
-            // the width * incremented value
-            dayLeft = dayWidth * i;
+		float dayWidth = 100f / days;
+		float dayLeft;
+		int week = DateUtils.calendarWeekIso(date);
+		int previousDayWeek = week;
+		Date previousDate = date;
+		float weekWidth = 0f;
+		float weekLeft = 0f;
 
-            // increment the date by 1
-            if (i > 0) {
-                DateUtils.moveOneDayForward(date);
-            } else {
-                // initialize the week values
-                weekLeft = dayLeft;
-                weekWidth = dayWidth;
-            }
+		for (int i = 0; i < days; i++) {
 
-            String headerTitle = CalendarFormat.INSTANCE.getDateFormat().format(date);
+			// set the left position of the day splitter to
+			// the width * incremented value
+			dayLeft = dayWidth * i;
 
-            Label dayLabel = new Label();
-            dayLabel.setStylePrimaryName("day-cell");
-            dayLabel.setWidth(dayWidth + "%");
-            dayLabel.setText(headerTitle);
-            DOM.setStyleAttribute(dayLabel.getElement(), "left", dayLeft + "%");
+			// increment the date by 1
+			if (i > 0) {
+				DateUtils.moveOneDayForward(date);
+			} else {
+				// initialize the week values
+				weekLeft = dayLeft;
+				weekWidth = dayWidth;
+			}
 
-            addDayClickHandler(dayLabel, (Date) date.clone());
+			String headerTitle = CalendarFormat.INSTANCE.getDateFormat().format(date);
 
-            boolean found = false;
-            for (Date day : settings.getSettings().getHolidays()) {
-                if (DateUtils.areOnTheSameDay(day, date)) {
-                    dayLabel.setStyleName("day-cell-holiday");
-                    found = true;
-                    break;
-                }
-            }
+			Label dayLabel = new Label();
+			dayLabel.setStylePrimaryName("day-cell");
+			dayLabel.setWidth(dayWidth + "%");
+			dayLabel.setText(headerTitle);
+			DOM.setStyleAttribute(dayLabel.getElement(), "left", dayLeft + "%");
 
-            // set the style of the header to show that it is today
-            if (DateUtils.areOnTheSameDay(new Date(), date)) {
-                dayLabel.setStyleName("day-cell-today");
-            } else if (!found && DateUtils.isWeekend(date)) {
-                dayLabel.setStyleName("day-cell-weekend");
-            }
+			addDayClickHandler(dayLabel, (Date) date.clone());
 
-            if (showWeekNumbers) {
-                week = DateUtils.calendarWeekIso(date);
-                boolean lastDay = i + 1 == days;
-                if ((previousDayWeek != week) || lastDay) {
-                    if (lastDay) {
-                        previousDayWeek = week;
-                        previousDate = date;
-                    }
-                    String weekTitle = "W " + previousDayWeek;
+			boolean found = false;
+			for (Date day : settings.getSettings().getHolidays()) {
+				if (DateUtils.areOnTheSameDay(day, date)) {
+					dayLabel.setStyleName("day-cell-holiday");
+					found = true;
+					break;
+				}
+			}
 
-                    Label weekLabel = new Label();
-                    weekLabel.setStylePrimaryName("week-cell");
-                    weekLabel.setWidth(weekWidth + "%");
-                    weekLabel.setText(weekTitle);
-                    DOM.setStyleAttribute(weekLabel.getElement(), "left", weekLeft + "%");
+			// set the style of the header to show that it is today
+			if (DateUtils.areOnTheSameDay(new Date(), date)) {
+				dayLabel.setStyleName("day-cell-today");
+			} else if (!found && DateUtils.isWeekend(date)) {
+				dayLabel.setStyleName("day-cell-weekend");
+			}
 
-                    addWeekClickHandler(weekLabel, previousDate);
+			if (showWeekNumbers) {
+				week = DateUtils.calendarWeekIso(date);
+				boolean lastDay = i + 1 == days;
+				if ((previousDayWeek != week) || lastDay) {
+					if (lastDay) {
+						previousDayWeek = week;
+						previousDate = date;
+					}
+					String weekTitle = "W " + previousDayWeek;
 
-                    weekPanel.add(weekLabel);
+					Label weekLabel = new Label();
+					weekLabel.setStylePrimaryName("week-cell");
+					weekLabel.setWidth(weekWidth + "%");
+					weekLabel.setText(weekTitle);
+					DOM.setStyleAttribute(weekLabel.getElement(), "left", weekLeft + "%");
 
-                    weekWidth = dayWidth;
-                    weekLeft = dayLeft + dayWidth;
-                } else {
-                    weekWidth += dayWidth;
-                }
-                previousDayWeek = week;
-                previousDate = date;
-            }
+					addWeekClickHandler(weekLabel, previousDate);
 
-            dayPanel.add(dayLabel);
-        }
-    }
+					weekPanel.add(weekLabel);
 
-    public void setYear(Date date) {
-        setYear(DateUtils.year(date));
-    }
+					weekWidth = dayWidth;
+					weekLeft = dayLeft + dayWidth;
+				} else {
+					weekWidth += dayWidth;
+				}
+				previousDayWeek = week;
+				previousDate = date;
+			}
 
-    public void setYear(int year) {
-        header.setText(0, 0, String.valueOf(year));
-    }
+			dayPanel.add(dayLabel);
+		}
+	}
 
-    private void addDayClickHandler(final Label dayLabel, final Date day) {
-        dayLabel.addClickHandler(new ClickHandler() {
-            @Override
+	public void setYear(Date date) {
+		setYear(DateUtils.year(date));
+	}
+
+	public void setYear(int year) {
+		header.setText(0, 0, String.valueOf(year));
+	}
+
+	private void addDayClickHandler(final Label dayLabel, final Date day) {
+		dayLabel.addClickHandler(new ClickHandler() {
+			@Override
 			public void onClick(ClickEvent event) {
-                fireSelectedDay(day);
-            }
-        });
-    }
+				fireSelectedDay(day);
+			}
+		});
+	}
 
-    private void addWeekClickHandler(final Label weekLabel, final Date day) {
-        weekLabel.addClickHandler(new ClickHandler() {
-            @Override
+	private void addWeekClickHandler(final Label weekLabel, final Date day) {
+		weekLabel.addClickHandler(new ClickHandler() {
+			@Override
 			public void onClick(ClickEvent event) {
-                fireSelectedWeek(day);
-            }
-        });
-    }
+				fireSelectedWeek(day);
+			}
+		});
+	}
 
-    private void fireSelectedDay(final Date day) {
-        DaySelectionEvent.fire(this, day);
-    }
+	private void fireSelectedDay(final Date day) {
+		DaySelectionEvent.fire(this, day);
+	}
 
-    private void fireSelectedWeek(final Date day) {
-        WeekSelectionEvent.fire(this, day);
-    }
-
-    @Override
-	public HandlerRegistration addWeekSelectionHandler(
-            WeekSelectionHandler<Date> handler) {
-        return addHandler(handler, WeekSelectionEvent.getType());
-    }
-
-    @Override
-	public HandlerRegistration addDaySelectionHandler(
-            DaySelectionHandler<Date> handler) {
-        return addHandler(handler, DaySelectionEvent.getType());
-    }
+	private void fireSelectedWeek(final Date day) {
+		WeekSelectionEvent.fire(this, day);
+	}
 }

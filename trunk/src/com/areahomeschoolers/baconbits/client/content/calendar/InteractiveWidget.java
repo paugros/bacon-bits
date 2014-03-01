@@ -18,6 +18,7 @@
 
 package com.areahomeschoolers.baconbits.client.content.calendar;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -26,7 +27,6 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
@@ -41,6 +41,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * 
  * @author Brad Rydzewski
  */
+@SuppressWarnings("deprecation")
 public abstract class InteractiveWidget extends Composite {
 
 	/**
@@ -191,6 +192,7 @@ public abstract class InteractiveWidget extends Composite {
 	/**
 	 * Makes the widget's focus panel invisible.
 	 */
+
 	private void hideFocusPanel() {
 		/*
 		 * Careful: Seems that making the focusPanel too big is blocking the keyevents

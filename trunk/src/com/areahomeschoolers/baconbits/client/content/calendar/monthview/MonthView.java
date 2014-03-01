@@ -48,8 +48,8 @@ import com.areahomeschoolers.baconbits.client.content.calendar.theme.google.clie
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
@@ -82,6 +82,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Brad Rydzewski
  * @since 0.9.0
  */
+@SuppressWarnings("deprecation")
 public class MonthView extends CalendarView implements HasWeekSelectionHandlers<Date>, HasDaySelectionHandlers<Date> {
 
 	private static int appointmentHeight() {
@@ -399,7 +400,6 @@ public class MonthView extends CalendarView implements HasWeekSelectionHandlers<
 	/**
 	 * Builds and formats the Calendar Grid. No appointments are included when building the grid.
 	 */
-	@SuppressWarnings("deprecation")
 	private void buildCalendarGrid() {
 		int firstDayOfWeek = CalendarFormat.INSTANCE.getFirstDayOfWeek();
 		int month = calendarWidget.getDate().getMonth();

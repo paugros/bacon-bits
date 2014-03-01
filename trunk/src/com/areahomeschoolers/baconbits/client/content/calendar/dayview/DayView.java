@@ -44,14 +44,15 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 
+@SuppressWarnings("deprecation")
 public class DayView extends CalendarView {
 
 	private DayViewHeader dayViewHeader = null;
@@ -122,7 +123,6 @@ public class DayView extends CalendarView {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public void doLayout() {
 		// PERFORM APPOINTMENT LAYOUT NOW
 		final Date date = (Date) calendarWidget.getDate().clone();
@@ -519,7 +519,6 @@ public class DayView extends CalendarView {
 		return findAppointmentWidget(findAppointmentByElement(element));
 	}
 
-	@SuppressWarnings("deprecation")
 	private Date getCoordinatesDate(int x, int y) {
 		int left = dayViewBody.getGrid().gridOverlay.getAbsoluteLeft();
 		int top = dayViewBody.getScrollPanel().getAbsoluteTop();

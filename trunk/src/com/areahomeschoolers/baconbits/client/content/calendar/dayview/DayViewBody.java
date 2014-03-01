@@ -36,6 +36,7 @@ public class DayViewBody extends Composite {
 	private DayViewGrid grid = null;
 	private HasSettings settings = null;
 
+	@SuppressWarnings("deprecation")
 	public DayViewBody(HasSettings settings) {
 		initWidget(scrollPanel);
 		this.settings = settings;

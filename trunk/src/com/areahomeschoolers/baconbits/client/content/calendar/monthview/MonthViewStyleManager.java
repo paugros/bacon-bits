@@ -20,8 +20,8 @@ package com.areahomeschoolers.baconbits.client.content.calendar.monthview;
 import com.areahomeschoolers.baconbits.client.content.calendar.Appointment;
 import com.areahomeschoolers.baconbits.client.content.calendar.ThemeAppointmentStyle;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 
 /**
  * Applies styles in a month view based on the currently selected theme. This class provides a template method to consistently style the appointments in a month
@@ -34,6 +34,7 @@ import com.google.gwt.user.client.Element;
  * @see com.areahomeschoolers.baconbits.client.content.calendar.theme.google.client.GoogleMonthViewStyleManager
  * @see com.bradrydzewski.gwt.calendar.theme.ical.client.ICalMonthViewStyleManager
  */
+@SuppressWarnings("deprecation")
 public abstract class MonthViewStyleManager {
 
 	protected static final String APPOINTMENT_STYLE = "appointment";
