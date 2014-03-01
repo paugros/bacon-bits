@@ -206,7 +206,11 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		List<Receiver> receiverLst = new ArrayList<Receiver>();
 
 		// The organization's cut
-		Receiver orgReceiver = new Receiver(round(p.getTotalAmount(), 2, BigDecimal.ROUND_HALF_UP));
+		double amount = p.getTotalAmount();
+		if (ServerContext.isCitrus()) {
+			amount += p.getMarkupAmount();
+		}
+		Receiver orgReceiver = new Receiver(round(amount, 2, BigDecimal.ROUND_HALF_UP));
 		orgReceiver.setPaymentType("SERVICE");
 
 		if (ServerContext.isLive()) {
@@ -216,7 +220,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		}
 
 		// Our cut
-		if (p.getMarkupAmount() > 0) {
+		if (p.getMarkupAmount() > 0 && !ServerContext.isCitrus()) {
 			// according to PayPal, the organization (tenant) must be the primary receiver
 			orgReceiver.setPrimary(Boolean.TRUE);
 			Receiver siteReceiver = new Receiver(round(p.getMarkupAmount(), 2, BigDecimal.ROUND_HALF_UP));
