@@ -418,7 +418,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select r.eventId, e.title, e.startDate, e.endDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
 		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, up.email as registrantEmailAddress, \n";
-		sql += "r.addedById, e.groupId, e.owningOrgId, e.seriesId, e.requiredInSeries, \n";
+		sql += "r.addedById, e.groupId, e.owningOrgId, e.seriesId, e.requiredInSeries, py.statusId as paymentStatusId, \n";
 		if (includeFields) {
 			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n";
 			sql += "from eventFieldValues v \n";
@@ -522,6 +522,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 				p.setEventId(rs.getInt("eventId"));
 				p.setEventTitle(rs.getString("title"));
 				p.setPaymentId(rs.getInt("paymentId"));
+				p.setPaymentStatusId(rs.getInt("paymentStatusId"));
 				p.setEventStartDate(rs.getTimestamp("startDate"));
 				p.setEventEndDate(rs.getTimestamp("endDate"));
 				p.setEventGroupId(rs.getInt("groupId"));
@@ -1267,6 +1268,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			// get the old status
 			sql = "select statusId from eventRegistrationParticipants where id = :id";
 			int oldStatusId = queryForInt(0, sql, namedParams);
+
+			// if we're un-canceling and we have already paid, go back to paid status
+			if (oldStatusId == 5 && participant.getStatusId() != 5 && participant.getPaymentStatusId() == 2) {
+				participant.setStatusId(2);
+			}
 
 			sql = "update eventRegistrationParticipants set statusId = :statusId where id = :id ";
 			update(sql, namedParams);
