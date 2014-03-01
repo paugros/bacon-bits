@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.Enumeration;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +36,7 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 	private static final long serialVersionUID = 1L;
 	protected ServletContext servletContext;
 	private final JdbcTemplate template;
+	private final Logger logger = Logger.getLogger(this.getClass().toString());
 
 	@Autowired
 	public IpnServlet(DataSource dataSource) {
@@ -138,7 +141,14 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 			sql += "rawData = ?, statusId = " + statusText + " where payKey = ?";
 			template.update(sql, paymentFee, txnId, rawData, key);
 
-			int paymentTypeId = template.queryForInt("select paymentTypeId from payments where payKey = ? limit 1", key);
+			int paymentTypeId = 0;
+
+			try {
+				paymentTypeId = template.queryForInt("select paymentTypeId from payments where payKey = ? limit 1", key);
+			} catch (EmptyResultDataAccessException e) {
+				logger.warning("Payment not found for key: " + key);
+				return;
+			}
 			int paymentId = template.queryForInt("select id from payments where payKey = ? limit 1", key);
 
 			// set adjustments as being applied
@@ -204,5 +214,4 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 			}
 		}
 	}
-
 }
