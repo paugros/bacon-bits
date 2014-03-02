@@ -23,7 +23,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Adjustment;
@@ -48,7 +48,7 @@ import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 public final class PaymentPage implements Page {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private EventParticipantTable table;
-	private Label total;
+	private FieldTable totalTable;
 	private SimplePanel payContainer = new SimplePanel();
 	private AdjustmentTable adjustments;
 	private SimplePanel buttonContainer = new SimplePanel();
@@ -67,11 +67,11 @@ public final class PaymentPage implements Page {
 		args.put(EventArg.STATUS_ID, 1);
 
 		table = new EventParticipantTable(args);
-		table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.TOTALED_PRICE,
+		table.setDisplayColumns(ParticipantColumn.EVENT, ParticipantColumn.EVENT_DATE, ParticipantColumn.PARTICIPANT_NAME, ParticipantColumn.PRICE,
 				ParticipantColumn.EDIT_STATUS);
 		table.disablePaging();
 		table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
-		table.setWidth("850px");
+		table.setWidth("900px");
 		buttonContainer.getElement().getStyle().setPaddingTop(10, Unit.PX);
 
 		final VerticalPanel vp = new VerticalPanel();
@@ -89,7 +89,7 @@ public final class PaymentPage implements Page {
 		vp.add(table);
 
 		page.add(vp);
-		page.add(WidgetFactory.wrapForWidth(payContainer, ContentWidth.MAXWIDTH750PX));
+		page.add(WidgetFactory.wrapForWidth(payContainer, ContentWidth.MAXWIDTH900PX));
 		page.setCellHorizontalAlignment(payContainer, HasHorizontalAlignment.ALIGN_RIGHT);
 
 		payClickHandler = new ClickHandler() {
@@ -161,18 +161,14 @@ public final class PaymentPage implements Page {
 				});
 
 				if (!Common.isNullOrEmpty(table.getFullList())) {
-					PaddedPanel payPanel = new PaddedPanel(15);
-					Label l = new Label("Amount due:");
-					l.addStyleName("hugeText");
-					payPanel.add(l);
-					total = new Label();
-					total.addStyleName("hugeText");
-					payPanel.add(total);
+					totalTable = new FieldTable();
+					totalTable.setWidth("250px");
+					totalTable.removeStyleName(totalTable.getStylePrimaryName());
 					VerticalPanel pvp = new VerticalPanel();
 					pvp.setWidth("100%");
-					pvp.add(payPanel);
+					pvp.add(totalTable);
 					pvp.add(buttonContainer);
-					pvp.setCellHorizontalAlignment(payPanel, HasHorizontalAlignment.ALIGN_RIGHT);
+					pvp.setCellHorizontalAlignment(totalTable, HasHorizontalAlignment.ALIGN_RIGHT);
 					pvp.setCellHorizontalAlignment(buttonContainer, HasHorizontalAlignment.ALIGN_RIGHT);
 
 					payContainer.setWidget(pvp);
@@ -216,23 +212,26 @@ public final class PaymentPage implements Page {
 	}
 
 	private void updateTotal() {
-		if (total == null) {
+		if (totalTable == null) {
 			return;
 		}
 
+		totalTable.removeAllRows();
+
 		double totalAmount = 0.00;
+		double amountDue = 0.00;
+		double totalAdjustments = 0.00;
+
 		for (EventParticipant p : table.getSelectedItems()) {
 			totalAmount += p.getAdjustedPrice();
 		}
 
 		for (Adjustment adjustment : adjustments.getFullList()) {
-			totalAmount += adjustment.getAmount();
+			totalAdjustments += adjustment.getAmount();
 		}
 
-		// if (Application.isCitrus()) {
-		// Label msg = new Label("Payments disabled on this site for now.  Please visit your group(s) site(s) to make payments.");
-		// buttonContainer.setWidget(msg);
-		// } else
+		amountDue = totalAmount + totalAdjustments;
+
 		if (totalAmount < 0) {
 			totalAmount = 0;
 			buttonContainer.setWidget(adjustmentButton);
@@ -242,6 +241,19 @@ public final class PaymentPage implements Page {
 			buttonContainer.clear();
 		}
 
-		total.setText(Formatter.formatCurrency(totalAmount));
+		if (totalAdjustments != 0) {
+			totalTable.addField(new Label("Sub-total"), Formatter.formatCurrency(totalAmount));
+			totalTable.addField(new Label("Adjustments"), Formatter.formatCurrency(totalAdjustments));
+		}
+
+		Label l = new Label("Amount due");
+		Label v = new Label(Formatter.formatCurrency(amountDue));
+		l.addStyleName("largeText");
+		v.addStyleName("largeText");
+		totalTable.addField(l, v);
+
+		for (int i = 0; i < totalTable.getFlexTable().getRowCount(); i++) {
+			totalTable.getFlexTable().getCellFormatter().setHorizontalAlignment(i, 1, HasHorizontalAlignment.ALIGN_RIGHT);
+		}
 	}
 }

@@ -640,7 +640,7 @@ public class UserPage implements Page {
 		// layout variables
 		int columnWidth = 225;
 		int pageMarginTop = 40;
-		int labelsPerPage = 30;
+		int labelsPerPage = 27;
 		int cellMarginLeft = 12;
 		int cellHeight = 96;
 

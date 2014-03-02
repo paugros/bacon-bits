@@ -90,6 +90,10 @@ public class FieldTable extends Composite {
 		addField(createFieldLabelPanel(new Label(name), new Label()), value);
 	}
 
+	public void addField(Widget label, Widget content) {
+		addField(label, content, flexTable.getRowCount());
+	}
+
 	public void addLinkPanel(LinkPanel linkPanel) {
 		flexTable.insertRow(0);
 		flexTable.setWidget(0, 0, linkPanel);
@@ -192,10 +196,6 @@ public class FieldTable extends Composite {
 		if (parentRows.get(field) != null) {
 			flexTable.getRowFormatter().setVisible(parentRows.get(field).getRowIndex(), true);
 		}
-	}
-
-	private void addField(Widget label, Widget content) {
-		addField(label, content, flexTable.getRowCount());
 	}
 
 	private void addField(Widget label, Widget content, int rowNumber) {
