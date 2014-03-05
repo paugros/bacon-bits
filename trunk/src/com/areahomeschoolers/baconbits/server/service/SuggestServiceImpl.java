@@ -27,7 +27,7 @@ public final class SuggestServiceImpl extends GwtController implements SuggestSe
 				ApplicationContext ctx = ServerContext.getApplicationContext();
 				Suggestible suggester = (Suggestible) ctx.getBean(type.substring(0, 1).toLowerCase() + type.substring(1) + "DaoImpl");
 
-				data = suggester.getSuggestionData(token, limit, options);
+				data.getSuggestions().addAll(suggester.getSuggestionData(token, limit, options).getSuggestions());
 
 			} catch (Exception e) {
 				e.printStackTrace();
