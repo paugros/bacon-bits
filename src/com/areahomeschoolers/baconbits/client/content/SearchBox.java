@@ -3,7 +3,6 @@ package com.areahomeschoolers.baconbits.client.content;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
 import com.areahomeschoolers.baconbits.client.widgets.ServerSuggestOracle;
 
@@ -42,9 +41,7 @@ public final class SearchBox extends Composite {
 		hPanel.setSpacing(4);
 
 		List<String> types = new ArrayList<String>();
-		if (Application.isAuthenticated()) {
-			types.add("User");
-		}
+		types.add("User");
 		types.add("Event");
 		types.add("Article");
 		types.add("Book");

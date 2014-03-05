@@ -420,11 +420,15 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	@Override
 	public ServerSuggestionData getSuggestionData(String token, int limit, Data options) {
 		ServerSuggestionData data = new ServerSuggestionData();
+		if (!ServerContext.isAuthenticated()) {
+			return data;
+		}
+
 		String sql = "select u.id, concat(u.firstName, ' ', u.lastName, ' - ', u.email) as Suggestion, 'User' as entityType ";
 		sql += "from users u ";
 		sql += "where u.email is not null and u.email != '' ";
 		sql += "and (concat(u.firstName, ' ', u.lastName) like ? or u.email like ?) and isActive(u.startDate, u.endDate) = 1 ";
-		if (ServerContext.isAuthenticated() && !ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
+		if (!ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
 			sql += "and u.directoryOptOut = 0 ";
 		}
 		sql += "order by concat(u.firstName, ' ', u.lastName) ";
