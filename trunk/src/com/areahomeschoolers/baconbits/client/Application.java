@@ -397,7 +397,7 @@ public final class Application implements ValueChangeHandler<String> {
 			}
 		});
 
-		pollUpdateData = new PollUpdateData(isAuthenticated() ? getCurrentUserId() : null, getCurrentOrgId());
+		pollUpdateData = new PollUpdateData(getCurrentOrgId());
 
 		pollForData();
 

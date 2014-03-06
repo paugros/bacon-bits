@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class PollUpdateData extends EntityDto<PollUpdateData> {
 	private static final long serialVersionUID = -4524434771240327430L;
-	private Integer userId;
 	private int organizationId;
 	private ArrayList<HistoryEntry> historyUpdates;
 
@@ -12,9 +11,8 @@ public class PollUpdateData extends EntityDto<PollUpdateData> {
 		super();
 	}
 
-	public PollUpdateData(Integer userId, int organizationId) {
+	public PollUpdateData(int organizationId) {
 		this();
-		this.userId = userId;
 		this.organizationId = organizationId;
 		historyUpdates = new ArrayList<HistoryEntry>();
 	}
@@ -35,34 +33,12 @@ public class PollUpdateData extends EntityDto<PollUpdateData> {
 		return organizationId;
 	}
 
-	public Integer getUserId() {
-		return userId;
-	}
-
 	public boolean hasHistoryUpdates() {
 		return historyUpdates != null && !historyUpdates.isEmpty();
 	}
 
 	public void setOrganizationId(int organizationId) {
 		this.organizationId = organizationId;
-	}
-
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		sb.append("UserID=").append(userId).append(",\n");
-		sb.append("HistoryUpdates {");
-		for (HistoryEntry he : historyUpdates) {
-			sb.append("\"" + he.getTitle() + "\"(" + he.getUrl() + "),");
-		}
-		sb.append("},\n");
-		sb.append("]");
-		return sb.toString();
 	}
 
 }
