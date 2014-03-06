@@ -24,6 +24,7 @@ import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
@@ -202,6 +203,10 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		if (articleId > 0) {
 			sql += "and a.id = ? ";
 			sqlArgs.add(articleId);
+		}
+
+		if (args.getStatus() != Status.ALL) {
+			sql += "and isActive(a.startDate, a.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
 		}
 
 		if (!Common.isNullOrBlank(idString)) {
