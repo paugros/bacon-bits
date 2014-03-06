@@ -389,14 +389,21 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 	@Override
 	public PollResponseData getPollData(PollUpdateData pollData) {
-		Integer userId = pollData.getUserId();
+		Integer userId = ServerContext.getCurrentUserId();
 		PollResponseData data = new PollResponseData();
-		data.setUserActivity(getUserActivitySinceLastPoll(ServerContext.getCurrentUserId()));
 
 		if (ServerContext.isAuthenticated()) {
+			// don't update the status of a user that you've switched to
+			if (!ServerContext.getCurrentUser().isSwitched()) {
+				// update the user's last active date
+				UserDaoImpl.updateUserActivity(userId);
+			}
+
 			PaymentDao paymentDao = ServerContext.getDaoImpl("payment");
 			data.setUnpaidBalance(paymentDao.getUnpaidBalance(ServerContext.getCurrentUserId()));
 		}
+
+		data.setUserActivity(getUserActivitySinceLastPoll(ServerContext.getCurrentUserId()));
 
 		if (pollData.hasHistoryUpdates()) {
 			ArrayList<Object[]> historyUpdate = new ArrayList<Object[]>();
@@ -405,7 +412,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				if (orgId == 0) {
 					orgId = null;
 				}
-				historyUpdate.add(new Object[] { orgId, pollData.getUserId(), he.getTitle(), he.getUrl(), ServerContext.getRequest().getRemoteAddr() });
+				historyUpdate.add(new Object[] { orgId, userId, he.getTitle(), he.getUrl(), ServerContext.getRequest().getRemoteAddr() });
 			}
 			batchUpdate("insert into userHistory(organizationId, userID, pageTitle, historyToken, ipAddress) values(?, ?, ?, ?, ?)", historyUpdate);
 		}
