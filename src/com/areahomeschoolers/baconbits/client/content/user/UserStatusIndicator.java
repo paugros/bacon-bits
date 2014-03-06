@@ -32,6 +32,8 @@ public class UserStatusIndicator extends Composite {
 		statusIndicators.removeAll(remove);
 	}
 
+	private boolean showWeeksAndMonths;
+
 	private PaddedPanel statusPanel = new PaddedPanel();
 	private Image icon = new Image();
 	private Label idleTime = new Label();
@@ -66,6 +68,11 @@ public class UserStatusIndicator extends Composite {
 			return 999999999;
 		}
 		return idleMinutes;
+	}
+
+	public void setShowWeeksAndMonths(boolean showWeeksAndMonths) {
+		this.showWeeksAndMonths = showWeeksAndMonths;
+		updateStatus();
 	}
 
 	public void setTextVisible(boolean visible) {
@@ -105,11 +112,16 @@ public class UserStatusIndicator extends Composite {
 		} else if (idleMinutes < (60 * 48)) {
 			titlePrefix = "";
 			icon.setResource(MainImageBundle.INSTANCE.circleOrange());
+		} else if (idleMinutes < (60 * 24 * 14)) {
+			icon.setResource(MainImageBundle.INSTANCE.circleGray());
 		} else {
 			titlePrefix = "";
-			icon.setResource(MainImageBundle.INSTANCE.pixel());
-			// titlePrefix = "Logged out ";
-			// icon.setResource(MainImageBundle.INSTANCE.circleGray());
+			if (showWeeksAndMonths) {
+				icon.setResource(MainImageBundle.INSTANCE.circleGray());
+			} else {
+				icon.setResource(MainImageBundle.INSTANCE.pixel());
+				icon.setSize("9px", "9px");
+			}
 		}
 
 		updateIdleTime(idleMinutes);
@@ -140,17 +152,21 @@ public class UserStatusIndicator extends Composite {
 				text += "s";
 			}
 		} else if (minutes < (60 * 24 * 60)) {
-			// double weeks = Math.round(((minutes / 60.0) / 24) / 7);
-			// text = Formatter.formatNumber(weeks, "0") + " week";
-			// if (weeks > 1) {
-			// text += "s";
-			// }
+			if (showWeeksAndMonths) {
+				double weeks = Math.round(((minutes / 60.0) / 24) / 7);
+				text = Formatter.formatNumber(weeks, "0") + " week";
+				if (weeks > 1) {
+					text += "s";
+				}
+			}
 		} else {
-			// double months = Math.round(((minutes / 60.0) / 24) / 30.5);
-			// text = Formatter.formatNumber(months, "0") + " month";
-			// if (months > 1) {
-			// text += "s";
-			// }
+			if (showWeeksAndMonths) {
+				double months = Math.round(((minutes / 60.0) / 24) / 30.5);
+				text = Formatter.formatNumber(months, "0") + " month";
+				if (months > 1) {
+					text += "s";
+				}
+			}
 		}
 
 		idleTime.setText(text);
