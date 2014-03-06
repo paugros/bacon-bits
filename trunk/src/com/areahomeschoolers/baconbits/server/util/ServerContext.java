@@ -115,9 +115,7 @@ public class ServerContext implements ApplicationContextAware {
 
 		if (u != null) {
 			Integer originalUserId = (Integer) session.getAttribute("originalUserId");
-			if (originalUserId != null && originalUserId > 0) {
-				u.setSwitched(true);
-			}
+			u.setSwitched(originalUserId != null && originalUserId != u.getId());
 		}
 
 		return u;
@@ -234,7 +232,7 @@ public class ServerContext implements ApplicationContextAware {
 		}
 
 		getSession().setAttribute("userId", u.getId());
-		cache.put("user_" + u.getId(), u);
+		updateUserCache(u);
 	}
 
 	public static void setCurrentUser(User u) {
@@ -245,16 +243,18 @@ public class ServerContext implements ApplicationContextAware {
 
 	public static void switchToUser(int userId) {
 		User currentUser = getCurrentUser();
-		if (currentUser.getId() == userId || currentUser.canSwitch() == false) {
+		if (!currentUser.canSwitch()) {
 			return;
 		}
 
+		Integer origId = (Integer) getSession().getAttribute("originalUserId");
 		getSession().setAttribute("userId", userId);
-		boolean switched = currentUser.getId() != userId;
-		if (switched) {
-			getSession().setAttribute("originalUserId", currentUser.getId());
-		} else {
+
+		// switching back
+		if (origId != null && origId == userId) {
 			getSession().removeAttribute("originalUserId");
+		} else if (origId == null && currentUser.getId() != userId) {
+			getSession().setAttribute("originalUserId", currentUser.getId());
 		}
 	}
 
@@ -267,6 +267,7 @@ public class ServerContext implements ApplicationContextAware {
 	}
 
 	public static void updateUserCache(User user) {
+		user.setSwitched(false);
 		cache.put("user_" + user.getId(), user);
 	}
 
