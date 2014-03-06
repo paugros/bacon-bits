@@ -61,9 +61,7 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		ap.setDynamicMenuItems(userDao.getMenuItems(new ArgMap<UserArg>(UserArg.ORGANIZATION_ID, ServerContext.getCurrentOrgId())));
 
 		if (user != null) {
-			if (!user.isSwitched()) {
-				UserDaoImpl.updateUserActivity(user.getId());
-			}
+			UserDaoImpl.updateUserActivity(user.getId());
 
 			TagDao tagDao = ServerContext.getDaoImpl("tag");
 			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_TYPE, TagMappingType.USER.toString());

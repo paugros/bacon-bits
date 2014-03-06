@@ -213,6 +213,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 	@Override
 	public synchronized void doUpdateUserActivity(int userId) {
+		// don't update if switched
+		if (ServerContext.getCurrentUser().isSwitched()) {
+			return;
+		}
+
 		// we remove first so that the new entry goes to the bottom
 		userActivity.remove(userId);
 		userActivity.put(userId, new Date());
@@ -390,14 +395,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	@Override
 	public PollResponseData getPollData(PollUpdateData pollData) {
 		Integer userId = ServerContext.getCurrentUserId();
+		if (userId == 0) {
+			userId = null;
+		}
 		PollResponseData data = new PollResponseData();
 
 		if (ServerContext.isAuthenticated()) {
-			// don't update the status of a user that you've switched to
-			if (!ServerContext.getCurrentUser().isSwitched()) {
-				// update the user's last active date
-				UserDaoImpl.updateUserActivity(userId);
-			}
+			// update the user's last active date
+			UserDaoImpl.updateUserActivity(userId);
 
 			PaymentDao paymentDao = ServerContext.getDaoImpl("payment");
 			data.setUnpaidBalance(paymentDao.getUnpaidBalance(ServerContext.getCurrentUserId()));
