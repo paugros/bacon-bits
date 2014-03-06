@@ -136,8 +136,9 @@ public class UserFieldTable extends FieldTable {
 			addField(emailField);
 		}
 
-		if (!user.isChild() && user.isSaved()) {
+		if (!user.isChild() && user.isSaved() && Application.getUserActivity().get(user.getId()) != null) {
 			UserStatusIndicator st = new UserStatusIndicator();
+			st.setShowWeeksAndMonths(true);
 			st.setUserId(user.getId());
 			addField("Last activity:", st);
 		}

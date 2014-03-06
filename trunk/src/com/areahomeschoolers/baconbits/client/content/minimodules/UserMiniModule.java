@@ -2,8 +2,10 @@ package com.areahomeschoolers.baconbits.client.content.minimodules;
 
 import java.util.ArrayList;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.UserStatusIndicator;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
@@ -16,6 +18,7 @@ import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -62,17 +65,20 @@ public class UserMiniModule extends Composite {
 		for (User u : users) {
 			PaddedPanel mhp = new PaddedPanel();
 
-			UserStatusIndicator usi = new UserStatusIndicator(u.getId());
-			usi.setTextVisible(false);
-			mhp.add(usi);
+			if (Application.getUserActivity().get(u.getId()) != null) {
+				UserStatusIndicator usi = new UserStatusIndicator(u.getId());
+				usi.setShowWeeksAndMonths(true);
+				usi.setTextVisible(false);
+				mhp.add(usi);
+			} else {
+				Image spacer = new Image(MainImageBundle.INSTANCE.pixel());
+				spacer.setSize("15px", "9px");
+				mhp.add(spacer);
+			}
+
 			Hyperlink link = new Hyperlink(u.getFirstName() + " " + u.getLastName(), PageUrl.user(u.getId()));
 			link.addStyleName("mediumText");
 			mhp.add(link);
-
-			// HTML date = new HTML(Formatter.formatDateTime(e.getStartDate()));
-			// date.setWordWrap(false);
-			// date.addStyleName("italic");
-			// mhp.add(date);
 
 			vp.add(mhp);
 		}
