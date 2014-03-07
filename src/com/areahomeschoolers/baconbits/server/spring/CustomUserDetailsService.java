@@ -12,7 +12,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,18 +26,21 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		RowMapper<User> mapper = new RowMapper<User>() {
+		RowMapper<SaltedUser> mapper = new RowMapper<SaltedUser>() {
 			@Override
-			public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return new User(rs.getString("email"), rs.getString("passwordDigest"), rs.getBoolean("isEnabled"), rs.getBoolean("isEnabled"), true, true,
-						getAuthorities(rs));
+			public SaltedUser mapRow(ResultSet rs, int rowNum) throws SQLException {
+				SaltedUser u = new SaltedUser(rs.getString("email"), rs.getString("passwordDigest"), rs.getBoolean("isEnabled"), rs.getBoolean("isEnabled"),
+						true, true, getAuthorities(rs));
+
+				u.setSalt(rs.getString("guid"));
+				return u;
 			}
 		};
 
-		User user;
+		SaltedUser user;
 
 		String sql = "select u.id, u.email, u.passwordDigest, u.isSystemAdministrator, ugm.isAdministrator, g.isOrganization, ugm.id as isGroupMember, ";
-		sql += "isActive(u.StartDate, u.EndDate) as isEnabled from users u ";
+		sql += "isActive(u.StartDate, u.EndDate) as isEnabled, u.guid from users u ";
 		sql += "left join userGroupMembers ugm on ugm.userId = u.id ";
 		sql += "left join groups g on g.id = ugm.groupId ";
 		sql += "where u.email = ? and u.passwordDigest is not null ";

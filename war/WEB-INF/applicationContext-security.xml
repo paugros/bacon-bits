@@ -34,7 +34,7 @@
 </beans:bean>
 
 <beans:bean id="saltSource" class="org.springframework.security.authentication.dao.ReflectionSaltSource">
-	<beans:property name="userPropertyToUse" value="username"/>
+	<beans:property name="userPropertyToUse" value="salt"/>
 </beans:bean>
 
 <beans:bean id="customUserDetailsService" class="com.areahomeschoolers.baconbits.server.spring.CustomUserDetailsService">

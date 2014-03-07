@@ -23,6 +23,7 @@ public final class User extends EntityDto<User> implements HasAddress {
 	private String passwordDigest;
 	private String homePhone;
 	private String facebookUrl;
+	private String guid;
 
 	// address
 	private String address;
@@ -200,6 +201,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public String getGroupsText() {
 		return groupsText;
+	}
+
+	public String getGuid() {
+		return guid;
 	}
 
 	public String getHomePhone() {
@@ -452,6 +457,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public void setGroupsText(String groupsText) {
 		this.groupsText = groupsText;
+	}
+
+	public void setGuid(String guid) {
+		this.guid = guid;
 	}
 
 	public void setHomePhone(String homePhone) {
