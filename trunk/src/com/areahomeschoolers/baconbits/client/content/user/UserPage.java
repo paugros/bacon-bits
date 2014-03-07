@@ -69,6 +69,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -327,7 +328,7 @@ public class UserPage implements Page {
 				tabPanel.add("Groups", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
-						ArgMap<UserGroupArg> userArgs = new ArgMap<UserGroupArg>();
+						ArgMap<UserGroupArg> userArgs = new ArgMap<UserGroupArg>(Status.ACTIVE);
 						userArgs.put(UserGroupArg.USER_ID, user.getId());
 						final UserGroupTable groupsTable = new UserGroupTable(userArgs);
 						groupsTable.setUser(user);
@@ -539,6 +540,29 @@ public class UserPage implements Page {
 				tabPanel.add("Privacy", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
+						String helpText = "<p><b>Public</b><br>Choosing to make your information 'Public' is exactly what it \n";
+						helpText += "sounds like: anyone, including people off of Citrus Group's Network, will be able to see it. \n";
+						helpText += "Choosing to make your information 'Public' also means that this information: \n";
+						helpText += "<ul><li>can be associated with you (i.e., your name, profile pictures, etc.) even off Citrus Groups; \n";
+						helpText += "<li>can show up when someone does a search on Citrus Groups or on a public search engine;</ul></p> \n";
+						helpText += "<p><b>All network members</b><br>Choosing to make your information available \n";
+						helpText += "to 'All network members' means any member logged into the Citrus Group's community of sites will be able to see it.</p>\n";
+						helpText += "<p><b>All my groups</b><br>Choosing to make your information available to 'All my groups' \n";
+						helpText += "will allow all current and future members within the groups with which you are associated to see \n";
+						helpText += "your information. To see a listing of all members in your groups, access the group \n";
+						helpText += "member listing page.</p>\n";
+						helpText += "<p><b>Members of</b><br>You can select a specific pre-established  group to share your information with.</p>\n";
+						helpText += "<p><b>Private</b><br>Information can only be seen by you, and administrators.</p>";
+						HTML help = new HTML(helpText);
+						help.getElement().getStyle().setMargin(10, Unit.PX);
+						help.getElement().getStyle().setPadding(10, Unit.PX);
+						help.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+						help.getElement().getStyle().setBorderColor("#cccccc");
+						help.getElement().getStyle().setBorderWidth(1, Unit.PX);
+						help.getElement().getStyle().setBackgroundColor("#ffffff");
+						help.addStyleName("smallText");
+						help.setWidth("600px");
+
 						FieldTable ft = new FieldTable();
 						ft.getFlexTable().setCellSpacing(8);
 						tabBody.add(WidgetFactory.newSection("Privacy Settings", ft, ContentWidth.MAXWIDTH900PX));
@@ -601,6 +625,8 @@ public class UserPage implements Page {
 							}
 						});
 						cb.setValue(user.getDirectoryOptOut(), true);
+
+						ft.addSpanningWidget(help);
 
 						tabPanel.selectTabNow(tabBody);
 					}

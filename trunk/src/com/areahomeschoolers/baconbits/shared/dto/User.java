@@ -24,6 +24,7 @@ public final class User extends EntityDto<User> implements HasAddress {
 	private String homePhone;
 	private String facebookUrl;
 	private String guid;
+	private boolean receiveNews;
 
 	// address
 	private String address;
@@ -284,6 +285,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 		return pp;
 	}
 
+	public boolean getReceiveNews() {
+		return receiveNews;
+	}
+
 	public boolean getResetPassword() {
 		return resetPassword;
 	}
@@ -519,6 +524,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public void setPrivacyPreferences(HashMap<PrivacyPreferenceType, PrivacyPreference> privacyPreferences) {
 		this.privacyPreferences = privacyPreferences;
+	}
+
+	public void setReceiveNews(boolean receiveNews) {
+		this.receiveNews = receiveNews;
 	}
 
 	public void setResetPassword(boolean resetPassword) {

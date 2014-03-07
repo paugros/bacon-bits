@@ -41,6 +41,7 @@ import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class UserFieldTable extends FieldTable {
 	private User user;
@@ -164,12 +165,21 @@ public class UserFieldTable extends FieldTable {
 		addField(sexField);
 
 		final MonthYearPicker birthDateInput = new MonthYearPicker();
+		VerticalPanel ep = new VerticalPanel();
+		if (!Application.isAuthenticated() && !user.isSaved()) {
+			Label explain = new Label("To confirm you are over 13 years old");
+			explain.addStyleName("smallText");
+			ep.add(explain);
+		}
+		ep.add(birthDateInput);
 		birthDateInput.setRequired(true);
 		birthDateInput.setEarliestMonth(Application.getApplicationData().getAdultBirthYear(), 1);
 		birthDateInput.getYearPicker().getListBox().insertItem("Adult", Integer.toString(Application.getApplicationData().getAdultBirthYear() - 1), 1);
 
 		final Label birthDateDisplay = new Label();
-		final FormField birthDateField = form.createFormField("Birth month / year:", birthDateInput, birthDateDisplay);
+
+		final FormField birthDateField = form.createFormField("Birth month / year:", ep, birthDateDisplay);
+		birthDateField.setValidator(birthDateInput.getValidator());
 		birthDateField.setRequired(true);
 		birthDateField.setInitializer(new Command() {
 			@Override
