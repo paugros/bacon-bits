@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -750,7 +751,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		if (user.getPassword() != null) {
-			String digest = getSha1Hash(user.getPassword(), user.getEmail());
+			user.setGuid(UUID.randomUUID().toString());
+			String digest = getSha1Hash(user.getPassword(), user.getGuid());
 			if (user.getPasswordDigest() != null && user.getPasswordDigest().equals(digest)) {
 				retData.addError("Password must be different from the current password.");
 				return retData;
@@ -782,7 +784,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
 			sql += "birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex, showUserAgreement = :showUserAgreement, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
-			sql += "directoryOptOut = :directoryOptOut, facebookUrl = :facebookUrl where id = :id";
+			sql += "directoryOptOut = :directoryOptOut, facebookUrl = :facebookUrl, guid = :guid where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (user.getStartDate() == null) {
@@ -797,11 +799,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				user.setImageId(Constants.BLANK_PROFILE_FEMALE_LARGE);
 			}
 			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
-			sql += "isSystemAdministrator, resetPassword, birthDate, parentId, sex, ";
+			sql += "isSystemAdministrator, resetPassword, birthDate, parentId, sex, guid, ";
 			sql += "address, street, city, state, zip, lat, lng, ";
 			sql += "imageId, smallImageId, directoryOptOut, showUserAgreement) values ";
 			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
-			sql += ":systemAdministrator, :resetPassword, :birthDate, :parentId, :sex, ";
+			sql += ":systemAdministrator, :resetPassword, :birthDate, :parentId, :sex, :guid, ";
 			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
 			sql += ":imageId, :smallImageId, :directoryOptOut, :showUserAgreement)";
 
@@ -993,7 +995,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			int id = queryForInt(sql, userId, digest);
 			User u = queryForObject(createSqlBase() + "where u.id = ?", new InsecureUserMapper(), id);
 			sql = "update users set passwordDigest = ?, resetPassword = 1 where id = ?";
-			update(sql, UserDaoImpl.getSha1Hash(digest, u.getUserName()), id);
+			update(sql, UserDaoImpl.getSha1Hash(digest, u.getGuid()), id);
 
 			return u;
 		} catch (DataAccessException e) {
@@ -1327,6 +1329,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		user.setFirstName(rs.getString("firstName"));
 		user.setLastName(rs.getString("lastName"));
 		user.setPasswordDigest(rs.getString("passwordDigest"));
+		user.setGuid(rs.getString("guid"));
 		if (!security || user.userCanSee(cu, PrivacyPreferenceType.HOME_PHONE)) {
 			user.setHomePhone(rs.getString("homePhone"));
 		}
