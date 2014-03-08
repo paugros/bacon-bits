@@ -122,7 +122,23 @@ public final class Application implements ValueChangeHandler<String> {
 	}
 
 	public static boolean administratorOf(HasGroupOwnership item) {
-		return isAuthenticated() && applicationData.getCurrentUser().administratorOfAny(item.getGroupId(), item.getOwningOrgId());
+		if (!isAuthenticated()) {
+			return false;
+		}
+
+		if (applicationData.getCurrentUser().administratorOfAny(item.getGroupId(), item.getOwningOrgId())) {
+			return true;
+		}
+
+		if (item.getAddedById() == getCurrentUserId()) {
+			return true;
+		}
+
+		if (item.getId() == 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public static boolean administratorOf(Integer groupId) {

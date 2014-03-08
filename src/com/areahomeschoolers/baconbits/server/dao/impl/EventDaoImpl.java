@@ -922,7 +922,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			registration.setId(ServerUtils.getIdFromKeys(keys));
 
 			Event e = getById(registration.getEventId());
-
 			if (!Common.isNullOrBlank(e.getNotificationEmail()) && !e.isSeriesChild()) {
 				UserDao userDao = ServerContext.getDaoImpl("user");
 				User u = userDao.getById(registration.getAddedById());
@@ -1279,6 +1278,33 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 			if (oldStatusId != 3 && participant.getStatusId() == 5 && eventIsFull && (waitData.getInt("participants") == waitData.getInt("maxParticipants"))) {
 				registerNextWaitingParticipant(waitData);
+			}
+
+			if (participant.getStatusId() == 5 && oldStatusId != 5) {
+				sql = "select notificationEmail from events where id = ?";
+				String email = queryForObject(sql, ServerUtils.getStringRowMapper(), participant.getEventId());
+				if (!Common.isNullOrBlank(email)) {
+					Mailer mailer = new Mailer();
+					if (email.contains(",")) {
+						String[] addrs = email.split(", *");
+						for (String a : addrs) {
+							if (!a.trim().isEmpty()) {
+								mailer.addTo(a.trim());
+							}
+						}
+					} else {
+						mailer.addTo(email);
+					}
+					String subject = "Event registration CANCELED: " + participant.getEventTitle();
+
+					String body = "Registrant: " + participant.getFirstName() + " " + participant.getLastName() + "\n";
+					body += "Event: " + participant.getEventTitle() + "\n";
+					body += "Date: " + participant.getEventStartDate() + " to " + participant.getEventEndDate() + "\n";
+					body += "Link: " + ServerContext.getBaseUrl() + "#" + PageUrl.event(participant.getEventId()) + "\n";
+					mailer.setSubject(subject);
+					mailer.setBody(body);
+					mailer.send();
+				}
 			}
 		} else {
 			// validate for time overlaps

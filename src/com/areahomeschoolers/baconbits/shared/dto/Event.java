@@ -106,6 +106,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return addedByFullName;
 	}
 
+	@Override
 	public int getAddedById() {
 		return addedById;
 	}
@@ -365,7 +366,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	}
 
 	public boolean isSeriesChild() {
-		return seriesId != null && seriesId != getId();
+		return getSeriesId() != null && getSeriesId() != getId();
 	}
 
 	public void setActive(boolean active) {

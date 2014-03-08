@@ -36,7 +36,6 @@ import com.areahomeschoolers.baconbits.server.dao.BookDao;
 import com.areahomeschoolers.baconbits.server.dao.DocumentDao;
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
 import com.areahomeschoolers.baconbits.server.dao.Suggestible;
-import com.areahomeschoolers.baconbits.server.dao.TagDao;
 import com.areahomeschoolers.baconbits.server.util.Mailer;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
@@ -44,7 +43,6 @@ import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
@@ -55,7 +53,6 @@ import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.appengine.api.images.Image;
 import com.google.appengine.api.images.ImagesServiceFactory;
@@ -137,12 +134,6 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 		if (bookId > 0) {
 			pd.setBook(getById(bookId));
-
-			// tags
-			TagDao tagDao = ServerContext.getDaoImpl("tag");
-			ArgMap<TagArg> tagArgs = new ArgMap<TagArg>(TagArg.ENTITY_ID, pd.getBook().getId());
-			tagArgs.put(TagArg.MAPPING_TYPE, TagMappingType.BOOK.toString());
-			pd.setTags(tagDao.list(tagArgs));
 		}
 
 		String sql = "select * from bookCategories order by category";
@@ -171,7 +162,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 		String sql = "select b.id, b.title as Suggestion, 'Book' as entityType ";
 		sql += "from books b ";
+		sql += "join users u on u.id = b.userId ";
 		sql += "where b.statusId = 1 and b.title like ? ";
+		sql += "and b.userId in(select userId from userGroupMembers where groupId = " + Constants.ONLINE_BOOK_SELLERS_GROUP_ID + ") ";
+		sql += "and isActive(u.startDate, u.endDate) = 1 ";
 		sql += "order by b.title ";
 		sql += "limit " + Integer.toString(limit + 1);
 
@@ -189,7 +183,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 		String sql = "select bb.*, (select group_concat(groupName separator ', ') from groups g \n";
 		sql += "join userGroupMembers ugm on ugm.groupId = g.id \n";
-		sql += "where bb.userId = ugm.userId and g.id in(16, 17)) as groups  from \n";
+		sql += "where bb.userId = ugm.userId and g.id in(" + Constants.ONLINE_BOOK_SELLERS_GROUP_ID + ", " + Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID
+				+ ")) as groups  from \n";
 		sql += "(select count(b.id) as total, sum(b.price) as totalPrice, b.userId, u.firstName, u.lastName \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
@@ -273,7 +268,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		}
 
 		if (hideOffline) {
-			sql += "and b.userId in(select userId from userGroupMembers where groupId = 16) and isActive(u.startDate, u.endDate) = 1 ";
+			sql += "and b.userId in(select userId from userGroupMembers where groupId = " + Constants.ONLINE_BOOK_SELLERS_GROUP_ID + ") ";
+			sql += "and isActive(u.startDate, u.endDate) = 1 ";
 		}
 
 		if (newNumber > 0) {

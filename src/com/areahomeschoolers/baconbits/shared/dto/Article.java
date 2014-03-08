@@ -42,6 +42,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return addedByFirstName;
 	}
 
+	@Override
 	public int getAddedById() {
 		return addedById;
 	}

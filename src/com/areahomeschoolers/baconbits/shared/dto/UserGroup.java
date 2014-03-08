@@ -161,6 +161,11 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	}
 
 	@Override
+	public int getAddedById() {
+		return -1;
+	}
+
+	@Override
 	public String getAddress() {
 		return address;
 	}
