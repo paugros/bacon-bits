@@ -26,6 +26,7 @@ public class MainMenuItem extends EntityDto<MainMenuItem> implements HasGroupOwn
 		subItems.add(item);
 	}
 
+	@Override
 	public int getAddedById() {
 		return addedById;
 	}

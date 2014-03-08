@@ -233,8 +233,11 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "Calendar", PageUrl.eventCalendar());
 		addLinkToMenu(menu, "News", PageUrl.news(0));
 
-		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
+		if (Application.isAuthenticated() && Application.isCitrus()) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
+		}
+
+		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Registration Management", PageUrl.registrationManagement());
 		}
 

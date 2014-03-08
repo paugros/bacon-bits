@@ -784,7 +784,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
 			sql += "birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex, showUserAgreement = :showUserAgreement, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
-			sql += "directoryOptOut = :directoryOptOut, facebookUrl = :facebookUrl, guid = :guid where id = :id";
+			sql += "directoryOptOut = :directoryOptOut, receiveNews = :receiveNews, facebookUrl = :facebookUrl, guid = :guid where id = :id";
 			update(sql, namedParams);
 		} else {
 			if (user.getStartDate() == null) {
@@ -1364,6 +1364,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		user.setImageId(rs.getInt("imageId"));
 		user.setSmallImageId(rs.getInt("smallImageId"));
 		user.setDirectoryOptOut(rs.getBoolean("directoryOptOut"));
+		user.setReceiveNews(rs.getBoolean("receiveNews"));
 		return user;
 	}
 

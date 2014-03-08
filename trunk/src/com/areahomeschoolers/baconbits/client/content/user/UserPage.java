@@ -626,6 +626,22 @@ public class UserPage implements Page {
 						});
 						cb.setValue(user.getDirectoryOptOut(), true);
 
+						CheckBox rb = new CheckBox("Send me information about news and events");
+						rb.setValue(user.getReceiveNews());
+						ft.addField("", rb);
+
+						rb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+							@Override
+							public void onValueChange(ValueChangeEvent<Boolean> event) {
+								user.setReceiveNews(event.getValue());
+								userService.save(user, new Callback<ServerResponseData<User>>(false) {
+									@Override
+									protected void doOnSuccess(ServerResponseData<User> result) {
+									}
+								});
+							}
+						});
+
 						ft.addSpanningWidget(help);
 
 						tabPanel.selectTabNow(tabBody);
