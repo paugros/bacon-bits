@@ -158,15 +158,21 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 
 	@Override
 	public Data getUnpaidBalance(int userId) {
-		String sql = "select count(p.id) as itemCount, sum(case isnull(a.price) when true then (e.price + e.markup) else (a.price + a.markup) end) as balance \n";
+		String sql = "select sum(itemCount) as itemCount, sum(balance) as balance from ( \n";
+		sql += "select count(p.id) as itemCount, sum(case isnull(a.price) when true then (e.price + e.markup) else (a.price + a.markup) end) as balance \n";
 		sql += "from eventRegistrationParticipants p \n";
 		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 		sql += "join events e on e.id = r.eventId \n";
 		sql += "left join eventAgeGroups a on a.id = p.ageGroupId \n";
-		sql += "where e.active = 1 and r.addedById = ? and p.statusId = 1";
+		sql += "where e.active = 1 and r.addedById = ? and p.statusId = 1 \n";
+		sql += "union all \n";
+		sql += "select count(b.id) as itemCount, sum(b.price) as balance \n";
+		sql += "from books b \n";
+		sql += "join bookShoppingCart bc on bc.bookId = b.id and bc.userId = ? \n";
+		sql += "where b.statusId = 1)  as tbl;";
 
-		return queryForObject(sql, ServerUtils.getGenericRowMapper(), userId);
+		return queryForObject(sql, ServerUtils.getGenericRowMapper(), userId, userId);
 	}
 
 	@Override

@@ -33,6 +33,7 @@ public final class Book extends EntityDto<Book> {
 
 	// auxillary
 	private String amazonNewPrice, amazonUsedPrice;
+	private String shippingFrom;
 	private String amazonUrl;
 	private String userFirstName, userLastName;
 	private String userEmail;
@@ -40,6 +41,7 @@ public final class Book extends EntityDto<Book> {
 	private String category;
 	private String gradeLevel;
 	private String condition;
+	private boolean inMyShoppingCart;
 
 	public Book() {
 
@@ -112,6 +114,10 @@ public final class Book extends EntityDto<Book> {
 		return imageUrl;
 	}
 
+	public boolean getInMyShoppingCart() {
+		return inMyShoppingCart;
+	}
+
 	public String getIsbn() {
 		return isbn;
 	}
@@ -134,6 +140,10 @@ public final class Book extends EntityDto<Book> {
 
 	public String getPublisher() {
 		return publisher;
+	}
+
+	public String getShippingFrom() {
+		return shippingFrom;
 	}
 
 	public Integer getSmallImageId() {
@@ -244,6 +254,10 @@ public final class Book extends EntityDto<Book> {
 		this.imageUrl = imageUrl;
 	}
 
+	public void setInMyShoppingCart(boolean inMyShoppingCart) {
+		this.inMyShoppingCart = inMyShoppingCart;
+	}
+
 	public void setIsbn(String isbn) {
 		this.isbn = isbn;
 	}
@@ -266,6 +280,10 @@ public final class Book extends EntityDto<Book> {
 
 	public void setPublisher(String publisher) {
 		this.publisher = publisher;
+	}
+
+	public void setShippingFrom(String shippingFrom) {
+		this.shippingFrom = shippingFrom;
 	}
 
 	public void setSmallImageId(Integer smallImageId) {

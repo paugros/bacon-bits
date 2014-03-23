@@ -29,6 +29,11 @@ public class BookServiceImpl extends GwtController implements BookService {
 	}
 
 	@Override
+	public Boolean addBookToCart(int bookId, int userId) {
+		return dao.addBookToCart(bookId, userId);
+	}
+
+	@Override
 	public void delete(Book book) {
 		dao.delete(book);
 	}
@@ -56,6 +61,11 @@ public class BookServiceImpl extends GwtController implements BookService {
 	@Override
 	public ArrayList<Book> list(ArgMap<BookArg> args) {
 		return dao.list(args);
+	}
+
+	@Override
+	public void removeBookFromCart(int bookId, int userId) {
+		dao.removeBookFromCart(bookId, userId);
 	}
 
 	@Override

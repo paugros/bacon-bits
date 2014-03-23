@@ -17,6 +17,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("service/book")
 public interface BookService extends RemoteService {
+	public Boolean addBookToCart(int bookId, int userId);
+
 	public void delete(Book book);
 
 	public Book fetchGoogleData(Book b);
@@ -28,6 +30,8 @@ public interface BookService extends RemoteService {
 	public ArrayList<Data> getSummaryData(ArgMap<BookArg> args);
 
 	public ArrayList<Book> list(ArgMap<BookArg> args);
+
+	public void removeBookFromCart(int bookId, int userId);
 
 	public Book save(Book book);
 

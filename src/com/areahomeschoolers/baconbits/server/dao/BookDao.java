@@ -10,6 +10,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 
 public interface BookDao {
+	public Boolean addBookToCart(int bookId, int userId);
+
 	public void delete(Book book);
 
 	public Book fetchGoogleData(Book b);
@@ -21,6 +23,8 @@ public interface BookDao {
 	public ArrayList<Data> getSummaryData(ArgMap<BookArg> args);
 
 	public ArrayList<Book> list(ArgMap<BookArg> args);
+
+	public void removeBookFromCart(int bookId, int userId);
 
 	public Book save(Book book);
 
