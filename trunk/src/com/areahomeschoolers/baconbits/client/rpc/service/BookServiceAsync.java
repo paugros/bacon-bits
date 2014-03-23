@@ -28,5 +28,9 @@ public interface BookServiceAsync {
 
 	public void signUpToSell(int groupOption, AsyncCallback<PaypalData> callback);
 
+	void addBookToCart(int bookId, int userId, AsyncCallback<Boolean> callback);
+
 	void fetchGoogleData(Book b, AsyncCallback<Book> callback);
+
+	void removeBookFromCart(int bookId, int userId, AsyncCallback<Void> callback);
 }

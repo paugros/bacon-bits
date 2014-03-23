@@ -189,7 +189,7 @@ public class CellTitleBar<T extends EntityDto<T>> extends TitleBar {
 			searchControl.addFocusHandler(new FocusHandler() {
 				@Override
 				public void onFocus(FocusEvent event) {
-					if (searchControl.getElement().getStyle().getColor().equals(defaultColor)) {
+					if (searchControl.getText().equals(defaultText)) {
 						searchControl.setText("");
 						searchControl.getElement().getStyle().setColor("#000000");
 						searchControl.getElement().getStyle().setFontStyle(FontStyle.NORMAL);

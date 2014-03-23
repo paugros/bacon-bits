@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -95,6 +96,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			book.setDescription(rs.getString("description"));
 			book.setPageCount(rs.getInt("pageCount"));
 			book.setGoogleCategories(rs.getString("googleCategories"));
+			book.setInMyShoppingCart(rs.getBoolean("inMyShoppingCart"));
+			book.setShippingFrom(rs.getString("shippingFrom"));
 			return book;
 		}
 	}
@@ -105,6 +108,22 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	@Autowired
 	public BookDaoImpl(DataSource dataSource) {
 		super(dataSource);
+	}
+
+	@Override
+	public Boolean addBookToCart(int bookId, int userId) {
+		String sql = "select count(*) from books where statusId = 1 and id = ?";
+		if (queryForInt(0, sql, bookId) == 0) {
+			return false;
+		}
+
+		sql = "insert into bookShoppingCart(bookId, userId) values(?, ?)";
+		try {
+			update(sql, bookId, userId);
+		} catch (DataIntegrityViolationException e) {
+		}
+
+		return true;
 	}
 
 	@Override
@@ -221,6 +240,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		int gradeLevelId = args.getInt(BookArg.GRADE_LEVEL_ID);
 		String priceBetween = args.getString(BookArg.PRICE_BETWEEN);
 		boolean hideOffline = args.getBoolean(BookArg.ONLINE_ONLY);
+		boolean inMyCart = args.getBoolean(BookArg.IN_MY_CART);
 		int newNumber = args.getInt(BookArg.NEW_NUMBER);
 		List<Integer> ids = args.getIntList(BookArg.IDS);
 		int withinMiles = args.getInt(BookArg.WITHIN_MILES);
@@ -237,6 +257,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		if (userId > 0) {
 			sql += "and b.userId = ? ";
 			sqlArgs.add(userId);
+		}
+
+		if (inMyCart) {
+			sql += "and bsc.id is not null ";
 		}
 
 		if (priceBetween != null) {
@@ -282,11 +306,18 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 		if (newNumber > 0) {
 			sql += "order by b.addedDate desc limit " + newNumber;
+		} else if (inMyCart) {
+			sql += "order by b.userId";
 		}
 
 		ArrayList<Book> data = query(sql, new BookMapper(), sqlArgs.toArray());
 
 		return data;
+	}
+
+	@Override
+	public void removeBookFromCart(int bookId, int userId) {
+		update("delete from bookShoppingCart where userId = ? and bookId = ?", userId, bookId);
 	}
 
 	@Override
@@ -432,17 +463,18 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	private String createSqlBase(String specialCols) {
-		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, ";
+		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, case when bsc.id is null then 0 else 1 end as inMyShoppingCart, ";
 		if (!Common.isNullOrBlank(specialCols)) {
 			sql += specialCols;
 		}
-		sql += "u.firstName, u.lastName, u.email, bo.bookCondition \n";
+		sql += "u.firstName, u.lastName, u.email, concat(u.city, ', ', u.state) as shippingFrom, bo.bookCondition \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
 		sql += "join bookStatus bs on bs.id = b.statusId \n";
 		sql += "join bookCategories bc on bc.id = b.categoryId \n";
 		sql += "left join bookGradeLevels ba on ba.id = b.gradeLevelId \n";
 		sql += "left join bookConditions bo on bo.id = b.conditionId \n";
+		sql += "left join bookShoppingCart bsc on bsc.bookId = b.id and bsc.userId = " + ServerContext.getCurrentUserId() + " \n";
 		sql += "where 1 = 1 \n";
 
 		return sql;

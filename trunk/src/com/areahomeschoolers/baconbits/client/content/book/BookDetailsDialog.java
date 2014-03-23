@@ -1,8 +1,10 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ButtonPanel;
+import com.areahomeschoolers.baconbits.client.widgets.BuyBookWidget;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultDialog;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
@@ -100,19 +102,27 @@ public class BookDetailsDialog extends DefaultDialog {
 
 		dt.add(new HTML("&nbsp;"));
 
+		VerticalPanel ddt = new VerticalPanel();
+		ddt.setSpacing(6);
+
+		if (Application.isSystemAdministrator()) {
+			ddt.add(new BuyBookWidget(book));
+		}
+
 		ClickLabel contact = new ClickLabel("Contact seller", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				BookTable.showEmailDialog(book);
 			}
 		});
-		dt.add(contact);
+		ddt.add(contact);
 
 		Hyperlink link = new Hyperlink("See all from this seller", PageUrl.bookSearch() + "&sellerId=" + book.getUserId());
-		dt.add(link);
+		ddt.add(link);
+
+		dt.add(ddt);
 
 		pp.add(dt);
-
 		vp.add(pp);
 
 		if (!Common.isNullOrBlank(book.getDescription())) {
