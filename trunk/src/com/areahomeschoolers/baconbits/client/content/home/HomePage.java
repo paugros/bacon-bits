@@ -88,7 +88,7 @@ public class HomePage implements Page {
 			Application.refreshSecurityGroups(new Command() {
 				@Override
 				public void execute() {
-					if (Application.memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
+					if (signedUpForBooks()) {
 						String text = "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>Book Store -> My Books</b> menu option.";
 						HTML label = new HTML(text);
 						label.setWidth("300px");
@@ -105,6 +105,10 @@ public class HomePage implements Page {
 					}
 				}
 			});
+		}
+
+		if (Url.getBooleanParameter("bookSaleSignup") && !signedUpForBooks()) {
+			new SellBooksMiniModule().showDialog();
 		}
 
 		centerPanel.setSpacing(10);
@@ -127,8 +131,7 @@ public class HomePage implements Page {
 				leftPanel.add(new CitrusMiniModule());
 
 				// book promo
-				if (!Application.isAuthenticated()
-						|| !Application.getCurrentUser().memberOfAny(Constants.ONLINE_BOOK_SELLERS_GROUP_ID, Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID)) {
+				if (!Application.isAuthenticated() || !signedUpForBooks()) {
 					leftPanel.add(new SellBooksMiniModule());
 				}
 
@@ -231,5 +234,13 @@ public class HomePage implements Page {
 		groupsTable.setTitle("Our Groups");
 
 		return WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH750PX);
+	}
+
+	private boolean signedUpForBooks() {
+		if (!Application.isAuthenticated()) {
+			return false;
+		}
+
+		return Application.getCurrentUser().memberOfAny(Constants.ONLINE_BOOK_SELLERS_GROUP_ID, Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID);
 	}
 }

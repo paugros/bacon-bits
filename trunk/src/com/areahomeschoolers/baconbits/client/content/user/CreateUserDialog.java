@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
@@ -62,6 +63,10 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 					AlertDialog.alert("Children under the age of 13 must have their account created by a parent or guardian.");
 					form.getSubmitButton().setEnabled(true);
 					return;
+				}
+
+				if (Url.getIntegerParameter("aagrp") > 0) {
+					entity.setAutoAddToGroupId(Url.getIntegerParameter("aagrp"));
 				}
 
 				AddressField.validateAddress(entity, new Command() {

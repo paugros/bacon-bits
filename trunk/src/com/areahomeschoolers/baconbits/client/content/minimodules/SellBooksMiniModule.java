@@ -47,83 +47,7 @@ public class SellBooksMiniModule extends Composite {
 		Button payButton = new Button("Sign Up ($5.00)", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (!Application.isAuthenticated()) {
-					LoginDialog.showLogin();
-					return;
-				}
-
-				articleService.getById(Constants.BOOK_TC_ARTICLE_ID, new Callback<Article>() {
-					@Override
-					protected void doOnSuccess(Article result) {
-						VerticalPanel content = new VerticalPanel();
-						content.setWidth("500px");
-						content.setSpacing(8);
-						DefaultDialog dialog = new DefaultDialog();
-
-						dialog.setText(result.getTitle());
-
-						dialog.setWidget(content);
-						content.add(new MaxHeightScrollPanel(new HTML(result.getArticle())));
-
-						PaddedPanel pp = new PaddedPanel();
-						pp.add(new Label("I want to sell books"));
-						final DefaultListBox lb = new DefaultListBox();
-						lb.addItem("at both the physical sale and online", 1);
-						lb.addItem("online only", 2);
-						lb.addItem("at the physical sale only", 3);
-						pp.add(lb);
-						content.add(pp);
-
-						CheckBox cb = new CheckBox("I accept the terms and conditions above");
-						content.add(cb);
-
-						ButtonPanel bp = new ButtonPanel(dialog);
-						bp.getCloseButton().setText("Cancel");
-						final Button confirm = new Button("Confirm");
-						bp.addRightButton(confirm);
-						confirm.setEnabled(false);
-						cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-							@Override
-							public void onValueChange(ValueChangeEvent<Boolean> event) {
-								confirm.setEnabled(event.getValue());
-							}
-						});
-
-						content.add(bp);
-
-						confirm.addClickHandler(new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								confirm.setEnabled(false);
-
-								if (paying) {
-									return;
-								}
-
-								paying = true;
-
-								bookService.signUpToSell(lb.getIntValue(), new Callback<PaypalData>() {
-									@Override
-									protected void doOnFailure(Throwable caught) {
-										super.doOnFailure(caught);
-										paying = false;
-									}
-
-									@Override
-									protected void doOnSuccess(PaypalData result) {
-										if (result.getAuthorizationUrl() != null) {
-											Window.Location.replace(result.getAuthorizationUrl());
-										} else {
-											HistoryToken.set(PageUrl.home() + "&ps=return");
-										}
-									}
-								});
-							}
-						});
-
-						dialog.center();
-					}
-				});
+				showDialog();
 			}
 		});
 
@@ -132,6 +56,87 @@ public class SellBooksMiniModule extends Composite {
 		vp.add(payButton);
 
 		initWidget(vp);
+	}
+
+	public void showDialog() {
+		if (!Application.isAuthenticated()) {
+			LoginDialog.showLogin();
+			return;
+		}
+
+		articleService.getById(Constants.BOOK_TC_ARTICLE_ID, new Callback<Article>() {
+			@Override
+			protected void doOnSuccess(Article result) {
+				VerticalPanel content = new VerticalPanel();
+				content.setWidth("500px");
+				content.setSpacing(8);
+				DefaultDialog dialog = new DefaultDialog();
+
+				dialog.setText(result.getTitle());
+
+				dialog.setWidget(content);
+				content.add(new MaxHeightScrollPanel(new HTML(result.getArticle())));
+
+				PaddedPanel pp = new PaddedPanel();
+				pp.add(new Label("I want to sell books"));
+				final DefaultListBox lb = new DefaultListBox();
+				lb.addItem("at both the physical sale and online", 1);
+				lb.addItem("online only", 2);
+				lb.addItem("at the physical sale only", 3);
+				pp.add(lb);
+				content.add(pp);
+
+				CheckBox cb = new CheckBox("I accept the terms and conditions above");
+				content.add(cb);
+
+				ButtonPanel bp = new ButtonPanel(dialog);
+				bp.getCloseButton().setText("Cancel");
+				final Button confirm = new Button("Confirm");
+				bp.addRightButton(confirm);
+				confirm.setEnabled(false);
+				cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+					@Override
+					public void onValueChange(ValueChangeEvent<Boolean> event) {
+						confirm.setEnabled(event.getValue());
+					}
+				});
+
+				content.add(bp);
+
+				confirm.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						confirm.setEnabled(false);
+
+						if (paying) {
+							return;
+						}
+
+						paying = true;
+
+						bookService.signUpToSell(lb.getIntValue(), new Callback<PaypalData>() {
+							@Override
+							protected void doOnFailure(Throwable caught) {
+								super.doOnFailure(caught);
+								paying = false;
+							}
+
+							@Override
+							protected void doOnSuccess(PaypalData result) {
+								if (result.getAuthorizationUrl() != null) {
+									Window.Location.replace(result.getAuthorizationUrl());
+								} else {
+									HistoryToken.set(PageUrl.home() + "&ps=return");
+								}
+							}
+						});
+					}
+				});
+
+				dialog.center();
+			}
+		});
+
 	}
 
 }
