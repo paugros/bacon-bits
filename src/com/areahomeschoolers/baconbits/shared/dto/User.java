@@ -61,6 +61,8 @@ public final class User extends EntityDto<User> implements HasAddress {
 	private HashSet<AccessLevel> accessLevels;
 	private boolean isChild;
 	private int age;
+	// special flag to indicate incoming user should be auto-added to a group
+	private int autoAddToGroupId;
 	// only for group membership listings
 	private boolean userApproved;
 	private boolean groupApproved;
@@ -144,6 +146,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public int getAge() {
 		return age;
+	}
+
+	public int getAutoAddToGroupId() {
+		return autoAddToGroupId;
 	}
 
 	public Date getBirthDate() {
@@ -406,6 +412,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	public void setAutoAddToGroupId(int autoAddToGroupId) {
+		this.autoAddToGroupId = autoAddToGroupId;
 	}
 
 	public void setBirthDate(Date birthDate) {

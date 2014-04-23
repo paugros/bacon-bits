@@ -840,6 +840,17 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			}
 
 			updateUserGroupRelation(returnUser, group, true);
+
+			// auto-associate user to a certain group, if requested
+			if (user.getAutoAddToGroupId() > 0) {
+				args.put(UserGroupArg.ID, user.getAutoAddToGroupId());
+				group = listGroups(args).get(0);
+
+				group.setUserApproved(true);
+				group.setGroupApproved(true);
+
+				updateUserGroupRelation(returnUser, group, true);
+			}
 		}
 
 		// update the user cache (using insecure mapper to ensure all data is present)
