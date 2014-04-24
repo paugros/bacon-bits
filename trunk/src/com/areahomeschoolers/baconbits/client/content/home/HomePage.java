@@ -89,7 +89,7 @@ public class HomePage implements Page {
 				@Override
 				public void execute() {
 					if (signedUpForBooks()) {
-						String text = "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>Book Store -> My Books</b> menu option.";
+						String text = "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>My Items -> Books</b> menu option.";
 						HTML label = new HTML(text);
 						label.setWidth("300px");
 						AlertDialog dialog = new AlertDialog("Thanks!", label);

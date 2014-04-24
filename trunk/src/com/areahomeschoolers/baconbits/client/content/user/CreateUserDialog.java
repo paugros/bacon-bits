@@ -85,7 +85,9 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 								loginService.login(entity.getUserName(), entity.getPassword(), new Callback<Boolean>() {
 									@Override
 									protected void doOnSuccess(Boolean result) {
-										HistoryToken.set(PageUrl.user(savedUser.getId()) + "&tab=7&gb=true", false);
+										if (!Url.getBooleanParameter("bookSaleSignup")) {
+											HistoryToken.set(PageUrl.user(savedUser.getId()) + "&tab=7&gb=true", false);
+										}
 										Window.Location.reload();
 									}
 								});
