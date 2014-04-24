@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.home;
 
+import java.util.ArrayList;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
@@ -17,6 +19,8 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
@@ -29,6 +33,8 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -109,6 +115,28 @@ public class HomePage implements Page {
 
 		if (Url.getBooleanParameter("bookSaleSignup") && !signedUpForBooks()) {
 			new SellBooksMiniModule().showDialog();
+		}
+
+		if (Url.getIntegerParameter("aagrp") > 0 && Application.isAuthenticated() && !Application.memberOf(Url.getIntegerParameter("aagrp"))) {
+			final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
+			userService.listGroups(new ArgMap<UserGroupArg>(UserGroupArg.ID, Url.getIntegerParameter("aagrp")), new Callback<ArrayList<UserGroup>>(false) {
+				@Override
+				protected void doOnSuccess(ArrayList<UserGroup> result) {
+					if (result.isEmpty()) {
+						return;
+					}
+
+					UserGroup g = result.get(0);
+					g.setUserApproved(true);
+					g.setGroupApproved(true);
+
+					userService.updateUserGroupRelation(Application.getCurrentUser(), g, true, new Callback<Void>(false) {
+						@Override
+						protected void doOnSuccess(Void result) {
+						}
+					});
+				}
+			});
 		}
 
 		centerPanel.setSpacing(10);
