@@ -9,6 +9,7 @@ import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.LazyLoadDialog;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 
@@ -53,6 +54,12 @@ public class BookEditDialog extends EntityEditDialog<Book> implements LazyLoadDi
 		});
 
 		getButtonPanel().getCloseButton().setText("Cancel");
+		getButtonPanel().addLeftButton(new Button("Help?", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				mailto(Constants.SUPPORT_EMAIL, "Adding books");
+			}
+		}));
 	}
 
 	@Override
@@ -84,6 +91,10 @@ public class BookEditDialog extends EntityEditDialog<Book> implements LazyLoadDi
 		}
 		super.setEntity(b);
 	}
+
+	private native void mailto(String address, String subject) /*-{
+		$wnd.location = "mailto:" + address + "?subject=" + subject;
+	}-*/;
 
 	@Override
 	protected Widget createContent() {
