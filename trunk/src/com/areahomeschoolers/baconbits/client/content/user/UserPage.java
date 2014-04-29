@@ -419,8 +419,11 @@ public class UserPage implements Page {
 					@Override
 					public void execute(VerticalPanel tabBody) {
 						Hyperlink link = new Hyperlink("Click here", PageUrl.article(65));
-						String html = link.toString() + " for book seller instructions.";
-						tabBody.add(new HTML(html));
+						String html = "<b>Need help?</b> " + link.toString() + " for book seller instructions, or ";
+						html += "<a href=\"mailto:" + Constants.SUPPORT_EMAIL + "?subject=Adding books\">contact us</a> with questions.";
+						HTML info = new HTML(html);
+						info.addStyleName("mediumText mediumPadding");
+						tabBody.add(info);
 
 						ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 						args.put(BookArg.USER_ID, user.getId());

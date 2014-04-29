@@ -32,6 +32,7 @@ public abstract class Constants {
 	public static final String CG_PAYPAL_EMAIL = "payments@citrusgroups.com";
 	public static final String BOOK_GROUP_OPTION_CACHE_KEY = "bookSellerGroupOption_";
 	public static final String SYSTEM_FROM_EMAIL = "kaugros@citrusgroups.com";
+	public static final String SUPPORT_EMAIL = "kaugros@citrusgroups.com";
 	public static final int DEFAULT_LOGO_ID = 1241;
 	public static final int ACCOUNT_CREATION_INSTRUCTIONS_ID = 77;
 	public static final int ONLINE_BOOK_SELLERS_GROUP_ID = 16;
