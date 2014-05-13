@@ -218,7 +218,7 @@ public class BookFieldTable extends FieldTable {
 				amazonPriceBox.setHTML("");
 
 				if (book.getAmazonUrl() != null) {
-					String html = "<a href=\"" + book.getAmazonUrl() + "\">Amazon prices:</a>&nbsp;";
+					String html = "<a href=\"" + book.getAmazonUrl() + "\" target=_blank>Amazon prices:</a>&nbsp;";
 					if (book.getAmazonNewPrice() != null) {
 						html += book.getAmazonNewPrice() + "&nbsp;new";
 					}
