@@ -304,7 +304,9 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			sql += "having distance < " + withinMiles + " ";
 		}
 
-		if (newNumber > 0) {
+		if (ids != null && !ids.isEmpty()) {
+			sql += "order by field(b.id, " + Common.join(ids, ", ") + ")";
+		} else if (newNumber > 0) {
 			sql += "order by b.addedDate desc limit " + newNumber;
 		} else if (inMyCart) {
 			sql += "order by b.userId";

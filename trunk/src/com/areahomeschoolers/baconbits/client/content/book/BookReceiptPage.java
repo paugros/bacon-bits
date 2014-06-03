@@ -1,5 +1,8 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
@@ -13,7 +16,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
-import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -22,6 +25,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -39,6 +43,8 @@ public final class BookReceiptPage implements Page {
 	private VerticalPanel page;
 	private BookTable table;
 	private PaddedPanel totalPanel = new PaddedPanel();
+	private static List<String> transactions = new ArrayList<>();
+	private static int showTransaction = 0;
 
 	public BookReceiptPage(final VerticalPanel p) {
 		if (!Application.administratorOf(17)) {
@@ -72,6 +78,46 @@ public final class BookReceiptPage implements Page {
 		hp.add(tb);
 		hp.add(submit);
 
+		if (!transactions.isEmpty()) {
+			PaddedPanel pp = new PaddedPanel(20);
+			pp.getElement().getStyle().setMarginLeft(20, Unit.PX);
+			if (showTransaction != 0) {
+				ClickLabel prev = new ClickLabel("<< Previous sale", new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						if (showTransaction == -1) {
+							showTransaction = transactions.size() - 1;
+						} else {
+							showTransaction -= 1;
+						}
+						Application.reloadPage();
+					}
+				});
+
+				pp.add(prev);
+			}
+
+			if (showTransaction > -1 && showTransaction < transactions.size()) {
+				ClickLabel next = new ClickLabel("Next sale >>", new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						if (showTransaction == transactions.size() - 1) {
+							showTransaction = -1;
+						} else {
+							showTransaction += 1;
+						}
+						Application.reloadPage();
+					}
+				});
+
+				pp.add(next);
+			}
+
+			if (pp.getWidgetCount() > 0) {
+				hp.add(pp);
+			}
+		}
+
 		tb.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
@@ -87,7 +133,7 @@ public final class BookReceiptPage implements Page {
 
 				PaddedPanel pp = new PaddedPanel();
 				if (table == null) {
-					ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
+					ArgMap<BookArg> args = new ArgMap<BookArg>();
 					table = new BookTable(args);
 					table.setOnDelete(new Command() {
 						@Override
@@ -97,7 +143,6 @@ public final class BookReceiptPage implements Page {
 					});
 					table.setDisplayColumns(BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.CONDITION, BookColumn.PRICE, BookColumn.DELETE_PURCHASE);
 					table.setTitle("Book Receipt");
-					table.disablePaging();
 					page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
 
 					table.addDataReturnHandler(new DataReturnHandler() {
@@ -111,6 +156,9 @@ public final class BookReceiptPage implements Page {
 				}
 
 				table.getArgMap().put(BookArg.IDS, tb.getText().replaceAll("\\+", ","));
+				table.disablePaging();
+				table.setSortingEnabled(false);
+
 				table.populate();
 
 				Label l = new Label("Email receipt to:");
@@ -140,19 +188,14 @@ public final class BookReceiptPage implements Page {
 						}
 
 						sell.setEnabled(false);
+
 						bookService.sellBooks(Common.asArrayList(table.getFullList()), emailBox.getValue(), new Callback<Void>() {
 							@Override
 							protected void doOnSuccess(Void result) {
-								Label ll = new Label("The books have been marked as sold and a receipt has been emailed.");
-								ll.setWidth("240px");
-								AlertDialog d = new AlertDialog("Success", ll);
-								d.getButton().addClickHandler(new ClickHandler() {
-									@Override
-									public void onClick(ClickEvent event) {
-										Application.reloadPage();
-									}
-								});
-								d.center();
+								transactions.add(table.getArgMap().getString(BookArg.IDS));
+								showTransaction = -1;
+
+								Application.reloadPage();
 							}
 						});
 					}
@@ -163,6 +206,17 @@ public final class BookReceiptPage implements Page {
 		});
 
 		page.add(hp);
+
+		if (!transactions.isEmpty() && showTransaction > -1) {
+			tb.setText(transactions.get(showTransaction));
+			Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+				@Override
+				public void execute() {
+					submit.click();
+				}
+			});
+		}
+
 	}
 
 	private void populateTotalPanel() {
