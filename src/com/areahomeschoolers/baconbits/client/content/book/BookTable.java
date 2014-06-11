@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
+import java.util.Date;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
@@ -43,7 +45,7 @@ import com.google.gwt.user.client.ui.Widget;
 public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
 		IMAGE("Image"), USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade Level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE(
-				"Price"), PRICE("Price"), CONTACT("Contact Seller"), DELETE(""), DELETE_PURCHASE("");
+				"Price"), PRICE("Price"), ADDED_DATE("Added"), CONTACT("Contact Seller"), DELETE(""), DELETE_PURCHASE("");
 
 		private String title;
 
@@ -194,6 +196,15 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 						return cl;
 					}
 				});
+				break;
+			case ADDED_DATE:
+				addDateTimeColumn(col, new ValueGetter<Date, Book>() {
+					@Override
+					public Date get(Book item) {
+						return item.getAddedDate();
+					}
+				});
+
 				break;
 			case IMAGE:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
