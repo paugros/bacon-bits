@@ -474,7 +474,7 @@ public class UserPage implements Page {
 						table.removeColumn(BookColumn.USER);
 						table.populate();
 
-						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1100PX));
 						tabPanel.selectTabNow(tabBody);
 					}
 				});
