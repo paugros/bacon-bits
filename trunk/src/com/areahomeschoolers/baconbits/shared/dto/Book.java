@@ -28,6 +28,7 @@ public final class Book extends EntityDto<Book> {
 	private String publisher;
 	private Date publishDate;
 	private String description;
+	private Date addedDate;
 	private int pageCount;
 	private String googleCategories;
 
@@ -45,6 +46,10 @@ public final class Book extends EntityDto<Book> {
 
 	public Book() {
 
+	}
+
+	public Date getAddedDate() {
+		return addedDate;
 	}
 
 	public String getAmazonNewPrice() {
@@ -196,6 +201,10 @@ public final class Book extends EntityDto<Book> {
 
 	public boolean isActive() {
 		return true;
+	}
+
+	public void setAddedDate(Date addedDate) {
+		this.addedDate = addedDate;
 	}
 
 	public void setAmazonNewPrice(String amazonNewPrice) {

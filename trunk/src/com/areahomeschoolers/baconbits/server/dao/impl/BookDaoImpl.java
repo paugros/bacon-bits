@@ -98,6 +98,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			book.setGoogleCategories(rs.getString("googleCategories"));
 			book.setInMyShoppingCart(rs.getBoolean("inMyShoppingCart"));
 			book.setShippingFrom(rs.getString("shippingFrom"));
+			book.setAddedDate(rs.getTimestamp("addedDate"));
 			return book;
 		}
 	}
