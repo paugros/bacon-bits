@@ -74,6 +74,13 @@ public final class BookManagementPage implements Page {
 						return item.getDouble("totalPrice");
 					}
 				});
+
+				addTotaledCurrencyColumn("15%", new ValueGetter<Number, Data>() {
+					@Override
+					public Number get(Data item) {
+						return item.getDouble("totalPrice") * 0.15;
+					}
+				});
 			}
 		};
 
