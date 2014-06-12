@@ -204,7 +204,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		String sql = "select bb.*, (select group_concat(groupName separator ', ') from groups g \n";
 		sql += "join userGroupMembers ugm on ugm.groupId = g.id \n";
 		sql += "where bb.userId = ugm.userId and g.id in(" + Constants.ONLINE_BOOK_SELLERS_GROUP_ID + ", " + Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID
-				+ ")) as groups  from \n";
+				+ ", 31)) as groups  from \n";
 		sql += "(select count(b.id) as total, sum(b.price) as totalPrice, b.userId, u.firstName, u.lastName \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
@@ -218,7 +218,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		}
 
 		if (soldAtBookSale) {
-			sql += "and b.soldAtBookSale = 1 \n";
+			sql += "and b.soldAtBookSale = 1 and soldDate > date_add(now(), interval -6 month) \n";
 		}
 
 		if (soldOnline) {
