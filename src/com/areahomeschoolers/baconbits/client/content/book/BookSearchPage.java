@@ -1,24 +1,23 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
+import java.util.ArrayList;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.Sidebar;
 import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
-import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
-import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -28,6 +27,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -35,13 +35,16 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public final class BookSearchPage implements Page {
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
-	private BookTable table = new BookTable(args);
 	private VerticalPanel optionsPanel = new VerticalPanel();
 	private PaddedPanel top = new PaddedPanel(15);
 	private PaddedPanel bottom = new PaddedPanel(15);
+	private VerticalPanel bookPanel = new VerticalPanel();
 	private int sellerId = Url.getIntegerParameter("sellerId");
+	private VerticalPanel page;
+	private boolean pageSet = false;
 
-	public BookSearchPage(final VerticalPanel page) {
+	public BookSearchPage(final VerticalPanel p) {
+		page = p;
 		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			args.put(BookArg.ONLINE_ONLY);
 		}
@@ -73,7 +76,7 @@ public final class BookSearchPage implements Page {
 					@Override
 					public void onChange(ChangeEvent event) {
 						args.put(BookArg.CATEGORY_ID, category.getIntValue());
-						table.populate();
+						populate();
 					}
 				});
 				category.addItem("all categories", 0);
@@ -86,7 +89,7 @@ public final class BookSearchPage implements Page {
 					@Override
 					public void onChange(ChangeEvent event) {
 						args.put(BookArg.GRADE_LEVEL_ID, grade.getIntValue());
-						table.populate();
+						populate();
 					}
 				});
 				grade.addItem("all grades", 0);
@@ -103,7 +106,7 @@ public final class BookSearchPage implements Page {
 						} else {
 							args.put(BookArg.PRICE_BETWEEN, price.getValue());
 						}
-						table.populate();
+						populate();
 					}
 				});
 				price.addItem("all prices");
@@ -133,7 +136,7 @@ public final class BookSearchPage implements Page {
 					public void onChange(ChangeEvent event) {
 						args.put(BookArg.WITHIN_MILES, milesInput.getIntValue());
 						if (!locationInput.getText().isEmpty()) {
-							table.populate();
+							populate();
 						}
 					}
 				});
@@ -143,7 +146,7 @@ public final class BookSearchPage implements Page {
 					public void execute() {
 						args.remove(BookArg.WITHIN_LAT);
 						args.remove(BookArg.WITHIN_LNG);
-						table.populate();
+						populate();
 					}
 				});
 
@@ -153,7 +156,7 @@ public final class BookSearchPage implements Page {
 						args.put(BookArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
 						args.put(BookArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
 						args.put(BookArg.WITHIN_MILES, milesInput.getIntValue());
-						table.populate();
+						populate();
 					}
 				});
 
@@ -162,7 +165,7 @@ public final class BookSearchPage implements Page {
 				bottom.add(new Label("miles of"));
 				bottom.add(locationInput);
 				bottom.add(new Label("with text"));
-				bottom.add(table.getTitleBar().extractSearchControl());
+				// bottom.add(table.getTitleBar().extractSearchControl());
 
 				for (int i = 0; i < bottom.getWidgetCount(); i++) {
 					bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
@@ -174,27 +177,36 @@ public final class BookSearchPage implements Page {
 			}
 		});
 
-		final String title = "Books";
+		bookPanel.setWidth("100%");
+		page.add(bookPanel);
 
-		table.setDisplayColumns(BookColumn.IMAGE, BookColumn.USER, BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.GRADE_LEVEL, BookColumn.PRICE,
-				BookColumn.CONTACT);
-		table.setTitle(title);
-		table.getTitleBar().addExcelControl();
-		table.getTitleBar().addSearchControl();
-		ContentWidth width = Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS) ? ContentWidth.MAXWIDTH1200PX : ContentWidth.MAXWIDTH1000PX;
-		page.add(WidgetFactory.newSection(table, width));
+		populate();
+	}
 
-		table.addDataReturnHandler(new DataReturnHandler() {
+	private void populate() {
+		bookService.list(args, new Callback<ArrayList<Book>>() {
 			@Override
-			public void onDataReturn() {
-				Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.NEW_BOOKS, MiniModule.SELL_BOOKS);
-				if (Application.isAuthenticated()) {
-					sb.add(MiniModule.ACTIVE_USERS);
+			protected void doOnSuccess(ArrayList<Book> books) {
+				bookPanel.clear();
+
+				for (int i = 0; i < books.size(); i += 2) {
+					HorizontalPanel hp = new HorizontalPanel();
+					hp.add(new BookTile(books.get(i)));
+					if (i < books.size()) {
+						hp.add(new BookTile(books.get(i + 1)));
+					}
+					bookPanel.add(hp);
 				}
-				Application.getLayout().setPage(title, sb, page);
+
+				if (!pageSet) {
+					Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.NEW_BOOKS, MiniModule.SELL_BOOKS);
+					if (Application.isAuthenticated()) {
+						sb.add(MiniModule.ACTIVE_USERS);
+					}
+					Application.getLayout().setPage("Books", sb, page);
+					pageSet = true;
+				}
 			}
 		});
-
-		table.populate();
 	}
 }

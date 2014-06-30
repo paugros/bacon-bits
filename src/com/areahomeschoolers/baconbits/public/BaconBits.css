@@ -503,8 +503,8 @@ img {
 }
 
 .boxedBlurb {
-	background-color: #c5eabf;
-	border: 1px solid #a5c99e;
+	background-color: #efefef;
+	border: 1px solid #cccccc;
 	padding: 18px;
 	-webkit-border-radius: 14px; 
 	-moz-border-radius: 14px;
