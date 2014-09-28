@@ -2,6 +2,8 @@ package com.areahomeschoolers.baconbits.client.rpc.service;
 
 import java.util.ArrayList;
 
+import com.areahomeschoolers.baconbits.shared.dto.Ad;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.AdArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
@@ -16,9 +18,13 @@ public interface ArticleServiceAsync {
 
 	public void save(Article article, AsyncCallback<Article> callback);
 
+	void getAds(ArgMap<AdArg> args, AsyncCallback<ArrayList<Ad>> callback);
+
 	void getComments(ArgMap<ArticleArg> args, AsyncCallback<ArrayList<NewsBulletinComment>> callback);
 
 	void hideComment(int commentId, AsyncCallback<Void> callback);
+
+	void saveAd(Ad ad, AsyncCallback<Ad> callback);
 
 	void saveComment(NewsBulletinComment comment, AsyncCallback<NewsBulletinComment> callback);
 }
