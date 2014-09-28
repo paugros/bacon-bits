@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.server.dao.ArticleDao;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
+import com.areahomeschoolers.baconbits.shared.dto.Ad;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.AdArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
@@ -25,6 +27,11 @@ public class ArticleServiceImpl extends GwtController implements ArticleService 
 	@Autowired
 	public ArticleServiceImpl(ArticleDao dao) {
 		this.dao = dao;
+	}
+
+	@Override
+	public ArrayList<Ad> getAds(ArgMap<AdArg> args) {
+		return dao.getAds(args);
 	}
 
 	@Override
@@ -50,6 +57,11 @@ public class ArticleServiceImpl extends GwtController implements ArticleService 
 	@Override
 	public Article save(Article article) {
 		return dao.save(article);
+	}
+
+	@Override
+	public Ad saveAd(Ad ad) {
+		return dao.saveAd(ad);
 	}
 
 	@Override
