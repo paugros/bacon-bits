@@ -17,6 +17,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("service/article")
 public interface ArticleService extends RemoteService {
+	public void clickAd(int adId);
+
 	public ArrayList<Ad> getAds(ArgMap<AdArg> args);
 
 	public Article getById(int articleId);

@@ -12,6 +12,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
 
 public interface ArticleDao {
+	public void clickAd(int adId);
+
 	public ArrayList<Ad> getAds(ArgMap<AdArg> args);
 
 	public Article getById(int articleId);

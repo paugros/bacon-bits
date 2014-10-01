@@ -2,6 +2,7 @@ package com.areahomeschoolers.baconbits.client.widgets;
 
 import com.areahomeschoolers.baconbits.client.content.document.FileUploadDialog;
 import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -17,7 +18,7 @@ import com.google.gwt.user.client.ui.Image;
 public class EditableImage extends Composite {
 	private Image image;
 	private UploadCompleteHandler uploadCompleteHandler;
-	private int docId;
+	private Integer docId;
 	private int entId;
 	private DocumentLinkType linkType;
 
@@ -26,7 +27,12 @@ public class EditableImage extends Composite {
 		entId = entityId;
 		linkType = documentLinkType;
 
-		image = new Image(Constants.DOCUMENT_URL_PREFIX + docId);
+		if (docId == null || docId == 0) {
+			image = new Image(MainImageBundle.INSTANCE.upload());
+		} else {
+			image = new Image(Constants.DOCUMENT_URL_PREFIX + docId);
+		}
+
 		initWidget(image);
 
 		if (!editable) {

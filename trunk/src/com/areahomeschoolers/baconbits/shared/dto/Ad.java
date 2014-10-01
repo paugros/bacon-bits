@@ -19,9 +19,10 @@ public final class Ad extends EntityDto<Ad> {
 	// auxiliary
 	private String addedByFirstName;
 	private String addedByLastName;
-	private int documentId;
+	private Integer documentId;
 	private int clickCount;
 	private Date lastClickDate;
+	private String url;
 
 	public Ad() {
 
@@ -47,7 +48,10 @@ public final class Ad extends EntityDto<Ad> {
 		return clickCount;
 	}
 
-	public int getDocumentId() {
+	public Integer getDocumentId() {
+		if (documentId == null || documentId == 0) {
+			return null;
+		}
 		return documentId;
 	}
 
@@ -69,6 +73,10 @@ public final class Ad extends EntityDto<Ad> {
 
 	public String getTitle() {
 		return title;
+	}
+
+	public String getUrl() {
+		return url;
 	}
 
 	public boolean isActive() {
@@ -95,6 +103,10 @@ public final class Ad extends EntityDto<Ad> {
 		this.clickCount = clickCount;
 	}
 
+	public void setDocumentId(Integer documentId) {
+		this.documentId = documentId;
+	}
+
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
@@ -113,6 +125,10 @@ public final class Ad extends EntityDto<Ad> {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 }

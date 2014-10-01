@@ -93,6 +93,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource swap();
 
+	ImageResource upload();
+
 	ImageResource user();
 
 	ImageResource verticalDragHandle();
