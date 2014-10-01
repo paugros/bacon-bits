@@ -52,6 +52,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			ad.setAddedByLastName(rs.getString("lastName"));
 			ad.setClickCount(rs.getInt("clickCount"));
 			ad.setLastClickDate(rs.getTimestamp("lastClickDate"));
+			ad.setUrl(rs.getString("url"));
+			ad.setDocumentId(rs.getInt("documentId"));
 			return ad;
 		}
 	}
@@ -104,6 +106,15 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		super(dataSource);
 	}
 
+	@Override
+	public void clickAd(int adId) {
+		String sql = "update ads set clickCount = clickCount + 1, lastClickDate = now() where id = ?";
+		update(sql, adId);
+
+		sql = "insert into adClicks (adId, ipAddress, clickDate) values(?, ?, now())";
+		update(sql, adId, ServerContext.getRequest().getRemoteAddr());
+	}
+
 	public String createSqlBase() {
 		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, u.smallImageId, \n";
 		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
@@ -127,7 +138,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		int limit = args.getInt(AdArg.LIMIT);
 		boolean random = args.getBoolean(AdArg.RANDOM);
 
-		String sql = "select a.*, u.firstName, u.lastName, \n";
+		String sql = "select a.*, u.firstName, u.lastName \n";
 		sql += "from ads a \n";
 		sql += "join users u on u.id = a.addedById \n";
 		sql += "where 1 = 1 ";
@@ -331,7 +342,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(ad);
 
 		if (ad.isSaved()) {
-			String sql = "update ads set title = :title, startDate = :startDate, endDate = :endDate ";
+			String sql = "update ads set title = :title, startDate = :startDate, endDate = :endDate, url = :url ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -341,8 +352,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			ad.setAddedById(ServerContext.getCurrentUserId());
 			ad.setOwningOrgId(ServerContext.getCurrentOrgId());
 
-			String sql = "insert into ads (addedById, startDate, endDate, addedDate, title, owningOrgId) values ";
-			sql += "(:addedById, :startDate, :endDate, now(), :title, :owningOrgId)";
+			String sql = "insert into ads (addedById, startDate, endDate, addedDate, title, url, owningOrgId) values ";
+			sql += "(:addedById, :startDate, :endDate, now(), :title, :url, :owningOrgId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

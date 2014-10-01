@@ -18,6 +18,8 @@ public interface ArticleServiceAsync {
 
 	public void save(Article article, AsyncCallback<Article> callback);
 
+	void clickAd(int adId, AsyncCallback<Void> callback);
+
 	void getAds(ArgMap<AdArg> args, AsyncCallback<ArrayList<Ad>> callback);
 
 	void getComments(ArgMap<ArticleArg> args, AsyncCallback<ArrayList<NewsBulletinComment>> callback);

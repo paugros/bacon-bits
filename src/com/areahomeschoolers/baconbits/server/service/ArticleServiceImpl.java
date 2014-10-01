@@ -30,6 +30,11 @@ public class ArticleServiceImpl extends GwtController implements ArticleService 
 	}
 
 	@Override
+	public void clickAd(int adId) {
+		dao.clickAd(adId);
+	}
+
+	@Override
 	public ArrayList<Ad> getAds(ArgMap<AdArg> args) {
 		return dao.getAds(args);
 	}
