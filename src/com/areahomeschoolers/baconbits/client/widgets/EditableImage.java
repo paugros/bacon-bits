@@ -22,7 +22,7 @@ public class EditableImage extends Composite {
 	private int entId;
 	private DocumentLinkType linkType;
 
-	public EditableImage(DocumentLinkType documentLinkType, int entityId, int documentId, boolean editable) {
+	public EditableImage(DocumentLinkType documentLinkType, int entityId, Integer documentId, boolean editable) {
 		docId = documentId;
 		entId = entityId;
 		linkType = documentLinkType;

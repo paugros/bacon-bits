@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
 import com.areahomeschoolers.baconbits.client.content.minimodules.ActiveUsersMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CommunityEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.LinksMiniModule;
@@ -170,6 +171,9 @@ public class HomePage implements Page {
 				HTML logos = new HTML(pageData.getPartners().getArticle());
 				leftPanel.add(logos);
 				leftPanel.setCellHorizontalAlignment(logos, HasHorizontalAlignment.ALIGN_CENTER);
+
+				// ad
+				rightPanel.add(new AdsMiniModule());
 
 				// links
 				rightPanel.add(new LinksMiniModule());

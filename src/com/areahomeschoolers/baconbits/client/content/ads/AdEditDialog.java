@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable.LabelColumnWidth;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.dto.Ad;
@@ -71,6 +72,24 @@ public class AdEditDialog extends EntityEditDialog<Ad> {
 			}
 		});
 		ft.addField(titleField);
+
+		final Label descriptionDisplay = new Label();
+		final MaxLengthTextArea descriptionInput = new MaxLengthTextArea(500);
+		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
+		descriptionField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				descriptionDisplay.setText(entity.getDescription());
+				descriptionInput.setText(entity.getDescription());
+			}
+		});
+		descriptionField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				entity.setDescription(descriptionInput.getText());
+			}
+		});
+		ft.addField(descriptionField);
 
 		final Label urlDisplay = new Label();
 		final TextBox urlInput = new TextBox();
