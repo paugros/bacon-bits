@@ -23,6 +23,7 @@ public final class Ad extends EntityDto<Ad> {
 	private int clickCount;
 	private Date lastClickDate;
 	private String url;
+	private String description;
 
 	public Ad() {
 
@@ -46,6 +47,10 @@ public final class Ad extends EntityDto<Ad> {
 
 	public int getClickCount() {
 		return clickCount;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 
 	public Integer getDocumentId() {
@@ -101,6 +106,10 @@ public final class Ad extends EntityDto<Ad> {
 
 	public void setClickCount(int clickCount) {
 		this.clickCount = clickCount;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setDocumentId(Integer documentId) {

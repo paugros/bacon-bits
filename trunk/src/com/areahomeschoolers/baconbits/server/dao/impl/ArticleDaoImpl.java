@@ -54,6 +54,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			ad.setLastClickDate(rs.getTimestamp("lastClickDate"));
 			ad.setUrl(rs.getString("url"));
 			ad.setDocumentId(rs.getInt("documentId"));
+			ad.setDescription(rs.getString("description"));
 			return ad;
 		}
 	}
@@ -342,7 +343,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(ad);
 
 		if (ad.isSaved()) {
-			String sql = "update ads set title = :title, startDate = :startDate, endDate = :endDate, url = :url ";
+			String sql = "update ads set title = :title, startDate = :startDate, endDate = :endDate, url = :url, description = :description ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -352,8 +353,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			ad.setAddedById(ServerContext.getCurrentUserId());
 			ad.setOwningOrgId(ServerContext.getCurrentOrgId());
 
-			String sql = "insert into ads (addedById, startDate, endDate, addedDate, title, url, owningOrgId) values ";
-			sql += "(:addedById, :startDate, :endDate, now(), :title, :url, :owningOrgId)";
+			String sql = "insert into ads (addedById, startDate, endDate, addedDate, title, url, owningOrgId, description) values ";
+			sql += "(:addedById, :startDate, :endDate, now(), :title, :url, :owningOrgId, :description)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
