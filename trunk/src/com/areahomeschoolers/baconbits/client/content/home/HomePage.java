@@ -42,7 +42,9 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.core.client.ScriptInjector;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
@@ -156,33 +158,6 @@ public class HomePage implements Page {
 		grid.getCellFormatter().setVerticalAlignment(0, 2, HasVerticalAlignment.ALIGN_TOP);
 		page.add(grid);
 
-		// rafflecopter
-		String html = "<a class=\"rafl\" href=\"http://www.rafflecopter.com/rafl/display/797bf8a71/\" id=\"rc-797bf8a71\" rel=\"nofollow\">a Rafflecopter giveaway</a>";
-		HTML raffle = new HTML(html);
-		raffle.addAttachHandler(new Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-						@Override
-						public void execute() {
-							ScriptInjector.fromUrl("//widget.rafflecopter.com/load.js").setCallback(new com.google.gwt.core.client.Callback<Void, Exception>() {
-								@Override
-								public void onFailure(Exception reason) {
-								}
-
-								@Override
-								public void onSuccess(Void result) {
-								}
-							}).inject();
-						}
-					});
-				}
-			}
-		});
-
-		centerPanel.add(raffle);
-
 		eventService.getHomePageData(new Callback<HomePageData>() {
 			@Override
 			protected void doOnSuccess(HomePageData result) {
@@ -242,6 +217,9 @@ public class HomePage implements Page {
 				// introduction
 				centerPanel.add(new ArticleWidget(pageData.getIntro()));
 
+				// raffle
+				centerPanel.add(createRaffleWidget());
+
 				// news
 				centerPanel.add(new NewsModule());
 
@@ -298,6 +276,32 @@ public class HomePage implements Page {
 		groupsTable.setTitle("Our Groups");
 
 		return WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH750PX);
+	}
+
+	private Widget createRaffleWidget() {
+		// rafflecopter
+		String html = "<div id=raffle><a class=\"rafl\" href=\"http://www.rafflecopter.com/rafl/display/797bf8a71/\" id=\"rc-797bf8a71\" rel=\"nofollow\">a Rafflecopter giveaway</a></div>";
+
+		HTML raffle = new HTML(html);
+		raffle.addAttachHandler(new Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+						@Override
+						public void execute() {
+							Element head = Document.get().getElementById("raffle");
+							ScriptElement sce = Document.get().createScriptElement();
+							sce.setType("text/javascript");
+							sce.setSrc("//widget.rafflecopter.com/load.js");
+							head.appendChild(sce);
+						}
+					});
+				}
+			}
+		});
+
+		return raffle;
 	}
 
 	private boolean signedUpForBooks() {
