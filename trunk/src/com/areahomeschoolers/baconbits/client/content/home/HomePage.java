@@ -175,9 +175,9 @@ public class HomePage implements Page {
 				leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
 
 				// partner logos/links
-				HTML logos = new HTML(pageData.getPartners().getArticle());
-				leftPanel.add(logos);
-				leftPanel.setCellHorizontalAlignment(logos, HasHorizontalAlignment.ALIGN_CENTER);
+				// HTML logos = new HTML(pageData.getPartners().getArticle());
+				// leftPanel.add(logos);
+				// leftPanel.setCellHorizontalAlignment(logos, HasHorizontalAlignment.ALIGN_CENTER);
 
 				// ad
 				rightPanel.add(new AdsMiniModule());
