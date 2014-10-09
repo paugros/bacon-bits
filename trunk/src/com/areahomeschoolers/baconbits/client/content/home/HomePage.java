@@ -40,8 +40,13 @@ import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
@@ -150,6 +155,33 @@ public class HomePage implements Page {
 		grid.getCellFormatter().setVerticalAlignment(0, 1, HasVerticalAlignment.ALIGN_TOP);
 		grid.getCellFormatter().setVerticalAlignment(0, 2, HasVerticalAlignment.ALIGN_TOP);
 		page.add(grid);
+
+		// rafflecopter
+		String html = "<a class=\"rafl\" href=\"http://www.rafflecopter.com/rafl/display/797bf8a71/\" id=\"rc-797bf8a71\" rel=\"nofollow\">a Rafflecopter giveaway</a>";
+		HTML raffle = new HTML(html);
+		raffle.addAttachHandler(new Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+						@Override
+						public void execute() {
+							ScriptInjector.fromUrl("//widget.rafflecopter.com/load.js").setCallback(new com.google.gwt.core.client.Callback<Void, Exception>() {
+								@Override
+								public void onFailure(Exception reason) {
+								}
+
+								@Override
+								public void onSuccess(Void result) {
+								}
+							}).inject();
+						}
+					});
+				}
+			}
+		});
+
+		centerPanel.add(raffle);
 
 		eventService.getHomePageData(new Callback<HomePageData>() {
 			@Override
