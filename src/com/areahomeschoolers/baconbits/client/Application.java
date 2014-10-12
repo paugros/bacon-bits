@@ -89,6 +89,7 @@ public final class Application implements ValueChangeHandler<String> {
 	private static Command confirmNavigatonCommand;
 	private static PollUpdateData pollUpdateData = null;
 	private static List<HistoryEntry> historyEntries = new ArrayList<HistoryEntry>();
+	private static List<Timer> timers = new ArrayList<Timer>();
 
 	public static void addHistoryEntry(String title, String url) {
 		if (historyEntries == null) {
@@ -258,6 +259,11 @@ public final class Application implements ValueChangeHandler<String> {
 		createNewPage(HistoryToken.getElement("page"));
 	}
 
+	public static void scheduleRepeatingPageTimer(Timer t, int milliseconds) {
+		timers.add(t);
+		t.scheduleRepeating(milliseconds);
+	}
+
 	public static void setConfirmNavigation(boolean confirm) {
 		setConfirmNavigation(confirm, null);
 	}
@@ -286,6 +292,13 @@ public final class Application implements ValueChangeHandler<String> {
 		}
 		confirmNavigation = false;
 		confirmNavigationPreviousUrl = null;
+
+		if (!timers.isEmpty()) {
+			for (Timer t : timers) {
+				t.cancel();
+			}
+			timers.clear();
+		}
 
 		VerticalPanel vp = layout.getNewPagePanel();
 
