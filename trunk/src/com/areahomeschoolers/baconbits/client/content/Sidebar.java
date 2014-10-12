@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.minimodules.ActiveUsersMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CommunityEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.LinksMiniModule;
@@ -26,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class Sidebar extends Composite {
 	public enum MiniModule {
-		COMMUNITY_EVENTS, UPCOMING_EVENTS, LINKS, SELL_BOOKS, NEW_EVENTS, MY_EVENTS, CITRUS, NEW_USERS, NEW_BOOKS, ACTIVE_USERS;
+		COMMUNITY_EVENTS, UPCOMING_EVENTS, LINKS, SELL_BOOKS, NEW_EVENTS, MY_EVENTS, CITRUS, NEW_USERS, NEW_BOOKS, ACTIVE_USERS, ADS;
 	}
 
 	private static Map<MiniModule, Widget> cache = new HashMap<MiniModule, Widget>();
@@ -34,27 +35,26 @@ public class Sidebar extends Composite {
 	private static EnumSet<MiniModule> expireModules = EnumSet.of(MiniModule.COMMUNITY_EVENTS, MiniModule.UPCOMING_EVENTS, MiniModule.NEW_EVENTS,
 			MiniModule.MY_EVENTS, MiniModule.ACTIVE_USERS, MiniModule.NEW_USERS);
 	private static EnumSet<MiniModule> noCacheModules = EnumSet.of(MiniModule.ACTIVE_USERS);
-	private VerticalPanel vp = new VerticalPanel();
-	private SimplePanel container = new SimplePanel();
-
-	private static Timer timer = new Timer() {
-		@Override
-		public void run() {
-			for (MiniModule m : expireModules) {
-				cache.remove(m);
-			}
-		}
-	};
-
-	static {
-		timer.scheduleRepeating(10 * 60 * 1000);
-	}
 
 	public static Sidebar create(MiniModule... modules) {
 		return new Sidebar(modules);
 	}
 
+	private VerticalPanel vp = new VerticalPanel();
+
+	private SimplePanel container = new SimplePanel();
+
 	public Sidebar() {
+		Timer timer = new Timer() {
+			@Override
+			public void run() {
+				for (MiniModule m : expireModules) {
+					cache.remove(m);
+				}
+			}
+		};
+		Application.scheduleRepeatingPageTimer(timer, 10 * 60 * 1000);
+
 		container.setWidget(vp);
 		container.getElement().getStyle().setPaddingLeft(10, Unit.PX);
 		container.getElement().getStyle().setPaddingTop(10, Unit.PX);
@@ -79,6 +79,9 @@ public class Sidebar extends Composite {
 		}
 
 		switch (module) {
+		case ADS:
+			add(module, new AdsMiniModule());
+			break;
 		case COMMUNITY_EVENTS:
 			add(module, new CommunityEventsMiniModule());
 			break;

@@ -17,6 +17,7 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -27,28 +28,42 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class AdsMiniModule extends Composite {
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
+	private VerticalPanel sp = new VerticalPanel();
+	private ArgMap<AdArg> args = new ArgMap<AdArg>(Status.ACTIVE);
+	private Timer t = new Timer() {
+		@Override
+		public void run() {
+			populate();
+		}
+	};
 
 	public AdsMiniModule() {
-		final VerticalPanel sp = new VerticalPanel();
-
-		ArgMap<AdArg> args = new ArgMap<AdArg>(Status.ACTIVE);
 		args.put(AdArg.RANDOM);
 		args.put(AdArg.LIMIT, 2);
 		args.put(AdArg.OWNING_ORG_ID, Application.getCurrentOrgId());
 
-		articleService.getAds(args, new Callback<ArrayList<Ad>>() {
+		populate();
+
+		initWidget(sp);
+
+	}
+
+	private void populate() {
+		articleService.getAds(args, new Callback<ArrayList<Ad>>(false) {
 			@Override
 			protected void doOnSuccess(ArrayList<Ad> result) {
+				sp.clear();
+				sp.setSpacing(8);
+				sp.setStyleName("module");
+
 				if (result.isEmpty()) {
 					setVisible(false);
 					removeFromParent();
 					return;
 				}
 
-				sp.setSpacing(8);
 				VerticalPanel vp = new VerticalPanel();
 				vp.setWidth("100%");
-				sp.setStyleName("module");
 				sp.add(vp);
 				Label linkLabel = new Label("HOMESCHOOL DEALS");
 				linkLabel.addStyleName("moduleTitle");
@@ -87,10 +102,12 @@ public class AdsMiniModule extends Composite {
 					label.getElement().getStyle().setPaddingRight(10, Unit.PX);
 					vp.add(label);
 				}
+
+				if (!t.isRunning()) {
+					Application.scheduleRepeatingPageTimer(t, 10000);
+				}
 			}
 		});
-
-		initWidget(sp);
 	}
 
 }

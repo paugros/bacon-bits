@@ -15,7 +15,6 @@ import com.areahomeschoolers.baconbits.client.content.minimodules.MyEventsMiniMo
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.UpcomingEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
@@ -24,40 +23,24 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedVerticalPanel;
 import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
-import com.areahomeschoolers.baconbits.client.widgets.cellview.GenericCellTable;
-import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
-import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
-import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 public class HomePage implements Page {
 
@@ -186,7 +169,7 @@ public class HomePage implements Page {
 				rightPanel.add(new LinksMiniModule());
 
 				// upcoming
-				rightPanel.add(new UpcomingEventsMiniModule(pageData.getUpcomingEvents()));
+				// rightPanel.add(new UpcomingEventsMiniModule(pageData.getUpcomingEvents()));
 
 				// new users
 				if (Application.isAuthenticated()) {
@@ -218,15 +201,15 @@ public class HomePage implements Page {
 				centerPanel.add(new ArticleWidget(pageData.getIntro()));
 
 				// raffle
-				centerPanel.add(createRaffleWidget());
+				// centerPanel.add(createRaffleWidget());
 
 				// news
 				centerPanel.add(new NewsModule());
 
 				// our groups
-				if (Application.isCitrus()) {
-					centerPanel.add(createGroupsTable());
-				}
+				// if (Application.isCitrus()) {
+				// centerPanel.add(createGroupsTable());
+				// }
 
 				Application.getLayout().setPage("Home", page);
 			}
@@ -234,75 +217,76 @@ public class HomePage implements Page {
 
 	}
 
-	private Widget createGroupsTable() {
-		GenericCellTable groupsTable = new GenericCellTable() {
-			@Override
-			protected void fetchData() {
+	// private Widget createGroupsTable() {
+	// GenericCellTable groupsTable = new GenericCellTable() {
+	// @Override
+	// protected void fetchData() {
+	//
+	// }
+	//
+	// @Override
+	// protected void setColumns() {
+	// addCompositeWidgetColumn("Group Name", new WidgetCellCreator<Data>() {
+	// @Override
+	// protected Widget createWidget(Data item) {
+	// String url = "http://www." + item.get("orgDomain");
+	// if (Constants.CG_DOMAIN.equals(item.get("orgDomain")) || "myhomeschoolgroups.com".equals(item.get("orgDomain"))) {
+	// url = "http://" + item.get("orgSubDomain") + "." + item.get("orgDomain");
+	// }
+	// Anchor link = new Anchor(item.get("groupName"), url);
+	// return link;
+	// }
+	// });
+	//
+	// addTextColumn("Description", new ValueGetter<String, Data>() {
+	// @Override
+	// public String get(Data item) {
+	// return item.get("description");
+	// }
+	// });
+	//
+	// addNumberColumn("Members", new ValueGetter<Number, Data>() {
+	// @Override
+	// public Number get(Data item) {
+	// return item.getInt("memberCount");
+	// }
+	// }).setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
+	// }
+	// };
+	//
+	// groupsTable.populate(pageData.getGroups());
+	// groupsTable.disablePaging();
+	// groupsTable.setTitle("Our Groups");
+	//
+	// return WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH750PX);
+	// }
 
-			}
-
-			@Override
-			protected void setColumns() {
-				addCompositeWidgetColumn("Group Name", new WidgetCellCreator<Data>() {
-					@Override
-					protected Widget createWidget(Data item) {
-						String url = "http://www." + item.get("orgDomain");
-						if (Constants.CG_DOMAIN.equals(item.get("orgDomain")) || "myhomeschoolgroups.com".equals(item.get("orgDomain"))) {
-							url = "http://" + item.get("orgSubDomain") + "." + item.get("orgDomain");
-						}
-						Anchor link = new Anchor(item.get("groupName"), url);
-						return link;
-					}
-				});
-
-				addTextColumn("Description", new ValueGetter<String, Data>() {
-					@Override
-					public String get(Data item) {
-						return item.get("description");
-					}
-				});
-
-				addNumberColumn("Members", new ValueGetter<Number, Data>() {
-					@Override
-					public Number get(Data item) {
-						return item.getInt("memberCount");
-					}
-				}).setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
-			}
-		};
-
-		groupsTable.populate(pageData.getGroups());
-		groupsTable.disablePaging();
-		groupsTable.setTitle("Our Groups");
-
-		return WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH750PX);
-	}
-
-	private Widget createRaffleWidget() {
-		// rafflecopter
-		String html = "<div id=raffle><a class=\"rafl\" href=\"http://www.rafflecopter.com/rafl/display/797bf8a71/\" id=\"rc-797bf8a71\" rel=\"nofollow\">a Rafflecopter giveaway</a></div>";
-
-		HTML raffle = new HTML(html);
-		raffle.addAttachHandler(new Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-						@Override
-						public void execute() {
-							Element head = Document.get().getElementById("raffle");
-							ScriptElement sce = Document.get().createScriptElement();
-							sce.setType("text/javascript");
-							sce.setSrc("//widget.rafflecopter.com/load.js");
-							head.appendChild(sce);
-						}
-					});
-				}
-			}
-		});
-
-		return raffle;
-	}
+	// private Widget createRaffleWidget() {
+	// // rafflecopter
+	// String html =
+	// "<div id=raffle><a class=\"rafl\" href=\"http://www.rafflecopter.com/rafl/display/797bf8a71/\" id=\"rc-797bf8a71\" rel=\"nofollow\">a Rafflecopter giveaway</a></div>";
+	//
+	// HTML raffle = new HTML(html);
+	// raffle.addAttachHandler(new Handler() {
+	// @Override
+	// public void onAttachOrDetach(AttachEvent event) {
+	// if (event.isAttached()) {
+	// Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+	// @Override
+	// public void execute() {
+	// Element head = Document.get().getElementById("raffle");
+	// ScriptElement sce = Document.get().createScriptElement();
+	// sce.setType("text/javascript");
+	// sce.setSrc("//widget.rafflecopter.com/load.js");
+	// head.appendChild(sce);
+	// }
+	// });
+	// }
+	// }
+	// });
+	//
+	// return raffle;
+	// }
 
 	private boolean signedUpForBooks() {
 		if (!Application.isAuthenticated()) {

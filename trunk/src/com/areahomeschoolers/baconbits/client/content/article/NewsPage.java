@@ -118,7 +118,7 @@ public class NewsPage implements Page {
 			initSinglePage();
 		}
 
-		Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.NEW_EVENTS, MiniModule.UPCOMING_EVENTS);
+		Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.LINKS, MiniModule.ADS);
 		Application.getLayout().setPage("News Bulletin", sb, page);
 	}
 
