@@ -3,14 +3,6 @@ package com.areahomeschoolers.baconbits.shared.dto;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public interface Arg {
-	public enum AdArg implements Arg, IsSerializable {
-		ID, OWNING_ORG_ID, LIMIT, RANDOM;
-
-		private AdArg() {
-
-		}
-	}
-
 	public enum ArticleArg implements Arg, IsSerializable {
 		ARTICLE_ID, MOST_RECENT, IDS, OWNING_ORG_ID, NEWS_ONLY, COMMENT_ID, BEFORE_ID, BEFORE_DATE, AFTER_DATE, SEARCH;
 
@@ -46,6 +38,14 @@ public interface Arg {
 		USER_ID, STATUS_ID, TYPE_ID, ADJUSTMENT_ID;
 
 		private PaymentArg() {
+
+		}
+	}
+
+	public enum ResourceArg implements Arg, IsSerializable {
+		ID, LIMIT, RANDOM;
+
+		private ResourceArg() {
 
 		}
 	}

@@ -3,38 +3,35 @@ package com.areahomeschoolers.baconbits.client.content.ads;
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.ads.AdTable.AdColumn;
+import com.areahomeschoolers.baconbits.client.content.ads.ResourceTable.ResourceColumn;
 import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
-import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
-import com.areahomeschoolers.baconbits.shared.dto.Ad;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.AdArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
+import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
-public final class AdTable extends EntityCellTable<Ad, AdArg, AdColumn> {
-	public enum AdColumn implements EntityCellTableColumn<AdColumn> {
-		TITLE("Title"), ADDED_DATE("Added"), ADDED_BY("Added By"), END_DATE("End Date"), START_DATE("Start Date"), IMAGE("Image"), CLICK_COUNT("Click Count"), URL(
-				"URL");
+public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, ResourceColumn> {
+	public enum ResourceColumn implements EntityCellTableColumn<ResourceColumn> {
+		NAME("Title"), ADDED_DATE("Added"), END_DATE("End Date"), START_DATE("Start Date"), IMAGE("Image"), CLICK_COUNT("Click Count"), URL("URL");
 
 		private String title;
 
-		AdColumn(String title) {
+		ResourceColumn(String title) {
 			this.title = title;
 		}
 
@@ -46,53 +43,45 @@ public final class AdTable extends EntityCellTable<Ad, AdArg, AdColumn> {
 
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 
-	public AdTable(ArgMap<AdArg> args) {
+	public ResourceTable(ArgMap<ResourceArg> args) {
 		this();
 		setArgMap(args);
 	}
 
-	private AdTable() {
-		setTitle("Ads");
+	private ResourceTable() {
+		setTitle("Resources");
 
-		setDefaultSortColumn(AdColumn.ADDED_DATE, SortDirection.SORT_DESC);
-		setDisplayColumns(AdColumn.values());
+		setDefaultSortColumn(ResourceColumn.ADDED_DATE, SortDirection.SORT_DESC);
+		setDisplayColumns(ResourceColumn.values());
 
 		disablePaging();
 	}
 
 	@Override
 	protected void fetchData() {
-		articleService.getAds(getArgMap(), getCallback());
+		articleService.getResources(getArgMap(), getCallback());
 	}
 
 	@Override
 	protected void setColumns() {
-		for (AdColumn col : getDisplayColumns()) {
+		for (ResourceColumn col : getDisplayColumns()) {
 			switch (col) {
-			case ADDED_BY:
-				addCompositeWidgetColumn(col, new WidgetCellCreator<Ad>() {
-					@Override
-					protected Widget createWidget(Ad item) {
-						return new Hyperlink(item.getAddedByFirstName() + " " + item.getAddedByLastName(), PageUrl.user(item.getAddedById()));
-					}
-				});
-				break;
 			case ADDED_DATE:
-				addDateColumn(col, new ValueGetter<Date, Ad>() {
+				addDateColumn(col, new ValueGetter<Date, Resource>() {
 					@Override
-					public Date get(Ad item) {
+					public Date get(Resource item) {
 						return item.getAddedDate();
 					}
 				});
 				break;
-			case TITLE:
-				addCompositeWidgetColumn(col, new WidgetCellCreator<Ad>() {
+			case NAME:
+				addCompositeWidgetColumn(col, new WidgetCellCreator<Resource>() {
 					@Override
-					protected Widget createWidget(final Ad item) {
-						return new ClickLabel(item.getTitle(), new ClickHandler() {
+					protected Widget createWidget(final Resource item) {
+						return new ClickLabel(item.getName(), new ClickHandler() {
 							@Override
 							public void onClick(ClickEvent event) {
-								new AdEditDialog(item, new Command() {
+								new ResourceEditDialog(item, new Command() {
 									@Override
 									public void execute() {
 										populate();
@@ -104,26 +93,26 @@ public final class AdTable extends EntityCellTable<Ad, AdArg, AdColumn> {
 				});
 				break;
 			case END_DATE:
-				addDateColumn(col, new ValueGetter<Date, Ad>() {
+				addDateColumn(col, new ValueGetter<Date, Resource>() {
 					@Override
-					public Date get(Ad item) {
+					public Date get(Resource item) {
 						return item.getEndDate();
 					}
 				});
 				break;
 			case CLICK_COUNT:
-				addNumberColumn(col, new ValueGetter<Number, Ad>() {
+				addNumberColumn(col, new ValueGetter<Number, Resource>() {
 					@Override
-					public Number get(Ad item) {
+					public Number get(Resource item) {
 						return item.getClickCount();
 					}
 				}).setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
 				break;
 			case IMAGE:
-				addCompositeWidgetColumn(col, new WidgetCellCreator<Ad>() {
+				addCompositeWidgetColumn(col, new WidgetCellCreator<Resource>() {
 					@Override
-					protected Widget createWidget(final Ad item) {
-						final EditableImage image = new EditableImage(DocumentLinkType.AD, item.getId(), item.getDocumentId(), true);
+					protected Widget createWidget(final Resource item) {
+						final EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, item.getId(), item.getDocumentId(), true);
 						image.setUploadCompleteHandler(new UploadCompleteHandler() {
 							@Override
 							public void onUploadComplete(int documentId) {
@@ -136,17 +125,17 @@ public final class AdTable extends EntityCellTable<Ad, AdArg, AdColumn> {
 				});
 				break;
 			case START_DATE:
-				addDateColumn(col, new ValueGetter<Date, Ad>() {
+				addDateColumn(col, new ValueGetter<Date, Resource>() {
 					@Override
-					public Date get(Ad item) {
+					public Date get(Resource item) {
 						return item.getStartDate();
 					}
 				});
 				break;
 			case URL:
-				addWidgetColumn(col, new WidgetCellCreator<Ad>() {
+				addWidgetColumn(col, new WidgetCellCreator<Resource>() {
 					@Override
-					protected Widget createWidget(Ad item) {
+					protected Widget createWidget(Resource item) {
 						Anchor link = new Anchor(item.getUrl(), item.getUrl());
 						return link;
 					}

@@ -7,11 +7,11 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
-import com.areahomeschoolers.baconbits.shared.dto.Ad;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.AdArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
+import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class AdsMiniModule extends Composite {
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private VerticalPanel sp = new VerticalPanel();
-	private ArgMap<AdArg> args = new ArgMap<AdArg>(Status.ACTIVE);
+	private ArgMap<ResourceArg> args = new ArgMap<ResourceArg>(Status.ACTIVE);
 	private Timer t = new Timer() {
 		@Override
 		public void run() {
@@ -38,9 +38,8 @@ public class AdsMiniModule extends Composite {
 	};
 
 	public AdsMiniModule() {
-		args.put(AdArg.RANDOM);
-		args.put(AdArg.LIMIT, 2);
-		args.put(AdArg.OWNING_ORG_ID, Application.getCurrentOrgId());
+		args.put(ResourceArg.RANDOM);
+		args.put(ResourceArg.LIMIT, 2);
 
 		populate();
 
@@ -49,9 +48,9 @@ public class AdsMiniModule extends Composite {
 	}
 
 	private void populate() {
-		articleService.getAds(args, new Callback<ArrayList<Ad>>(false) {
+		articleService.getResources(args, new Callback<ArrayList<Resource>>(false) {
 			@Override
-			protected void doOnSuccess(ArrayList<Ad> result) {
+			protected void doOnSuccess(ArrayList<Resource> result) {
 				sp.clear();
 				sp.setSpacing(8);
 				sp.setStyleName("module");
@@ -70,7 +69,7 @@ public class AdsMiniModule extends Composite {
 				linkLabel.getElement().getStyle().setMarginBottom(8, Unit.PX);
 				vp.add(linkLabel);
 
-				for (final Ad ad : result) {
+				for (final Resource ad : result) {
 					if (ad.getDocumentId() != null) {
 						Image image = new Image();
 						image.setUrl(Document.toUrl(ad.getDocumentId()));
@@ -84,7 +83,7 @@ public class AdsMiniModule extends Composite {
 								// return;
 								// }
 
-								articleService.clickAd(ad.getId(), new Callback<Void>(false) {
+								articleService.clickResource(ad.getId(), new Callback<Void>(false) {
 									@Override
 									protected void doOnSuccess(Void result) {
 

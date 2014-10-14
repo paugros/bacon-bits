@@ -211,8 +211,8 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 					g.setLogoId(document.getId());
 					ServerContext.setCurrentOrg(g);
 					update(newsql, document.getId(), document.getLinkId());
-				} else if (document.getLinkType() == DocumentLinkType.AD) {
-					String newsql = "update ads set documentId = ? where id = ?";
+				} else if (document.getLinkType() == DocumentLinkType.RESOURCE) {
+					String newsql = "update resources set documentId = ? where id = ?";
 					update(newsql, document.getId(), document.getLinkId());
 				} else {
 					link(document);

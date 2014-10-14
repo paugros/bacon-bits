@@ -14,21 +14,21 @@ import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
-import com.areahomeschoolers.baconbits.shared.dto.Ad;
+import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class AdEditDialog extends EntityEditDialog<Ad> {
+public class ResourceEditDialog extends EntityEditDialog<Resource> {
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 
-	public AdEditDialog(Ad ad, final Command refreshCommand) {
+	public ResourceEditDialog(Resource ad, final Command refreshCommand) {
 		if (ad.isSaved()) {
-			setText("Edit Ad");
+			setText("Edit Resource");
 		} else {
-			setText("Add Ad");
+			setText("Resourced Resource");
 		}
 		setEntity(ad);
 
@@ -37,12 +37,11 @@ public class AdEditDialog extends EntityEditDialog<Ad> {
 			public void onFormSubmit(FormField formField) {
 				if (!entity.isSaved()) {
 					entity.setAddedById(Application.getCurrentUserId());
-					entity.setOwningOrgId(Application.getCurrentOrgId());
 				}
 
-				articleService.saveAd(entity, new Callback<Ad>() {
+				articleService.saveResource(entity, new Callback<Resource>() {
 					@Override
-					protected void doOnSuccess(Ad result) {
+					protected void doOnSuccess(Resource result) {
 						refreshCommand.execute();
 					}
 				});
@@ -58,17 +57,17 @@ public class AdEditDialog extends EntityEditDialog<Ad> {
 
 		final RequiredTextBox titleInput = new RequiredTextBox();
 		titleInput.setMaxLength(50);
-		FormField titleField = form.createFormField("Title:", titleInput, null);
+		FormField titleField = form.createFormField("Name:", titleInput, null);
 		titleField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				titleInput.setText(entity.getTitle());
+				titleInput.setText(entity.getName());
 			}
 		});
 		titleField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setTitle(titleInput.getText().trim());
+				entity.setName(titleInput.getText().trim());
 			}
 		});
 		ft.addField(titleField);
