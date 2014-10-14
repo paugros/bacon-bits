@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.content.Layout;
-import com.areahomeschoolers.baconbits.client.content.ads.AdManagementPage;
+import com.areahomeschoolers.baconbits.client.content.ads.ResourceManagementPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleGroupPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleListPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
@@ -339,8 +339,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new ArticleListPage(vp);
 		} else if ("News".equals(page)) {
 			new NewsPage(vp);
-		} else if ("AdManagement".equals(page)) {
-			new AdManagementPage(vp);
+		} else if ("ResourceManagement".equals(page)) {
+			new ResourceManagementPage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

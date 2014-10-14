@@ -150,7 +150,7 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "List Groups", PageUrl.userGroupList());
 
 		if (Application.isSystemAdministrator()) {
-			addLinkToMenu(menu, "Ad Management", PageUrl.adManagement());
+			addLinkToMenu(menu, "Resource Management", PageUrl.resourceManagement());
 			menu.addItem("Change Logo", new ScheduledCommand() {
 				@Override
 				public void execute() {

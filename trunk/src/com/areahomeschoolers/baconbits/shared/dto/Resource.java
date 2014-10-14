@@ -18,7 +18,14 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	private String description;
 	private String phone;
 	private String name;
-	private int categoryId;
+
+	private int categoryId = 8;
+	private int clickCount;
+	private Date lastClickDate;
+	private Integer documentId;
+
+	private Date startDate;
+	private Date endDate;
 
 	// address
 	private String address;
@@ -68,8 +75,27 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		return city;
 	}
 
+	public int getClickCount() {
+		return clickCount;
+	}
+
 	public String getDescription() {
 		return description;
+	}
+
+	public Integer getDocumentId() {
+		if (documentId == null || documentId == 0) {
+			return null;
+		}
+		return documentId;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public Date getLastClickDate() {
+		return lastClickDate;
 	}
 
 	@Override
@@ -88,6 +114,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public String getPhone() {
 		return phone;
+	}
+
+	public Date getStartDate() {
+		return startDate;
 	}
 
 	@Override
@@ -140,8 +170,24 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		this.city = city;
 	}
 
+	public void setClickCount(int clickCount) {
+		this.clickCount = clickCount;
+	}
+
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public void setDocumentId(Integer documentId) {
+		this.documentId = documentId;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public void setLastClickDate(Date lastClickDate) {
+		this.lastClickDate = lastClickDate;
 	}
 
 	@Override
@@ -160,6 +206,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
 	}
 
 	@Override

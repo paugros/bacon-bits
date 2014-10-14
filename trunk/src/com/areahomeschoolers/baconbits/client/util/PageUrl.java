@@ -2,10 +2,6 @@ package com.areahomeschoolers.baconbits.client.util;
 
 public class PageUrl {
 
-	public static String adManagement() {
-		return "page=AdManagement";
-	}
-
 	public static String article(int id) {
 		String url = "page=Article";
 		return (id == 0) ? url : url + "&articleId=" + id;
@@ -64,6 +60,10 @@ public class PageUrl {
 
 	public static String registrationManagement() {
 		return "page=RegistrationManagement";
+	}
+
+	public static String resourceManagement() {
+		return "page=ResourceManagement";
 	}
 
 	public static String user(int id) {
