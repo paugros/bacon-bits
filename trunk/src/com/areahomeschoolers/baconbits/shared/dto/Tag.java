@@ -6,7 +6,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 
 public class Tag extends EntityDto<Tag> {
 	public enum TagMappingType {
-		USER, ARTICLE, EVENT, BOOK;
+		USER, ARTICLE, EVENT, BOOK, RESOURCE;
 	}
 
 	private static final long serialVersionUID = 1L;

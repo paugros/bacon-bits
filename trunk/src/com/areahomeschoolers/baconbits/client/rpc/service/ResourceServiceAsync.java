@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
+import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -16,4 +17,6 @@ public interface ResourceServiceAsync {
 	public void save(Resource resource, AsyncCallback<Resource> callback);
 
 	void clickResource(int adId, AsyncCallback<Void> callback);
+
+	void getPageData(int resourceId, AsyncCallback<ResourcePageData> callback);
 }

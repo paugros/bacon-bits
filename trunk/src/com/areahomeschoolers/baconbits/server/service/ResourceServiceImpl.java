@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
+import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 
 @Controller
 @RequestMapping("/resource")
@@ -34,6 +35,11 @@ public class ResourceServiceImpl extends GwtController implements ResourceServic
 	@Override
 	public Resource getById(int resourceId) {
 		return dao.getById(resourceId);
+	}
+
+	@Override
+	public ResourcePageData getPageData(int resourceId) {
+		return dao.getPageData(resourceId);
 	}
 
 	@Override

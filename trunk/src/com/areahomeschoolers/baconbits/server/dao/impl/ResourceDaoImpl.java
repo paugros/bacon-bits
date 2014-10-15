@@ -26,6 +26,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
+import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 
 @Repository
@@ -46,8 +47,6 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			ad.setUrl(rs.getString("url"));
 			ad.setDocumentId(rs.getInt("documentId"));
 			ad.setDescription(rs.getString("description"));
-			ad.setCategory(rs.getString("category"));
-			ad.setCategoryId(rs.getInt("categoryId"));
 			ad.setPhone(rs.getString("phone"));
 			ad.setCity(rs.getString("city"));
 			ad.setZip(rs.getString("zip"));
@@ -56,6 +55,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			ad.setStreet(rs.getString("street"));
 			ad.setLat(rs.getDouble("lat"));
 			ad.setLng(rs.getDouble("lng"));
+			ad.setShowInAds(rs.getBoolean("showInAds"));
+			ad.setTagCount(rs.getInt("tagCount"));
 
 			return ad;
 		}
@@ -76,18 +77,30 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	}
 
 	public String createSqlBase() {
-		String sql = "select r.*, u.firstName, u.lastName, rc.category \n";
+		String sql = "select r.*, u.firstName, u.lastName, \n";
+		sql += "(select count(id) from tagResourceMapping where resourceId = r.id) as tagCount \n";
 		sql += "from resources r \n";
 		sql += "join users u on u.id = r.addedById \n";
-		sql += "join resourceCategories rc on rc.id = r.categoryId \n";
 		return sql;
 	}
 
 	@Override
 	public Resource getById(int resourceId) {
-		String sql = createSqlBase() + "and a.id = ?";
+		String sql = createSqlBase() + "and r.id = ?";
 
 		return queryForObject(sql, new ResourceMapper(), resourceId);
+	}
+
+	@Override
+	public ResourcePageData getPageData(int resourceId) {
+		ResourcePageData pd = new ResourcePageData();
+		if (resourceId > 0) {
+			pd.setResource(getById(resourceId));
+		} else {
+			pd.setResource(new Resource());
+		}
+
+		return pd;
 	}
 
 	@Override
@@ -112,12 +125,17 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		int id = args.getInt(ResourceArg.ID);
 		int limit = args.getInt(ResourceArg.LIMIT);
 		boolean random = args.getBoolean(ResourceArg.RANDOM);
+		boolean ad = args.getBoolean(ResourceArg.AD);
 
 		String sql = createSqlBase();
 		sql += "where 1 = 1 ";
 
 		if (args.getStatus() != Status.ALL) {
 			sql += "and isActive(r.startDate, r.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
+		}
+
+		if (ad) {
+			sql += "and r.showInAds = 1 ";
 		}
 
 		if (id > 0) {
@@ -143,7 +161,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(r);
 
 		if (r.isSaved()) {
-			String sql = "update resources set name = :name, startDate = :startDate, endDate = :endDate, url = :url, description = :description, ";
+			String sql = "update resources set name = :name, startDate = :startDate, endDate = :endDate, url = :url, description = :description, showInAds = :showInAds, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone ";
 			sql += "where id = :id";
 			update(sql, namedParams);
@@ -154,9 +172,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			r.setAddedById(ServerContext.getCurrentUserId());
 
 			String sql = "insert into resources (addedById, startDate, endDate, addedDate, name, url, description, ";
-			sql += "address, street, city, state, zip, lat, lng, phone, categoryId) ";
+			sql += "address, street, city, state, zip, lat, lng, phone, showInAds) ";
 			sql += "values(:addedById, :startDate, :endDate, now(), :name, :url, :description, ";
-			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :categoryId)";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
