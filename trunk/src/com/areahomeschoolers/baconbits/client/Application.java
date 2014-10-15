@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.client.content.event.PaymentPage;
 import com.areahomeschoolers.baconbits.client.content.event.RegistrationManagementPage;
 import com.areahomeschoolers.baconbits.client.content.home.HomePage;
 import com.areahomeschoolers.baconbits.client.content.resource.ResourceManagementPage;
+import com.areahomeschoolers.baconbits.client.content.resource.ResourcePage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupListPage;
@@ -341,6 +342,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new NewsPage(vp);
 		} else if ("ResourceManagement".equals(page)) {
 			new ResourceManagementPage(vp);
+		} else if ("Resource".equals(page)) {
+			new ResourcePage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

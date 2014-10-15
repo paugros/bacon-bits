@@ -23,49 +23,17 @@ import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
-import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
 @Repository
 public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggestible {
-
-	private final class AdMapper implements RowMapper<Resource> {
-		@Override
-		public Resource mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Resource ad = new Resource();
-			ad.setId(rs.getInt("id"));
-			ad.setAddedById(rs.getInt("addedById"));
-			ad.setStartDate(rs.getTimestamp("startDate"));
-			ad.setEndDate(rs.getTimestamp("endDate"));
-			ad.setAddedDate(rs.getTimestamp("addedDate"));
-			ad.setName(rs.getString("name"));
-			ad.setClickCount(rs.getInt("clickCount"));
-			ad.setLastClickDate(rs.getTimestamp("lastClickDate"));
-			ad.setUrl(rs.getString("url"));
-			ad.setDocumentId(rs.getInt("documentId"));
-			ad.setDescription(rs.getString("description"));
-			ad.setCategory(rs.getString("category"));
-			ad.setCategoryId(rs.getInt("categoryId"));
-			ad.setPhone(rs.getString("phone"));
-			ad.setCity(rs.getString("city"));
-			ad.setZip(rs.getString("zip"));
-			ad.setState(rs.getString("state"));
-			ad.setAddress(rs.getString("address"));
-			ad.setStreet(rs.getString("street"));
-			ad.setLat(rs.getDouble("lat"));
-			ad.setLng(rs.getDouble("lng"));
-
-			return ad;
-		}
-	}
 
 	private final class ArticleMapper implements RowMapper<Article> {
 		@Override
@@ -115,15 +83,6 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		super(dataSource);
 	}
 
-	@Override
-	public void clickResource(int adId) {
-		String sql = "update resources set clickCount = clickCount + 1, lastClickDate = now() where id = ?";
-		update(sql, adId);
-
-		sql = "insert into adClicks (resourceId, ipAddress, clickDate) values(?, ?, now())";
-		update(sql, adId, ServerContext.getRequest().getRemoteAddr());
-	}
-
 	public String createSqlBase() {
 		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, u.smallImageId, \n";
 		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
@@ -167,41 +126,6 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		sql += "order by c.addedDate desc";
 
 		return query(sql, new NewsBulletinCommentMapper(), sqlArgs.toArray());
-	}
-
-	@Override
-	public ArrayList<Resource> getResources(ArgMap<ResourceArg> args) {
-		List<Object> sqlArgs = new ArrayList<Object>();
-		int id = args.getInt(ResourceArg.ID);
-		int limit = args.getInt(ResourceArg.LIMIT);
-		boolean random = args.getBoolean(ResourceArg.RANDOM);
-
-		String sql = "select r.*, u.firstName, u.lastName, rc.category \n";
-		sql += "from resources r \n";
-		sql += "join users u on u.id = r.addedById \n";
-		sql += "join resourceCategories rc on rc.id = r.categoryId \n";
-		sql += "where 1 = 1 ";
-
-		if (args.getStatus() != Status.ALL) {
-			sql += "and isActive(r.startDate, r.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
-		}
-
-		if (id > 0) {
-			sql += "and r.id = ? ";
-			sqlArgs.add(id);
-		}
-
-		if (random) {
-			sql += "order by rand() ";
-		}
-
-		if (limit > 0) {
-			sql += "limit " + limit;
-		}
-
-		ArrayList<Resource> data = query(sql, new AdMapper(), sqlArgs.toArray());
-
-		return data;
 	}
 
 	@Override
@@ -362,35 +286,6 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		}
 
 		return comment;
-	}
-
-	@Override
-	public Resource saveResource(Resource r) {
-		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(r);
-
-		if (r.isSaved()) {
-			String sql = "update resources set name = :name, startDate = :startDate, endDate = :endDate, url = :url, description = :description, ";
-			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone ";
-			sql += "where id = :id";
-			update(sql, namedParams);
-		} else {
-			if (r.getStartDate() == null) {
-				r.setStartDate(new Date());
-			}
-			r.setAddedById(ServerContext.getCurrentUserId());
-
-			String sql = "insert into resources (addedById, startDate, endDate, addedDate, name, url, description, ";
-			sql += "address, street, city, state, zip, lat, lng, phone, categoryId) ";
-			sql += "values(:addedById, :startDate, :endDate, now(), :name, :url, :description, ";
-			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :categoryId)";
-
-			KeyHolder keys = new GeneratedKeyHolder();
-			update(sql, namedParams, keys);
-
-			r.setId(ServerUtils.getIdFromKeys(keys));
-		}
-
-		return getResources(new ArgMap<ResourceArg>(ResourceArg.ID, r.getId())).get(0);
 	}
 
 	private String createWhere() {

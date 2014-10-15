@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
-import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
-import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
+import com.areahomeschoolers.baconbits.client.rpc.service.ResourceService;
+import com.areahomeschoolers.baconbits.client.rpc.service.ResourceServiceAsync;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class AdsMiniModule extends Composite {
-	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
+	private ResourceServiceAsync resourceService = (ResourceServiceAsync) ServiceCache.getService(ResourceService.class);
 	private VerticalPanel sp = new VerticalPanel();
 	private ArgMap<ResourceArg> args = new ArgMap<ResourceArg>(Status.ACTIVE);
 	private Timer t = new Timer() {
@@ -48,7 +48,7 @@ public class AdsMiniModule extends Composite {
 	}
 
 	private void populate() {
-		articleService.getResources(args, new Callback<ArrayList<Resource>>(false) {
+		resourceService.list(args, new Callback<ArrayList<Resource>>(false) {
 			@Override
 			protected void doOnSuccess(ArrayList<Resource> result) {
 				sp.clear();
@@ -83,7 +83,7 @@ public class AdsMiniModule extends Composite {
 								// return;
 								// }
 
-								articleService.clickResource(ad.getId(), new Callback<Void>(false) {
+								resourceService.clickResource(ad.getId(), new Callback<Void>(false) {
 									@Override
 									protected void doOnSuccess(Void result) {
 

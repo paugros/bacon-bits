@@ -62,6 +62,11 @@ public class PageUrl {
 		return "page=RegistrationManagement";
 	}
 
+	public static String resource(int id) {
+		String url = "page=Resource";
+		return (id == 0) ? url : url + "&resourceId=" + id;
+	}
+
 	public static String resourceManagement() {
 		return "page=ResourceManagement";
 	}

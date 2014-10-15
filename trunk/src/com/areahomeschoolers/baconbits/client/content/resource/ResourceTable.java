@@ -5,9 +5,9 @@ import java.util.Date;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.resource.ResourceTable.ResourceColumn;
 import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
-import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
-import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
-import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.rpc.service.ResourceService;
+import com.areahomeschoolers.baconbits.client.rpc.service.ResourceServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
@@ -18,11 +18,9 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, ResourceColumn> {
@@ -41,7 +39,7 @@ public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, 
 		}
 	}
 
-	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
+	private ResourceServiceAsync resourceService = (ResourceServiceAsync) ServiceCache.getService(ResourceService.class);
 
 	public ResourceTable(ArgMap<ResourceArg> args) {
 		this();
@@ -59,7 +57,7 @@ public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, 
 
 	@Override
 	protected void fetchData() {
-		articleService.getResources(getArgMap(), getCallback());
+		resourceService.list(getArgMap(), getCallback());
 	}
 
 	@Override
@@ -75,20 +73,10 @@ public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, 
 				});
 				break;
 			case NAME:
-				addCompositeWidgetColumn(col, new WidgetCellCreator<Resource>() {
+				addWidgetColumn(col, new WidgetCellCreator<Resource>() {
 					@Override
-					protected Widget createWidget(final Resource item) {
-						return new ClickLabel(item.getName(), new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								new ResourceEditDialog(item, new Command() {
-									@Override
-									public void execute() {
-										populate();
-									}
-								}).center();
-							}
-						});
+					protected Widget createWidget(Resource item) {
+						return new Hyperlink(item.getName(), PageUrl.resource(item.getId()));
 					}
 				});
 				break;
