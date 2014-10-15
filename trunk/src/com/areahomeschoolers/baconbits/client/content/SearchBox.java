@@ -45,6 +45,7 @@ public final class SearchBox extends Composite {
 		types.add("Event");
 		types.add("Article");
 		types.add("Book");
+		types.add("Resource");
 		final ServerSuggestOracle oracle = new ServerSuggestOracle(types);
 
 		textBox = new TextBox();

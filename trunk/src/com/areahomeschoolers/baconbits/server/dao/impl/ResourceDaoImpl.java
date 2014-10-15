@@ -107,9 +107,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	public ServerSuggestionData getSuggestionData(String token, int limit, Data options) {
 		ServerSuggestionData data = new ServerSuggestionData();
 
-		String sql = "select r.id, r.title as Suggestion, 'Resource' as entityType ";
+		String sql = "select r.id, r.name as Suggestion, 'Resource' as entityType ";
 		sql += "from resources r ";
-		sql += "and isActive(r.startDate, r.endDate) = 1 ";
+		sql += "where isActive(r.startDate, r.endDate) = 1 ";
 		sql += "and r.name like ? ";
 		sql += "order by r.name ";
 		sql += "limit " + Integer.toString(limit + 1);
