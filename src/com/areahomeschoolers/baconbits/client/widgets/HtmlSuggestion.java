@@ -30,6 +30,7 @@ public class HtmlSuggestion implements Suggestion {
 		imageMap.put("Event", new Image(MainImageBundle.INSTANCE.event()));
 		imageMap.put("Article", new Image(MainImageBundle.INSTANCE.article()));
 		imageMap.put("Book", new Image(MainImageBundle.INSTANCE.book()));
+		imageMap.put("Resource", new Image(MainImageBundle.INSTANCE.resource()));
 	}
 
 	public HtmlSuggestion(ServerSuggestion suggestion, String token, int fontSize) {

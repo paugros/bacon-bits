@@ -81,6 +81,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource refresh();
 
+	ImageResource resource();
+
 	ImageResource search();
 
 	ImageResource shoppingCart();
