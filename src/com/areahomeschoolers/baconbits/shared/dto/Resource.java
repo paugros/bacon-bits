@@ -19,13 +19,14 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	private String phone;
 	private String name;
 
-	private int categoryId = 8;
 	private int clickCount;
 	private Date lastClickDate;
 	private Integer documentId;
 
 	private Date startDate;
 	private Date endDate;
+
+	private boolean showInAds;
 
 	// address
 	private String address;
@@ -38,7 +39,7 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	private boolean addressChanged;
 
 	// auxiliary
-	private String category;
+	private int tagCount;
 
 	public Resource() {
 
@@ -60,14 +61,6 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	@Override
 	public boolean getAddressChanged() {
 		return addressChanged;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public int getCategoryId() {
-		return categoryId;
 	}
 
 	@Override
@@ -116,6 +109,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		return phone;
 	}
 
+	public boolean getShowInAds() {
+		return showInAds;
+	}
+
 	public Date getStartDate() {
 		return startDate;
 	}
@@ -130,6 +127,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		return street;
 	}
 
+	public int getTagCount() {
+		return tagCount;
+	}
+
 	public String getUrl() {
 		return url;
 	}
@@ -137,6 +138,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	@Override
 	public String getZip() {
 		return zip;
+	}
+
+	public boolean hasTags() {
+		return tagCount > 0;
 	}
 
 	public void setAddedById(int addedById) {
@@ -155,14 +160,6 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	@Override
 	public void setAddressChanged(boolean addressChanged) {
 		this.addressChanged = addressChanged;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
-	public void setCategoryId(int categoryId) {
-		this.categoryId = categoryId;
 	}
 
 	@Override
@@ -208,6 +205,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		this.phone = phone;
 	}
 
+	public void setShowInAds(boolean showInAds) {
+		this.showInAds = showInAds;
+	}
+
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
@@ -220,6 +221,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	@Override
 	public void setStreet(String street) {
 		this.street = street;
+	}
+
+	public void setTagCount(int tagCount) {
+		this.tagCount = tagCount;
 	}
 
 	public void setUrl(String url) {

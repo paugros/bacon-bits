@@ -40,6 +40,7 @@ public class AdsMiniModule extends Composite {
 	public AdsMiniModule() {
 		args.put(ResourceArg.RANDOM);
 		args.put(ResourceArg.LIMIT, 2);
+		args.put(ResourceArg.AD);
 
 		populate();
 
