@@ -1,9 +1,9 @@
-package com.areahomeschoolers.baconbits.client.content.ads;
+package com.areahomeschoolers.baconbits.client.content.resource;
 
 import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.ads.ResourceTable.ResourceColumn;
+import com.areahomeschoolers.baconbits.client.content.resource.ResourceTable.ResourceColumn;
 import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;

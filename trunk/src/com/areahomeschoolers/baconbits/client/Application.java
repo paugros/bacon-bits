@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.content.Layout;
-import com.areahomeschoolers.baconbits.client.content.ads.ResourceManagementPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleGroupPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleListPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
@@ -22,6 +21,7 @@ import com.areahomeschoolers.baconbits.client.content.event.EventPage;
 import com.areahomeschoolers.baconbits.client.content.event.PaymentPage;
 import com.areahomeschoolers.baconbits.client.content.event.RegistrationManagementPage;
 import com.areahomeschoolers.baconbits.client.content.home.HomePage;
+import com.areahomeschoolers.baconbits.client.content.resource.ResourceManagementPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupListPage;
