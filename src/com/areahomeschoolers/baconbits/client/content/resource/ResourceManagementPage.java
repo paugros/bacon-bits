@@ -1,4 +1,4 @@
-package com.areahomeschoolers.baconbits.client.content.ads;
+package com.areahomeschoolers.baconbits.client.content.resource;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
