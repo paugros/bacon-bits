@@ -121,7 +121,7 @@ public class ResourcePage implements Page {
 		descriptionField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				descriptionDisplay.setHTML(resource.getDescription());
+				descriptionDisplay.setHTML(Formatter.formatNoteText(resource.getDescription()));
 				descriptionInput.setText(resource.getDescription());
 			}
 		});
