@@ -39,6 +39,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -114,13 +115,13 @@ public class ResourcePage implements Page {
 		});
 		ft.addField(titleField);
 
-		final Label descriptionDisplay = new Label();
+		final HTML descriptionDisplay = new HTML();
 		final DefaultTextArea descriptionInput = new DefaultTextArea();
 		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
 		descriptionField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				descriptionDisplay.setText(resource.getDescription());
+				descriptionDisplay.setHTML(resource.getDescription());
 				descriptionInput.setText(resource.getDescription());
 			}
 		});
