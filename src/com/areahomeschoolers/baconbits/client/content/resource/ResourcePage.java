@@ -18,12 +18,11 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
-import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
@@ -33,12 +32,14 @@ import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -114,7 +115,7 @@ public class ResourcePage implements Page {
 		ft.addField(titleField);
 
 		final Label descriptionDisplay = new Label();
-		final MaxLengthTextArea descriptionInput = new MaxLengthTextArea(500);
+		final DefaultTextArea descriptionInput = new DefaultTextArea();
 		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
 		descriptionField.setInitializer(new Command() {
 			@Override
@@ -267,10 +268,11 @@ public class ResourcePage implements Page {
 			form.emancipate();
 		}
 
-		PaddedPanel pp = new PaddedPanel();
+		HorizontalPanel pp = new HorizontalPanel();
 		pp.setWidth("100%");
 		if (resource.isSaved()) {
 			EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, resource.getId(), resource.getDocumentId(), true);
+			image.getElement().getStyle().setMarginRight(10, Unit.PX);
 			pp.add(image);
 
 			image.addStyleName("profilePic");
