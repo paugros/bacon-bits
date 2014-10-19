@@ -32,6 +32,10 @@ public class EmailTextBox extends TextBox implements HasValidator {
 	private boolean multiEmail;
 	private Set<String> typedEmails;
 
+	public EmailTextBox() {
+		setVisibleLength(30);
+	}
+
 	/**
 	 * Retrieve the email addresses that were typed into this box as a {@link Set}
 	 */

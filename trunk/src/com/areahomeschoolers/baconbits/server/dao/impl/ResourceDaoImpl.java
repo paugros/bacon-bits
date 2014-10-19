@@ -37,12 +37,14 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		public Resource mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Resource ad = new Resource();
 			ad.setId(rs.getInt("id"));
+			ad.setUrlDisplay(rs.getString("urlDisplay"));
 			ad.setAddedById(rs.getInt("addedById"));
 			ad.setStartDate(rs.getTimestamp("startDate"));
 			ad.setEndDate(rs.getTimestamp("endDate"));
 			ad.setAddedDate(rs.getTimestamp("addedDate"));
 			ad.setName(rs.getString("name"));
 			ad.setClickCount(rs.getInt("clickCount"));
+			ad.setAddressScopeId(rs.getInt("addressScopeId"));
 			ad.setLastClickDate(rs.getTimestamp("lastClickDate"));
 			ad.setUrl(rs.getString("url"));
 			ad.setDocumentId(rs.getInt("documentId"));
@@ -57,6 +59,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			ad.setLng(rs.getDouble("lng"));
 			ad.setShowInAds(rs.getBoolean("showInAds"));
 			ad.setTagCount(rs.getInt("tagCount"));
+			ad.setAddressScope(rs.getString("addressScope"));
+			ad.setEmail(rs.getString("email"));
 
 			return ad;
 		}
@@ -77,10 +81,11 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	}
 
 	public String createSqlBase() {
-		String sql = "select r.*, u.firstName, u.lastName, \n";
+		String sql = "select r.*, u.firstName, u.lastName, s.scope as addressScope, \n";
 		sql += "(select count(id) from tagResourceMapping where resourceId = r.id) as tagCount \n";
 		sql += "from resources r \n";
 		sql += "join users u on u.id = r.addedById \n";
+		sql += "join addressScope s on s.id = r.addressScopeId \n";
 		return sql;
 	}
 
@@ -99,6 +104,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		} else {
 			pd.setResource(new Resource());
 		}
+
+		String sql = "select * from addressScope";
+		pd.setAddressScopes(query(sql, ServerUtils.getGenericRowMapper()));
 
 		return pd;
 	}
@@ -162,7 +170,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 		if (r.isSaved()) {
 			String sql = "update resources set name = :name, startDate = :startDate, endDate = :endDate, url = :url, description = :description, showInAds = :showInAds, ";
-			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone ";
+			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone, email = :email, ";
+			sql += "urlDisplay = :urlDisplay, addressScopeId = :addressScopeId ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -172,9 +181,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			r.setAddedById(ServerContext.getCurrentUserId());
 
 			String sql = "insert into resources (addedById, startDate, endDate, addedDate, name, url, description, ";
-			sql += "address, street, city, state, zip, lat, lng, phone, showInAds) ";
+			sql += "address, street, city, state, zip, lat, lng, phone, showInAds, email, urlDisplay, addressScopeId) ";
 			sql += "values(:addedById, :startDate, :endDate, now(), :name, :url, :description, ";
-			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds)";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds, :email, :urlDisplay, :addressScopeId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

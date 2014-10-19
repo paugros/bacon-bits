@@ -96,7 +96,14 @@ public class AdsMiniModule extends Composite {
 						vp.setCellHorizontalAlignment(link, HasHorizontalAlignment.ALIGN_CENTER);
 					}
 
-					HTML label = new HTML(ad.getDescription().substring(0, 250));
+					String text = "";
+					if (ad.getDescription() != null) {
+						text = ad.getDescription();
+					}
+					if (text.length() > 250) {
+						text = text.substring(0, 250);
+					}
+					HTML label = new HTML(text);
 					label.getElement().getStyle().setMarginBottom(20, Unit.PX);
 					label.getElement().getStyle().setPaddingLeft(10, Unit.PX);
 					label.getElement().getStyle().setPaddingRight(10, Unit.PX);
