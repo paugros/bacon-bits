@@ -91,7 +91,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 	@Override
 	public Resource getById(int resourceId) {
-		String sql = createSqlBase() + "and r.id = ?";
+		String sql = createSqlBase() + "where r.id = ?";
 
 		return queryForObject(sql, new ResourceMapper(), resourceId);
 	}
