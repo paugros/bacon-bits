@@ -85,7 +85,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		sql += "(select count(id) from tagResourceMapping where resourceId = r.id) as tagCount \n";
 		sql += "from resources r \n";
 		sql += "join users u on u.id = r.addedById \n";
-		sql += "join addressScope s on s.id = r.addressScopeId \n";
+		sql += "left join addressScope s on s.id = r.addressScopeId \n";
 		return sql;
 	}
 
