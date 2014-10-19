@@ -17,7 +17,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	private String url;
 	private String description;
 	private String phone;
+	private String email;
+	private String urlDisplay;
 	private String name;
+	private int addressScopeId;
 
 	private int clickCount;
 	private Date lastClickDate;
@@ -40,6 +43,7 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	// auxiliary
 	private int tagCount;
+	private String addressScope;
 
 	public Resource() {
 
@@ -63,6 +67,14 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		return addressChanged;
 	}
 
+	public String getAddressScope() {
+		return addressScope;
+	}
+
+	public int getAddressScopeId() {
+		return addressScopeId;
+	}
+
 	@Override
 	public String getCity() {
 		return city;
@@ -81,6 +93,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 			return null;
 		}
 		return documentId;
+	}
+
+	public String getEmail() {
+		return email;
 	}
 
 	public Date getEndDate() {
@@ -135,6 +151,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		return url;
 	}
 
+	public String getUrlDisplay() {
+		return urlDisplay;
+	}
+
 	@Override
 	public String getZip() {
 		return zip;
@@ -162,6 +182,14 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		this.addressChanged = addressChanged;
 	}
 
+	public void setAddressScope(String addressScope) {
+		this.addressScope = addressScope;
+	}
+
+	public void setAddressScopeId(int addressScopeId) {
+		this.addressScopeId = addressScopeId;
+	}
+
 	@Override
 	public void setCity(String city) {
 		this.city = city;
@@ -177,6 +205,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setDocumentId(Integer documentId) {
 		this.documentId = documentId;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public void setEndDate(Date endDate) {
@@ -229,6 +261,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public void setUrlDisplay(String urlDisplay) {
+		this.urlDisplay = urlDisplay;
 	}
 
 	@Override

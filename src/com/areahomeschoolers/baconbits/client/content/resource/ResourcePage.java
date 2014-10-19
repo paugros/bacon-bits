@@ -20,6 +20,7 @@ import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
+import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
@@ -27,6 +28,7 @@ import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
@@ -42,6 +44,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class ResourcePage implements Page {
@@ -59,6 +62,7 @@ public class ResourcePage implements Page {
 	private VerticalPanel page;
 	private FieldTable ft = new FieldTable();
 	private Resource resource = new Resource();
+	private ResourcePageData pd;
 	private ResourceServiceAsync resourceService = (ResourceServiceAsync) ServiceCache.getService(ResourceService.class);
 
 	public ResourcePage(VerticalPanel page) {
@@ -71,21 +75,18 @@ public class ResourcePage implements Page {
 
 		this.page = page;
 
-		if (resourceId > 0) {
-			resourceService.getPageData(resourceId, new Callback<ResourcePageData>() {
-				@Override
-				protected void doOnSuccess(ResourcePageData result) {
-					if (result == null) {
-						new ErrorPage(PageError.PAGE_NOT_FOUND);
-						return;
-					}
-					resource = result.getResource();
-					initializePage();
+		resourceService.getPageData(resourceId, new Callback<ResourcePageData>() {
+			@Override
+			protected void doOnSuccess(ResourcePageData result) {
+				if (result == null) {
+					new ErrorPage(PageError.PAGE_NOT_FOUND);
+					return;
 				}
-			});
-		} else {
-			initializePage();
-		}
+				resource = result.getResource();
+				pd = result;
+				initializePage();
+			}
+		});
 	}
 
 	private boolean allowEdit() {
@@ -137,7 +138,7 @@ public class ResourcePage implements Page {
 		final RequiredTextBox urlInput = new RequiredTextBox();
 		urlInput.setMaxLength(500);
 		urlInput.setVisibleLength(50);
-		FormField urlField = form.createFormField("URL:", urlInput, urlDisplay);
+		FormField urlField = form.createFormField("Web address:", urlInput, urlDisplay);
 		urlField.setInitializer(new Command() {
 			@Override
 			public void execute() {
@@ -153,6 +154,26 @@ public class ResourcePage implements Page {
 			}
 		});
 		ft.addField(urlField);
+
+		final Label urlTextDisplay = new Label();
+		final TextBox urlTextInput = new TextBox();
+		urlTextInput.setVisibleLength(30);
+		urlTextInput.setMaxLength(100);
+		FormField urlTextField = form.createFormField("Link text:", urlTextInput, urlTextDisplay);
+		urlTextField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				urlTextDisplay.setText(resource.getUrlDisplay());
+				urlTextInput.setText(resource.getUrlDisplay());
+			}
+		});
+		urlTextField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setUrlDisplay(urlTextInput.getText());
+			}
+		});
+		ft.addField(urlTextField);
 
 		final Label adDisplay = new Label();
 		final DefaultListBox adInput = new DefaultListBox();
@@ -218,6 +239,25 @@ public class ResourcePage implements Page {
 		});
 		ft.addField(endDateField);
 
+		final Label emailDisplay = new Label();
+		final EmailTextBox emailInput = new EmailTextBox();
+		emailInput.setMaxLength(100);
+		FormField emailField = form.createFormField("Email:", emailInput, emailDisplay);
+		emailField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				emailDisplay.setText(resource.getEmail());
+				emailInput.setText(resource.getEmail());
+			}
+		});
+		emailField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setEmail(emailInput.getText());
+			}
+		});
+		ft.addField(emailField);
+
 		final Label phoneDisplay = new Label();
 		final PhoneTextBox phoneInput = new PhoneTextBox();
 		FormField phoneField = form.createFormField("Phone:", phoneInput, phoneDisplay);
@@ -239,6 +279,28 @@ public class ResourcePage implements Page {
 		FormField addressField = new AddressField(resource).getFormField();
 		form.addField(addressField);
 		ft.addField(addressField);
+
+		final Label scopeDisplay = new Label();
+		final DefaultListBox scopeInput = new DefaultListBox();
+		scopeInput.addItem("N/A", 0);
+		for (Data d : pd.getAddressScopes()) {
+			scopeInput.addItem(d.get("scope"), d.getId());
+		}
+		FormField scopeField = form.createFormField("Address scope:", scopeInput, scopeDisplay);
+		scopeField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				scopeDisplay.setText(resource.getAddressScope());
+				scopeInput.setValue(resource.getAddressScopeId());
+			}
+		});
+		scopeField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setAddressScopeId(scopeInput.getIntValue());
+			}
+		});
+		ft.addField(scopeField);
 
 		if (resource.isSaved() && (resource.hasTags() || allowEdit())) {
 			TagSection ts = new TagSection(TagMappingType.RESOURCE, resource.getId());
