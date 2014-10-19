@@ -163,7 +163,7 @@ public class ResourcePage implements Page {
 		urlTextField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				urlTextDisplay.setText(resource.getUrlDisplay());
+				urlTextDisplay.setText(Common.getDefaultIfNull(resource.getUrlDisplay()));
 				urlTextInput.setText(resource.getUrlDisplay());
 			}
 		});
@@ -246,7 +246,7 @@ public class ResourcePage implements Page {
 		emailField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				emailDisplay.setText(resource.getEmail());
+				emailDisplay.setText(Common.getDefaultIfNull(resource.getEmail()));
 				emailInput.setText(resource.getEmail());
 			}
 		});
@@ -290,7 +290,7 @@ public class ResourcePage implements Page {
 		scopeField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				scopeDisplay.setText(resource.getAddressScope());
+				scopeDisplay.setText(Common.getDefaultIfNull(resource.getAddressScope(), "N/A"));
 				scopeInput.setValue(resource.getAddressScopeId());
 			}
 		});
