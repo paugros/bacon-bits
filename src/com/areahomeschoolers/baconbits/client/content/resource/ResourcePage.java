@@ -241,7 +241,7 @@ public class ResourcePage implements Page {
 		ft.addField(addressField);
 
 		if (resource.isSaved() && (resource.hasTags() || allowEdit())) {
-			TagSection ts = new TagSection(TagMappingType.ARTICLE, resource.getId());
+			TagSection ts = new TagSection(TagMappingType.RESOURCE, resource.getId());
 			ts.setEditingEnabled(allowEdit());
 			ft.addField("Tags:", ts);
 			ts.populate();
