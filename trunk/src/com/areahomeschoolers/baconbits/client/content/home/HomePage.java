@@ -9,12 +9,10 @@ import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
 import com.areahomeschoolers.baconbits.client.content.minimodules.ActiveUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.CommunityEventsMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.LinksMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.MyEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewUsersMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniModule;
+import com.areahomeschoolers.baconbits.client.content.resource.Tile;
+import com.areahomeschoolers.baconbits.client.content.resource.TileConfig;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
@@ -24,9 +22,9 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedVerticalPanel;
 import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
-import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -104,9 +102,9 @@ public class HomePage implements Page {
 			});
 		}
 
-		if (Url.getBooleanParameter("bookSaleSignup") && !signedUpForBooks()) {
-			new SellBooksMiniModule().showDialog();
-		}
+		// if (Url.getBooleanParameter("bookSaleSignup") && !signedUpForBooks()) {
+		// new SellBooksMiniModule().showDialog();
+		// }
 
 		if (Url.getIntegerParameter("aagrp") > 0 && Application.isAuthenticated() && !Application.memberOf(Url.getIntegerParameter("aagrp"))) {
 			final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
@@ -150,12 +148,12 @@ public class HomePage implements Page {
 				leftPanel.add(new CitrusMiniModule());
 
 				// book promo
-				if (!Application.isAuthenticated() || !signedUpForBooks()) {
-					leftPanel.add(new SellBooksMiniModule());
-				}
+				// if (!Application.isAuthenticated() || !signedUpForBooks()) {
+				// leftPanel.add(new SellBooksMiniModule());
+				// }
 
 				// community
-				leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
+				// leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
 
 				// partner logos/links
 				// HTML logos = new HTML(pageData.getPartners().getArticle());
@@ -166,7 +164,7 @@ public class HomePage implements Page {
 				rightPanel.add(new AdsMiniModule());
 
 				// links
-				rightPanel.add(new LinksMiniModule());
+				// rightPanel.add(new LinksMiniModule());
 
 				// upcoming
 				// rightPanel.add(new UpcomingEventsMiniModule(pageData.getUpcomingEvents()));
@@ -185,13 +183,37 @@ public class HomePage implements Page {
 				}
 
 				// my events
-				if (Application.isAuthenticated()) {
-					if (!Common.isNullOrEmpty(pageData.getMyUpcomingEvents())) {
-						rightPanel.add(new MyEventsMiniModule(pageData.getMyUpcomingEvents()));
-					}
-				}
+				// if (Application.isAuthenticated()) {
+				// if (!Common.isNullOrEmpty(pageData.getMyUpcomingEvents())) {
+				// rightPanel.add(new MyEventsMiniModule(pageData.getMyUpcomingEvents()));
+				// }
+				// }
 
 				UserGroup org = Application.getCurrentOrg();
+
+				PaddedPanel pp = new PaddedPanel(20);
+
+				TileConfig ec = new TileConfig().setText("Events").setCount(47).setImageId(1221).setUrl(PageUrl.eventList());
+				ec.setColor(0xe6b48f);
+				Tile eventsTile = new Tile(ec);
+				pp.add(eventsTile);
+
+				TileConfig uc = new TileConfig().setText("Users").setCount(224).setImageId(1221).setUrl(PageUrl.userList());
+				uc.setColor(0xf4e499);
+				Tile usersTile = new Tile(uc);
+				pp.add(usersTile);
+
+				TileConfig bc = new TileConfig().setText("Books").setCount(652).setImageId(1221).setUrl(PageUrl.bookSearch());
+				bc.setColor(0xf28e76);
+				Tile booksTile = new Tile(bc);
+				pp.add(booksTile);
+
+				TileConfig bbc = new TileConfig().setText("Blog").setCount(29).setImageId(1221).setUrl(PageUrl.news(0));
+				bbc.setColor(0xe6b48f);
+				Tile blogTile = new Tile(bbc);
+				pp.add(blogTile);
+
+				centerPanel.add(pp);
 
 				if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(org.getId()) == null) {
 					centerPanel.add(new RequestMembershipLink(org));

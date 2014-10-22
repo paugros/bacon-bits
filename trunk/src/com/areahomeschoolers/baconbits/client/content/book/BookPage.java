@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.content.Sidebar;
 import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -26,6 +27,7 @@ import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -116,10 +118,10 @@ public class BookPage implements Page {
 		vp.setWidth("100%");
 		vp.add(pp);
 
-		// TagSection ts = new TagSection(TagMappingType.BOOK, book.getId(), pageData.getTags());
-		// ts.setEditingEnabled(editable);
-		// ts.populate();
-		// vp.add(ts);
+		TagSection ts = new TagSection(TagMappingType.BOOK, book.getId(), pageData.getTags());
+		ts.setEditingEnabled(editable);
+		ts.populate();
+		vp.add(ts);
 
 		page.add(WidgetFactory.newSection(tb, vp, ContentWidth.MAXWIDTH1000PX));
 

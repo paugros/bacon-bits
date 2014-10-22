@@ -331,6 +331,20 @@ img {
 	vertical-align: middle;
 }
 
+.tile {
+	border: 1px solid #cccccc;
+	-webkit-border-radius: 10px; 
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	min-width: 250px;
+	opacity: 0.8;
+}
+
+.tile:hover {
+	opacity: 1.0;
+	cursor: pointer;
+}
+
 .module {
 	border: 1px solid #cccccc;
 	-webkit-border-radius: 14px; 
