@@ -110,7 +110,7 @@ public class AdsMiniModule extends Composite {
 					vp.add(label);
 				}
 
-				if (!t.isRunning()) {
+				if (!t.isRunning() && Application.isLive()) {
 					Application.scheduleRepeatingPageTimer(t, 10000);
 				}
 			}

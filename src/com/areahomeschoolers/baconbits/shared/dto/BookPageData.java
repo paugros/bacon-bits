@@ -10,6 +10,7 @@ public class BookPageData implements IsSerializable {
 	private ArrayList<Data> gradeLevels;
 	private ArrayList<Data> conditions;
 	private ArrayList<Data> statuses;
+	private ArrayList<Tag> tags;
 
 	public Book getBook() {
 		return book;
@@ -31,6 +32,10 @@ public class BookPageData implements IsSerializable {
 		return statuses;
 	}
 
+	public ArrayList<Tag> getTags() {
+		return tags;
+	}
+
 	public void setBook(Book book) {
 		this.book = book;
 	}
@@ -49,6 +54,10 @@ public class BookPageData implements IsSerializable {
 
 	public void setStatuses(ArrayList<Data> statuses) {
 		this.statuses = statuses;
+	}
+
+	public void setTags(ArrayList<Tag> tags) {
+		this.tags = tags;
 	}
 
 }
