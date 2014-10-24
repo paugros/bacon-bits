@@ -232,7 +232,7 @@ public final class MainMenu extends MenuBar {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Event Listing", PageUrl.eventList());
 		addLinkToMenu(menu, "Calendar", PageUrl.eventCalendar());
-		addLinkToMenu(menu, "News", PageUrl.news(0));
+		addLinkToMenu(menu, "Blog", PageUrl.news(0));
 
 		if (Application.isAuthenticated() && Application.isCitrus()) {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
