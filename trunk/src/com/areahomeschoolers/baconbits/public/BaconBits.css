@@ -389,12 +389,12 @@ img {
 }
 
 .headerPanel {
-	background-image: url(images/headerBackground.png);
-	color: #ffffff;
+	background-image: url(images/headerBackground.jpg);
+	color: #000000;
 }
 
 .headerPanel .ClickLabel, .headerPanel a {
-	color: #ffffff;
+	color: #000000;
 }
 
 .bodyPanel {
@@ -767,7 +767,7 @@ img {
 	padding: 5px 15px 5px 15px;
 	vertical-align: bottom;
 	font-weight: normal;
-	color: white;
+	color: black;
 	cursor: pointer;
 }
 
