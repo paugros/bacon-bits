@@ -18,6 +18,8 @@ public interface BookDao {
 
 	public Book getById(int bookId);
 
+	public int getCount();
+
 	public BookPageData getPageData(int bookId);
 
 	public ArrayList<Data> getSummaryData(ArgMap<BookArg> args);

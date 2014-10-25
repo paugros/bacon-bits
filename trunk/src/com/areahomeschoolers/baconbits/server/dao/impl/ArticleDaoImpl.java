@@ -129,6 +129,14 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	}
 
 	@Override
+	public int getNewsCount() {
+		String sql = "select count(*) from articles a ";
+		sql += "where a.newsItem = 1 and isActive(a.startDate, a.endDate) = 1 \n";
+		sql += "and a.addedDate >= date_add(now(), interval -2 week)\n";
+		return queryForInt(sql);
+	}
+
+	@Override
 	public ServerSuggestionData getSuggestionData(String token, int limit, Data options) {
 		ServerSuggestionData data = new ServerSuggestionData();
 

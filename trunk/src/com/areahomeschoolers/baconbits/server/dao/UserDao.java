@@ -30,6 +30,8 @@ public interface UserDao {
 
 	public User getById(int userId, boolean useSecureMapper);
 
+	public int getCount();
+
 	public ArrayList<MainMenuItem> getMenuItems(ArgMap<UserArg> args);
 
 	public ArrayList<HistoryEntry> getNavigationHistory(int userId);

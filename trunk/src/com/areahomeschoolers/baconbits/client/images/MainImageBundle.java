@@ -13,7 +13,11 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource article();
 
+	ImageResource blogTile();
+
 	ImageResource book();
+
+	ImageResource bookTile();
 
 	ImageResource cancel();
 
@@ -32,6 +36,8 @@ public interface MainImageBundle extends ClientBundle {
 	ImageResource edit();
 
 	ImageResource event();
+
+	ImageResource eventTile();
 
 	ImageResource expand();
 
@@ -67,6 +73,8 @@ public interface MainImageBundle extends ClientBundle {
 	@Source("file/zip.png")
 	ImageResource fileIconZip();
 
+	ImageResource headerBackground();
+
 	ImageResource link();
 
 	ImageResource littleLogo();
@@ -98,6 +106,8 @@ public interface MainImageBundle extends ClientBundle {
 	ImageResource upload();
 
 	ImageResource user();
+
+	ImageResource userTile();
 
 	ImageResource verticalDragHandle();
 

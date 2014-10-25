@@ -4,7 +4,6 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 
-import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -34,14 +33,20 @@ public class Tile extends Composite {
 		vp.addStyleName("tile");
 		vp.setSpacing(12);
 		vp.getElement().getStyle().setBackgroundColor("#" + Long.toString(config.getColor(), 16));
-		long bordercolor = (config.getColor() & 0x3e3e3e) >> 1 | (config.getColor() & 0x808080);
-		vp.getElement().getStyle().setBorderColor("#" + Long.toString(bordercolor, 16));
-		vp.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-		vp.getElement().getStyle().setBorderWidth(1, Unit.PX);
+		// long bordercolor = (config.getColor() & 0x3e3e3e) >> 1 | (config.getColor() & 0x808080);
+		// vp.getElement().getStyle().setBorderColor("#" + Long.toString(bordercolor, 16));
+		// vp.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+		// vp.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
 		SimplePanel sp = new SimplePanel();
 		sp.getElement().getStyle().setHeight(200, Unit.PX);
-		Image image = new Image(Document.toUrl(config.getImageId()));
+		Image image = null;
+
+		if (config.getImageResource() == null) {
+			image = new Image(Document.toUrl(config.getImageId()));
+		} else {
+			image = new Image(config.getImageResource());
+		}
 		sp.setWidget(image);
 		vp.add(sp);
 		vp.setCellHorizontalAlignment(sp, HasHorizontalAlignment.ALIGN_CENTER);
