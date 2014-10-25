@@ -1,11 +1,14 @@
 package com.areahomeschoolers.baconbits.client.content.resource;
 
+import com.google.gwt.resources.client.ImageResource;
+
 public class TileConfig {
 	private String text;
 	private String url;
 	private int count;
 	private long color;
 	private int imageId;
+	private ImageResource imageResource;
 
 	public TileConfig() {
 	}
@@ -20,6 +23,10 @@ public class TileConfig {
 
 	public int getImageId() {
 		return imageId;
+	}
+
+	public ImageResource getImageResource() {
+		return imageResource;
 	}
 
 	public String getText() {
@@ -42,6 +49,11 @@ public class TileConfig {
 
 	public TileConfig setImageId(int imageId) {
 		this.imageId = imageId;
+		return this;
+	}
+
+	public TileConfig setImageResource(ImageResource imageResource) {
+		this.imageResource = imageResource;
 		return this;
 	}
 

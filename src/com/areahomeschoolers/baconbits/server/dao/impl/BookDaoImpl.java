@@ -152,6 +152,11 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	@Override
+	public int getCount() {
+		return queryForInt("select count(*) from books where statusId = 1");
+	}
+
+	@Override
 	public BookPageData getPageData(int bookId) {
 		BookPageData pd = new BookPageData();
 

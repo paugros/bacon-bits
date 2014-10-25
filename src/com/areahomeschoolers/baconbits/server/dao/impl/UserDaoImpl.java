@@ -268,6 +268,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
+	public int getCount() {
+		String sql = "select count(*) from users u " + createSqlWhere() + " ";
+		sql += "and isActive(u.startDate, u.endDate) = 1 ";
+
+		return queryForInt(sql);
+	}
+
+	@Override
 	public ArrayList<MainMenuItem> getMenuItems(ArgMap<UserArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 

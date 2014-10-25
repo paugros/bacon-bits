@@ -73,7 +73,8 @@ public final class Layout {
 		}
 	}
 
-	private static final int HEADER_HEIGHT = 53;
+	// private static final int HEADER_HEIGHT = 53;
+	private static final int HEADER_HEIGHT = 172;
 	private static final int MENU_HEIGHT = 35;
 	private static final int LOGO_DIV_WIDTH = 115;
 	private final MainLayoutDock dock = new MainLayoutDock(Unit.PX);
@@ -91,6 +92,9 @@ public final class Layout {
 	private boolean isMobileBrowser = false;
 	private HTML logoDiv;
 
+	/**
+	 *
+	 */
 	public Layout() {
 		isMobileBrowser = ClientUtils.isMobileBrowser();
 
@@ -268,12 +272,13 @@ public final class Layout {
 		hp.setCellVerticalAlignment(logoDiv, HasVerticalAlignment.ALIGN_MIDDLE);
 		hp.setCellWidth(logoDiv, LOGO_DIV_WIDTH + "px");
 		hp.setHeight(HEADER_HEIGHT + MENU_HEIGHT + "px");
+		hp.addStyleName("headerPanel");
+		// hp.getElement().getStyle().setBackgroundImage("url(images/headerBackground.png)");
 
 		VerticalPanel vp = new VerticalPanel();
 		vp.setWidth("100%");
 		vp.add(headerPanel);
 		vp.add(menuPanel);
-		hp.addStyleName("headerPanel");
 		hp.add(vp);
 		if (isMobileBrowser) {
 			mobileBodyPanel.addStyleName("bodyPanel");

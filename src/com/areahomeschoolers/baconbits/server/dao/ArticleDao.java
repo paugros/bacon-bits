@@ -14,6 +14,8 @@ public interface ArticleDao {
 
 	public ArrayList<NewsBulletinComment> getComments(ArgMap<ArticleArg> args);
 
+	public int getNewsCount();
+
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void hideComment(int commentId);
 

@@ -5,15 +5,14 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
 import com.areahomeschoolers.baconbits.client.content.minimodules.ActiveUsersMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.NewUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
 import com.areahomeschoolers.baconbits.client.content.resource.TileConfig;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
@@ -161,7 +160,7 @@ public class HomePage implements Page {
 				// leftPanel.setCellHorizontalAlignment(logos, HasHorizontalAlignment.ALIGN_CENTER);
 
 				// ad
-				rightPanel.add(new AdsMiniModule());
+				// rightPanel.add(new AdsMiniModule());
 
 				// links
 				// rightPanel.add(new LinksMiniModule());
@@ -193,22 +192,26 @@ public class HomePage implements Page {
 
 				PaddedPanel pp = new PaddedPanel(20);
 
-				TileConfig ec = new TileConfig().setText("Events").setCount(47).setImageId(1221).setUrl(PageUrl.eventList());
+				TileConfig ec = new TileConfig().setText("Events").setCount(pageData.getEventCount());
+				ec.setImageResource(MainImageBundle.INSTANCE.eventTile()).setUrl(PageUrl.eventList());
 				ec.setColor(0xe6b48f);
 				Tile eventsTile = new Tile(ec);
 				pp.add(eventsTile);
 
-				TileConfig uc = new TileConfig().setText("Users").setCount(224).setImageId(1221).setUrl(PageUrl.userList());
+				TileConfig uc = new TileConfig().setText("Users").setCount(pageData.getUserCount());
+				uc.setImageResource(MainImageBundle.INSTANCE.userTile()).setUrl(PageUrl.userList());
 				uc.setColor(0xf4e499);
 				Tile usersTile = new Tile(uc);
 				pp.add(usersTile);
 
-				TileConfig bc = new TileConfig().setText("Books").setCount(652).setImageId(1221).setUrl(PageUrl.bookSearch());
+				TileConfig bc = new TileConfig().setText("Books").setCount(pageData.getBookCount());
+				bc.setImageResource(MainImageBundle.INSTANCE.bookTile()).setUrl(PageUrl.bookSearch());
 				bc.setColor(0xf28e76);
 				Tile booksTile = new Tile(bc);
 				pp.add(booksTile);
 
-				TileConfig bbc = new TileConfig().setText("Blog").setCount(29).setImageId(1221).setUrl(PageUrl.news(0));
+				TileConfig bbc = new TileConfig().setText("Blog").setCount(pageData.getBlogCount());
+				bbc.setImageResource(MainImageBundle.INSTANCE.blogTile()).setUrl(PageUrl.news(0));
 				bbc.setColor(0xe6b48f);
 				Tile blogTile = new Tile(bbc);
 				pp.add(blogTile);
@@ -220,13 +223,13 @@ public class HomePage implements Page {
 				}
 
 				// introduction
-				centerPanel.add(new ArticleWidget(pageData.getIntro()));
+				// centerPanel.add(new ArticleWidget(pageData.getIntro()));
 
 				// raffle
 				// centerPanel.add(createRaffleWidget());
 
 				// news
-				centerPanel.add(new NewsModule());
+				// centerPanel.add(new NewsModule());
 
 				// our groups
 				// if (Application.isCitrus()) {

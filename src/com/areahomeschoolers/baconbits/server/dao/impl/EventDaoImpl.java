@@ -21,6 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.server.dao.ArticleDao;
+import com.areahomeschoolers.baconbits.server.dao.BookDao;
 import com.areahomeschoolers.baconbits.server.dao.EventDao;
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
 import com.areahomeschoolers.baconbits.server.dao.Suggestible;
@@ -307,6 +308,18 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		pd.setIntro(a);
 
 		pd.setPartners(articleDao.getById(Constants.PARTNER_LOGO_ARTICLE_ID));
+
+		// various counts
+		BookDao bd = ServerContext.getDaoImpl("book");
+		pd.setBookCount(bd.getCount());
+
+		UserDao ud = ServerContext.getDaoImpl("user");
+		pd.setUserCount(ud.getCount());
+
+		pd.setBlogCount(articleDao.getNewsCount());
+
+		String sql = "select count(*) from events e " + createWhere() + " and e.endDate > now()";
+		pd.setEventCount(queryForInt(sql));
 
 		return pd;
 	}
