@@ -51,7 +51,7 @@ public interface Arg {
 	}
 
 	public enum TagArg implements Arg, IsSerializable {
-		ENTITY_ID, MAPPING_TYPE, MAPPING_ID;
+		ENTITY_ID, MAPPING_TYPE, MAPPING_ID, GET_COUNTS;
 		private TagArg() {
 
 		}

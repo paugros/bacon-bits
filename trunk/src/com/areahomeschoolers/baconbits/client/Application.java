@@ -25,11 +25,14 @@ import com.areahomeschoolers.baconbits.client.content.resource.ResourceManagemen
 import com.areahomeschoolers.baconbits.client.content.resource.ResourcePage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.tag.TagGroupPage;
+import com.areahomeschoolers.baconbits.client.content.tag.TagManagementPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserStatusIndicator;
+import com.areahomeschoolers.baconbits.client.content.user.UserTilePage;
 import com.areahomeschoolers.baconbits.client.event.CancelHandler;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
@@ -342,8 +345,14 @@ public final class Application implements ValueChangeHandler<String> {
 			new NewsPage(vp);
 		} else if ("ResourceManagement".equals(page)) {
 			new ResourceManagementPage(vp);
+		} else if ("TagManagement".equals(page)) {
+			new TagManagementPage(vp);
 		} else if ("Resource".equals(page)) {
 			new ResourcePage(vp);
+		} else if ("TagGroup".equals(page)) {
+			new TagGroupPage(vp);
+		} else if ("UserTile".equals(page)) {
+			new UserTilePage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

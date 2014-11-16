@@ -5,10 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.minimodules.ActiveUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.NewBooksMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.NewUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
 import com.areahomeschoolers.baconbits.client.content.resource.TileConfig;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -23,7 +20,6 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedVerticalPanel;
-import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -169,17 +165,17 @@ public class HomePage implements Page {
 				// rightPanel.add(new UpcomingEventsMiniModule(pageData.getUpcomingEvents()));
 
 				// new users
-				if (Application.isAuthenticated()) {
-					rightPanel.add(new NewUsersMiniModule());
-				}
+				// if (Application.isAuthenticated()) {
+				// rightPanel.add(new NewUsersMiniModule());
+				// }
 
 				// new books
-				rightPanel.add(new NewBooksMiniModule());
+				// rightPanel.add(new NewBooksMiniModule());
 
 				// active users
-				if (Application.isAuthenticated()) {
-					rightPanel.add(new ActiveUsersMiniModule());
-				}
+				// if (Application.isAuthenticated()) {
+				// rightPanel.add(new ActiveUsersMiniModule());
+				// }
 
 				// my events
 				// if (Application.isAuthenticated()) {
@@ -188,7 +184,7 @@ public class HomePage implements Page {
 				// }
 				// }
 
-				UserGroup org = Application.getCurrentOrg();
+				// UserGroup org = Application.getCurrentOrg();
 
 				PaddedPanel pp = new PaddedPanel(20);
 
@@ -218,9 +214,9 @@ public class HomePage implements Page {
 
 				centerPanel.add(pp);
 
-				if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(org.getId()) == null) {
-					centerPanel.add(new RequestMembershipLink(org));
-				}
+				// if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(org.getId()) == null) {
+				// centerPanel.add(new RequestMembershipLink(org));
+				// }
 
 				// introduction
 				// centerPanel.add(new ArticleWidget(pageData.getIntro()));

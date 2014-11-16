@@ -333,14 +333,24 @@ img {
 
 .tile {
 	border: 1px solid #cccccc;
-/* 	-webkit-border-radius: 10px;  */
-/* 	-moz-border-radius: 10px; */
-/* 	border-radius: 10px; */
 	min-width: 250px;
+	min-height: 250px;
 	opacity: 0.8;
 }
 
 .tile:hover {
+	opacity: 1.0;
+	cursor: pointer;
+}
+
+.userTile {
+	opacity: 0.8;
+	background-color: #f4e499;
+	margin: 5px;
+	padding: 10px;
+}
+
+.userTile:hover {
 	opacity: 1.0;
 	cursor: pointer;
 }
@@ -376,6 +386,11 @@ img {
 }
 
 .headerPanel {
+	background-image: url(images/headerBackground.jpg);
+	color: #000000;
+}
+
+.headerPanel {
 	background: rgb(104,157,255); /* Old browsers */
 	background: -moz-linear-gradient(top,  rgba(104,157,255,1) 0%, rgba(44,83,158,1) 100%); /* FF3.6+ */
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(104,157,255,1)), color-stop(100%,rgba(44,83,158,1))); /* Chrome,Safari4+ */
@@ -388,13 +403,8 @@ img {
 	color: #ffffff;
 }
 
-.headerPanel {
-	background-image: url(images/headerBackground.jpg);
-	color: #000000;
-}
-
 .headerPanel .ClickLabel, .headerPanel a {
-	color: #000000;
+	color: #ffffff;
 }
 
 .bodyPanel {
@@ -767,7 +777,7 @@ img {
 	padding: 5px 15px 5px 15px;
 	vertical-align: bottom;
 	font-weight: normal;
-	color: black;
+	color: white;
 	cursor: pointer;
 }
 
