@@ -73,8 +73,8 @@ public final class Layout {
 		}
 	}
 
-	// private static final int HEADER_HEIGHT = 53;
-	private static final int HEADER_HEIGHT = 172;
+	private static final int HEADER_HEIGHT = 53;
+	// private static final int HEADER_HEIGHT = 172;
 	private static final int MENU_HEIGHT = 35;
 	private static final int LOGO_DIV_WIDTH = 115;
 	private final MainLayoutDock dock = new MainLayoutDock(Unit.PX);

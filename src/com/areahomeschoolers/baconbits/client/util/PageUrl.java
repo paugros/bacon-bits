@@ -71,6 +71,10 @@ public class PageUrl {
 		return "page=ResourceManagement";
 	}
 
+	public static String tagManagement() {
+		return "page=TagManagement";
+	}
+
 	public static String user(int id) {
 		String url = "page=User";
 		return (id == 0) ? url : url + "&userId=" + id;
@@ -87,6 +91,10 @@ public class PageUrl {
 
 	public static String userList() {
 		return "page=UserList";
+	}
+
+	public static String userTile() {
+		return "page=UserTile";
 	}
 
 	private PageUrl() {

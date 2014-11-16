@@ -151,6 +151,7 @@ public final class MainMenu extends MenuBar {
 
 		if (Application.isSystemAdministrator()) {
 			addLinkToMenu(menu, "Resource Management", PageUrl.resourceManagement());
+			addLinkToMenu(menu, "Tag Management", PageUrl.tagManagement());
 			menu.addItem("Change Logo", new ScheduledCommand() {
 				@Override
 				public void execute() {

@@ -33,6 +33,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource collapse();
 
+	ImageResource defaultImage();
+
 	ImageResource edit();
 
 	ImageResource event();

@@ -13,12 +13,16 @@ public class Tag extends EntityDto<Tag> {
 	private String name;
 	private Date addedDate;
 	private int addedById;
+	private Integer imageId;
 
 	// mapping
 	private int entityId;
 	private Date mappingAddedDate;
 	private int mappingId;
 	private TagMappingType mappingType;
+
+	// aux
+	private int count;
 
 	public int getAddedById() {
 		return addedById;
@@ -28,8 +32,19 @@ public class Tag extends EntityDto<Tag> {
 		return addedDate;
 	}
 
+	public int getCount() {
+		return count;
+	}
+
 	public int getEntityId() {
 		return entityId;
+	}
+
+	public Integer getImageId() {
+		if (imageId == null || imageId == 0) {
+			return null;
+		}
+		return imageId;
 	}
 
 	public Date getMappingAddedDate() {
@@ -70,8 +85,16 @@ public class Tag extends EntityDto<Tag> {
 		this.addedDate = addedDate;
 	}
 
+	public void setCount(int count) {
+		this.count = count;
+	}
+
 	public void setEntityId(int entityId) {
 		this.entityId = entityId;
+	}
+
+	public void setImageId(Integer imageId) {
+		this.imageId = imageId;
 	}
 
 	public void setMappingAddedDate(Date mappingAddedDate) {

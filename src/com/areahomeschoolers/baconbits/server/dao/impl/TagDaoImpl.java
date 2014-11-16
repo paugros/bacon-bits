@@ -109,14 +109,20 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 	public ArrayList<Tag> list(ArgMap<TagArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		final int entityId = args.getInt(TagArg.ENTITY_ID);
+		final boolean getCounts = args.getBoolean(TagArg.GET_COUNTS);
 		final TagMappingType mappingType = Common.isNullOrBlank(args.getString(TagArg.MAPPING_TYPE)) ? null : TagMappingType.valueOf(args
 				.getString(TagArg.MAPPING_TYPE));
 		int mappingId = args.getInt(TagArg.MAPPING_ID);
 
 		// tags
-		String sql = "select t.id, t.name, t.addedDate, t.addedById ";
+		String always = "t.id, t.name, t.addedDate, t.addedById, t.imageId ";
+		String sql = "select " + always;
 		if (mappingType != null) {
-			sql += ", tm.id as mappingId, tm.addedDate as mappingAddedDate ";
+			if (getCounts) {
+				sql += ", count(tm.id) as count ";
+			} else {
+				sql += ", tm.id as mappingId, tm.addedDate as mappingAddedDate ";
+			}
 		}
 		sql += "from tags t ";
 		if (mappingType != null) {
@@ -131,7 +137,12 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				sqlArgs.add(mappingId);
 			}
 
-			sql += "order by tm.id";
+			if (getCounts) {
+				sql += "group by " + always;
+				sql += "order by t.name";
+			} else {
+				sql += "order by tm.id";
+			}
 		} else {
 			sql += "order by t.name";
 		}
@@ -144,13 +155,18 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				t.setName(rs.getString("name"));
 				t.setAddedDate(rs.getTimestamp("addedDate"));
 				t.setAddedById(rs.getInt("addedById"));
+				t.setImageId(rs.getInt("imageId"));
 				if (entityId > 0) {
 					t.setEntityId(entityId);
 				}
 				if (mappingType != null) {
-					t.setMappingType(mappingType);
-					t.setMappingId(rs.getInt("mappingId"));
-					t.setMappingAddedDate(rs.getTimestamp("mappingAddedDate"));
+					if (getCounts) {
+						t.setCount(rs.getInt("count"));
+					} else {
+						t.setMappingType(mappingType);
+						t.setMappingId(rs.getInt("mappingId"));
+						t.setMappingAddedDate(rs.getTimestamp("mappingAddedDate"));
+					}
 				}
 				return t;
 			}
