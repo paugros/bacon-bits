@@ -45,6 +45,10 @@ public class PageUrl {
 		return "page=EventList";
 	}
 
+	public static String eventTile() {
+		return "page=EventTile";
+	}
+
 	public static String home() {
 		return "page=Home";
 	}
@@ -69,6 +73,10 @@ public class PageUrl {
 
 	public static String resourceManagement() {
 		return "page=ResourceManagement";
+	}
+
+	public static String tagGroup(String type) {
+		return "page=TagGroup&type=" + type;
 	}
 
 	public static String tagManagement() {

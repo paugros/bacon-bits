@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.resource.UserTile;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -14,6 +13,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -28,7 +28,6 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
@@ -38,7 +37,7 @@ public final class UserTilePage implements Page {
 	private VerticalPanel optionsPanel = new VerticalPanel();
 	private ArgMap<UserArg> args = getDefaultArgs();
 	// private TextBox searchControl;
-	private FlowPanel fp = new FlowPanel();
+	private TilePanel fp = new TilePanel();
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
 	public UserTilePage(final VerticalPanel page) {
@@ -82,7 +81,7 @@ public final class UserTilePage implements Page {
 				fp.clear();
 
 				for (User u : result) {
-					fp.add(new UserTile(u));
+					fp.add(new UserTile(u), u.getId());
 				}
 			}
 		});

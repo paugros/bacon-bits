@@ -189,13 +189,13 @@ public class HomePage implements Page {
 				PaddedPanel pp = new PaddedPanel(20);
 
 				TileConfig ec = new TileConfig().setText("Events").setCount(pageData.getEventCount());
-				ec.setImageResource(MainImageBundle.INSTANCE.eventTile()).setUrl(PageUrl.eventList());
+				ec.setImageResource(MainImageBundle.INSTANCE.eventTile()).setUrl(PageUrl.tagGroup("EVENT"));
 				ec.setColor(0xe6b48f);
 				Tile eventsTile = new Tile(ec);
 				pp.add(eventsTile);
 
 				TileConfig uc = new TileConfig().setText("Users").setCount(pageData.getUserCount());
-				uc.setImageResource(MainImageBundle.INSTANCE.userTile()).setUrl(PageUrl.userList());
+				uc.setImageResource(MainImageBundle.INSTANCE.userTile()).setUrl(PageUrl.userTile());
 				uc.setColor(0xf4e499);
 				Tile usersTile = new Tile(uc);
 				pp.add(usersTile);
