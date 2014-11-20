@@ -6,33 +6,45 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
 import com.areahomeschoolers.baconbits.client.content.resource.TileConfig;
+import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
+import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagService;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
-import com.google.gwt.dom.client.Style.Display;
-import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class TagGroupPage implements Page {
 	private ArgMap<TagArg> args = new ArgMap<TagArg>();
 	private TagServiceAsync tagService = (TagServiceAsync) ServiceCache.getService(TagService.class);
-	private FlowPanel fp = new FlowPanel();
+	private TilePanel fp = new TilePanel();
 
 	public TagGroupPage(final VerticalPanel page) {
+		TagMappingType type = null;
+
+		try {
+			type = TagMappingType.valueOf(Url.getParameter("type"));
+		} catch (Exception e) {
+		}
+
+		if (type == null) {
+			new ErrorPage(PageError.PAGE_NOT_FOUND);
+			return;
+		}
+
 		final String title = "Categories";
 		fp.setWidth("100%");
 
-		args.put(TagArg.MAPPING_TYPE, TagMappingType.RESOURCE.toString());
+		args.put(TagArg.MAPPING_TYPE, type.toString());
 		args.put(TagArg.GET_COUNTS);
 
 		tagService.list(args, new Callback<ArrayList<Tag>>() {
@@ -49,12 +61,7 @@ public final class TagGroupPage implements Page {
 					uc.setColor(0xf28e76);
 					Tile tile = new Tile(uc);
 
-					// wrapper
-					SimplePanel sp = new SimplePanel(tile);
-					sp.getElement().getStyle().setMargin(10, Unit.PX);
-					sp.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
-
-					fp.add(sp);
+					fp.add(tile);
 				}
 			}
 		});

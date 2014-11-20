@@ -18,6 +18,7 @@ import com.areahomeschoolers.baconbits.client.content.book.BookSearchPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventCalendarPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventListPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventPage;
+import com.areahomeschoolers.baconbits.client.content.event.EventTilePage;
 import com.areahomeschoolers.baconbits.client.content.event.PaymentPage;
 import com.areahomeschoolers.baconbits.client.content.event.RegistrationManagementPage;
 import com.areahomeschoolers.baconbits.client.content.home.HomePage;
@@ -353,6 +354,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new TagGroupPage(vp);
 		} else if ("UserTile".equals(page)) {
 			new UserTilePage(vp);
+		} else if ("EventTile".equals(page)) {
+			new EventTilePage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}
