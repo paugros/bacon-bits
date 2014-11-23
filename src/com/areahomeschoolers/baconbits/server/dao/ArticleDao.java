@@ -21,7 +21,7 @@ public interface ArticleDao {
 
 	public ArrayList<Article> list(ArgMap<ArticleArg> args);
 
-	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
+	@PreAuthorize("hasAnyRole('GROUP_ADMINISTRATORS', 'BLOG_CONTRIBUTORS')")
 	public Article save(Article article);
 
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
