@@ -1,23 +1,22 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
-import java.util.ArrayList;
-
 import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
+import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
-import com.areahomeschoolers.baconbits.client.rpc.Callback;
-import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
-import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
-import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SortDirection;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
-import com.areahomeschoolers.baconbits.shared.dto.User;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -30,18 +29,18 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public final class UserTilePage implements Page {
+public final class OldUserListPage implements Page {
 	private VerticalPanel optionsPanel = new VerticalPanel();
 	private ArgMap<UserArg> args = getDefaultArgs();
-	// private TextBox searchControl;
-	private TilePanel fp = new TilePanel();
-	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
+	private UserTable table;
+	private TextBox searchControl;
 
-	public UserTilePage(final VerticalPanel page) {
-		fp.setWidth("100%");
+	public OldUserListPage(final VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
@@ -53,7 +52,17 @@ public final class UserTilePage implements Page {
 		heading.addStyleName("hugeText");
 		page.add(heading);
 
-		// searchControl.setVisibleLength(30);
+		table = new UserTable(args);
+		table.removeColumn(UserColumn.STATUS);
+		table.removeColumn(UserColumn.SEX);
+		table.setDefaultSortColumn(UserColumn.ACTIVITY, SortDirection.SORT_DESC);
+
+		table.setTitle(title);
+		table.getTitleBar().addExcelControl();
+		table.getTitleBar().addSearchControl();
+
+		searchControl = table.getTitleBar().extractSearchControl();
+		searchControl.setVisibleLength(30);
 
 		// this is done after adding the search control, so we can move it into the options panel
 		optionsPanel.addStyleName("boxedBlurb");
@@ -62,29 +71,35 @@ public final class UserTilePage implements Page {
 
 		populateOptionsPanel();
 
-		page.add(fp);
-		Application.getLayout().setPage(title, page);
+		ContentWidth cw = null;
+		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+			Hyperlink addLink = new Hyperlink("Add", PageUrl.user(0));
+			table.getTitleBar().addLink(addLink);
+			table.addStatusFilterBox();
+			cw = ContentWidth.MAXWIDTH1200PX;
+		} else {
+			table.removeColumn(UserColumn.GROUP);
+			table.removeColumn(UserColumn.EMAIL);
+			table.removeColumn(UserColumn.PHONE);
+			cw = ContentWidth.MAXWIDTH1000PX;
+		}
 
-		populate();
+		page.add(WidgetFactory.newSection(table, cw));
+
+		table.addDataReturnHandler(new DataReturnHandler() {
+			@Override
+			public void onDataReturn() {
+				Application.getLayout().setPage(title, page);
+			}
+		});
+
+		table.populate();
 	}
 
 	private ArgMap<UserArg> getDefaultArgs() {
 		ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 		args.put(UserArg.PARENTS);
 		return args;
-	}
-
-	private void populate() {
-		userService.list(args, new Callback<ArrayList<User>>() {
-			@Override
-			protected void doOnSuccess(ArrayList<User> result) {
-				fp.clear();
-
-				for (User u : result) {
-					fp.add(new UserTile(u), u.getId());
-				}
-			}
-		});
 	}
 
 	private void populateOptionsPanel() {
@@ -134,7 +149,7 @@ public final class UserTilePage implements Page {
 					break;
 				}
 
-				populate();
+				table.populate();
 			}
 		});
 
@@ -150,7 +165,7 @@ public final class UserTilePage implements Page {
 			@Override
 			public void onChange(ChangeEvent event) {
 				args.put(UserArg.AGES, ageInput.getValue());
-				populate();
+				table.populate();
 			}
 		});
 
@@ -166,7 +181,7 @@ public final class UserTilePage implements Page {
 			public void onChange(ChangeEvent event) {
 				args.put(UserArg.WITHIN_MILES, milesInput.getIntValue());
 				if (!locationInput.getText().isEmpty()) {
-					populate();
+					table.populate();
 				}
 			}
 		});
@@ -176,7 +191,7 @@ public final class UserTilePage implements Page {
 			public void execute() {
 				args.remove(UserArg.WITHIN_LAT);
 				args.remove(UserArg.WITHIN_LNG);
-				populate();
+				table.populate();
 			}
 		});
 
@@ -186,7 +201,7 @@ public final class UserTilePage implements Page {
 				args.put(UserArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
 				args.put(UserArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
 				args.put(UserArg.WITHIN_MILES, milesInput.getIntValue());
-				populate();
+				table.populate();
 			}
 		});
 
@@ -204,12 +219,12 @@ public final class UserTilePage implements Page {
 
 		optionsPanel.add(top);
 
-		// PaddedPanel sp = new PaddedPanel();
-		// sp.add(new Label("Search text"));
+		PaddedPanel sp = new PaddedPanel();
+		sp.add(new Label("Search text"));
 
-		// sp.add(searchControl);
+		sp.add(searchControl);
 
-		// optionsPanel.add(sp);
+		optionsPanel.add(sp);
 
 		if (Application.isAuthenticated()) {
 			CheckBox cb = new CheckBox("Only show members with whom I have interests in common");
@@ -222,7 +237,7 @@ public final class UserTilePage implements Page {
 						args.remove(UserArg.ONLY_COMMON_INTERESTS);
 					}
 
-					populate();
+					table.populate();
 				}
 			});
 			optionsPanel.add(cb);
@@ -243,6 +258,7 @@ public final class UserTilePage implements Page {
 		optionsPanel.clear();
 		populateOptionsPanel();
 		args = getDefaultArgs();
-		populate();
+		table.setArgMap(args);
+		table.populate();
 	}
 }

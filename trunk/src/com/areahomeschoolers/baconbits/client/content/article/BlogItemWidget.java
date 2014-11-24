@@ -42,7 +42,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class NewsItemWidget extends Composite {
+public class BlogItemWidget extends Composite {
 	private class ReadNewsItem extends Composite {
 		private VerticalPanel vp = new VerticalPanel();
 
@@ -50,7 +50,7 @@ public class NewsItemWidget extends Composite {
 			vp.setWidth(NEWS_ITEM_WIDTH + 6 + "px");
 			vp.addStyleName("grayUnderline");
 
-			Hyperlink title = new Hyperlink(item.getTitle(), PageUrl.news(item.getId()));
+			Hyperlink title = new Hyperlink(item.getTitle(), PageUrl.blog(item.getId()));
 			title.getElement().getStyle().setFontSize(25, Unit.PX);
 			title.getElement().getStyle().setColor("#333333");
 			vp.add(title);
@@ -109,7 +109,7 @@ public class NewsItemWidget extends Composite {
 			if (item.getCommentCount() == 1) {
 				s = "";
 			}
-			Hyperlink commentLink = new Hyperlink(item.getCommentCount() + " comment" + s, PageUrl.news(item.getId()) + "&comment=1");
+			Hyperlink commentLink = new Hyperlink(item.getCommentCount() + " comment" + s, PageUrl.blog(item.getId()) + "&comment=1");
 			commentLink.addStyleName("largeText");
 			commentsPanel.add(commentLink);
 
@@ -137,7 +137,7 @@ public class NewsItemWidget extends Composite {
 			vp.add(body);
 
 			if (Application.isAuthenticated() && Url.getIntegerParameter("comment") != 1) {
-				vp.add(new Hyperlink("Add comment", PageUrl.news(item.getId()) + "&comment=1"));
+				vp.add(new Hyperlink("Add comment", PageUrl.blog(item.getId()) + "&comment=1"));
 				vp.add(new Spacer(1));
 			}
 
@@ -245,7 +245,7 @@ public class NewsItemWidget extends Composite {
 			vp.add(ft);
 
 			final ControlledRichTextArea bodyInput = new ControlledRichTextArea();
-			bodyInput.getTextArea().setWidth(NewsItemWidget.NEWS_ITEM_WIDTH + 10 + "px");
+			bodyInput.getTextArea().setWidth(BlogItemWidget.NEWS_ITEM_WIDTH + 10 + "px");
 			FormField bodyField = form.createFormField("Body:", bodyInput, null);
 			bodyField.setInitializer(new Command() {
 				@Override
@@ -271,7 +271,7 @@ public class NewsItemWidget extends Composite {
 					if (item.isSaved()) {
 						panel.setWidget(new ReadNewsItem());
 					} else {
-						HistoryToken.set(PageUrl.news(0));
+						HistoryToken.set(PageUrl.blog(0));
 					}
 				}
 			});
@@ -298,7 +298,7 @@ public class NewsItemWidget extends Composite {
 						item = result;
 						panel.setWidget(new ReadNewsItem());
 					} else {
-						HistoryToken.set(PageUrl.news(result.getId()));
+						HistoryToken.set(PageUrl.blog(result.getId()));
 					}
 				}
 			});
@@ -309,7 +309,7 @@ public class NewsItemWidget extends Composite {
 	private SimplePanel panel = new SimplePanel();
 	private Article item;
 
-	public NewsItemWidget(Article item) {
+	public BlogItemWidget(Article item) {
 		this.item = item;
 
 		if (item.isSaved()) {

@@ -45,32 +45,32 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class NewsPage implements Page {
+public class BlogPage implements Page {
 	private final ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private VerticalPanel page = new VerticalPanel();
-	private int newsId = Url.getIntegerParameter("newsId");
+	private int blogId = Url.getIntegerParameter("postId");
 	private List<Article> items;
 	private Article item;
-	private VerticalPanel newsPanel = new VerticalPanel();
+	private VerticalPanel blogPanel = new VerticalPanel();
 	private ArgMap<ArticleArg> args;
 	private static HandlerRegistration registration;
 
-	public NewsPage(VerticalPanel p) {
+	public BlogPage(VerticalPanel p) {
 		page = p;
 		page.getElement().getStyle().setPaddingLeft(20, Unit.PX);
 
 		args = new ArgMap<ArticleArg>(ArticleArg.OWNING_ORG_ID, Application.getCurrentOrgId());
 		args.put(ArticleArg.MOST_RECENT, 15);
 		args.setStatus(Status.ACTIVE);
-		args.put(ArticleArg.NEWS_ONLY);
-		if (newsId > 0) {
-			args.put(ArticleArg.ARTICLE_ID, newsId);
+		args.put(ArticleArg.BLOG_ONLY);
+		if (blogId > 0) {
+			args.put(ArticleArg.ARTICLE_ID, blogId);
 		}
 		articleService.list(args, new Callback<ArrayList<Article>>() {
 			@Override
 			protected void doOnSuccess(ArrayList<Article> result) {
 				items = result;
-				if (newsId > 0) {
+				if (blogId > 0) {
 					item = result.get(0);
 				}
 
@@ -79,9 +79,9 @@ public class NewsPage implements Page {
 		});
 	}
 
-	private void addNewsItems(List<Article> list) {
+	private void addBlogItems(List<Article> list) {
 		for (Article i : list) {
-			newsPanel.add(new NewsItemWidget(i));
+			blogPanel.add(new BlogItemWidget(i));
 		}
 	}
 
@@ -91,7 +91,7 @@ public class NewsPage implements Page {
 			registration = History.addValueChangeHandler(new ValueChangeHandler<String>() {
 				@Override
 				public void onValueChange(ValueChangeEvent<String> event) {
-					if (event.getValue().contains("page=News")) {
+					if (event.getValue().contains("page=Blog")) {
 						return;
 					}
 
@@ -104,28 +104,28 @@ public class NewsPage implements Page {
 			});
 		}
 
-		newsPanel.getElement().getStyle().setBackgroundColor("#ffffff");
-		newsPanel.getElement().getStyle().setPaddingLeft(20, Unit.PX);
-		newsPanel.getElement().getStyle().setPaddingRight(10, Unit.PX);
-		newsPanel.getElement().getStyle().setPaddingTop(10, Unit.PX);
-		newsPanel.getElement().getStyle().setBorderColor("#dddddd");
-		newsPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-		newsPanel.getElement().getStyle().setBorderWidth(1, Unit.PX);
+		blogPanel.getElement().getStyle().setBackgroundColor("#ffffff");
+		blogPanel.getElement().getStyle().setPaddingLeft(20, Unit.PX);
+		blogPanel.getElement().getStyle().setPaddingRight(10, Unit.PX);
+		blogPanel.getElement().getStyle().setPaddingTop(10, Unit.PX);
+		blogPanel.getElement().getStyle().setBorderColor("#dddddd");
+		blogPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+		blogPanel.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
-		if (newsId < 0) {
+		if (blogId < 0) {
 			initListPage();
 		} else {
 			initSinglePage();
 		}
 
 		Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.LINKS, MiniModule.ADS);
-		Application.getLayout().setPage("News Bulletin", sb, page);
+		Application.getLayout().setPage("Blog", sb, page);
 	}
 
 	private void initListPage() {
 		// header
 		VerticalPanel outerVp = new VerticalPanel();
-		Label header = new Label("News Bulletin");
+		Label header = new Label("Blog");
 		header.getElement().getStyle().setFontSize(24, Unit.PX);
 		header.getElement().getStyle().setPaddingLeft(5, Unit.PX);
 		header.addStyleName("bold");
@@ -190,10 +190,10 @@ public class NewsPage implements Page {
 				articleService.list(args, new Callback<ArrayList<Article>>() {
 					@Override
 					protected void doOnSuccess(ArrayList<Article> result) {
-						newsPanel.clear();
+						blogPanel.clear();
 						items.clear();
 						items.addAll(result);
-						addNewsItems(result);
+						addBlogItems(result);
 						filterButton.setEnabled(true);
 					}
 				});
@@ -230,7 +230,7 @@ public class NewsPage implements Page {
 				@Override
 				public void onClick(ClickEvent event) {
 					page.clear();
-					newsPanel.clear();
+					blogPanel.clear();
 					item = new Article();
 					HistoryToken.append("newsId=0", false);
 					initSinglePage();
@@ -245,9 +245,9 @@ public class NewsPage implements Page {
 			page.add(pp);
 		}
 
-		page.add(newsPanel);
+		page.add(blogPanel);
 
-		addNewsItems(items);
+		addBlogItems(items);
 
 		ClickLabel more = new ClickLabel("Load more news >>", new ClickHandler() {
 			@Override
@@ -257,7 +257,7 @@ public class NewsPage implements Page {
 					@Override
 					protected void doOnSuccess(ArrayList<Article> result) {
 						items.addAll(result);
-						addNewsItems(result);
+						addBlogItems(result);
 					}
 				});
 			}
@@ -267,20 +267,20 @@ public class NewsPage implements Page {
 	}
 
 	private void initSinglePage() {
-		page.add(newsPanel);
+		page.add(blogPanel);
 
 		if (item == null) {
 			item = new Article();
 		}
 
-		Hyperlink back = new Hyperlink("<< News list", PageUrl.news(0));
-		newsPanel.add(back);
+		Hyperlink back = new Hyperlink("<< Blog", PageUrl.blog(0));
+		blogPanel.add(back);
 
-		newsPanel.add(new NewsItemWidget(item));
+		blogPanel.add(new BlogItemWidget(item));
 
-		if (newsId > 0) {
-			ArgMap<ArticleArg> args = new ArgMap<ArticleArg>(ArticleArg.ARTICLE_ID, newsId);
-			newsPanel.add(new NewsCommentSection(newsId, args));
+		if (blogId > 0) {
+			ArgMap<ArticleArg> args = new ArgMap<ArticleArg>(ArticleArg.ARTICLE_ID, blogId);
+			blogPanel.add(new BlogCommentSection(blogId, args));
 		}
 	}
 }

@@ -2,7 +2,7 @@ package com.areahomeschoolers.baconbits.shared.dto;
 
 import java.util.Date;
 
-public class NewsBulletinComment extends EntityDto<NewsBulletinComment> {
+public class BlogComment extends EntityDto<BlogComment> {
 	private static final long serialVersionUID = 1L;
 	private String comment, addedBy;
 	private Date addedDate;
@@ -10,7 +10,7 @@ public class NewsBulletinComment extends EntityDto<NewsBulletinComment> {
 	private int userId;
 	private int imageDocumentId;
 
-	public NewsBulletinComment() {
+	public BlogComment() {
 	}
 
 	public void addedBy(String addedBy) {

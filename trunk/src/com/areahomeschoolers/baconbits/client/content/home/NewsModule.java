@@ -40,7 +40,7 @@ public class NewsModule extends Composite {
 		args = new ArgMap<ArticleArg>(ArticleArg.OWNING_ORG_ID, Application.getCurrentOrgId());
 		args.put(ArticleArg.MOST_RECENT, 5);
 		args.setStatus(Status.ACTIVE);
-		args.put(ArticleArg.NEWS_ONLY);
+		args.put(ArticleArg.BLOG_ONLY);
 
 		articleService.list(args, new Callback<ArrayList<Article>>() {
 			@Override
@@ -72,7 +72,7 @@ public class NewsModule extends Composite {
 			pp.add(date);
 			pp.setCellVerticalAlignment(date, HasVerticalAlignment.ALIGN_MIDDLE);
 
-			Hyperlink title = new InlineHyperlink(item.getTitle(), PageUrl.news(item.getId()));
+			Hyperlink title = new InlineHyperlink(item.getTitle(), PageUrl.blog(item.getId()));
 			title.getElement().getStyle().setFontWeight(FontWeight.BOLD);
 			title.getElement().getStyle().setFontSize(14, Unit.PX);
 			title.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
@@ -80,7 +80,7 @@ public class NewsModule extends Composite {
 			String text = new HTML(item.getArticle()).getText();
 			text = text.replaceAll("\\.", ". ");
 
-			Hyperlink body = new InlineHyperlink("- " + text, PageUrl.news(item.getId()));
+			Hyperlink body = new InlineHyperlink("- " + text, PageUrl.blog(item.getId()));
 			body.getElement().getStyle().setHeight(2.83, Unit.EX);
 			body.getElement().getStyle().setColor("#777777");
 			body.getElement().getStyle().setOverflow(Overflow.HIDDEN);
@@ -96,7 +96,7 @@ public class NewsModule extends Composite {
 			vp.add(pp);
 		}
 
-		Hyperlink more = new Hyperlink(":: More news ::", PageUrl.news(0));
+		Hyperlink more = new Hyperlink(":: More news ::", PageUrl.blog(0));
 		vp.add(more);
 	}
 

@@ -80,6 +80,7 @@ public final class MainMenu extends MenuBar {
 
 		addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this, null, 0);
 
+		addItem("News", getBlogMenu());
 		addItem("Events", getEventsMenu());
 		addItem("Book Store", getBooksMenu());
 
@@ -215,9 +216,22 @@ public final class MainMenu extends MenuBar {
 		return menu;
 	}
 
+	private MenuBar getBlogMenu() {
+		MenuBar menu = new MenuBar(true);
+
+		addLinkToMenu(menu, "News Blog", PageUrl.blog(0));
+		addLinkToMenu(menu, "Events Calendar", PageUrl.eventCalendar());
+
+		if (Application.hasRole(AccessLevel.BLOG_CONTRIBUTORS)) {
+			menu.addSeparator();
+			addLinkToMenu(menu, "Add Blog Post", PageUrl.blog(0) + "&postId=0");
+		}
+		return menu;
+	}
+
 	private MenuBar getBooksMenu() {
 		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Search Books", PageUrl.bookSearch());
+		addLinkToMenu(menu, "Search Books", PageUrl.bookList());
 		if (Application.isAuthenticated() && Application.getCurrentUser().administratorOf(Application.getCurrentOrgId())) {
 			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
 		}
@@ -233,11 +247,9 @@ public final class MainMenu extends MenuBar {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Event Listing", PageUrl.eventList());
 		addLinkToMenu(menu, "Calendar", PageUrl.eventCalendar());
-		addLinkToMenu(menu, "Blog", PageUrl.news(0));
 
-		if (Application.isAuthenticated() && Application.isCitrus()) {
-			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
-		}
+		menu.addSeparator();
+		addLinkToMenu(menu, "Add Event", PageUrl.event(0));
 
 		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Registration Management", PageUrl.registrationManagement());

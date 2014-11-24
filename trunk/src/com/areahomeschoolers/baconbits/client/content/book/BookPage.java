@@ -88,7 +88,7 @@ public class BookPage implements Page {
 				BookTable.showEmailDialog(book);
 			}
 		}));
-		Hyperlink link = new Hyperlink("More from this seller", PageUrl.bookSearch() + "&sellerId=" + book.getUserId());
+		Hyperlink link = new Hyperlink("More from this seller", PageUrl.bookList() + "&sellerId=" + book.getUserId());
 		tb.addLink(link);
 
 		boolean editable = Application.administratorOf(book);

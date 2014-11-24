@@ -1,41 +1,76 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
+import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 
+import com.google.gwt.dom.client.Style.BorderStyle;
+import com.google.gwt.dom.client.Style.Overflow;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.WhiteSpace;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 
 public class BookTile extends Composite {
-	private Book book;
 
-	public BookTile(Book b) {
-		this.book = b;
-		String h = "";
+	public BookTile(final Book item) {
+		addDomHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				HistoryToken.set(PageUrl.book(item.getId()));
+			}
+		}, ClickEvent.getType());
 
-		h += "<table style=\"border-spacing: 4px;\"><tr><td style=\"vertical-align: top;\"><a href=\"#page=Book&bookId=" + book.getId() + "\">";
-		h += "<img src=\"/baconbits/service/file?id=" + book.getSmallImageId() + "\"></td>";
+		HorizontalPanel hp = new PaddedPanel(10);
+		hp.setWidth("400px");
+		hp.addStyleName("bookTile");
 
-		h += "<td style=\"vertical-align: top;\"><div><a href=\"#page=Book&bookId=" + book.getId() + "\" class=bold>" + book.getTitle() + "</a></div>";
+		Image i = new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
+		i.getElement().getStyle().setBorderColor("#c7c7c7");
+		i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+		i.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
-		h += "<div class=bold>" + Formatter.formatCurrency(book.getPrice()) + "</div>";
+		hp.add(new HTML(i.toString()));
 
-		if (!Common.isNullOrBlank(book.getAuthor())) {
-			h += "<div>By " + book.getAuthor() + "</div>";
+		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.user(item.getId()));
+		link.addStyleName("bold");
+		String text = link.toString() + "<br>";
+
+		if (!Common.isNullOrBlank(item.getAuthor())) {
+			text += item.getAuthor() + "<br>";
 		}
 
-		if (!Common.isNullOrBlank(book.getCondition())) {
-			h += "<div>Condition: " + book.getCondition() + "</div>";
+		if (!Common.isNullOrBlank(item.getPublisher())) {
+			String publish = item.getPublisher();
+			if (item.getPublishDate() != null) {
+				publish += ", " + Formatter.formatDate(item.getPublishDate(), "yyyy");
+			}
+
+			text += publish + "<br>";
 		}
 
-		// if (Application.isSystemAdministrator()) {
-		// ddt.add(new BuyBookWidget(book));
-		// }
+		text += "<span style=\"font-size: 16px; font-weight: bold;\">" + Formatter.formatCurrency(item.getPrice()) + "</span> / ";
+		text += item.getCondition() + " condition<br>";
 
-		HTML html = new HTML(h);
-		html.setWidth("600px");
-		initWidget(html);
+		HTML h = new HTML(text);
+		h.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
+		h.getElement().getStyle().setOverflow(Overflow.HIDDEN);
+		h.getElement().getStyle().setWidth(315, Unit.PX);
+
+		hp.add(h);
+		hp.setCellHorizontalAlignment(h, HasHorizontalAlignment.ALIGN_LEFT);
+
+		initWidget(hp);
 	}
 
 }

@@ -14,7 +14,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.Fader;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
-import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
+import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -30,7 +30,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class CommentWidget extends Composite {
 	private final ArticleServiceAsync newsService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 
-	public CommentWidget(final NewsBulletinComment comment) {
+	public CommentWidget(final BlogComment comment) {
 		PaddedPanel leftMugPanel = new PaddedPanel(5);
 		Image userPhoto = new Image();
 		int thumbNailPixelHeight = 60;
@@ -69,7 +69,7 @@ public class CommentWidget extends Composite {
 		mugVP.add(pp);
 
 		HTML html = new HTML(comment.getComment());
-		html.setWidth(NewsItemWidget.NEWS_ITEM_WIDTH + "px");
+		html.setWidth(BlogItemWidget.NEWS_ITEM_WIDTH + "px");
 		mugVP.add(html);
 
 		if (Application.administratorOfCurrentOrg()) {

@@ -32,6 +32,11 @@ public class TagServiceImpl extends GwtController implements TagService {
 	}
 
 	@Override
+	public void delete(int tagId) {
+		dao.delete(tagId);
+	}
+
+	@Override
 	public void deleteMapping(Tag tag) {
 		dao.deleteMapping(tag);
 	}
@@ -39,6 +44,11 @@ public class TagServiceImpl extends GwtController implements TagService {
 	@Override
 	public ArrayList<Tag> list(ArgMap<TagArg> args) {
 		return dao.list(args);
+	}
+
+	@Override
+	public void save(Tag tag) {
+		dao.save(tag);
 	}
 
 }

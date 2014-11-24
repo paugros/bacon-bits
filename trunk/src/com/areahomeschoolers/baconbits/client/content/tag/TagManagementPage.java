@@ -23,6 +23,7 @@ public final class TagManagementPage implements Page {
 		}
 
 		final String title = "Tags";
+		args.put(TagArg.GET_ALL_COUNTS);
 
 		final TagTable table = new TagTable(args);
 
