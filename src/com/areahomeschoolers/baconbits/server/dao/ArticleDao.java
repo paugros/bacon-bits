@@ -7,12 +7,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
-import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
+import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
 
 public interface ArticleDao {
 	public Article getById(int articleId);
 
-	public ArrayList<NewsBulletinComment> getComments(ArgMap<ArticleArg> args);
+	public ArrayList<BlogComment> getComments(ArgMap<ArticleArg> args);
 
 	public int getNewsCount();
 
@@ -25,5 +25,5 @@ public interface ArticleDao {
 	public Article save(Article article);
 
 	@PreAuthorize("hasRole('SITE_MEMBERS')")
-	public NewsBulletinComment saveComment(NewsBulletinComment comment);
+	public BlogComment saveComment(BlogComment comment);
 }

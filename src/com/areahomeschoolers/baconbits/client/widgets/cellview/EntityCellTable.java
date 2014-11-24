@@ -440,7 +440,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 			}
 		}, numberGetter);
 
-		setColumnAlignment(getColumnCount() - 1, HasHorizontalAlignment.ALIGN_RIGHT);
+		// setColumnAlignment(getColumnCount() - 1, HasHorizontalAlignment.ALIGN_RIGHT);
 		return col;
 	}
 

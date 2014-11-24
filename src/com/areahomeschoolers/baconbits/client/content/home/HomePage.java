@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
 import com.areahomeschoolers.baconbits.client.content.resource.TileConfig;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -19,7 +18,6 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedVerticalPanel;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -66,9 +64,9 @@ public class HomePage implements Page {
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private VerticalPanel page = new VerticalPanel();
 	private Grid grid = new Grid(1, 3);
-	private VerticalPanel leftPanel = new PaddedVerticalPanel();
+	// private VerticalPanel leftPanel = new PaddedVerticalPanel();
 	private VerticalPanel centerPanel = new VerticalPanel();
-	private VerticalPanel rightPanel = new PaddedVerticalPanel();
+	// private VerticalPanel rightPanel = new PaddedVerticalPanel();
 	private HomePageData pageData;
 
 	public HomePage(VerticalPanel p) {
@@ -124,14 +122,14 @@ public class HomePage implements Page {
 		}
 
 		centerPanel.setSpacing(10);
-		grid.setWidget(0, 0, leftPanel);
-		grid.setWidget(0, 1, centerPanel);
-		grid.setWidget(0, 2, rightPanel);
-		grid.getCellFormatter().setWidth(0, 0, "250px");
-		grid.getCellFormatter().setWidth(0, 2, "250px");
+		// grid.setWidget(0, 0, leftPanel);
+		grid.setWidget(0, 0, centerPanel);
+		// grid.setWidget(0, 1, rightPanel);
+		// grid.getCellFormatter().setWidth(0, 0, "250px");
+		// grid.getCellFormatter().setWidth(0, 2, "250px");
 		grid.getCellFormatter().setVerticalAlignment(0, 0, HasVerticalAlignment.ALIGN_TOP);
-		grid.getCellFormatter().setVerticalAlignment(0, 1, HasVerticalAlignment.ALIGN_TOP);
-		grid.getCellFormatter().setVerticalAlignment(0, 2, HasVerticalAlignment.ALIGN_TOP);
+		// grid.getCellFormatter().setVerticalAlignment(0, 1, HasVerticalAlignment.ALIGN_TOP);
+		// grid.getCellFormatter().setVerticalAlignment(0, 2, HasVerticalAlignment.ALIGN_TOP);
 		page.add(grid);
 
 		eventService.getHomePageData(new Callback<HomePageData>() {
@@ -140,7 +138,7 @@ public class HomePage implements Page {
 				pageData = result;
 
 				// citrus link
-				leftPanel.add(new CitrusMiniModule());
+				// leftPanel.add(new CitrusMiniModule());
 
 				// book promo
 				// if (!Application.isAuthenticated() || !signedUpForBooks()) {
@@ -194,20 +192,20 @@ public class HomePage implements Page {
 				Tile eventsTile = new Tile(ec);
 				pp.add(eventsTile);
 
-				// TileConfig uc = new TileConfig().setText("Users").setCount(pageData.getUserCount());
-				// uc.setImageResource(MainImageBundle.INSTANCE.userTile()).setUrl(PageUrl.userTile());
-				// uc.setColor(0xf4e499);
-				// Tile usersTile = new Tile(uc);
-				// pp.add(usersTile);
+				TileConfig uc = new TileConfig().setText("Users").setCount(pageData.getUserCount());
+				uc.setImageResource(MainImageBundle.INSTANCE.userTile()).setUrl(PageUrl.userList());
+				uc.setColor(0xf4e499);
+				Tile usersTile = new Tile(uc);
+				pp.add(usersTile);
 
 				TileConfig bc = new TileConfig().setText("Books").setCount(pageData.getBookCount());
-				bc.setImageResource(MainImageBundle.INSTANCE.bookTile()).setUrl(PageUrl.bookSearch());
+				bc.setImageResource(MainImageBundle.INSTANCE.bookTile()).setUrl(PageUrl.tagGroup("BOOK"));
 				bc.setColor(0xf28e76);
 				Tile booksTile = new Tile(bc);
 				pp.add(booksTile);
 
 				TileConfig bbc = new TileConfig().setText("Blog").setCount(pageData.getBlogCount());
-				bbc.setImageResource(MainImageBundle.INSTANCE.blogTile()).setUrl(PageUrl.news(0));
+				bbc.setImageResource(MainImageBundle.INSTANCE.blogTile()).setUrl(PageUrl.blog(0));
 				bbc.setColor(0xe6b48f);
 				Tile blogTile = new Tile(bbc);
 				pp.add(blogTile);

@@ -117,7 +117,7 @@ public class BookDetailsDialog extends DefaultDialog {
 		});
 		ddt.add(contact);
 
-		Hyperlink link = new Hyperlink("See all from this seller", PageUrl.bookSearch() + "&sellerId=" + book.getUserId());
+		Hyperlink link = new Hyperlink("See all from this seller", PageUrl.bookList() + "&sellerId=" + book.getUserId());
 		ddt.add(link);
 
 		dt.add(ddt);

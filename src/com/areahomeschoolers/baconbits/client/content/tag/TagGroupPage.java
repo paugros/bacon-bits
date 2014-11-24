@@ -27,9 +27,9 @@ public final class TagGroupPage implements Page {
 	private ArgMap<TagArg> args = new ArgMap<TagArg>();
 	private TagServiceAsync tagService = (TagServiceAsync) ServiceCache.getService(TagService.class);
 	private TilePanel fp = new TilePanel();
+	private TagMappingType type = null;
 
 	public TagGroupPage(final VerticalPanel page) {
-		TagMappingType type = null;
 
 		try {
 			type = TagMappingType.valueOf(Url.getParameter("type"));
@@ -57,7 +57,27 @@ public final class TagGroupPage implements Page {
 					} else {
 						uc.setImageResource(MainImageBundle.INSTANCE.defaultImage());
 					}
-					uc.setUrl(PageUrl.resourceManagement());
+					String url = null;
+					switch (type) {
+					case ARTICLE:
+						url = PageUrl.articleList();
+						break;
+					case BOOK:
+						url = PageUrl.bookList();
+						break;
+					case EVENT:
+						url = PageUrl.eventList();
+						break;
+					case RESOURCE:
+						url = PageUrl.resourceManagement();
+						break;
+					case USER:
+						url = PageUrl.userList();
+						break;
+					default:
+						break;
+					}
+					uc.setUrl(url);
 					uc.setColor(0xf28e76);
 					Tile tile = new Tile(uc);
 

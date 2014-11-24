@@ -318,7 +318,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 		pd.setBlogCount(articleDao.getNewsCount());
 
-		String sql = "select count(*) from events e " + createWhere() + " and e.endDate > now()";
+		String sql = "select count(*) from events e " + createWhere() + " and e.endDate > now() and e.active = 1";
 		pd.setEventCount(queryForInt(sql));
 
 		return pd;

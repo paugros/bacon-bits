@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.Sidebar;
-import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
@@ -15,6 +13,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -27,23 +26,22 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public final class BookSearchPage implements Page {
+public final class BookListPage implements Page {
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 	private VerticalPanel optionsPanel = new VerticalPanel();
 	private PaddedPanel top = new PaddedPanel(15);
 	private PaddedPanel bottom = new PaddedPanel(15);
-	private VerticalPanel bookPanel = new VerticalPanel();
 	private int sellerId = Url.getIntegerParameter("sellerId");
+	private TilePanel fp = new TilePanel();
 	private VerticalPanel page;
-	private boolean pageSet = false;
 
-	public BookSearchPage(final VerticalPanel p) {
+	public BookListPage(final VerticalPanel p) {
+		fp.setWidth("100%");
 		page = p;
 		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			args.put(BookArg.ONLINE_ONLY);
@@ -53,6 +51,29 @@ public final class BookSearchPage implements Page {
 			args.put(BookArg.USER_ID, sellerId);
 		}
 
+		populateOptionsPanel();
+
+		page.add(fp);
+
+		Application.getLayout().setPage("Books", page);
+
+		populate();
+	}
+
+	private void populate() {
+		bookService.list(args, new Callback<ArrayList<Book>>() {
+			@Override
+			protected void doOnSuccess(ArrayList<Book> books) {
+				fp.clear();
+
+				for (Book b : books) {
+					fp.add(new BookTile(b), b.getId());
+				}
+			}
+		});
+	}
+
+	private void populateOptionsPanel() {
 		optionsPanel.addStyleName("boxedBlurb");
 		optionsPanel.setSpacing(8);
 		Label label = new Label("Show");
@@ -63,7 +84,7 @@ public final class BookSearchPage implements Page {
 		page.add(new HTML(text));
 
 		if (sellerId > 0) {
-			Hyperlink all = new Hyperlink(">>> Books below are for a single seller. Click here to see all books.", PageUrl.bookSearch());
+			Hyperlink all = new Hyperlink(">>> Books below are for a single seller. Click here to see all books.", PageUrl.bookList());
 			all.addStyleName("largeText bold mediumPadding");
 			page.add(all);
 		}
@@ -174,38 +195,6 @@ public final class BookSearchPage implements Page {
 				optionsPanel.add(top);
 				optionsPanel.add(bottom);
 				page.insert(optionsPanel, 0);
-			}
-		});
-
-		bookPanel.setWidth("100%");
-		page.add(bookPanel);
-
-		populate();
-	}
-
-	private void populate() {
-		bookService.list(args, new Callback<ArrayList<Book>>() {
-			@Override
-			protected void doOnSuccess(ArrayList<Book> books) {
-				bookPanel.clear();
-
-				for (int i = 0; i < books.size(); i += 2) {
-					HorizontalPanel hp = new HorizontalPanel();
-					hp.add(new BookTile(books.get(i)));
-					if (i < books.size()) {
-						hp.add(new BookTile(books.get(i + 1)));
-					}
-					bookPanel.add(hp);
-				}
-
-				if (!pageSet) {
-					Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.NEW_BOOKS, MiniModule.SELL_BOOKS);
-					if (Application.isAuthenticated()) {
-						sb.add(MiniModule.ACTIVE_USERS);
-					}
-					Application.getLayout().setPage("Books", sb, page);
-					pageSet = true;
-				}
 			}
 		});
 	}

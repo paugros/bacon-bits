@@ -821,6 +821,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			user.setId(ServerUtils.getIdFromKeys(keys));
 		}
 
+		// children must inherit opt-out status
+		if (user.getParentId() == null) {
+			update("update users set directoryOptOut = ? where parentId = ?", user.getDirectoryOptOut(), user.getId());
+		}
+
 		boolean secureMapper = true;
 		// if you're not authenticated, it's because this user you just added is for yourself. no need for secure mapper.
 		if (!ServerContext.isAuthenticated() || ServerContext.getCurrentUser().administratorOf(user)) {
@@ -837,12 +842,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			args.put(UserGroupArg.ID, ServerContext.getCurrentOrgId());
 			UserGroup group = listGroups(args).get(0);
 
+			if (ServerContext.isCitrus()) {
+				// auto-approve members of main citrus site
+				group.setGroupApproved(true);
+				group.setUserApproved(true);
+			}
+
 			if (!ServerContext.isAuthenticated()) {
 				group.setUserApproved(true);
-				if (ServerContext.isCitrus()) {
-					// auto-approve members of main citrus site
-					group.setGroupApproved(true);
-				}
 			} else {
 				group.setGroupApproved(true);
 			}
@@ -1262,8 +1269,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String sql = "where 1 = 1 ";
 		if (!ServerContext.isAuthenticated()) {
 			sql += "and u.directoryOptOut = 0 \n";
-		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().isSwitched() || ServerContext.getCurrentUser().hasRole(
-				AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
+		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
 			int id = ServerContext.getCurrentUserId();
 			sql += "and (u.directoryOptOut = 0 or u.id = " + id + " or u.parentId = " + id + ") \n";
 		}
@@ -1318,6 +1324,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			levels.add(AccessLevel.ORGANIZATION_ADMINISTRATORS);
 			levels.add(AccessLevel.GROUP_ADMINISTRATORS);
 			levels.add(AccessLevel.GROUP_MEMBERS);
+			levels.add(AccessLevel.BLOG_CONTRIBUTORS);
 		}
 
 		user.setGroups(groups);

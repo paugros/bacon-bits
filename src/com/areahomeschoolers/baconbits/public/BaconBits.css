@@ -355,6 +355,18 @@ img {
 	cursor: pointer;
 }
 
+.bookTile {
+	opacity: 0.8;
+	background-color: #f28e76;
+	margin: 5px;
+	padding: 10px;
+}
+
+.bookTile:hover {
+	opacity: 1.0;
+	cursor: pointer;
+}
+
 .module {
 	border: 1px solid #cccccc;
 	-webkit-border-radius: 14px; 

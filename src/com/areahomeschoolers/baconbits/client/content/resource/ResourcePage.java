@@ -155,45 +155,47 @@ public class ResourcePage implements Page {
 		});
 		ft.addField(urlField);
 
-		final Label urlTextDisplay = new Label();
-		final TextBox urlTextInput = new TextBox();
-		urlTextInput.setVisibleLength(30);
-		urlTextInput.setMaxLength(100);
-		FormField urlTextField = form.createFormField("Link text:", urlTextInput, urlTextDisplay);
-		urlTextField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				urlTextDisplay.setText(Common.getDefaultIfNull(resource.getUrlDisplay()));
-				urlTextInput.setText(resource.getUrlDisplay());
-			}
-		});
-		urlTextField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				resource.setUrlDisplay(urlTextInput.getText());
-			}
-		});
-		ft.addField(urlTextField);
+		if (Application.isSystemAdministrator()) {
+			final Label urlTextDisplay = new Label();
+			final TextBox urlTextInput = new TextBox();
+			urlTextInput.setVisibleLength(30);
+			urlTextInput.setMaxLength(100);
+			FormField urlTextField = form.createFormField("Link display text:", urlTextInput, urlTextDisplay);
+			urlTextField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					urlTextDisplay.setText(Common.getDefaultIfNull(resource.getUrlDisplay()));
+					urlTextInput.setText(resource.getUrlDisplay());
+				}
+			});
+			urlTextField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					resource.setUrlDisplay(urlTextInput.getText());
+				}
+			});
+			ft.addField(urlTextField);
 
-		final Label adDisplay = new Label();
-		final DefaultListBox adInput = new DefaultListBox();
-		adInput.addItem("Yes");
-		adInput.addItem("No");
-		FormField adField = form.createFormField("Show in ads:", adInput, adDisplay);
-		adField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				adDisplay.setText(resource.getShowInAds() ? "Yes" : "No");
-				adInput.setValue(resource.getShowInAds() ? "Yes" : "No");
-			}
-		});
-		adField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				resource.setShowInAds(adInput.getValue().equals("Yes"));
-			}
-		});
-		ft.addField(adField);
+			final Label adDisplay = new Label();
+			final DefaultListBox adInput = new DefaultListBox();
+			adInput.addItem("Yes");
+			adInput.addItem("No");
+			FormField adField = form.createFormField("Show in ads:", adInput, adDisplay);
+			adField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					adDisplay.setText(resource.getShowInAds() ? "Yes" : "No");
+					adInput.setValue(resource.getShowInAds() ? "Yes" : "No");
+				}
+			});
+			adField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					resource.setShowInAds(adInput.getValue().equals("Yes"));
+				}
+			});
+			ft.addField(adField);
+		}
 
 		if (resource.isSaved() && resource.getShowInAds()) {
 			String clicks = "None";
@@ -203,41 +205,43 @@ public class ResourcePage implements Page {
 			ft.addField("Clicks:", clicks);
 		}
 
-		final Label startDateDisplay = new Label();
-		final ValidatorDateBox startDateInput = new ValidatorDateBox();
-		FormField startDateField = form.createFormField("Start date:", startDateInput, startDateDisplay);
-		startDateField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				startDateDisplay.setText(Formatter.formatDate(resource.getStartDate()));
-				startDateInput.setValue(resource.getStartDate());
-			}
-		});
-		startDateField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				resource.setStartDate(startDateInput.getValue());
-			}
-		});
-		ft.addField(startDateField);
+		if (Application.isSystemAdministrator()) {
+			final Label startDateDisplay = new Label();
+			final ValidatorDateBox startDateInput = new ValidatorDateBox();
+			FormField startDateField = form.createFormField("Start date:", startDateInput, startDateDisplay);
+			startDateField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					startDateDisplay.setText(Formatter.formatDate(resource.getStartDate()));
+					startDateInput.setValue(resource.getStartDate());
+				}
+			});
+			startDateField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					resource.setStartDate(startDateInput.getValue());
+				}
+			});
+			ft.addField(startDateField);
 
-		final Label endDateDisplay = new Label();
-		final ValidatorDateBox endDateInput = new ValidatorDateBox();
-		FormField endDateField = form.createFormField("End date:", endDateInput, endDateDisplay);
-		endDateField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				endDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(resource.getEndDate())));
-				endDateInput.setValue(resource.getEndDate());
-			}
-		});
-		endDateField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				resource.setEndDate(endDateInput.getValue());
-			}
-		});
-		ft.addField(endDateField);
+			final Label endDateDisplay = new Label();
+			final ValidatorDateBox endDateInput = new ValidatorDateBox();
+			FormField endDateField = form.createFormField("End date:", endDateInput, endDateDisplay);
+			endDateField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					endDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(resource.getEndDate())));
+					endDateInput.setValue(resource.getEndDate());
+				}
+			});
+			endDateField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					resource.setEndDate(endDateInput.getValue());
+				}
+			});
+			ft.addField(endDateField);
+		}
 
 		final Label emailDisplay = new Label();
 		final EmailTextBox emailInput = new EmailTextBox();
@@ -280,27 +284,29 @@ public class ResourcePage implements Page {
 		form.addField(addressField);
 		ft.addField(addressField);
 
-		final Label scopeDisplay = new Label();
-		final DefaultListBox scopeInput = new DefaultListBox();
-		scopeInput.addItem("N/A", 0);
-		for (Data d : pd.getAddressScopes()) {
-			scopeInput.addItem(d.get("scope"), d.getId());
+		if (Application.isSystemAdministrator()) {
+			final Label scopeDisplay = new Label();
+			final DefaultListBox scopeInput = new DefaultListBox();
+			scopeInput.addItem("N/A", 0);
+			for (Data d : pd.getAddressScopes()) {
+				scopeInput.addItem(d.get("scope"), d.getId());
+			}
+			FormField scopeField = form.createFormField("Address scope:", scopeInput, scopeDisplay);
+			scopeField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					scopeDisplay.setText(Common.getDefaultIfNull(resource.getAddressScope(), "N/A"));
+					scopeInput.setValue(resource.getAddressScopeId());
+				}
+			});
+			scopeField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					resource.setAddressScopeId(scopeInput.getIntValue());
+				}
+			});
+			ft.addField(scopeField);
 		}
-		FormField scopeField = form.createFormField("Address scope:", scopeInput, scopeDisplay);
-		scopeField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				scopeDisplay.setText(Common.getDefaultIfNull(resource.getAddressScope(), "N/A"));
-				scopeInput.setValue(resource.getAddressScopeId());
-			}
-		});
-		scopeField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				resource.setAddressScopeId(scopeInput.getIntValue());
-			}
-		});
-		ft.addField(scopeField);
 
 		if (resource.isSaved() && (resource.hasTags() || allowEdit())) {
 			TagSection ts = new TagSection(TagMappingType.RESOURCE, resource.getId());

@@ -17,7 +17,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public enum AccessLevel implements IsSerializable, Serializable {
 		PUBLIC(1, "Public"), SITE_MEMBERS(2, "Site members"), GROUP_MEMBERS(3, "Group members"), GROUP_ADMINISTRATORS(4, "Group administrators"), ORGANIZATION_ADMINISTRATORS(
-				6, "Organization administrators"), SYSTEM_ADMINISTRATORS(7, "System administrators");
+				6, "Organization administrators"), SYSTEM_ADMINISTRATORS(7, "System administrators"), BLOG_CONTRIBUTORS(33, "Blog contributors");
 
 		private static final Map<Integer, AccessLevel> lookup = new HashMap<Integer, AccessLevel>();
 

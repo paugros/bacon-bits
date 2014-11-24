@@ -27,7 +27,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
-import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
+import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -61,10 +61,10 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		}
 	}
 
-	private final class NewsBulletinCommentMapper implements RowMapper<NewsBulletinComment> {
+	private final class BlogCommentMapper implements RowMapper<BlogComment> {
 		@Override
-		public NewsBulletinComment mapRow(ResultSet rs, int rowNum) throws SQLException {
-			NewsBulletinComment comment = new NewsBulletinComment();
+		public BlogComment mapRow(ResultSet rs, int rowNum) throws SQLException {
+			BlogComment comment = new BlogComment();
 			comment.setId(rs.getInt("id"));
 			comment.setUserId(rs.getInt("userId"));
 
@@ -106,7 +106,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	}
 
 	@Override
-	public ArrayList<NewsBulletinComment> getComments(ArgMap<ArticleArg> args) {
+	public ArrayList<BlogComment> getComments(ArgMap<ArticleArg> args) {
 		int newsId = args.getInt(ArticleArg.ARTICLE_ID);
 		int commentId = args.getInt(ArticleArg.COMMENT_ID);
 		List<Object> sqlArgs = new ArrayList<Object>();
@@ -125,7 +125,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		}
 		sql += "order by c.addedDate desc";
 
-		return query(sql, new NewsBulletinCommentMapper(), sqlArgs.toArray());
+		return query(sql, new BlogCommentMapper(), sqlArgs.toArray());
 	}
 
 	@Override
@@ -166,7 +166,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		int top = args.getInt(ArticleArg.MOST_RECENT);
 		String idString = args.getString(ArticleArg.IDS);
 		int orgId = args.getInt(ArticleArg.OWNING_ORG_ID);
-		boolean newsOnly = args.getBoolean(ArticleArg.NEWS_ONLY);
+		boolean newsOnly = args.getBoolean(ArticleArg.BLOG_ONLY);
 		int beforeId = args.getInt(ArticleArg.BEFORE_ID);
 		String search = args.getString(ArticleArg.SEARCH);
 		Date beforeDate = args.getDate(ArticleArg.BEFORE_DATE);
@@ -274,7 +274,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	}
 
 	@Override
-	public NewsBulletinComment saveComment(NewsBulletinComment comment) {
+	public BlogComment saveComment(BlogComment comment) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(comment);
 
 		if (comment.isSaved()) {

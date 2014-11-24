@@ -26,7 +26,7 @@ public class TilePanel extends Composite {
 
 	public void add(Widget tile, Integer itemId) {
 		SimplePanel sp = new SimplePanel(tile);
-		sp.getElement().getStyle().setMargin(8, Unit.PX);
+		sp.getElement().getStyle().setMargin(6, Unit.PX);
 		sp.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
 
 		if (itemId != null) {

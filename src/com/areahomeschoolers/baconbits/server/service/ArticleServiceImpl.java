@@ -12,7 +12,7 @@ import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
-import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
+import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
 
 @Controller
 @RequestMapping("/article")
@@ -33,7 +33,7 @@ public class ArticleServiceImpl extends GwtController implements ArticleService 
 	}
 
 	@Override
-	public ArrayList<NewsBulletinComment> getComments(ArgMap<ArticleArg> args) {
+	public ArrayList<BlogComment> getComments(ArgMap<ArticleArg> args) {
 		return dao.getComments(args);
 	}
 
@@ -53,7 +53,7 @@ public class ArticleServiceImpl extends GwtController implements ArticleService 
 	}
 
 	@Override
-	public NewsBulletinComment saveComment(NewsBulletinComment comment) {
+	public BlogComment saveComment(BlogComment comment) {
 		return dao.saveComment(comment);
 	}
 

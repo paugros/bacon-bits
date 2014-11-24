@@ -15,9 +15,18 @@ public class PageUrl {
 		return "page=ArticleList";
 	}
 
+	public static String blog(int id) {
+		String url = "page=News";
+		return (id == 0) ? url : url + "&postId=" + id;
+	}
+
 	public static String book(int id) {
 		String url = "page=Book";
 		return (id == 0) ? url : url + "&bookId=" + id;
+	}
+
+	public static String bookList() {
+		return "page=BookList";
 	}
 
 	public static String bookManagement() {
@@ -26,10 +35,6 @@ public class PageUrl {
 
 	public static String bookReceipt() {
 		return "page=BookReceipt";
-	}
-
-	public static String bookSearch() {
-		return "page=BookSearch";
 	}
 
 	public static String event(int id) {
@@ -45,17 +50,8 @@ public class PageUrl {
 		return "page=EventList";
 	}
 
-	public static String eventTile() {
-		return "page=EventTile";
-	}
-
 	public static String home() {
 		return "page=Home";
-	}
-
-	public static String news(int id) {
-		String url = "page=News";
-		return (id == 0) ? url : url + "&newsId=" + id;
 	}
 
 	public static String payment() {
@@ -99,10 +95,6 @@ public class PageUrl {
 
 	public static String userList() {
 		return "page=UserList";
-	}
-
-	public static String userTile() {
-		return "page=UserTile";
 	}
 
 	private PageUrl() {

@@ -1,29 +1,27 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
-import com.areahomeschoolers.baconbits.client.content.Sidebar;
-import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
-import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColumn;
-import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
+import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
+import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
-import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.MonthPicker;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
-import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -33,22 +31,23 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class EventListPage implements Page {
 	private MonthPicker monthBox;
 	private DefaultListBox ageBox;
 	private DefaultListBox categoryBox;
-	private EventTable table;
 	private static final String NEWLY_ADDED_TOKEN = "newlyAdded";
 	private boolean showCommunity = Url.getBooleanParameter("showCommunity");
 	private boolean newlyAdded = Url.getBooleanParameter(NEWLY_ADDED_TOKEN);
+	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
+	private TilePanel fp = new TilePanel();
+	private ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
+	private ArrayList<Event> events;
+	private boolean runOnce;
 
 	public EventListPage(final VerticalPanel page) {
-		final ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 		if (showCommunity) {
 			args.put(EventArg.ONLY_COMMUNITY);
 		}
@@ -56,7 +55,6 @@ public final class EventListPage implements Page {
 			args.put(EventArg.NEWLY_ADDED);
 		}
 		final String title = showCommunity ? "Community Events" : "Events";
-		table = new EventTable(args);
 
 		if (!showCommunity) {
 			VerticalPanel vp = new VerticalPanel();
@@ -127,7 +125,7 @@ public final class EventListPage implements Page {
 				public void onChange(ChangeEvent event) {
 					args.put(EventArg.WITHIN_MILES, milesInput.getIntValue());
 					if (!locationInput.getText().isEmpty()) {
-						table.populate();
+						populate();
 					}
 				}
 			});
@@ -137,7 +135,7 @@ public final class EventListPage implements Page {
 				public void execute() {
 					args.remove(EventArg.WITHIN_LAT);
 					args.remove(EventArg.WITHIN_LNG);
-					table.populate();
+					populate();
 				}
 			});
 
@@ -147,7 +145,7 @@ public final class EventListPage implements Page {
 					args.put(EventArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
 					args.put(EventArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
 					args.put(EventArg.WITHIN_MILES, milesInput.getIntValue());
-					table.populate();
+					populate();
 				}
 			});
 
@@ -161,12 +159,12 @@ public final class EventListPage implements Page {
 			}
 			vpp.add(bottom);
 
-			PaddedPanel searchPanel = new PaddedPanel(15);
-			searchPanel.add(new Label("with text"));
-			TextBox searchControl = table.getTitleBar().extractSearchControl();
-			searchControl.setVisibleLength(50);
-			searchPanel.add(searchControl);
-			vpp.add(searchPanel);
+			// PaddedPanel searchPanel = new PaddedPanel(15);
+			// searchPanel.add(new Label("with text"));
+			// TextBox searchControl = table.getTitleBar().extractSearchControl();
+			// searchControl.setVisibleLength(50);
+			// searchPanel.add(searchControl);
+			// vpp.add(searchPanel);
 
 			CheckBox cb = new CheckBox("Only show recently added events");
 			cb.setValue(newlyAdded, false);
@@ -181,7 +179,7 @@ public final class EventListPage implements Page {
 						args.remove(EventArg.NEWLY_ADDED);
 						HistoryToken.removeToken(NEWLY_ADDED_TOKEN, false);
 					}
-					table.populate();
+					populate();
 				}
 			});
 			vpp.add(cb);
@@ -191,56 +189,12 @@ public final class EventListPage implements Page {
 			hp.add(vp);
 
 			page.add(hp);
-			// page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH1000PX));
-
-			table.addDataReturnHandler(new DataReturnHandler() {
-				@Override
-				public void onDataReturn() {
-					if (table.returnHandlersHaveRun()) {
-						return;
-					}
-					// add in categories
-					Map<Integer, String> categories = new HashMap<Integer, String>();
-					for (Event item : table.getFullList()) {
-						categories.put(item.getCategoryId(), item.getCategory());
-					}
-
-					for (int id : categories.keySet()) {
-						categoryBox.addItem(categories.get(id), id);
-					}
-				}
-			});
 		}
 
-		table.addDataReturnHandler(new DataReturnHandler() {
-			@Override
-			public void onDataReturn() {
-				if (table.returnHandlersHaveRun()) {
-					return;
-				}
+		page.add(fp);
+		Application.getLayout().setPage(title, page);
 
-				Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.COMMUNITY_EVENTS, MiniModule.SELL_BOOKS);
-				Application.getLayout().setPage(title, sb, page);
-			}
-		});
-
-		if (showCommunity) {
-			table.removeColumn(EventColumn.CATEGORY);
-			table.removeColumn(EventColumn.REGISTER);
-			table.removeColumn(EventColumn.REGISTERED);
-		}
-		table.setTitle(title);
-		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
-			Hyperlink addLink = new Hyperlink("Add", PageUrl.event(0));
-			table.getTitleBar().addLink(addLink);
-		}
-
-		table.addStatusFilterBox();
-		table.getTitleBar().addSearchControl();
-		table.getTitleBar().addExcelControl();
-		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH900PX));
-
-		table.populate();
+		populate();
 	}
 
 	private void applyTableFilter() {
@@ -250,11 +204,11 @@ public final class EventListPage implements Page {
 		int categoryId = categoryBox.getIntValue();
 
 		if (month == 0 && age == 0 && categoryId == 0) {
-			table.showAllItems();
+			fp.showAll();
 			return;
 		}
 
-		for (Event e : table.getFullList()) {
+		for (Event e : events) {
 			boolean monthMatch = false;
 			boolean ageMatch = false;
 			boolean categoryMatch = false;
@@ -287,13 +241,40 @@ public final class EventListPage implements Page {
 			}
 
 			if (monthMatch && ageMatch && categoryMatch) {
-				table.showItem(e, false, false, false);
+				fp.show(e);
 			} else {
-				table.hideItem(e, false, false);
+				fp.hide(e);
 			}
 		}
 
-		table.refresh(false);
-		table.sort();
+	}
+
+	private void populate() {
+		eventService.list(args, new Callback<ArrayList<Event>>() {
+			@Override
+			protected void doOnSuccess(ArrayList<Event> result) {
+				events = result;
+				fp.clear();
+
+				for (Event e : result) {
+					fp.add(new EventTile(e), e.getId());
+				}
+
+				if (runOnce) {
+					return;
+				}
+
+				runOnce = true;
+				// add in categories
+				Map<Integer, String> categories = new HashMap<Integer, String>();
+				for (Event item : result) {
+					categories.put(item.getCategoryId(), item.getCategory());
+				}
+
+				for (int id : categories.keySet()) {
+					categoryBox.addItem(categories.get(id), id);
+				}
+			}
+		});
 	}
 }

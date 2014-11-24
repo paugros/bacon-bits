@@ -3,6 +3,8 @@ package com.areahomeschoolers.baconbits.server.dao.impl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -84,6 +86,11 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 	}
 
 	@Override
+	public void delete(int tagId) {
+		update("delete from tags where id = ?", tagId);
+	}
+
+	@Override
 	public void deleteMapping(Tag tag) {
 		String sql = "delete from " + tag.getMappingTable() + " where id = ?";
 		update(sql, tag.getMappingId());
@@ -110,25 +117,43 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		final int entityId = args.getInt(TagArg.ENTITY_ID);
 		final boolean getCounts = args.getBoolean(TagArg.GET_COUNTS);
+		final boolean getAllCounts = args.getBoolean(TagArg.GET_ALL_COUNTS);
 		final TagMappingType mappingType = Common.isNullOrBlank(args.getString(TagArg.MAPPING_TYPE)) ? null : TagMappingType.valueOf(args
 				.getString(TagArg.MAPPING_TYPE));
 		int mappingId = args.getInt(TagArg.MAPPING_ID);
 
 		// tags
-		String always = "t.id, t.name, t.addedDate, t.addedById, t.imageId ";
+		String always = "t.id, t.name, t.addedDate, t.addedById, t.imageId \n";
 		String sql = "select " + always;
+
 		if (mappingType != null) {
 			if (getCounts) {
-				sql += ", count(tm.id) as count ";
+				sql += ", count(tm.id) as count \n";
 			} else {
-				sql += ", tm.id as mappingId, tm.addedDate as mappingAddedDate ";
+				sql += ", tm.id as mappingId, tm.addedDate as mappingAddedDate \n";
 			}
 		}
-		sql += "from tags t ";
+		if (getAllCounts) {
+			sql += ", tm.count \n";
+		}
+		sql += "from tags t \n";
+		if (getAllCounts) {
+			sql += "join (select tagId, count(id) as count from (\n";
+			EnumSet<TagMappingType> types = EnumSet.allOf(TagMappingType.class);
+			Iterator<TagMappingType> i = types.iterator();
+			while (i.hasNext()) {
+				String type = i.next().toString();
+				sql += "select id, tagId from tag" + Common.ucWords(type.toString()) + "Mapping \n";
+				if (i.hasNext()) {
+					sql += "union all \n";
+				}
+			}
+			sql += ") tcm group by tagId) tm on tm.tagId = t.id \n";
+		}
 		if (mappingType != null) {
-			sql += "join tag" + Common.ucWords(mappingType.toString()) + "Mapping tm on tm.tagId = t.id ";
+			sql += "join tag" + Common.ucWords(mappingType.toString()) + "Mapping tm on tm.tagId = t.id \n";
 			if (entityId > 0) {
-				sql += "and tm." + mappingType.toString().toLowerCase() + "Id = ? ";
+				sql += "and tm." + mappingType.toString().toLowerCase() + "Id = ? \n";
 				sqlArgs.add(entityId);
 			}
 
@@ -159,6 +184,10 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				if (entityId > 0) {
 					t.setEntityId(entityId);
 				}
+				if (getAllCounts) {
+					t.setCount(rs.getInt("count"));
+				}
+
 				if (mappingType != null) {
 					if (getCounts) {
 						t.setCount(rs.getInt("count"));
@@ -171,6 +200,11 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				return t;
 			}
 		}, sqlArgs.toArray());
+	}
+
+	@Override
+	public void save(Tag tag) {
+		update("update tags set name = ? where id = ?", tag.getName(), tag.getId());
 	}
 
 }

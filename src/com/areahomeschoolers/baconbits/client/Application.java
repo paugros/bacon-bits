@@ -10,15 +10,14 @@ import com.areahomeschoolers.baconbits.client.content.Layout;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleGroupPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleListPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
-import com.areahomeschoolers.baconbits.client.content.article.NewsPage;
+import com.areahomeschoolers.baconbits.client.content.article.BlogPage;
+import com.areahomeschoolers.baconbits.client.content.book.BookListPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookManagementPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookReceiptPage;
-import com.areahomeschoolers.baconbits.client.content.book.BookSearchPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventCalendarPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventListPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventPage;
-import com.areahomeschoolers.baconbits.client.content.event.EventTilePage;
 import com.areahomeschoolers.baconbits.client.content.event.PaymentPage;
 import com.areahomeschoolers.baconbits.client.content.event.RegistrationManagementPage;
 import com.areahomeschoolers.baconbits.client.content.home.HomePage;
@@ -33,7 +32,6 @@ import com.areahomeschoolers.baconbits.client.content.user.UserGroupPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserStatusIndicator;
-import com.areahomeschoolers.baconbits.client.content.user.UserTilePage;
 import com.areahomeschoolers.baconbits.client.event.CancelHandler;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
@@ -334,8 +332,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new BookReceiptPage(vp);
 		} else if ("BookManagement".equals(page)) {
 			new BookManagementPage(vp);
-		} else if ("BookSearch".equals(page)) {
-			new BookSearchPage(vp);
+		} else if ("BookList".equals(page)) {
+			new BookListPage(vp);
 		} else if ("EventCalendar".equals(page)) {
 			new EventCalendarPage(vp);
 		} else if ("RegistrationManagement".equals(page)) {
@@ -343,7 +341,7 @@ public final class Application implements ValueChangeHandler<String> {
 		} else if ("ArticleList".equals(page)) {
 			new ArticleListPage(vp);
 		} else if ("News".equals(page)) {
-			new NewsPage(vp);
+			new BlogPage(vp);
 		} else if ("ResourceManagement".equals(page)) {
 			new ResourceManagementPage(vp);
 		} else if ("TagManagement".equals(page)) {
@@ -352,10 +350,6 @@ public final class Application implements ValueChangeHandler<String> {
 			new ResourcePage(vp);
 		} else if ("TagGroup".equals(page)) {
 			new TagGroupPage(vp);
-		} else if ("UserTile".equals(page)) {
-			new UserTilePage(vp);
-		} else if ("EventTile".equals(page)) {
-			new EventTilePage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

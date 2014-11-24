@@ -16,7 +16,11 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 public interface TagService extends RemoteService {
 	public Tag addMapping(Tag mappingTag);
 
+	public void delete(int tagId);
+
 	public void deleteMapping(Tag tag);
 
 	public ArrayList<Tag> list(ArgMap<TagArg> args);
+
+	public void save(Tag tag);
 }

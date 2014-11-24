@@ -71,6 +71,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 			authList.add(new SimpleGrantedAuthority("ORGANIZATION_ADMINISTRATORS"));
 			authList.add(new SimpleGrantedAuthority("GROUP_ADMINISTRATORS"));
 			authList.add(new SimpleGrantedAuthority("GROUP_MEMBERS"));
+			authList.add(new SimpleGrantedAuthority("BLOG_CONTRIBUTORS"));
 		} else {
 			if (rs.getInt("isGroupMember") > 0) {
 				authList.add(new SimpleGrantedAuthority("GROUP_MEMBERS"));

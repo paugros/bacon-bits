@@ -11,7 +11,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
-import com.areahomeschoolers.baconbits.shared.dto.NewsBulletinComment;
+import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -23,11 +23,11 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class NewsCommentSection extends Composite {
+public class BlogCommentSection extends Composite {
 	private boolean commenting = Url.getIntegerParameter("comment") == 1;
 	private final ArticleServiceAsync newsService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 
-	public NewsCommentSection(final int newsId, ArgMap<ArticleArg> args) {
+	public BlogCommentSection(final int newsId, ArgMap<ArticleArg> args) {
 		final VerticalPanel vp = new VerticalPanel();
 		final VerticalPanel commentPanel = new VerticalPanel();
 
@@ -57,7 +57,7 @@ public class NewsCommentSection extends Composite {
 						return;
 					}
 
-					NewsBulletinComment comment = new NewsBulletinComment();
+					BlogComment comment = new BlogComment();
 					comment.setComment(commentBox.getText());
 					comment.setArticleId(newsId);
 					submit.setEnabled(false);
@@ -68,9 +68,9 @@ public class NewsCommentSection extends Composite {
 						}
 					});
 
-					newsService.saveComment(comment, new Callback<NewsBulletinComment>() {
+					newsService.saveComment(comment, new Callback<BlogComment>() {
 						@Override
-						protected void doOnSuccess(NewsBulletinComment result) {
+						protected void doOnSuccess(BlogComment result) {
 							commentPanel.insert(new CommentWidget(result), 0);
 							commentBox.setText("");
 							submit.setEnabled(true);
@@ -89,10 +89,10 @@ public class NewsCommentSection extends Composite {
 		commentPanel.setSpacing(10);
 		vp.add(commentPanel);
 
-		newsService.getComments(args, new Callback<ArrayList<NewsBulletinComment>>() {
+		newsService.getComments(args, new Callback<ArrayList<BlogComment>>() {
 			@Override
-			protected void doOnSuccess(ArrayList<NewsBulletinComment> result) {
-				for (NewsBulletinComment c : result) {
+			protected void doOnSuccess(ArrayList<BlogComment> result) {
+				for (BlogComment c : result) {
 					commentPanel.add(new CommentWidget(c));
 				}
 			}
