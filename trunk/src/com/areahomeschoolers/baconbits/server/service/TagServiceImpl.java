@@ -47,8 +47,8 @@ public class TagServiceImpl extends GwtController implements TagService {
 	}
 
 	@Override
-	public void save(Tag tag) {
-		dao.save(tag);
+	public Tag save(Tag tag) {
+		return dao.save(tag);
 	}
 
 }

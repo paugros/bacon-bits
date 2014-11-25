@@ -192,7 +192,7 @@ public class HomePage implements Page {
 				Tile eventsTile = new Tile(ec);
 				pp.add(eventsTile);
 
-				TileConfig uc = new TileConfig().setText("Users").setCount(pageData.getUserCount());
+				TileConfig uc = new TileConfig().setText("Homeschoolers").setCount(pageData.getUserCount());
 				uc.setImageResource(MainImageBundle.INSTANCE.userTile()).setUrl(PageUrl.userList());
 				uc.setColor(0xf4e499);
 				Tile usersTile = new Tile(uc);

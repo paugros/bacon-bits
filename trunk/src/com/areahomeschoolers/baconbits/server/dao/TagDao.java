@@ -15,5 +15,5 @@ public interface TagDao {
 
 	public ArrayList<Tag> list(ArgMap<TagArg> args);
 
-	public void save(Tag tag);
+	public Tag save(Tag tag);
 }

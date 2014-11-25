@@ -43,33 +43,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(tag);
 		String sql = "";
 		if (!tag.isSaved()) {
-			// new tag dupe validation
-			String name = tag.getName();
-
-			name = name.trim();
-			name = name.replaceAll("[^0-9A-Za-z ]+", "");
-			name = name.replaceAll("\\s+", " ");
-
-			String[] words = name.split(" ");
-			for (int i = 0; i < words.length; i++) {
-				String word = words[i];
-				if (Common.isAllLowerCase(word)) {
-					words[i] = Common.ucWords(word);
-				}
-			}
-
-			String nameout = Common.join(words, " ");
-			int tagId = queryForInt(0, "select id from tags where lower(name) = ?", nameout.toLowerCase());
-			if (tagId > 0) {
-				tag.setId(tagId);
-			} else {
-				tag.setName(nameout);
-				tag.setAddedById(ServerContext.getCurrentUserId());
-				sql = "insert into tags (name, addedById) values(:name, :addedById)";
-				KeyHolder keys = new GeneratedKeyHolder();
-				update(sql, namedParams, keys);
-				tag.setId(ServerUtils.getIdFromKeys(keys));
-			}
+			tag = addNewTag(tag);
 		}
 
 		sql = "insert into " + tag.getMappingTable() + "(" + tag.getMappingColumn() + ", tagId) ";
@@ -116,6 +90,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 	public ArrayList<Tag> list(ArgMap<TagArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
 		final int entityId = args.getInt(TagArg.ENTITY_ID);
+		final int tagId = args.getInt(TagArg.TAG_ID);
 		final boolean getCounts = args.getBoolean(TagArg.GET_COUNTS);
 		final boolean getAllCounts = args.getBoolean(TagArg.GET_ALL_COUNTS);
 		final TagMappingType mappingType = Common.isNullOrBlank(args.getString(TagArg.MAPPING_TYPE)) ? null : TagMappingType.valueOf(args
@@ -138,7 +113,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		}
 		sql += "from tags t \n";
 		if (getAllCounts) {
-			sql += "join (select tagId, count(id) as count from (\n";
+			sql += "left join (select tagId, count(id) as count from (\n";
 			EnumSet<TagMappingType> types = EnumSet.allOf(TagMappingType.class);
 			Iterator<TagMappingType> i = types.iterator();
 			while (i.hasNext()) {
@@ -150,6 +125,13 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			}
 			sql += ") tcm group by tagId) tm on tm.tagId = t.id \n";
 		}
+
+		String where = "where 1 = 1 ";
+		if (tagId > 0) {
+			where += "and t.id = ? ";
+			sqlArgs.add(tagId);
+		}
+
 		if (mappingType != null) {
 			sql += "join tag" + Common.ucWords(mappingType.toString()) + "Mapping tm on tm.tagId = t.id \n";
 			if (entityId > 0) {
@@ -162,6 +144,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				sqlArgs.add(mappingId);
 			}
 
+			sql += where;
 			if (getCounts) {
 				sql += "group by " + always;
 				sql += "order by t.name";
@@ -169,6 +152,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				sql += "order by tm.id";
 			}
 		} else {
+			sql += where;
 			sql += "order by t.name";
 		}
 
@@ -203,8 +187,49 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 	}
 
 	@Override
-	public void save(Tag tag) {
-		update("update tags set name = ? where id = ?", tag.getName(), tag.getId());
+	public Tag save(Tag tag) {
+		if (tag.isSaved()) {
+			update("update tags set name = ? where id = ?", tag.getName(), tag.getId());
+			return tag;
+		}
+
+		tag = addNewTag(tag);
+
+		return list(new ArgMap<TagArg>(TagArg.TAG_ID, tag.getId())).get(0);
+	}
+
+	private Tag addNewTag(Tag tag) {
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(tag);
+
+		// new tag dupe validation
+		String name = tag.getName();
+
+		name = name.trim();
+		name = name.replaceAll("[^0-9A-Za-z \\&\\-]+", "");
+		name = name.replaceAll("\\s+", " ");
+
+		String[] words = name.split(" ");
+		for (int i = 0; i < words.length; i++) {
+			String word = words[i];
+			if (Common.isAllLowerCase(word)) {
+				words[i] = Common.ucWords(word);
+			}
+		}
+
+		String nameout = Common.join(words, " ");
+		int tagId = queryForInt(0, "select id from tags where lower(name) = ?", nameout.toLowerCase());
+		if (tagId > 0) {
+			tag.setId(tagId);
+		} else {
+			tag.setName(nameout);
+			tag.setAddedById(ServerContext.getCurrentUserId());
+			String sql = "insert into tags (name, addedById) values(:name, :addedById)";
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
+			tag.setId(ServerUtils.getIdFromKeys(keys));
+		}
+
+		return tag;
 	}
 
 }

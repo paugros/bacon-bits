@@ -127,6 +127,8 @@ public class TagSection extends Composite {
 		suggestBox.getTextBox().getElement().setAttribute("maxlength", "25");
 		allowedChars.addAll(ClientUtils.ALLOWED_KEY_CODES);
 		allowedChars.add(new Character(' '));
+		allowedChars.add(new Character('-'));
+		allowedChars.add(new Character('&'));
 		suggestBox.getTextBox().addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
