@@ -22,5 +22,5 @@ public interface TagService extends RemoteService {
 
 	public ArrayList<Tag> list(ArgMap<TagArg> args);
 
-	public void save(Tag tag);
+	public Tag save(Tag tag);
 }

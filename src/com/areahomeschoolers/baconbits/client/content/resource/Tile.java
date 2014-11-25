@@ -1,15 +1,18 @@
 package com.areahomeschoolers.baconbits.client.content.resource;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -31,12 +34,9 @@ public class Tile extends Composite {
 		}, ClickEvent.getType());
 
 		vp.addStyleName("tile");
+		vp.setHeight("267px");
 		vp.setSpacing(12);
 		vp.getElement().getStyle().setBackgroundColor("#" + Long.toString(config.getColor(), 16));
-		// long bordercolor = (config.getColor() & 0x3e3e3e) >> 1 | (config.getColor() & 0x808080);
-		// vp.getElement().getStyle().setBorderColor("#" + Long.toString(bordercolor, 16));
-		// vp.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-		// vp.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
 		SimplePanel sp = new SimplePanel();
 		sp.getElement().getStyle().setHeight(200, Unit.PX);
@@ -51,18 +51,39 @@ public class Tile extends Composite {
 		vp.add(sp);
 		vp.setCellHorizontalAlignment(sp, HasHorizontalAlignment.ALIGN_CENTER);
 
-		PaddedPanel pp = new PaddedPanel();
-		pp.setWidth("100%");
-		Label label = new Label(config.getText());
-		label.addStyleName("hugeText");
-		pp.add(label);
+		HorizontalPanel hp = new HorizontalPanel();
+		hp.setWidth("100%");
+
+		String url = config.getUrl();
+		if (url.startsWith("page=")) {
+			url = Url.getBaseUrl() + "#" + url;
+		}
+
+		String textSize = null;
+		int countLength = Integer.toString(config.getCount()).length();
+		int width = 215;
+		if (config.getText().length() + countLength > 18) {
+			textSize = "largeText";
+			width -= countLength * 10;
+		} else {
+			textSize = "hugeText";
+			width -= countLength * 12;
+		}
+
+		String htmlText = "<a href=\"" + url + "\" class=\"" + textSize + "\" style=\"color: black;\">" + config.getText() + "</a>";
+		HTML link = new HTML(htmlText);
+
+		link.setWordWrap(false);
+		link.setWidth(width + "px");
+		link.getElement().getStyle().setOverflow(Overflow.HIDDEN);
+		hp.add(link);
 
 		Label countDisplay = new Label(Integer.toString(config.getCount()));
-		countDisplay.addStyleName("hugeText");
-		pp.add(countDisplay);
-		pp.setCellHorizontalAlignment(countDisplay, HasHorizontalAlignment.ALIGN_RIGHT);
+		countDisplay.addStyleName(textSize);
+		hp.add(countDisplay);
+		hp.setCellHorizontalAlignment(countDisplay, HasHorizontalAlignment.ALIGN_RIGHT);
 
-		vp.add(pp);
+		vp.add(hp);
 
 		initWidget(vp);
 	}

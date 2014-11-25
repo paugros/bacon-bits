@@ -42,7 +42,7 @@ public class BookTile extends Composite {
 
 		hp.add(new HTML(i.toString()));
 
-		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.user(item.getId()));
+		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.book(item.getId()));
 		link.addStyleName("bold");
 		String text = link.toString() + "<br>";
 
