@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -186,31 +187,34 @@ public class HomePage implements Page {
 
 				PaddedPanel pp = new PaddedPanel(20);
 
-				TileConfig ec = new TileConfig().setText("Events").setCount(pageData.getEventCount());
-				ec.setImageResource(MainImageBundle.INSTANCE.eventTile()).setUrl(PageUrl.tagGroup("EVENT"));
-				ec.setColor(0xe6b48f);
-				Tile eventsTile = new Tile(ec);
-				pp.add(eventsTile);
+				TileConfig ec = new TileConfig().setTagType(TagMappingType.EVENT).setCount(pageData.getEventCount());
+				ec.setImageResource(MainImageBundle.INSTANCE.eventTile());
+				pp.add(new Tile(ec));
 
-				TileConfig uc = new TileConfig().setText("Homeschoolers").setCount(pageData.getUserCount());
-				uc.setImageResource(MainImageBundle.INSTANCE.userTile()).setUrl(PageUrl.userList());
-				uc.setColor(0xf4e499);
-				Tile usersTile = new Tile(uc);
-				pp.add(usersTile);
+				TileConfig uc = new TileConfig().setTagType(TagMappingType.USER).setCount(pageData.getUserCount());
+				uc.setImageResource(MainImageBundle.INSTANCE.userTile());
+				pp.add(new Tile(uc));
 
-				TileConfig bc = new TileConfig().setText("Books").setCount(pageData.getBookCount());
-				bc.setImageResource(MainImageBundle.INSTANCE.bookTile()).setUrl(PageUrl.tagGroup("BOOK"));
-				bc.setColor(0xf28e76);
-				Tile booksTile = new Tile(bc);
-				pp.add(booksTile);
+				TileConfig bc = new TileConfig().setTagType(TagMappingType.BOOK).setCount(pageData.getBookCount());
+				bc.setImageResource(MainImageBundle.INSTANCE.bookTile());
+				pp.add(new Tile(bc));
 
-				TileConfig bbc = new TileConfig().setText("Blog").setCount(pageData.getBlogCount());
+				PaddedPanel ppp = new PaddedPanel(20);
+
+				TileConfig bbc = new TileConfig().setTagType(TagMappingType.ARTICLE).setText("Blog");
 				bbc.setImageResource(MainImageBundle.INSTANCE.blogTile()).setUrl(PageUrl.blog(0));
-				bbc.setColor(0xe6b48f);
-				Tile blogTile = new Tile(bbc);
-				pp.add(blogTile);
+				ppp.add(new Tile(bbc));
+
+				TileConfig rc = new TileConfig().setTagType(TagMappingType.RESOURCE).setCount(pageData.getResourceCount());
+				rc.setImageResource(MainImageBundle.INSTANCE.resourceTile());
+				ppp.add(new Tile(rc));
+
+				TileConfig ac = new TileConfig().setTagType(TagMappingType.ARTICLE).setCount(pageData.getArticleCount());
+				ac.setImageResource(MainImageBundle.INSTANCE.articleTile());
+				ppp.add(new Tile(ac));
 
 				centerPanel.add(pp);
+				centerPanel.add(ppp);
 
 				// if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(org.getId()) == null) {
 				// centerPanel.add(new RequestMembershipLink(org));

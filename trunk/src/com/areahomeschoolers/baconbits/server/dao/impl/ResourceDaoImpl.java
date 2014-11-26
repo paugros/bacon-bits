@@ -21,6 +21,7 @@ import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -97,6 +98,13 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	}
 
 	@Override
+	public int getCount() {
+		String sql = "select count(*) from resources r where isActive(r.startDate, r.endDate) = 1 and r.showInAds = 0";
+
+		return queryForInt(0, sql);
+	}
+
+	@Override
 	public ResourcePageData getPageData(int resourceId) {
 		ResourcePageData pd = new ResourcePageData();
 		if (resourceId > 0) {
@@ -130,6 +138,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	@Override
 	public ArrayList<Resource> list(ArgMap<ResourceArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
+		List<Integer> tagIds = args.getIntList(ResourceArg.HAS_TAGS);
 		int id = args.getInt(ResourceArg.ID);
 		int limit = args.getInt(ResourceArg.LIMIT);
 		boolean random = args.getBoolean(ResourceArg.RANDOM);
@@ -144,6 +153,12 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 		if (ad) {
 			sql += "and r.showInAds = 1 ";
+		}
+
+		if (!Common.isNullOrEmpty(tagIds)) {
+			sql += "and r.id in(select tm.resourceId from tagResourceMapping tm ";
+			sql += "join tags t on t.id = tm.tagId ";
+			sql += "where t.id in(" + Common.join(tagIds, ", ") + ")) ";
 		}
 
 		if (id > 0) {

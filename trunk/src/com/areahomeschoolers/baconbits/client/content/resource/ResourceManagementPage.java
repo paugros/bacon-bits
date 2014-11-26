@@ -6,8 +6,10 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -27,6 +29,9 @@ public final class ResourceManagementPage implements Page {
 		final String title = "Resources";
 
 		final ResourceTable table = new ResourceTable(args);
+		if (!Common.isNullOrBlank(Url.getParameter("tagIds"))) {
+			args.put(ResourceArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
+		}
 
 		table.setTitle(title);
 		table.getTitleBar().addLink(new Hyperlink("Add", PageUrl.resource(0)));

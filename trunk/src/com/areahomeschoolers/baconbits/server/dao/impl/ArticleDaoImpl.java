@@ -26,8 +26,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
-import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -129,11 +129,11 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	}
 
 	@Override
-	public int getNewsCount() {
+	public int getCount() {
 		String sql = "select count(*) from articles a ";
-		sql += "where a.newsItem = 1 and isActive(a.startDate, a.endDate) = 1 \n";
-		sql += "and a.addedDate >= date_add(now(), interval -2 week)\n";
-		return queryForInt(sql);
+		sql += createWhere();
+		sql += "and a.newsItem = 0 and isActive(a.startDate, a.endDate) = 1 \n";
+		return queryForInt(0, sql);
 	}
 
 	@Override
@@ -163,6 +163,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	@Override
 	public ArrayList<Article> list(ArgMap<ArticleArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
+		List<Integer> tagIds = args.getIntList(ArticleArg.HAS_TAGS);
 		int top = args.getInt(ArticleArg.MOST_RECENT);
 		String idString = args.getString(ArticleArg.IDS);
 		int orgId = args.getInt(ArticleArg.OWNING_ORG_ID);
@@ -196,6 +197,12 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		if (!search.isEmpty()) {
 			sql += "and concat(a.title, ' ', a.article) like ? ";
 			sqlArgs.add("%" + search + "%");
+		}
+
+		if (!Common.isNullOrEmpty(tagIds)) {
+			sql += "and a.id in(select tm.articleId from tagArticleMapping tm ";
+			sql += "join tags t on t.id = tm.tagId ";
+			sql += "where t.id in(" + Common.join(tagIds, ", ") + ")) ";
 		}
 
 		if (beforeDate != null) {

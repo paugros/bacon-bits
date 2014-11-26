@@ -6,7 +6,24 @@ import com.areahomeschoolers.baconbits.shared.Common;
 
 public class Tag extends EntityDto<Tag> {
 	public enum TagMappingType {
-		USER, ARTICLE, EVENT, BOOK, RESOURCE;
+		USER("#f4e499"), ARTICLE("#e6b48f"), EVENT("#e6b48f"), BOOK("#f28e76"), RESOURCE("#e6b48f");
+
+		private String color;
+
+		private TagMappingType(String color) {
+			this.color = color;
+		}
+
+		public String getColor() {
+			return color;
+		}
+
+		public String getName() {
+			if (TagMappingType.this.equals(USER)) {
+				return "Homeschoolers";
+			}
+			return Common.ucWords(this.toString()) + "s";
+		}
 	}
 
 	private static final long serialVersionUID = 1L;

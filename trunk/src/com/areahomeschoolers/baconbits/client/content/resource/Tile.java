@@ -36,7 +36,7 @@ public class Tile extends Composite {
 		vp.addStyleName("tile");
 		vp.setHeight("267px");
 		vp.setSpacing(12);
-		vp.getElement().getStyle().setBackgroundColor("#" + Long.toString(config.getColor(), 16));
+		vp.getElement().getStyle().setBackgroundColor(config.getColor());
 
 		SimplePanel sp = new SimplePanel();
 		sp.getElement().getStyle().setHeight(200, Unit.PX);
@@ -60,7 +60,10 @@ public class Tile extends Composite {
 		}
 
 		String textSize = null;
-		int countLength = Integer.toString(config.getCount()).length();
+		int countLength = 0;
+		if (config.getCount() != null) {
+			countLength = Integer.toString(config.getCount()).length();
+		}
 		int width = 215;
 		if (config.getText().length() + countLength > 18) {
 			textSize = "largeText";
@@ -78,10 +81,12 @@ public class Tile extends Composite {
 		link.getElement().getStyle().setOverflow(Overflow.HIDDEN);
 		hp.add(link);
 
-		Label countDisplay = new Label(Integer.toString(config.getCount()));
-		countDisplay.addStyleName(textSize);
-		hp.add(countDisplay);
-		hp.setCellHorizontalAlignment(countDisplay, HasHorizontalAlignment.ALIGN_RIGHT);
+		if (config.getCount() != null) {
+			Label countDisplay = new Label(Integer.toString(config.getCount()));
+			countDisplay.addStyleName(textSize);
+			hp.add(countDisplay);
+			hp.setCellHorizontalAlignment(countDisplay, HasHorizontalAlignment.ALIGN_RIGHT);
+		}
 
 		vp.add(hp);
 

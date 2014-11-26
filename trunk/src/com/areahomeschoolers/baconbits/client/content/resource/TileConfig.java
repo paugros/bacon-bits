@@ -1,23 +1,27 @@
 package com.areahomeschoolers.baconbits.client.content.resource;
 
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+
 import com.google.gwt.resources.client.ImageResource;
 
 public class TileConfig {
 	private String text;
 	private String url;
-	private int count;
-	private long color;
+	private Integer count;
+	private String color;
 	private int imageId;
 	private ImageResource imageResource;
+	private TagMappingType tagType;
 
 	public TileConfig() {
 	}
 
-	public long getColor() {
+	public String getColor() {
 		return color;
 	}
 
-	public int getCount() {
+	public Integer getCount() {
 		return count;
 	}
 
@@ -29,6 +33,10 @@ public class TileConfig {
 		return imageResource;
 	}
 
+	public TagMappingType getTagType() {
+		return tagType;
+	}
+
 	public String getText() {
 		return text;
 	}
@@ -37,12 +45,12 @@ public class TileConfig {
 		return url;
 	}
 
-	public TileConfig setColor(long color) {
+	public TileConfig setColor(String color) {
 		this.color = color;
 		return this;
 	}
 
-	public TileConfig setCount(int count) {
+	public TileConfig setCount(Integer count) {
 		this.count = count;
 		return this;
 	}
@@ -54,6 +62,14 @@ public class TileConfig {
 
 	public TileConfig setImageResource(ImageResource imageResource) {
 		this.imageResource = imageResource;
+		return this;
+	}
+
+	public TileConfig setTagType(TagMappingType tagType) {
+		this.color = tagType.getColor();
+		this.text = tagType.getName();
+		this.tagType = tagType;
+		this.url = PageUrl.tagGroup(tagType.toString());
 		return this;
 	}
 

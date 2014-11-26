@@ -14,6 +14,8 @@ public interface ResourceDao {
 
 	public Resource getById(int resourceId);
 
+	public int getCount();
+
 	public ResourcePageData getPageData(int resourceId);
 
 	public ArrayList<Resource> list(ArgMap<ResourceArg> args);

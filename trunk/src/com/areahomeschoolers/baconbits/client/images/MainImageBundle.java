@@ -13,6 +13,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource article();
 
+	ImageResource articleTile();
+
 	ImageResource blogTile();
 
 	ImageResource book();
@@ -92,6 +94,8 @@ public interface MainImageBundle extends ClientBundle {
 	ImageResource refresh();
 
 	ImageResource resource();
+
+	ImageResource resourceTile();
 
 	ImageResource search();
 
