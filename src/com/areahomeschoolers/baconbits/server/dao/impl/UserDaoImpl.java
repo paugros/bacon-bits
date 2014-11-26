@@ -479,7 +479,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	@Override
 	public ArrayList<User> list(ArgMap<UserArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
-
+		List<Integer> tagIds = args.getIntList(UserArg.HAS_TAGS);
 		int parentIdPlusSelf = args.getInt(UserArg.PARENT_ID_PLUS_SELF);
 		int parentId = args.getInt(UserArg.PARENT_ID);
 		int registrationId = args.getInt(UserArg.NOT_ON_REGISTRATION_ID);
@@ -534,6 +534,12 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sqlArgs.add(registrationId);
 		}
 		sql += createSqlWhere();
+
+		if (!Common.isNullOrEmpty(tagIds)) {
+			sql += "and u.id in(select tm.userId from tagUserMapping tm ";
+			sql += "join tags t on t.id = tm.tagId ";
+			sql += "where t.id in(" + Common.join(tagIds, ", ") + ")) ";
+		}
 
 		if (hasEmail) {
 			sql += "and u.email is not null and u.email != '' \n";

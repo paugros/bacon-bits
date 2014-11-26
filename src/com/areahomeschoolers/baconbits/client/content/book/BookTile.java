@@ -50,7 +50,6 @@ public class BookTile extends Composite {
 		// price/condition
 		text += "<span style=\"font-size: 16px; font-weight: bold;\">" + Formatter.formatCurrency(item.getPrice()) + "</span> / ";
 		text += item.getCondition() + " condition<br>";
-		text += "</div>";
 
 		// author
 		if (!Common.isNullOrBlank(item.getAuthor())) {
@@ -66,6 +65,7 @@ public class BookTile extends Composite {
 
 			text += publish + "<br>";
 		}
+		text += "</div>";
 
 		HTML h = new HTML(text);
 

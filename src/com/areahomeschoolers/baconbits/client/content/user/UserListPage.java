@@ -10,10 +10,12 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -65,6 +67,9 @@ public final class UserListPage implements Page {
 	private ArgMap<UserArg> getDefaultArgs() {
 		ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 		args.put(UserArg.PARENTS);
+		if (!Common.isNullOrBlank(Url.getParameter("tagIds"))) {
+			args.put(UserArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
+		}
 		return args;
 	}
 

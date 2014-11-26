@@ -78,7 +78,7 @@ public final class TagGroupPage implements Page {
 						break;
 					}
 					uc.setUrl(url);
-					uc.setColor(0xf28e76);
+					uc.setColor(type.getColor());
 					Tile tile = new Tile(uc);
 
 					fp.add(tile);

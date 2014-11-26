@@ -15,14 +15,15 @@ public class HomePageData implements IsSerializable {
 	private int eventCount;
 	private int userCount;
 	private int bookCount;
-	private int blogCount;
+	private int resourceCount;
+	private int articleCount;
 
 	public HomePageData() {
 
 	}
 
-	public int getBlogCount() {
-		return blogCount;
+	public int getArticleCount() {
+		return articleCount;
 	}
 
 	public int getBookCount() {
@@ -57,6 +58,10 @@ public class HomePageData implements IsSerializable {
 		return partners;
 	}
 
+	public int getResourceCount() {
+		return resourceCount;
+	}
+
 	public ArrayList<Event> getUpcomingEvents() {
 		return upcomingEvents;
 	}
@@ -65,8 +70,8 @@ public class HomePageData implements IsSerializable {
 		return userCount;
 	}
 
-	public void setBlogCount(int blogCount) {
-		this.blogCount = blogCount;
+	public void setArticleCount(int articleCount) {
+		this.articleCount = articleCount;
 	}
 
 	public void setBookCount(int bookCount) {
@@ -99,6 +104,10 @@ public class HomePageData implements IsSerializable {
 
 	public void setPartners(Article partners) {
 		this.partners = partners;
+	}
+
+	public void setResourceCount(int resourceCount) {
+		this.resourceCount = resourceCount;
 	}
 
 	public void setUpcomingEvents(ArrayList<Event> upcomingEvents) {

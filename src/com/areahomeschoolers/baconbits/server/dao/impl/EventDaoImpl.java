@@ -24,6 +24,7 @@ import com.areahomeschoolers.baconbits.server.dao.ArticleDao;
 import com.areahomeschoolers.baconbits.server.dao.BookDao;
 import com.areahomeschoolers.baconbits.server.dao.EventDao;
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
+import com.areahomeschoolers.baconbits.server.dao.ResourceDao;
 import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.dao.TagDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
@@ -316,7 +317,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		UserDao ud = ServerContext.getDaoImpl("user");
 		pd.setUserCount(ud.getCount());
 
-		pd.setBlogCount(articleDao.getNewsCount());
+		ResourceDao rd = ServerContext.getDaoImpl("resource");
+		pd.setResourceCount(rd.getCount());
 
 		String sql = "select count(*) from events e " + createWhere() + " and e.endDate > now() and e.active = 1";
 		pd.setEventCount(queryForInt(sql));
@@ -660,6 +662,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	@Override
 	public ArrayList<Event> list(ArgMap<EventArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
+		List<Integer> tagIds = args.getIntList(EventArg.HAS_TAGS);
 		int upcoming = args.getInt(EventArg.UPCOMING_NUMBER);
 		boolean showCommunity = args.getBoolean(EventArg.ONLY_COMMUNITY);
 		boolean includeCommunity = args.getBoolean(EventArg.INCLUDE_COMMUNITY);
@@ -687,6 +690,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 		if (!args.getBoolean(EventArg.SHOW_INACTIVE)) {
 			sql += "and e.active = 1 \n";
+		}
+
+		if (!Common.isNullOrEmpty(tagIds)) {
+			sql += "and e.id in(select tm.eventId from tagEventMapping tm ";
+			sql += "join tags t on t.id = tm.tagId ";
+			sql += "where t.id in(" + Common.join(tagIds, ", ") + ")) ";
 		}
 
 		if (!(seriesId > 0)) {

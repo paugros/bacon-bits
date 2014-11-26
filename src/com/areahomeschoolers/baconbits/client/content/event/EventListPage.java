@@ -18,6 +18,7 @@ import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.MonthPicker;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -53,6 +54,9 @@ public final class EventListPage implements Page {
 		}
 		if (newlyAdded) {
 			args.put(EventArg.NEWLY_ADDED);
+		}
+		if (!Common.isNullOrBlank(Url.getParameter("tagIds"))) {
+			args.put(EventArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
 		}
 		final String title = showCommunity ? "Community Events" : "Events";
 

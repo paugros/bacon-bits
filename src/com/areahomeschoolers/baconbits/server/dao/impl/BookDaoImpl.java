@@ -153,7 +153,12 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 	@Override
 	public int getCount() {
-		return queryForInt("select count(*) from books where statusId = 1");
+		String sql = "select count(*) from books b ";
+		sql += "join users u on u.id = b.userId ";
+		sql += "where b.statusId = 1 ";
+		sql += "and b.userId in(select userId from userGroupMembers where groupId = " + Constants.ONLINE_BOOK_SELLERS_GROUP_ID + ") ";
+		sql += "and isActive(u.startDate, u.endDate) = 1";
+		return queryForInt(0, sql);
 	}
 
 	@Override
