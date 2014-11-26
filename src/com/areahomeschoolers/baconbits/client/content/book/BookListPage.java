@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -45,6 +46,10 @@ public final class BookListPage implements Page {
 		page = p;
 		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			args.put(BookArg.ONLINE_ONLY);
+		}
+
+		if (!Common.isNullOrBlank(Url.getParameter("tagIds"))) {
+			args.put(BookArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
 		}
 
 		if (sellerId > 0) {
@@ -185,7 +190,7 @@ public final class BookListPage implements Page {
 				bottom.add(milesInput);
 				bottom.add(new Label("miles of"));
 				bottom.add(locationInput);
-				bottom.add(new Label("with text"));
+				// bottom.add(new Label("with text"));
 				// bottom.add(table.getTitleBar().extractSearchControl());
 
 				for (int i = 0; i < bottom.getWidgetCount(); i++) {

@@ -1,6 +1,8 @@
 package com.areahomeschoolers.baconbits.client.util;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -85,6 +87,18 @@ public class Url {
 			return Integer.parseInt(value);
 		}
 		return -1;
+	}
+
+	public static ArrayList<Integer> getIntListParameter(String token) {
+		ArrayList<Integer> list = new ArrayList<>();
+		String value = HistoryToken.getElement(token);
+		List<String> strs = Common.split(value, ",");
+		for (String item : strs) {
+			if (Common.isInteger(item)) {
+				list.add(Integer.parseInt(item));
+			}
+		}
+		return list;
 	}
 
 	public static String getParameter(String token) {
