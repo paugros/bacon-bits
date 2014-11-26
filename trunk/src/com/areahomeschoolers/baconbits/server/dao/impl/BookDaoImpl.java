@@ -249,6 +249,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	@Override
 	public ArrayList<Book> list(ArgMap<BookArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
+		List<Integer> tagIds = args.getIntList(BookArg.HAS_TAGS);
 		int statusId = args.getInt(BookArg.STATUS_ID);
 		int userId = args.getInt(BookArg.USER_ID);
 		int categoryId = args.getInt(BookArg.CATEGORY_ID);
@@ -304,6 +305,12 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		if (gradeLevelId > 0) {
 			sql += "and b.gradeLevelId = ? ";
 			sqlArgs.add(gradeLevelId);
+		}
+
+		if (!Common.isNullOrEmpty(tagIds)) {
+			sql += "and b.id in(select tm.bookId from tagBookMapping tm ";
+			sql += "join tags t on t.id = tm.tagId ";
+			sql += "where t.id in(" + Common.join(tagIds, ", ") + ")) ";
 		}
 
 		if (hideOffline) {

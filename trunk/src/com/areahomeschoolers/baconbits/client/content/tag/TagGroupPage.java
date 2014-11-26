@@ -60,19 +60,19 @@ public final class TagGroupPage implements Page {
 					String url = null;
 					switch (type) {
 					case ARTICLE:
-						url = PageUrl.articleList();
+						url = PageUrl.articleList() + "&tagIds=" + tag.getId();
 						break;
 					case BOOK:
-						url = PageUrl.bookList();
+						url = PageUrl.bookList() + "&tagIds=" + tag.getId();
 						break;
 					case EVENT:
-						url = PageUrl.eventList();
+						url = PageUrl.eventList() + "&tagIds=" + tag.getId();
 						break;
 					case RESOURCE:
-						url = PageUrl.resourceManagement();
+						url = PageUrl.resourceManagement() + "&tagIds=" + tag.getId();
 						break;
 					case USER:
-						url = PageUrl.userList();
+						url = PageUrl.userList() + "&tagIds=" + tag.getId();
 						break;
 					default:
 						break;
