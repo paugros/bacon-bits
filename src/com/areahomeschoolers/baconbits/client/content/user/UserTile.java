@@ -2,7 +2,7 @@ package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.client.widgets.EmailDisplay;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -45,7 +45,7 @@ public class UserTile extends Composite {
 		link.addStyleName("largeText bold");
 		String text = link.toString() + "<br>";
 		if (item.getEmail() != null) {
-			text += new EmailDisplay(item.getEmail()).toString() + "<br>";
+			text += WidgetFactory.createEmailLink(item.getEmail()).toString() + "<br>";
 		}
 
 		if (item.getCommonInterestCount() > 0) {

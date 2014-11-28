@@ -111,17 +111,17 @@ public class BookPage implements Page {
 			ivp.add(change);
 		}
 
+		TagSection ts = new TagSection(TagMappingType.BOOK, book.getId(), pageData.getTags());
+		ts.setEditingEnabled(editable);
+		ts.populate();
+		fieldTable.addField("Tags:", ts);
+
 		pp.add(fieldTable);
 
 		VerticalPanel vp = new VerticalPanel();
 		vp.addStyleName("sectionContent");
 		vp.setWidth("100%");
 		vp.add(pp);
-
-		TagSection ts = new TagSection(TagMappingType.BOOK, book.getId(), pageData.getTags());
-		ts.setEditingEnabled(editable);
-		ts.populate();
-		vp.add(ts);
 
 		page.add(WidgetFactory.newSection(tb, vp, ContentWidth.MAXWIDTH1000PX));
 

@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -184,6 +185,27 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				return t;
 			}
 		}, sqlArgs.toArray());
+	}
+
+	@Override
+	public Tag merge(Tag tag, HashSet<Integer> tagIds) {
+		Tag newTag = addNewTag(tag);
+
+		// in case the new tag is already in the selected
+		tagIds.remove(newTag.getId());
+
+		for (TagMappingType type : TagMappingType.values()) {
+			String item = Common.ucWords(type.toString());
+			String sql = "update ignore tag" + item + "Mapping set tagId = ? where tagId in(" + Common.join(tagIds, ", ") + ") ";
+			update(sql, newTag.getId());
+		}
+
+		update("delete from tags where id in(" + Common.join(tagIds, ", ") + ")");
+
+		ArgMap<TagArg> args = new ArgMap<>(TagArg.TAG_ID, newTag.getId());
+		args.put(TagArg.GET_ALL_COUNTS);
+
+		return list(args).get(0);
 	}
 
 	@Override

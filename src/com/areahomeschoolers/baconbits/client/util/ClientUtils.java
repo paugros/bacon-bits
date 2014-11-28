@@ -13,6 +13,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.dom.client.TableSectionElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTMLTable;
@@ -118,6 +120,15 @@ public abstract class ClientUtils {
 		if (currentElement != null) {
 			currentElement.removeFromParent();
 		}
+	}
+
+	public static void stopPropagation(Widget w) {
+		w.addDomHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				event.stopPropagation();
+			}
+		}, ClickEvent.getType());
 	}
 
 	private static Element getParentElementByTagName(Element el, String type, int depth) {

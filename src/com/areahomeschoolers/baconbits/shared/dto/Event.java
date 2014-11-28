@@ -146,6 +146,9 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	}
 
 	public int getCategoryId() {
+		if (categoryId == 0) {
+			return 1;
+		}
 		return categoryId;
 	}
 

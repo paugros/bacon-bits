@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.ButtonBase;
 import com.google.gwt.user.client.ui.CustomButton;
 import com.google.gwt.user.client.ui.Grid;
@@ -45,6 +46,11 @@ public abstract class WidgetFactory {
 		cb.setStylePrimaryName("clickBox");
 		cb.addClickHandler(ch);
 		return cb;
+	}
+
+	public static Anchor createEmailLink(String email) {
+		Anchor a = new Anchor(email, "mailto:" + email);
+		return a;
 	}
 
 	public static VerticalPanel createPagePanel() {

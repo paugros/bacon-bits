@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.server.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,6 +45,11 @@ public class TagServiceImpl extends GwtController implements TagService {
 	@Override
 	public ArrayList<Tag> list(ArgMap<TagArg> args) {
 		return dao.list(args);
+	}
+
+	@Override
+	public Tag merge(Tag tag, HashSet<Integer> tagIds) {
+		return dao.merge(tag, tagIds);
 	}
 
 	@Override

@@ -43,7 +43,6 @@ import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
-import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
@@ -60,11 +59,10 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -284,7 +282,7 @@ public class EventPage implements Page {
 			fieldTable.addField(phoneField);
 		}
 
-		if (Application.administratorOf(calendarEvent)) {
+		if (Application.administratorOf(calendarEvent) && Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
 			final Label costDisplay = new Label();
 			final NumericTextBox costInput = new NumericTextBox(2);
 			costInput.setMaxLength(10);
@@ -303,41 +301,41 @@ public class EventPage implements Page {
 				}
 			});
 			fieldTable.addField(costField);
-
-			final Label categoryDisplay = new Label();
-			final RequiredListBox categoryInput = new RequiredListBox();
-			for (Data item : pageData.getCategories()) {
-				categoryInput.addItem(item.get("category"), item.getId());
-			}
-			categoryInput.addChangeHandler(new ChangeHandler() {
-				@Override
-				public void onChange(ChangeEvent event) {
-					int categoryId = categoryInput.getIntValue();
-					if (categoryId == 6) {
-						calendarEvent.setMarkupOverride(true);
-						calendarEvent.setMarkupDollars(0);
-						calendarEvent.setMarkupPercent(0);
-					} else {
-						calendarEvent.setMarkupOverride(false);
-					}
-				}
-			});
-			FormField categoryField = form.createFormField("Category:", categoryInput, categoryDisplay);
-			categoryField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					categoryDisplay.setText(calendarEvent.getCategory());
-					categoryInput.setValue(calendarEvent.getCategoryId());
-				}
-			});
-			categoryField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setCategoryId(categoryInput.getIntValue());
-				}
-			});
-			fieldTable.addField(categoryField);
 		}
+
+		// final Label categoryDisplay = new Label();
+		// final RequiredListBox categoryInput = new RequiredListBox();
+		// for (Data item : pageData.getCategories()) {
+		// categoryInput.addItem(item.get("category"), item.getId());
+		// }
+		// categoryInput.addChangeHandler(new ChangeHandler() {
+		// @Override
+		// public void onChange(ChangeEvent event) {
+		// int categoryId = categoryInput.getIntValue();
+		// if (categoryId == 6) {
+		// calendarEvent.setMarkupOverride(true);
+		// calendarEvent.setMarkupDollars(0);
+		// calendarEvent.setMarkupPercent(0);
+		// } else {
+		// calendarEvent.setMarkupOverride(false);
+		// }
+		// }
+		// });
+		// FormField categoryField = form.createFormField("Category:", categoryInput, categoryDisplay);
+		// categoryField.setInitializer(new Command() {
+		// @Override
+		// public void execute() {
+		// categoryDisplay.setText(calendarEvent.getCategory());
+		// categoryInput.setValue(calendarEvent.getCategoryId());
+		// }
+		// });
+		// categoryField.setDtoUpdater(new Command() {
+		// @Override
+		// public void execute() {
+		// calendarEvent.setCategoryId(categoryInput.getIntValue());
+		// }
+		// });
+		// fieldTable.addField(categoryField);
 
 		if (Application.isSystemAdministrator()) {
 			MarkupField mf = new MarkupField(calendarEvent);
@@ -458,25 +456,25 @@ public class EventPage implements Page {
 				}
 			});
 
-			final Label adultDisplay = new Label();
-			final DefaultListBox adultInput = new DefaultListBox();
-			adultInput.addItem("No", 0);
-			adultInput.addItem("Yes", 1);
-			FormField adultField = form.createFormField("Adult required:", adultInput, adultDisplay);
-			adultField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					adultDisplay.setText(Common.yesNo(calendarEvent.getAdultRequired()));
-					adultInput.setValue(calendarEvent.getAdultRequired() ? 1 : 0);
-				}
-			});
-			adultField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setAdultRequired(adultInput.getIntValue() == 1);
-				}
-			});
-			fieldTable.addField(adultField);
+			// final Label adultDisplay = new Label();
+			// final DefaultListBox adultInput = new DefaultListBox();
+			// adultInput.addItem("No", 0);
+			// adultInput.addItem("Yes", 1);
+			// FormField adultField = form.createFormField("Adult required:", adultInput, adultDisplay);
+			// adultField.setInitializer(new Command() {
+			// @Override
+			// public void execute() {
+			// adultDisplay.setText(Common.yesNo(calendarEvent.getAdultRequired()));
+			// adultInput.setValue(calendarEvent.getAdultRequired() ? 1 : 0);
+			// }
+			// });
+			// adultField.setDtoUpdater(new Command() {
+			// @Override
+			// public void execute() {
+			// calendarEvent.setAdultRequired(adultInput.getIntValue() == 1);
+			// }
+			// });
+			// fieldTable.addField(adultField);
 
 			final Label publishDateDisplay = new Label();
 			final DateTimeBox publishDateInput = new DateTimeBox();

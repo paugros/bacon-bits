@@ -10,8 +10,8 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.EmailDisplay;
 import com.areahomeschoolers.baconbits.client.widgets.GroupMembershipControl;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
@@ -215,7 +215,7 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 				addCompositeWidgetColumn(col, new WidgetCellCreator<User>() {
 					@Override
 					protected Widget createWidget(User item) {
-						return new EmailDisplay(item.getEmail());
+						return WidgetFactory.createEmailLink(item.getEmail());
 					}
 				});
 				break;
