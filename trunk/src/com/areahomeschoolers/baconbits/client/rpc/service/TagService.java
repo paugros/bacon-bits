@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.rpc.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -21,6 +22,8 @@ public interface TagService extends RemoteService {
 	public void deleteMapping(Tag tag);
 
 	public ArrayList<Tag> list(ArgMap<TagArg> args);
+
+	public Tag merge(Tag tag, HashSet<Integer> tagIds);
 
 	public Tag save(Tag tag);
 }

@@ -21,6 +21,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class TagGroupPage implements Page {
@@ -85,6 +87,12 @@ public final class TagGroupPage implements Page {
 				}
 			}
 		});
+
+		Hyperlink home = new Hyperlink("Home", PageUrl.home());
+		String ccText = home.toString() + "&nbsp;>&nbsp;" + type.getName();
+		HTML cc = new HTML(ccText);
+		cc.addStyleName("hugeText");
+		page.add(cc);
 
 		page.add(fp);
 

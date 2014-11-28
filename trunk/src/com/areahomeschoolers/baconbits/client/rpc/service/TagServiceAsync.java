@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.rpc.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -18,4 +19,6 @@ public interface TagServiceAsync {
 	public void list(ArgMap<TagArg> args, AsyncCallback<ArrayList<Tag>> callback);
 
 	public void save(Tag tag, AsyncCallback<Tag> callback);
+
+	void merge(Tag tag, HashSet<Integer> tagIds, AsyncCallback<Tag> callback);
 }

@@ -75,6 +75,7 @@ public class Tile extends Composite {
 
 		String htmlText = "<a href=\"" + url + "\" class=\"" + textSize + "\" style=\"color: black;\">" + config.getText() + "</a>";
 		HTML link = new HTML(htmlText);
+		// ClientUtils.stopPropagation(link);
 
 		link.setWordWrap(false);
 		link.setWidth(width + "px");
