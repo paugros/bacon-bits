@@ -1,14 +1,13 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
-import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.WhiteSpace;
@@ -36,10 +35,11 @@ public class EventTile extends Composite {
 		hp.addStyleName("itemTile");
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.EVENT.getColor());
 
-		Image i = new Image(Constants.DOCUMENT_URL_PREFIX + 1222);
-		i.getElement().getStyle().setBorderColor("#6b48f");
-		i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-		i.getElement().getStyle().setBorderWidth(1, Unit.PX);
+		// Image i = new Image(Constants.DOCUMENT_URL_PREFIX + 1222);
+		Image i = new Image(MainImageBundle.INSTANCE.logo());
+		// i.getElement().getStyle().setBorderColor("#6b48f");
+		// i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+		// i.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
 		hp.add(new HTML(i.toString()));
 
