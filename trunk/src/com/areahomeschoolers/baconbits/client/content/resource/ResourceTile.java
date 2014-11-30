@@ -44,9 +44,8 @@ public class ResourceTile extends Composite {
 		Hyperlink link = new Hyperlink(item.getName(), PageUrl.resource(item.getId()));
 		link.addStyleName("bold");
 		// title/link
-		String text = "<div style=\"overflow: hidden; width: " + textWidth + "px;\">" + link.toString() + "</div>";
+		String text = "<div style=\"overflow: hidden; width: " + textWidth + "px; white-space: nowrap;\">" + link.toString() + "<br>";
 
-		text += "<div style=\"overflow: hidden; width: " + textWidth + "px; white-space: nowrap;\">";
 		// address
 		if (!Common.isNullOrBlank(item.getAddress())) {
 			String a = "";
