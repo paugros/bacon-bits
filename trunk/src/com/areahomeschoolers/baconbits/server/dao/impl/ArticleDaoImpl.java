@@ -133,6 +133,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		String sql = "select count(*) from articles a ";
 		sql += createWhere();
 		sql += "and a.newsItem = 0 and isActive(a.startDate, a.endDate) = 1 \n";
+
 		return queryForInt(0, sql);
 	}
 

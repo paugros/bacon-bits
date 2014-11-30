@@ -9,6 +9,7 @@ import java.util.Map;
 import com.areahomeschoolers.baconbits.client.content.Layout;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleGroupPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleListPage;
+import com.areahomeschoolers.baconbits.client.content.article.ArticleManagementPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
 import com.areahomeschoolers.baconbits.client.content.article.BlogPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookListPage;
@@ -21,6 +22,7 @@ import com.areahomeschoolers.baconbits.client.content.event.EventPage;
 import com.areahomeschoolers.baconbits.client.content.event.PaymentPage;
 import com.areahomeschoolers.baconbits.client.content.event.RegistrationManagementPage;
 import com.areahomeschoolers.baconbits.client.content.home.HomePage;
+import com.areahomeschoolers.baconbits.client.content.resource.ResourceListPage;
 import com.areahomeschoolers.baconbits.client.content.resource.ResourceManagementPage;
 import com.areahomeschoolers.baconbits.client.content.resource.ResourcePage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
@@ -350,6 +352,10 @@ public final class Application implements ValueChangeHandler<String> {
 			new ResourcePage(vp);
 		} else if ("TagGroup".equals(page)) {
 			new TagGroupPage(vp);
+		} else if ("ResourceList".equals(page)) {
+			new ResourceListPage(vp);
+		} else if ("ArticleManagement".equals(page)) {
+			new ArticleManagementPage(vp);
 		} else {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}

@@ -71,7 +71,7 @@ public final class TagGroupPage implements Page {
 						url = PageUrl.eventList() + "&tagIds=" + tag.getId();
 						break;
 					case RESOURCE:
-						url = PageUrl.resourceManagement() + "&tagIds=" + tag.getId();
+						url = PageUrl.resourceList() + "&tagIds=" + tag.getId();
 						break;
 					case USER:
 						url = PageUrl.userList() + "&tagIds=" + tag.getId();
@@ -89,7 +89,7 @@ public final class TagGroupPage implements Page {
 		});
 
 		Hyperlink home = new Hyperlink("Home", PageUrl.home());
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + type.getName();
+		String ccText = home.toString() + "&nbsp;>&nbsp;" + type.getName() + " By Type";
 		HTML cc = new HTML(ccText);
 		cc.addStyleName("hugeText");
 		page.add(cc);

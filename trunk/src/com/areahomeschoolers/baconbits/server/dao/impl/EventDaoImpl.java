@@ -33,12 +33,10 @@ import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
-import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
@@ -253,62 +251,62 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	public HomePageData getHomePageData() {
 		HomePageData pd = new HomePageData();
 
-		if (ServerContext.isCitrus()) {
-			String sql = "select g.id, g.groupName, g.description, g.orgDomain, g.orgSubDomain, g.logoId, \n";
-			sql += "(select count(ugm.id) from userGroupMembers ugm \n";
-			sql += "join users u on u.id = ugm.userId \n";
-			sql += "where groupId = g.id and isActive(u.startDate, u.endDate) = 1) as memberCount \n";
-			sql += "from groups g \n";
-			sql += "where g.isOrganization = 1 and g.id != " + Constants.CG_ORG_ID + "\n";
-			sql += "and isActive(g.startDate, g.endDate) = 1 \n";
-			sql += "order by g.groupName";
-			pd.setGroups(query(sql, ServerUtils.getGenericRowMapper()));
-		}
-
-		ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
-		args.put(EventArg.UPCOMING_NUMBER, 5);
-
-		pd.setUpcomingEvents(list(args));
-
-		args.put(EventArg.ONLY_COMMUNITY);
-		pd.setCommunityEvents(list(args));
-
-		args.remove(EventArg.ONLY_COMMUNITY);
-		args.put(EventArg.NEWLY_ADDED);
-		pd.setNewlyAddedEvents(list(args));
-
-		if (ServerContext.isAuthenticated()) {
-			args.remove(EventArg.NEWLY_ADDED);
-			args.put(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, ServerContext.getCurrentUserId());
-			pd.setMyUpcomingEvents(list(args));
-		}
-
-		Integer articleId = 0;
-
-		UserGroup org = ServerContext.getCurrentOrg();
-		if (org != null) {
-			articleId = ServerContext.isAuthenticated() ? org.getPrivateGreetingId() : org.getPublicGreetingId();
-			if (articleId == null) {
-				articleId = 0;
-			}
-		}
-		ArticleDao articleDao = ServerContext.getDaoImpl("article");
-		Article a = articleDao.getById(articleId);
-		if (a == null) {
-			a = new Article();
-			a.setTitle("Welcome!");
-			String text;
-			if (org != null) {
-				text = "Welcome to " + org.getGroupName() + ". ";
-			} else {
-				text = "Welcome. ";
-			}
-			text += "Our site is still being constructed, but you can have a look around anyway.";
-			a.setArticle(text);
-		}
-		pd.setIntro(a);
-
-		pd.setPartners(articleDao.getById(Constants.PARTNER_LOGO_ARTICLE_ID));
+		// if (ServerContext.isCitrus()) {
+		// String sql = "select g.id, g.groupName, g.description, g.orgDomain, g.orgSubDomain, g.logoId, \n";
+		// sql += "(select count(ugm.id) from userGroupMembers ugm \n";
+		// sql += "join users u on u.id = ugm.userId \n";
+		// sql += "where groupId = g.id and isActive(u.startDate, u.endDate) = 1) as memberCount \n";
+		// sql += "from groups g \n";
+		// sql += "where g.isOrganization = 1 and g.id != " + Constants.CG_ORG_ID + "\n";
+		// sql += "and isActive(g.startDate, g.endDate) = 1 \n";
+		// sql += "order by g.groupName";
+		// pd.setGroups(query(sql, ServerUtils.getGenericRowMapper()));
+		// }
+		//
+		// ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
+		// args.put(EventArg.UPCOMING_NUMBER, 5);
+		//
+		// pd.setUpcomingEvents(list(args));
+		//
+		// args.put(EventArg.ONLY_COMMUNITY);
+		// pd.setCommunityEvents(list(args));
+		//
+		// args.remove(EventArg.ONLY_COMMUNITY);
+		// args.put(EventArg.NEWLY_ADDED);
+		// pd.setNewlyAddedEvents(list(args));
+		//
+		// if (ServerContext.isAuthenticated()) {
+		// args.remove(EventArg.NEWLY_ADDED);
+		// args.put(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, ServerContext.getCurrentUserId());
+		// pd.setMyUpcomingEvents(list(args));
+		// }
+		//
+		// Integer articleId = 0;
+		//
+		// UserGroup org = ServerContext.getCurrentOrg();
+		// if (org != null) {
+		// articleId = ServerContext.isAuthenticated() ? org.getPrivateGreetingId() : org.getPublicGreetingId();
+		// if (articleId == null) {
+		// articleId = 0;
+		// }
+		// }
+		// ArticleDao articleDao = ServerContext.getDaoImpl("article");
+		// Article a = articleDao.getById(articleId);
+		// if (a == null) {
+		// a = new Article();
+		// a.setTitle("Welcome!");
+		// String text;
+		// if (org != null) {
+		// text = "Welcome to " + org.getGroupName() + ". ";
+		// } else {
+		// text = "Welcome. ";
+		// }
+		// text += "Our site is still being constructed, but you can have a look around anyway.";
+		// a.setArticle(text);
+		// }
+		// pd.setIntro(a);
+		//
+		// pd.setPartners(articleDao.getById(Constants.PARTNER_LOGO_ARTICLE_ID));
 
 		// various counts
 		BookDao bd = ServerContext.getDaoImpl("book");
@@ -319,6 +317,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 		ResourceDao rd = ServerContext.getDaoImpl("resource");
 		pd.setResourceCount(rd.getCount());
+
+		ArticleDao ad = ServerContext.getDaoImpl("article");
+		pd.setArticleCount(ad.getCount());
 
 		String sql = "select count(*) from events e " + createWhere() + " and e.endDate > now() and e.active = 1";
 		pd.setEventCount(queryForInt(sql));

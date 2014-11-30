@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
@@ -30,8 +31,10 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -52,9 +55,12 @@ public final class UserListPage implements Page {
 
 		final String title = "Directory";
 
-		Label heading = new Label("Member Directory");
-		heading.addStyleName("hugeText");
-		page.add(heading);
+		Hyperlink home = new Hyperlink("Home", PageUrl.home());
+		Hyperlink cat = new Hyperlink("Homeschoolers By Interests", PageUrl.tagGroup("USER"));
+		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString() + "&nbsp;>&nbsp;Homeschoolers";
+		HTML cc = new HTML(ccText);
+		cc.addStyleName("hugeText");
+		page.add(cc);
 
 		populateOptionsPanel();
 

@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Constants;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.dom.client.Style.BorderStyle;
@@ -32,7 +33,8 @@ public class UserTile extends Composite {
 
 		HorizontalPanel hp = new PaddedPanel(10);
 		hp.setWidth("300px");
-		hp.addStyleName("userTile");
+		hp.addStyleName("itemTile");
+		hp.getElement().getStyle().setBackgroundColor(TagMappingType.USER.getColor());
 
 		Image i = new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
 		i.getElement().getStyle().setBorderColor("#c7c7c7");
