@@ -1,11 +1,10 @@
-package com.areahomeschoolers.baconbits.client.content.book;
+package com.areahomeschoolers.baconbits.client.content.resource;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
-import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
-import com.areahomeschoolers.baconbits.shared.dto.Book;
+import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.BorderStyle;
@@ -19,13 +18,13 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 
-public class BookTile extends Composite {
+public class ResourceTile extends Composite {
 
-	public BookTile(final Book item) {
+	public ResourceTile(final Resource item) {
 		addDomHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				HistoryToken.set(PageUrl.book(item.getId()));
+				HistoryToken.set(PageUrl.resource(item.getId()));
 			}
 		}, ClickEvent.getType());
 
@@ -34,40 +33,44 @@ public class BookTile extends Composite {
 		hp.setWidth((textWidth + 80) + "px");
 		hp.setHeight("117px");
 		hp.addStyleName("itemTile");
-		hp.getElement().getStyle().setBackgroundColor(TagMappingType.BOOK.getColor());
+		hp.getElement().getStyle().setBackgroundColor(TagMappingType.RESOURCE.getColor());
 
-		Image i = new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
-		i.getElement().getStyle().setBorderColor("#c7c7c7");
+		Image i = new Image(Constants.DOCUMENT_URL_PREFIX + 1222);
+		i.getElement().getStyle().setBorderColor("#6b48f");
 		i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 		i.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
 		hp.add(new HTML("<div style=\"width: 80px; margin-right: 10px; text-align: center;\">" + i.toString() + "</div>"));
 
-		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.book(item.getId()));
+		Hyperlink link = new Hyperlink(item.getName(), PageUrl.resource(item.getId()));
 		link.addStyleName("bold");
 		// title/link
-		String text = "<div style=\"overflow: hidden; max-height: 38px; width: " + textWidth + "px;\">" + link.toString() + "</div>";
+		String text = "<div style=\"overflow: hidden; width: " + textWidth + "px;\">" + link.toString() + "</div>";
+
 		text += "<div style=\"overflow: hidden; width: " + textWidth + "px; white-space: nowrap;\">";
-
-		// price/condition
-		text += "<span style=\"font-size: 16px; font-weight: bold;\">" + Formatter.formatCurrency(item.getPrice()) + "</span> / ";
-		text += item.getCondition() + " condition<br>";
-
-		// author
-		if (!Common.isNullOrBlank(item.getAuthor())) {
-			text += "by " + item.getAuthor() + "<br>";
-		}
-
-		// publisher
-		if (!Common.isNullOrBlank(item.getPublisher())) {
-			String publish = item.getPublisher();
-			if (item.getPublishDate() != null) {
-				publish += ", " + Formatter.formatDate(item.getPublishDate(), "yyyy");
+		// address
+		if (!Common.isNullOrBlank(item.getAddress())) {
+			String a = "";
+			if (!Common.isNullOrBlank(item.getStreet())) {
+				a += item.getStreet() + "<br>";
 			}
-
-			text += publish + "<br>";
+			if (!Common.isNullOrBlank(item.getCity())) {
+				a += item.getCity() + " ";
+			}
+			if (!Common.isNullOrBlank(item.getState())) {
+				a += item.getState() + " ";
+			}
+			if (!Common.isNullOrBlank(item.getZip())) {
+				a += item.getZip();
+			}
+			text += a + "<br>";
+		} else if (!Common.isNullOrBlank(item.getPhone())) {
+			text += item.getPhone() + "<br>";
 		}
 		text += "</div>";
+
+		// description
+		text += "<div class=smallText style=\"overflow: hidden; max-height: 38px; width: " + textWidth + "px;\">" + item.getDescription() + "</div>";
 
 		HTML h = new HTML(text);
 
@@ -76,4 +79,5 @@ public class BookTile extends Composite {
 
 		initWidget(hp);
 	}
+
 }

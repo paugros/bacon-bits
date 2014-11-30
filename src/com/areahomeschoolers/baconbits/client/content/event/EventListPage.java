@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
+import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
@@ -30,8 +31,10 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -59,6 +62,13 @@ public final class EventListPage implements Page {
 			args.put(EventArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
 		}
 		final String title = showCommunity ? "Community Events" : "Events";
+
+		Hyperlink home = new Hyperlink("Home", PageUrl.home());
+		Hyperlink cat = new Hyperlink("Events By Type", PageUrl.tagGroup("EVENT"));
+		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString() + "&nbsp;>&nbsp;Events";
+		HTML cc = new HTML(ccText);
+		cc.addStyleName("hugeText");
+		page.add(cc);
 
 		if (!showCommunity) {
 			VerticalPanel vp = new VerticalPanel();

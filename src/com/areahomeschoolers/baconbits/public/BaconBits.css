@@ -343,26 +343,13 @@ img {
 	cursor: pointer;
 }
 
-.userTile {
+.itemTile {
 	opacity: 0.8;
-	background-color: #f4e499;
 	margin: 5px;
-	padding: 10px;
+	padding: 10px;	
 }
 
-.userTile:hover {
-	opacity: 1.0;
-	cursor: pointer;
-}
-
-.bookTile {
-	opacity: 0.8;
-	background-color: #f28e76;
-	margin: 5px;
-	padding: 10px;
-}
-
-.bookTile:hover {
+.itemTile:hover {
 	opacity: 1.0;
 	cursor: pointer;
 }

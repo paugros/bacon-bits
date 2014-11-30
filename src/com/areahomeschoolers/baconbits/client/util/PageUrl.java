@@ -15,6 +15,10 @@ public class PageUrl {
 		return "page=ArticleList";
 	}
 
+	public static String articleManagement() {
+		return "page=ArticleManagement";
+	}
+
 	public static String blog(int id) {
 		String url = "page=News";
 		return (id == 0) ? url : url + "&postId=" + id;
@@ -65,6 +69,10 @@ public class PageUrl {
 	public static String resource(int id) {
 		String url = "page=Resource";
 		return (id == 0) ? url : url + "&resourceId=" + id;
+	}
+
+	public static String resourceList() {
+		return "page=ResourceList";
 	}
 
 	public static String resourceManagement() {

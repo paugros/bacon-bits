@@ -56,6 +56,14 @@ public final class BookListPage implements Page {
 			args.put(BookArg.USER_ID, sellerId);
 		}
 
+		Hyperlink home = new Hyperlink("Home", PageUrl.home());
+		Hyperlink cat = new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK"));
+		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString() + "&nbsp;>&nbsp;Books";
+		HTML cc = new HTML(ccText);
+		cc.addStyleName("hugeText");
+		page.add(cc);
+
+		page.add(optionsPanel);
 		populateOptionsPanel();
 
 		page.add(fp);
@@ -199,7 +207,6 @@ public final class BookListPage implements Page {
 
 				optionsPanel.add(top);
 				optionsPanel.add(bottom);
-				page.insert(optionsPanel, 0);
 			}
 		});
 	}

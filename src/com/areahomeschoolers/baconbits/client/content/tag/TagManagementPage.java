@@ -41,6 +41,7 @@ public final class TagManagementPage implements Page {
 
 		final TagTable table = new TagTable(args);
 		table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
+		table.getTitleBar().addPagingControl();
 		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addLink(new ClickLabel("Add", new ClickHandler() {
