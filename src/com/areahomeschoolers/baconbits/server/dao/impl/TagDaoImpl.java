@@ -148,7 +148,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			sql += where;
 			if (getCounts) {
 				sql += "group by " + always;
-				sql += "order by t.name";
+				sql += "order by count(tm.id) desc, t.name";
 			} else {
 				sql += "order by tm.id";
 			}
