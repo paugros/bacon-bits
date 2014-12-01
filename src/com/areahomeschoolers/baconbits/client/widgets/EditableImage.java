@@ -12,48 +12,29 @@ import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
 
 public class EditableImage extends Composite {
 	private Image image;
 	private UploadCompleteHandler uploadCompleteHandler;
-	private Integer docId;
-	private int entId;
+	private Integer imageId;
+	private int itemId;
 	private DocumentLinkType linkType;
+	private boolean enabled = true;
+	private ImageResource imageResource;
 
-	public EditableImage(DocumentLinkType documentLinkType, int entityId, Integer documentId, boolean editable) {
-		docId = documentId;
-		entId = entityId;
+	public EditableImage(DocumentLinkType documentLinkType, int entityId) {
+		itemId = entityId;
 		linkType = documentLinkType;
-
-		if (docId == null || docId == 0) {
-			image = new Image(MainImageBundle.INSTANCE.upload());
-		} else {
-			image = new Image(Constants.DOCUMENT_URL_PREFIX + docId);
-		}
-
-		initWidget(image);
-
-		if (!editable) {
-			return;
-		}
-
-		image.addStyleName("pointer");
-
-		image.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				click();
-			}
-		});
 	}
 
 	public void click() {
-		final FileUploadDialog uploadDialog = new FileUploadDialog(linkType, entId, false, new UploadCompleteHandler() {
+		final FileUploadDialog uploadDialog = new FileUploadDialog(linkType, itemId, false, new UploadCompleteHandler() {
 			@Override
 			public void onUploadComplete(int documentId) {
-				docId = documentId;
+				imageId = documentId;
 				image.setUrl(Constants.DOCUMENT_URL_PREFIX + documentId);
 				if (uploadCompleteHandler != null) {
 					uploadCompleteHandler.onUploadComplete(documentId);
@@ -81,6 +62,51 @@ public class EditableImage extends Composite {
 
 	public Image getImage() {
 		return image;
+	}
+
+	public ImageResource getImageResource() {
+		return imageResource;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void populate() {
+		if (imageId != null && imageId != 0) {
+			image = new Image(Constants.DOCUMENT_URL_PREFIX + imageId);
+		} else if (imageResource != null) {
+			image = new Image(imageResource);
+		} else {
+			image = new Image(MainImageBundle.INSTANCE.logo());
+		}
+
+		initWidget(image);
+
+		if (!enabled) {
+			return;
+		}
+
+		image.addStyleName("pointer");
+
+		image.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				click();
+			}
+		});
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public void setImageId(Integer imageId) {
+		this.imageId = imageId;
+	}
+
+	public void setImageResource(ImageResource imageResource) {
+		this.imageResource = imageResource;
 	}
 
 	public void setUploadCompleteHandler(UploadCompleteHandler uploadCompleteHandler) {

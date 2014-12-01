@@ -26,6 +26,7 @@ import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGr
 import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
@@ -76,6 +77,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
@@ -213,7 +215,12 @@ public class UserPage implements Page {
 					HorizontalPanel hp = new HorizontalPanel();
 					hp.setWidth("100%");
 
-					EditableImage image = new EditableImage(DocumentLinkType.PROFILE, user.getId(), user.getImageId(), canEditUser(user));
+					ImageResource r = user.getSex().equals("m") ? MainImageBundle.INSTANCE.blankProfileMale() : MainImageBundle.INSTANCE.blankProfileFemale();
+					EditableImage image = new EditableImage(DocumentLinkType.PROFILE, user.getId());
+					image.setImageId(user.getImageId());
+					image.setImageResource(r);
+					image.setEnabled(canEditUser(user));
+					image.populate();
 					image.addStyleName("profilePic");
 					fieldTable.removeStyleName("sectionContent");
 					hp.addStyleName("sectionContent");

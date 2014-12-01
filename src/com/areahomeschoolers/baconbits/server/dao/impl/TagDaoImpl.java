@@ -99,7 +99,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		int mappingId = args.getInt(TagArg.MAPPING_ID);
 
 		// tags
-		String always = "t.id, t.name, t.addedDate, t.addedById, t.imageId \n";
+		String always = "t.id, t.name, t.addedDate, t.addedById, t.imageId, t.smallImageId \n";
 		String sql = "select " + always;
 
 		if (mappingType != null) {
@@ -166,6 +166,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				t.setAddedDate(rs.getTimestamp("addedDate"));
 				t.setAddedById(rs.getInt("addedById"));
 				t.setImageId(rs.getInt("imageId"));
+				t.setSmallImageId(rs.getInt("smallImageId"));
 				if (entityId > 0) {
 					t.setEntityId(entityId);
 				}

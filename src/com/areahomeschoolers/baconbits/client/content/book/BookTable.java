@@ -211,7 +211,10 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 					@Override
 					protected Widget createWidget(final Book item) {
 						boolean editable = Application.administratorOf(item);
-						final EditableImage image = new EditableImage(DocumentLinkType.BOOK, item.getId(), item.getSmallImageId(), editable);
+						final EditableImage image = new EditableImage(DocumentLinkType.BOOK, item.getId());
+						image.setEnabled(editable);
+						image.setImageId(item.getSmallImageId());
+						image.populate();
 						image.setUploadCompleteHandler(new UploadCompleteHandler() {
 							@Override
 							public void onUploadComplete(int documentId) {

@@ -92,7 +92,10 @@ public class BookPage implements Page {
 		tb.addLink(link);
 
 		boolean editable = Application.administratorOf(book);
-		final EditableImage image = new EditableImage(DocumentLinkType.BOOK, book.getId(), book.getImageId(), editable);
+		final EditableImage image = new EditableImage(DocumentLinkType.BOOK, book.getId());
+		image.setImageId(book.getImageId());
+		image.setEnabled(editable);
+		image.populate();
 		image.addStyleName("profilePic");
 		fieldTable.removeStyleName("sectionContent");
 		VerticalPanel ivp = new VerticalPanel();

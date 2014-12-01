@@ -5,6 +5,8 @@ import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -35,12 +37,11 @@ public class EventTile extends Composite {
 		hp.addStyleName("itemTile");
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.EVENT.getColor());
 
-		// Image i = new Image(Constants.DOCUMENT_URL_PREFIX + 1222);
 		Image i = new Image(MainImageBundle.INSTANCE.logo());
-		// i.getElement().getStyle().setBorderColor("#6b48f");
-		// i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-		// i.getElement().getStyle().setBorderWidth(1, Unit.PX);
-
+		if (item.getTagImages() != null) {
+			int imageId = Integer.parseInt(Common.split(item.getTagImages(), ",").get(0));
+			i = new Image(Document.toUrl(imageId));
+		}
 		hp.add(new HTML(i.toString()));
 
 		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.event(item.getId()));

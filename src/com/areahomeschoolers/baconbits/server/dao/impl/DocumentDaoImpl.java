@@ -133,13 +133,15 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 			String sql = "update documents set description = :description, startDate = :startDate, endDate = :endDate where id = :id";
 			update(sql, namedParams);
 		} else {
+			DocumentLinkType type = document.getLinkType();
+
 			// scale original document if needed
 			if (document.getLinkType() != null) {
-				if (document.getLinkType() == DocumentLinkType.HTML_IMAGE_INSERT) {
+				if (type == DocumentLinkType.HTML_IMAGE_INSERT) {
 					scaleImageToMaximumSize(document, 600, 2000);
-				} else if (document.getLinkType() == DocumentLinkType.BOOK) {
-					scaleImageToMaximumSize(document, 300, 300);
-				} else if (document.getLinkType() == DocumentLinkType.PROFILE) {
+				} else if (type == DocumentLinkType.BOOK) {
+					scaleImageToMaximumSize(document, 200, 200);
+				} else if (type == DocumentLinkType.PROFILE || type == DocumentLinkType.RESOURCE || type == DocumentLinkType.TAG) {
 					cropToSquare(document);
 					scaleImageToMaximumSize(document, 200, 200);
 				}
@@ -176,7 +178,7 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 			int originalId = document.getId();
 
 			if (document.getLinkType() != null && document.getLinkId() > 0) {
-				if (document.getLinkType() == DocumentLinkType.BOOK) {
+				if (type == DocumentLinkType.BOOK) {
 					// attach the original to the book
 					String newsql = "update books set imageId = ? where id = ?";
 					update(newsql, document.getId(), document.getLinkId());
@@ -190,7 +192,7 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 					// attach the second image to the book
 					sql = "update books set smallImageId = ? where id = ?";
 					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
-				} else if (document.getLinkType() == DocumentLinkType.PROFILE) {
+				} else if (type == DocumentLinkType.PROFILE) {
 					// attach the original to the user
 					String newsql = "update users set imageId = ? where id = ?";
 					update(newsql, document.getId(), document.getLinkId());
@@ -204,19 +206,39 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 					// attach the second image to the user
 					sql = "update users set smallImageId = ? where id = ?";
 					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
-				} else if (document.getLinkType() == DocumentLinkType.LOGO) {
+				} else if (type == DocumentLinkType.LOGO) {
 					// attach logo to org
 					String newsql = "update groups set logoId = ? where id = ?";
 					UserGroup g = ServerContext.getCurrentOrg();
 					g.setLogoId(document.getId());
 					ServerContext.setCurrentOrg(g);
 					update(newsql, document.getId(), document.getLinkId());
-				} else if (document.getLinkType() == DocumentLinkType.RESOURCE) {
+				} else if (type == DocumentLinkType.RESOURCE) {
 					String newsql = "update resources set documentId = ? where id = ?";
 					update(newsql, document.getId(), document.getLinkId());
-				} else if (document.getLinkType() == DocumentLinkType.TAG) {
+					// this scales the document we just inserted
+					scaleImageToMaximumSize(document, 80, 80);
+					// this inserts the same document again, but scaled
+					update(sql, namedParams, keys);
+					// save to gcs again
+					document.setId(ServerUtils.getIdFromKeys(keys));
+					saveGcsDocument(document);
+					// attach the second image to the resource
+					sql = "update resources set smallImageId = ? where id = ?";
+					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
+				} else if (type == DocumentLinkType.TAG) {
 					String newsql = "update tags set imageId = ? where id = ?";
 					update(newsql, document.getId(), document.getLinkId());
+					// this scales the document we just inserted
+					scaleImageToMaximumSize(document, 80, 80);
+					// this inserts the same document again, but scaled
+					update(sql, namedParams, keys);
+					// save to gcs again
+					document.setId(ServerUtils.getIdFromKeys(keys));
+					saveGcsDocument(document);
+					// attach the second image to the tag
+					sql = "update tags set smallImageId = ? where id = ?";
+					update(sql, ServerUtils.getIdFromKeys(keys), document.getLinkId());
 				} else {
 					link(document);
 				}

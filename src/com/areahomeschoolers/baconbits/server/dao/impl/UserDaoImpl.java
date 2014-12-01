@@ -805,13 +805,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				user.setStartDate(new Date());
 			}
 
-			if ("m".equals(user.getSex())) {
-				user.setSmallImageId(Constants.BLANK_PROFILE_MALE_SMALL);
-				user.setImageId(Constants.BLANK_PROFILE_MALE_LARGE);
-			} else {
-				user.setSmallImageId(Constants.BLANK_PROFILE_FEMALE_SMALL);
-				user.setImageId(Constants.BLANK_PROFILE_FEMALE_LARGE);
-			}
 			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
 			sql += "isSystemAdministrator, resetPassword, birthDate, parentId, sex, guid, ";
 			sql += "address, street, city, state, zip, lat, lng, ";

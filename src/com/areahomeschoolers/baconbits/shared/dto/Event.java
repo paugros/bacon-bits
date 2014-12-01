@@ -60,6 +60,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private boolean newlyAdded;
 	private boolean saveAllInSeries;
 	private boolean markupChanged;
+	private String tagImages;
 
 	private int cloneFromId;
 	private int currentUserParticipantCount;
@@ -338,6 +339,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return street;
 	}
 
+	public String getTagImages() {
+		return tagImages;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -590,6 +595,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	@Override
 	public void setStreet(String street) {
 		this.street = street;
+	}
+
+	public void setTagImages(String tagImages) {
+		this.tagImages = tagImages;
 	}
 
 	public void setTitle(String title) {

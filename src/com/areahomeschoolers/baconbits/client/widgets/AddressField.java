@@ -55,7 +55,12 @@ public class AddressField {
 							}
 							// https://developers.google.com/maps/documentation/geocoding/#Types
 							item.setAddress(location.getFormattedAddress());
-							item.setStreet(parts.get("street_number") + " " + parts.get("route"));
+							String street = verifyBlank(parts.get("street_number"));
+							String route = verifyBlank(parts.get("route"));
+							if (!route.isEmpty()) {
+								street += " " + route;
+							}
+							item.setStreet(street);
 							item.setCity(parts.get("locality"));
 							item.setState(parts.get("administrative_area_level_1"));
 							item.setZip(parts.get("postal_code"));
@@ -68,6 +73,17 @@ public class AddressField {
 				});
 			}
 		});
+	}
+
+	private static String verifyBlank(String input) {
+		if (input == null) {
+			return "";
+		}
+		if (input.equals("null") || input.equals("undefined")) {
+			return "";
+		}
+
+		return input;
 	}
 
 	private FormField addressField;
