@@ -85,7 +85,10 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	}
 
 	public String createSqlBase() {
-		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, u.smallImageId, group_concat(t.smallImageId) as tagImages, \n";
+		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, u.smallImageId, \n";
+		sql += "(select group_concat(t.smallImageId) from tagArticleMapping tm \n";
+		sql += "left join tags t on t.id = tm.tagId and t.smallImageId is not null \n";
+		sql += "where tm.articleId = a.id) as tagImages, \n";
 		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
 		sql += "(select count(id) from comments where articleId = a.id and endDate is null) as commentCount, \n";
 		sql += "(select addedDate from comments where articleId = a.id and endDate is null order by addedDate desc limit 1) as lastCommentDate, \n";
@@ -94,8 +97,6 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		sql += "join users u on u.id = a.addedById \n";
 		sql += "left join groups g on g.id = a.groupId \n";
 		sql += "join itemVisibilityLevels l on l.id = a.visibilityLevelId \n";
-		sql += "left join tagArticleMapping tm on tm.articleId = a.id \n";
-		sql += "left join tags t on t.id = tm.tagId and t.smallImageId is not null \n";
 
 		sql += createWhere();
 		return sql;
