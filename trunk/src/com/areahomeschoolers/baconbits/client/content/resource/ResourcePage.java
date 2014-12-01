@@ -340,7 +340,9 @@ public class ResourcePage implements Page {
 		HorizontalPanel pp = new HorizontalPanel();
 		pp.setWidth("100%");
 		if (resource.isSaved()) {
-			EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, resource.getId(), resource.getDocumentId(), true);
+			EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, resource.getId());
+			image.setImageId(resource.getImageId());
+			image.populate();
 			image.getElement().getStyle().setMarginRight(10, Unit.PX);
 			pp.add(image);
 

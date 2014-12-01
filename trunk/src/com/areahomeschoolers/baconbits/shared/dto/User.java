@@ -51,8 +51,8 @@ public final class User extends EntityDto<User> implements HasAddress {
 	private Integer parentId;
 	private boolean showUserAgreement;
 	private String sex;
-	private int imageId;
-	private int smallImageId;
+	private Integer imageId;
+	private Integer smallImageId;
 	// aux
 	private boolean isSwitched;
 	private int commonInterestCount;
@@ -218,7 +218,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 		return homePhone;
 	}
 
-	public int getImageId() {
+	public Integer getImageId() {
+		if (imageId == null || imageId == 0) {
+			return null;
+		}
 		return imageId;
 	}
 
@@ -317,7 +320,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 		return showUserAgreement;
 	}
 
-	public int getSmallImageId() {
+	public Integer getSmallImageId() {
+		if (smallImageId == null || smallImageId == 0) {
+			return null;
+		}
 		return smallImageId;
 	}
 
@@ -482,7 +488,7 @@ public final class User extends EntityDto<User> implements HasAddress {
 		this.homePhone = homePhone;
 	}
 
-	public void setImageId(int imageId) {
+	public void setImageId(Integer imageId) {
 		this.imageId = imageId;
 	}
 
@@ -552,7 +558,7 @@ public final class User extends EntityDto<User> implements HasAddress {
 		this.showUserAgreement = showUserAgreement;
 	}
 
-	public void setSmallImageId(int smallImageId) {
+	public void setSmallImageId(Integer smallImageId) {
 		this.smallImageId = smallImageId;
 	}
 

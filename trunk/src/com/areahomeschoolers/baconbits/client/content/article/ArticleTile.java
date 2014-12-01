@@ -3,7 +3,9 @@ package com.areahomeschoolers.baconbits.client.content.article;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
+import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,16 +30,15 @@ public class ArticleTile extends Composite {
 		HorizontalPanel hp = new HorizontalPanel();
 		int textWidth = 200;
 		hp.setWidth((textWidth + 80) + "px");
-		hp.setHeight("117px");
+		hp.setHeight("100px");
 		hp.addStyleName("itemTile");
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.ARTICLE.getColor());
 
-		// Image i = new Image(Constants.DOCUMENT_URL_PREFIX + 1222);
 		Image i = new Image(MainImageBundle.INSTANCE.logo());
-		// i.getElement().getStyle().setBorderColor("#6b48f");
-		// i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-		// i.getElement().getStyle().setBorderWidth(1, Unit.PX);
-
+		if (item.getTagImages() != null) {
+			int imageId = Integer.parseInt(Common.split(item.getTagImages(), ",").get(0));
+			i = new Image(Document.toUrl(imageId));
+		}
 		hp.add(new HTML("<div style=\"width: 80px; margin-right: 10px; text-align: center;\">" + i.toString() + "</div>"));
 
 		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.article(item.getId()));

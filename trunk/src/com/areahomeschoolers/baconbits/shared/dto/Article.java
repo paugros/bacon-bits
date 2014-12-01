@@ -33,6 +33,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	private int imageDocumentId;
 	private int commentCount;
 	private Date lastCommentDate;
+	private String tagImages;
 
 	public Article() {
 
@@ -116,6 +117,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 
 	public int getTagCount() {
 		return tagCount;
+	}
+
+	public String getTagImages() {
+		return tagImages;
 	}
 
 	public String getTitle() {
@@ -211,6 +216,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 
 	public void setTagCount(int tagCount) {
 		this.tagCount = tagCount;
+	}
+
+	public void setTagImages(String tagImages) {
+		this.tagImages = tagImages;
 	}
 
 	public void setTitle(String title) {

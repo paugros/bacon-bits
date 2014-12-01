@@ -48,7 +48,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			ad.setAddressScopeId(rs.getInt("addressScopeId"));
 			ad.setLastClickDate(rs.getTimestamp("lastClickDate"));
 			ad.setUrl(rs.getString("url"));
-			ad.setDocumentId(rs.getInt("documentId"));
+			ad.setImageId(rs.getInt("imageId"));
+			ad.setSmallImageId(rs.getInt("smallImageId"));
 			ad.setDescription(rs.getString("description"));
 			ad.setPhone(rs.getString("phone"));
 			ad.setCity(rs.getString("city"));
@@ -62,6 +63,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			ad.setTagCount(rs.getInt("tagCount"));
 			ad.setAddressScope(rs.getString("addressScope"));
 			ad.setEmail(rs.getString("email"));
+			ad.setTagImages(rs.getString("tagImages"));
 
 			return ad;
 		}
@@ -82,11 +84,13 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	}
 
 	public String createSqlBase() {
-		String sql = "select r.*, u.firstName, u.lastName, s.scope as addressScope, \n";
+		String sql = "select r.*, u.firstName, u.lastName, s.scope as addressScope, group_concat(t.smallImageId) as tagImages, \n";
 		sql += "(select count(id) from tagResourceMapping where resourceId = r.id) as tagCount \n";
 		sql += "from resources r \n";
 		sql += "join users u on u.id = r.addedById \n";
 		sql += "left join addressScope s on s.id = r.addressScopeId \n";
+		sql += "left join tagResourceMapping tm on tm.resourceId = r.id \n";
+		sql += "left join tags t on t.id = tm.tagId and t.smallImageId is not null \n";
 		return sql;
 	}
 

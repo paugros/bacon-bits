@@ -71,9 +71,9 @@ public class AdsMiniModule extends Composite {
 				vp.add(linkLabel);
 
 				for (final Resource ad : result) {
-					if (ad.getDocumentId() != null) {
+					if (ad.getImageId() != null) {
 						Image image = new Image();
-						image.setUrl(Document.toUrl(ad.getDocumentId()));
+						image.setUrl(Document.toUrl(ad.getImageId()));
 
 						Anchor link = new Anchor(SafeHtmlUtils.fromTrustedString(image.toString()), ad.getUrl());
 						link.setTarget("_blank");

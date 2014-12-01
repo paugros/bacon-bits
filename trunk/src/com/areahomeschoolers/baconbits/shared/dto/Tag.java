@@ -31,6 +31,7 @@ public class Tag extends EntityDto<Tag> {
 	private Date addedDate;
 	private int addedById;
 	private Integer imageId;
+	private Integer smallImageId;
 
 	// mapping
 	private int entityId;
@@ -94,6 +95,14 @@ public class Tag extends EntityDto<Tag> {
 		return name;
 	}
 
+	public Integer getSmallImageId() {
+		if (smallImageId == null || smallImageId == 0) {
+			return null;
+		}
+
+		return smallImageId;
+	}
+
 	public void setAddedById(int addedById) {
 		this.addedById = addedById;
 	}
@@ -128,6 +137,10 @@ public class Tag extends EntityDto<Tag> {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setSmallImageId(Integer smallImageId) {
+		this.smallImageId = smallImageId;
 	}
 
 }

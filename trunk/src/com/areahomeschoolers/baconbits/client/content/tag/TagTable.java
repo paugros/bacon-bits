@@ -82,7 +82,9 @@ public final class TagTable extends EntityCellTable<Tag, TagArg, TagColumn> {
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Tag>() {
 					@Override
 					protected Widget createWidget(final Tag item) {
-						final EditableImage image = new EditableImage(DocumentLinkType.TAG, item.getId(), item.getImageId(), true);
+						final EditableImage image = new EditableImage(DocumentLinkType.TAG, item.getId());
+						image.setImageId(item.getSmallImageId());
+						image.populate();
 						image.setUploadCompleteHandler(new UploadCompleteHandler() {
 							@Override
 							public void onUploadComplete(int documentId) {

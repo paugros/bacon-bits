@@ -21,13 +21,6 @@ public abstract class Constants {
 
 	public static final String DOCUMENT_URL_PREFIX = "/baconbits/service/file?id=";
 
-	public static final int BLANK_PROFILE_MALE_LARGE = 961;
-	public static final int BLANK_PROFILE_MALE_SMALL = 963;
-	public static final int BLANK_PROFILE_FEMALE_LARGE = 960;
-	public static final int BLANK_PROFILE_FEMALE_SMALL = 962;
-	public static final int BLANK_BOOK_IMAGE_SMALL = 34;
-	public static final int BLANK_BOOK_IMAGE = 32;
-
 	public static final int CG_ORG_ID = 21;
 	public static final String CG_PAYPAL_EMAIL = "payments@citrusgroups.com";
 	public static final String BOOK_GROUP_OPTION_CACHE_KEY = "bookSellerGroupOption_";

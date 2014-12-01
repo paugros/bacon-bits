@@ -57,6 +57,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			article.setCommentCount(rs.getInt("commentCount"));
 			article.setLastCommentDate(rs.getTimestamp("lastCommentDate"));
 			article.setImageDocumentId(rs.getInt("smallImageId"));
+			article.setTagImages(rs.getString("tagImages"));
 			return article;
 		}
 	}
@@ -84,7 +85,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	}
 
 	public String createSqlBase() {
-		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, u.smallImageId, \n";
+		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, u.smallImageId, group_concat(t.smallImageId) as tagImages, \n";
 		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
 		sql += "(select count(id) from comments where articleId = a.id and endDate is null) as commentCount, \n";
 		sql += "(select addedDate from comments where articleId = a.id and endDate is null order by addedDate desc limit 1) as lastCommentDate, \n";
@@ -93,6 +94,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		sql += "join users u on u.id = a.addedById \n";
 		sql += "left join groups g on g.id = a.groupId \n";
 		sql += "join itemVisibilityLevels l on l.id = a.visibilityLevelId \n";
+		sql += "left join tagArticleMapping tm on tm.articleId = a.id \n";
+		sql += "left join tags t on t.id = tm.tagId and t.smallImageId is not null \n";
 
 		sql += createWhere();
 		return sql;

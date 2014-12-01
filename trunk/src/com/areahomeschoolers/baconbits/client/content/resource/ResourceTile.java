@@ -4,6 +4,7 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -29,16 +30,17 @@ public class ResourceTile extends Composite {
 		HorizontalPanel hp = new HorizontalPanel();
 		int textWidth = 200;
 		hp.setWidth((textWidth + 80) + "px");
-		hp.setHeight("117px");
+		hp.setHeight("100px");
 		hp.addStyleName("itemTile");
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.RESOURCE.getColor());
 
-		// Image i = new Image(Constants.DOCUMENT_URL_PREFIX + 1222);
 		Image i = new Image(MainImageBundle.INSTANCE.logo());
-		// i.getElement().getStyle().setBorderColor("#6b48f");
-		// i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-		// i.getElement().getStyle().setBorderWidth(1, Unit.PX);
-
+		if (item.getSmallImageId() != null) {
+			i = new Image(Document.toUrl(item.getSmallImageId()));
+		} else if (item.getTagImages() != null) {
+			int imageId = Integer.parseInt(Common.split(item.getTagImages(), ",").get(0));
+			i = new Image(Document.toUrl(imageId));
+		}
 		hp.add(new HTML("<div style=\"width: 80px; margin-right: 10px; text-align: center;\">" + i.toString() + "</div>"));
 
 		Hyperlink link = new Hyperlink(item.getName(), PageUrl.resource(item.getId()));
@@ -49,17 +51,11 @@ public class ResourceTile extends Composite {
 		// address
 		if (!Common.isNullOrBlank(item.getAddress())) {
 			String a = "";
-			if (!Common.isNullOrBlank(item.getStreet())) {
-				a += item.getStreet() + "<br>";
-			}
 			if (!Common.isNullOrBlank(item.getCity())) {
 				a += item.getCity() + " ";
 			}
 			if (!Common.isNullOrBlank(item.getState())) {
-				a += item.getState() + " ";
-			}
-			if (!Common.isNullOrBlank(item.getZip())) {
-				a += item.getZip();
+				a += item.getState();
 			}
 			text += a + "<br>";
 		} else if (!Common.isNullOrBlank(item.getPhone())) {
@@ -68,7 +64,7 @@ public class ResourceTile extends Composite {
 		text += "</div>";
 
 		// description
-		text += "<div class=smallText style=\"overflow: hidden; max-height: 38px; width: " + textWidth + "px;\">" + item.getDescription() + "</div>";
+		text += "<div class=smallText style=\"overflow: hidden; max-height: 41px; width: " + textWidth + "px;\">" + item.getDescription() + "</div>";
 
 		HTML h = new HTML(text);
 

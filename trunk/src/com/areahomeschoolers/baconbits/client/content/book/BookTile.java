@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -8,8 +9,6 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
-import com.google.gwt.dom.client.Style.BorderStyle;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
@@ -36,10 +35,10 @@ public class BookTile extends Composite {
 		hp.addStyleName("itemTile");
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.BOOK.getColor());
 
-		Image i = new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
-		i.getElement().getStyle().setBorderColor("#c7c7c7");
-		i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-		i.getElement().getStyle().setBorderWidth(1, Unit.PX);
+		Image i = new Image(MainImageBundle.INSTANCE.logo());
+		if (item.getSmallImageId() != null) {
+			i = new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
+		}
 
 		hp.add(new HTML("<div style=\"width: 80px; margin-right: 10px; text-align: center;\">" + i.toString() + "</div>"));
 

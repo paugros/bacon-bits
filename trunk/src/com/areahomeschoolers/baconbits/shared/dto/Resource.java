@@ -24,7 +24,8 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	private int clickCount;
 	private Date lastClickDate;
-	private Integer documentId;
+	private Integer imageId;
+	private Integer smallImageId;
 
 	private Date startDate;
 	private Date endDate;
@@ -44,6 +45,7 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	// auxiliary
 	private int tagCount;
 	private String addressScope;
+	private String tagImages;
 
 	public Resource() {
 
@@ -88,19 +90,19 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		return description;
 	}
 
-	public Integer getDocumentId() {
-		if (documentId == null || documentId == 0) {
-			return null;
-		}
-		return documentId;
-	}
-
 	public String getEmail() {
 		return email;
 	}
 
 	public Date getEndDate() {
 		return endDate;
+	}
+
+	public Integer getImageId() {
+		if (imageId == null || imageId == 0) {
+			return null;
+		}
+		return imageId;
 	}
 
 	public Date getLastClickDate() {
@@ -129,6 +131,13 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		return showInAds;
 	}
 
+	public Integer getSmallImageId() {
+		if (smallImageId == null || smallImageId == 0) {
+			return null;
+		}
+		return smallImageId;
+	}
+
 	public Date getStartDate() {
 		return startDate;
 	}
@@ -145,6 +154,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public int getTagCount() {
 		return tagCount;
+	}
+
+	public String getTagImages() {
+		return tagImages;
 	}
 
 	public String getUrl() {
@@ -203,16 +216,16 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		this.description = description;
 	}
 
-	public void setDocumentId(Integer documentId) {
-		this.documentId = documentId;
-	}
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public void setImageId(Integer imageId) {
+		this.imageId = imageId;
 	}
 
 	public void setLastClickDate(Date lastClickDate) {
@@ -241,6 +254,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		this.showInAds = showInAds;
 	}
 
+	public void setSmallImageId(Integer smallImageId) {
+		this.smallImageId = smallImageId;
+	}
+
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
@@ -257,6 +274,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setTagCount(int tagCount) {
 		this.tagCount = tagCount;
+	}
+
+	public void setTagImages(String tagImages) {
+		this.tagImages = tagImages;
 	}
 
 	public void setUrl(String url) {

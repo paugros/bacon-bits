@@ -15,6 +15,14 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource articleTile();
 
+	ImageResource blankProfileFemale();
+
+	ImageResource blankProfileFemaleSmall();
+
+	ImageResource blankProfileMale();
+
+	ImageResource blankProfileMaleSmall();
+
 	ImageResource blogTile();
 
 	ImageResource book();
@@ -79,8 +87,6 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource headerBackground();
 
-	ImageResource link();
-
 	ImageResource littleLogo();
 
 	ImageResource logo();
@@ -108,8 +114,6 @@ public interface MainImageBundle extends ClientBundle {
 	ImageResource sortDescending();
 
 	ImageResource swap();
-
-	ImageResource upload();
 
 	ImageResource user();
 

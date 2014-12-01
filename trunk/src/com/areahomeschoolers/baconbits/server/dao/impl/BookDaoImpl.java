@@ -366,8 +366,6 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		} else {
 			book.setUserId(ServerContext.getCurrentUser().getId());
 
-			book.setImageId(Constants.BLANK_BOOK_IMAGE);
-			book.setSmallImageId(Constants.BLANK_BOOK_IMAGE_SMALL);
 			String sql = "insert into books (userId, title, categoryId, gradeLevelId, statusId, price, isbn, notes, conditionId, imageId, smallImageId, author, ";
 			sql += "subTitle, publisher, publishDate, description, pageCount, googleCategories) values ";
 			sql += "(:userId, :title, :categoryId, :gradeLevelId, :statusId, :price, :isbn, :notes, :conditionId, :imageId, :smallImageId, :author, ";
