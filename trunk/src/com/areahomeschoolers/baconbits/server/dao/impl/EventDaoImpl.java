@@ -1047,11 +1047,14 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 	private String createSqlBase(String specialCols) {
 		int userId = ServerContext.getCurrentUserId();
-		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.visibilityLevel, group_concat(t.smallImageId) as tagImages, \n";
+		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.visibilityLevel, \n";
 		sql += "gg.markupPercent as groupMarkupPercent, gg.markupDollars as groupMarkupDollars, gg.markupOverride as groupMarkupOverride, \n";
 		if (!Common.isNullOrBlank(specialCols)) {
 			sql += specialCols;
 		}
+		sql += "(select group_concat(t.smallImageId) from tagEventMapping tm \n";
+		sql += "left join tags t on t.id = tm.tagId and t.smallImageId is not null \n";
+		sql += "where tm.eventId = e.id) as tagImages, \n";
 		sql += "(select group_concat(price + markup) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {
@@ -1069,8 +1072,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		sql += "join eventCategories c on c.id = e.categoryId \n";
 		sql += "join users u on u.id = e.addedById \n";
 		sql += "join itemVisibilityLevels l on l.id = e.visibilityLevelId \n";
-		sql += "left join tagEventMapping tm on tm.eventId = e.id \n";
-		sql += "left join tags t on t.id = tm.tagId and t.smallImageId is not null \n";
 
 		sql += createWhere();
 
