@@ -1,10 +1,10 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -36,7 +36,7 @@ public class UserTile extends Composite {
 		hp.addStyleName("itemTile");
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.USER.getColor());
 
-		Image i = new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
+		Image i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
 		i.getElement().getStyle().setBorderColor("#c7c7c7");
 		i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 		i.getElement().getStyle().setBorderWidth(1, Unit.PX);

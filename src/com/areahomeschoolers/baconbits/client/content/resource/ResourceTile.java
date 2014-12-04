@@ -2,9 +2,9 @@ package com.areahomeschoolers.baconbits.client.content.resource;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -36,10 +36,7 @@ public class ResourceTile extends Composite {
 
 		Image i = new Image(MainImageBundle.INSTANCE.logo());
 		if (item.getSmallImageId() != null) {
-			i = new Image(Document.toUrl(item.getSmallImageId()));
-		} else if (item.getTagImages() != null) {
-			int imageId = Integer.parseInt(Common.split(item.getTagImages(), ",").get(0));
-			i = new Image(Document.toUrl(imageId));
+			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
 		}
 		hp.add(new HTML("<div style=\"width: 80px; margin-right: 10px; text-align: center;\">" + i.toString() + "</div>"));
 

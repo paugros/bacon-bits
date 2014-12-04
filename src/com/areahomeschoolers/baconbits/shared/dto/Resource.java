@@ -26,6 +26,7 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	private Date lastClickDate;
 	private Integer imageId;
 	private Integer smallImageId;
+	private String imageExtension;
 
 	private Date startDate;
 	private Date endDate;
@@ -45,7 +46,6 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	// auxiliary
 	private int tagCount;
 	private String addressScope;
-	private String tagImages;
 
 	public Resource() {
 
@@ -96,6 +96,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public Date getEndDate() {
 		return endDate;
+	}
+
+	public String getImageExtension() {
+		return imageExtension;
 	}
 
 	public Integer getImageId() {
@@ -154,10 +158,6 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public int getTagCount() {
 		return tagCount;
-	}
-
-	public String getTagImages() {
-		return tagImages;
 	}
 
 	public String getUrl() {
@@ -224,6 +224,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 		this.endDate = endDate;
 	}
 
+	public void setImageExtension(String imageExtension) {
+		this.imageExtension = imageExtension;
+	}
+
 	public void setImageId(Integer imageId) {
 		this.imageId = imageId;
 	}
@@ -274,10 +278,6 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setTagCount(int tagCount) {
 		this.tagCount = tagCount;
-	}
-
-	public void setTagImages(String tagImages) {
-		this.tagImages = tagImages;
 	}
 
 	public void setUrl(String url) {

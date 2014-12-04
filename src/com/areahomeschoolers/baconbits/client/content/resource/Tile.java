@@ -2,7 +2,6 @@ package com.areahomeschoolers.baconbits.client.content.resource;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.util.Url;
-import com.areahomeschoolers.baconbits.shared.dto.Document;
 
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
@@ -40,13 +39,8 @@ public class Tile extends Composite {
 
 		SimplePanel sp = new SimplePanel();
 		sp.getElement().getStyle().setHeight(200, Unit.PX);
-		Image image = null;
+		Image image = config.getImage();
 
-		if (config.getImageResource() == null) {
-			image = new Image(Document.toUrl(config.getImageId()));
-		} else {
-			image = new Image(config.getImageResource());
-		}
 		sp.setWidget(image);
 		vp.add(sp);
 		vp.setCellHorizontalAlignment(sp, HasHorizontalAlignment.ALIGN_CENTER);
@@ -65,17 +59,11 @@ public class Tile extends Composite {
 			countLength = Integer.toString(config.getCount()).length();
 		}
 		int width = 215;
-		if (config.getText().length() + countLength > 18) {
-			textSize = "largeText";
-			width -= countLength * 10;
-		} else {
-			textSize = "hugeText";
-			width -= countLength * 12;
-		}
+		textSize = "largeText";
+		width -= countLength * 10;
 
 		String htmlText = "<a href=\"" + url + "\" class=\"" + textSize + "\" style=\"color: black;\">" + config.getText() + "</a>";
 		HTML link = new HTML(htmlText);
-		// ClientUtils.stopPropagation(link);
 
 		link.setWordWrap(false);
 		link.setWidth(width + "px");

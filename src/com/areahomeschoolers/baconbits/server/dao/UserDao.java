@@ -21,6 +21,8 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
 
 public interface UserDao {
+	public String createWhere();
+
 	@PreAuthorize("hasRole('ORGANIZATION_ADMINISTRATORS')")
 	public void deleteMenuItem(MainMenuItem item);
 

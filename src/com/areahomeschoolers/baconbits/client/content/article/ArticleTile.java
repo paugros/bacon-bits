@@ -2,10 +2,9 @@ package com.areahomeschoolers.baconbits.client.content.article;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
-import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -35,16 +34,15 @@ public class ArticleTile extends Composite {
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.ARTICLE.getColor());
 
 		Image i = new Image(MainImageBundle.INSTANCE.logo());
-		if (item.getTagImages() != null) {
-			int imageId = Integer.parseInt(Common.split(item.getTagImages(), ",").get(0));
-			i = new Image(Document.toUrl(imageId));
+		if (item.getSmallImageId() != null) {
+			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
 		}
 		hp.add(new HTML("<div style=\"width: 80px; margin-right: 10px; text-align: center;\">" + i.toString() + "</div>"));
 
 		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.article(item.getId()));
 		link.addStyleName("bold");
 		// title/link
-		String text = "<div style=\"overflow: hidden; width: " + textWidth + "px;\">" + link.toString() + "</div>";
+		String text = "<div style=\"overflow: hidden; width: " + textWidth + "px; white-space: nowrap;\">" + link.toString() + "</div>";
 
 		// description
 		String d = new HTML(item.getArticle()).getText();

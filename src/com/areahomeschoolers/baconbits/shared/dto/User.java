@@ -53,6 +53,7 @@ public final class User extends EntityDto<User> implements HasAddress {
 	private String sex;
 	private Integer imageId;
 	private Integer smallImageId;
+	private String imageExtension;
 	// aux
 	private boolean isSwitched;
 	private int commonInterestCount;
@@ -216,6 +217,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public String getHomePhone() {
 		return homePhone;
+	}
+
+	public String getImageExtension() {
+		return imageExtension;
 	}
 
 	public Integer getImageId() {
@@ -486,6 +491,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public void setHomePhone(String homePhone) {
 		this.homePhone = homePhone;
+	}
+
+	public void setImageExtension(String imageExtension) {
+		this.imageExtension = imageExtension;
 	}
 
 	public void setImageId(Integer imageId) {

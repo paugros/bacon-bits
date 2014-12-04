@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
@@ -231,7 +232,7 @@ public final class MainMenu extends MenuBar {
 
 	private MenuBar getBooksMenu() {
 		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Search Books", PageUrl.bookList());
+		addLinkToMenu(menu, "Search Books", PageUrl.tagGroup(TagMappingType.BOOK.toString()));
 		if (Application.isAuthenticated() && Application.getCurrentUser().administratorOf(Application.getCurrentOrgId())) {
 			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
 		}

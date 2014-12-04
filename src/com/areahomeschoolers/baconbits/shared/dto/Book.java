@@ -31,6 +31,7 @@ public final class Book extends EntityDto<Book> {
 	private Date addedDate;
 	private int pageCount;
 	private String googleCategories;
+	private String imageExtension;
 
 	// auxillary
 	private String amazonNewPrice, amazonUsedPrice;
@@ -105,6 +106,10 @@ public final class Book extends EntityDto<Book> {
 			return null;
 		}
 		return gradeLevelId;
+	}
+
+	public String getImageExtension() {
+		return imageExtension;
 	}
 
 	public Integer getImageId() {
@@ -253,6 +258,10 @@ public final class Book extends EntityDto<Book> {
 
 	public void setGradeLevelId(Integer gradeLevelId) {
 		this.gradeLevelId = gradeLevelId;
+	}
+
+	public void setImageExtension(String imageExtension) {
+		this.imageExtension = imageExtension;
 	}
 
 	public void setImageId(int imageId) {

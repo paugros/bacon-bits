@@ -4,10 +4,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.DocumentService;
 import com.areahomeschoolers.baconbits.client.rpc.service.DocumentServiceAsync;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 
 import com.google.gwt.dom.client.Element;
@@ -30,6 +32,14 @@ public abstract class ClientUtils {
 			KeyCodes.KEY_RIGHT, KeyCodes.KEY_END, KeyCodes.KEY_HOME, KeyCodes.KEY_ENTER, KeyCodes.KEY_ESCAPE, KeyCodes.KEY_DELETE, KeyCodes.KEY_SHIFT,
 			KeyCodes.KEY_ALT, KeyCodes.KEY_CTRL, KeyCodes.KEY_TAB };
 	public static final List<Character> ALLOWED_KEY_CODES = Collections.unmodifiableList(Arrays.asList(PRIVATE_ALLOWED_KEY_CODES));
+
+	public final static String createDocumentUrl(int documentId, String fileExtension) {
+		if (Application.isLive()) {
+			return Constants.GCS_PREFIX + Integer.toString(documentId) + "." + fileExtension;
+		}
+
+		return Document.toUrl(documentId);
+	}
 
 	public static void exportCsvFile(String name, String fileData) {
 		DocumentServiceAsync documentService = (DocumentServiceAsync) ServiceCache.getService(DocumentService.class);

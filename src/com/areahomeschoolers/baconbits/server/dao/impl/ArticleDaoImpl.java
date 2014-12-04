@@ -29,6 +29,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
@@ -56,8 +57,10 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			article.setAddedByLastName(rs.getString("lastName"));
 			article.setCommentCount(rs.getInt("commentCount"));
 			article.setLastCommentDate(rs.getTimestamp("lastCommentDate"));
-			article.setImageDocumentId(rs.getInt("smallImageId"));
-			article.setTagImages(rs.getString("tagImages"));
+			article.setUserImageId(rs.getInt("userImageId"));
+			article.setImageExtension(rs.getString("fileExtension"));
+			article.setImageId(rs.getInt("imageId"));
+			article.setSmallImageId(rs.getInt("smallImageId"));
 			return article;
 		}
 	}
@@ -85,20 +88,39 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	}
 
 	public String createSqlBase() {
-		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, u.smallImageId, \n";
-		sql += "(select group_concat(t.smallImageId) from tagArticleMapping tm \n";
-		sql += "left join tags t on t.id = tm.tagId and t.smallImageId is not null \n";
-		sql += "where tm.articleId = a.id) as tagImages, \n";
+		String sql = "select a.*, g.groupName, l.visibilityLevel, u.firstName, u.lastName, u.smallImageId as userImageId, \n";
 		sql += "(select count(id) from documentArticleMapping where articleId = a.id) as documentCount, \n";
 		sql += "(select count(id) from comments where articleId = a.id and endDate is null) as commentCount, \n";
+		sql += "t.imageId, t.smallImageId, d.fileExtension, \n";
 		sql += "(select addedDate from comments where articleId = a.id and endDate is null order by addedDate desc limit 1) as lastCommentDate, \n";
 		sql += "(select count(id) from tagArticleMapping where articleId = a.id) as tagCount \n";
 		sql += "from articles a \n";
 		sql += "join users u on u.id = a.addedById \n";
+		sql += "left join tags t on t.id = a.firstTagId \n";
+		sql += "left join documents d on d.id = t.imageId \n";
 		sql += "left join groups g on g.id = a.groupId \n";
 		sql += "join itemVisibilityLevels l on l.id = a.visibilityLevelId \n";
 
 		sql += createWhere();
+		return sql;
+	}
+
+	@Override
+	public String createWhere() {
+		int userId = ServerContext.getCurrentUserId();
+		String sql = "left join userGroupMembers ugm on ugm.groupId = a.groupId and ugm.userId = " + userId + " \n";
+		sql += "left join userGroupMembers org on org.groupId = a.owningOrgId and org.userId = " + userId + " \n";
+		sql += "where 1 = 1 \n";
+
+		int auth = ServerContext.isAuthenticated() ? 1 : 0;
+		if (!ServerContext.isSystemAdministrator()) {
+			sql += "and case a.visibilityLevelId ";
+			sql += "when 1 then 1 ";
+			sql += "when 2 then " + auth + " \n";
+			sql += "when 4 then (ugm.id > 0 or org.isAdministrator) \n";
+			sql += "else 0 end > 0 \n";
+		}
+
 		return sql;
 	}
 
@@ -135,8 +157,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	@Override
 	public int getCount() {
 		String sql = "select count(*) from articles a ";
-		sql += createWhere();
-		sql += "and a.newsItem = 0 and isActive(a.startDate, a.endDate) = 1 \n";
+		sql += TagDaoImpl.createWhere(TagMappingType.ARTICLE);
 
 		return queryForInt(0, sql);
 	}
@@ -148,9 +169,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		String sql = "select a.id, a.title as Suggestion, 'Article' as entityType ";
 		sql += "from articles a ";
 		sql += createWhere();
-		sql += "and isActive(a.startDate, a.endDate) = 1 ";
+		sql += "and isActive(a.startDate, a.endDate) = 1 and a.newsItem = 0 ";
 		sql += "and a.title like ? ";
-		sql += "and a.newsItem = 0 ";
 		sql += "order by a.title ";
 		sql += "limit " + Integer.toString(limit + 1);
 
@@ -306,24 +326,6 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		}
 
 		return comment;
-	}
-
-	private String createWhere() {
-		int userId = ServerContext.getCurrentUserId();
-		String sql = "left join userGroupMembers ugm on ugm.groupId = a.groupId and ugm.userId = " + userId + " \n";
-		sql += "left join userGroupMembers org on org.groupId = a.owningOrgId and org.userId = " + userId + " \n";
-		sql += "where 1 = 1 \n";
-
-		int auth = ServerContext.isAuthenticated() ? 1 : 0;
-		if (!ServerContext.isSystemAdministrator()) {
-			sql += "and case a.visibilityLevelId ";
-			sql += "when 1 then 1 ";
-			sql += "when 2 then " + auth + " \n";
-			sql += "when 4 then (ugm.id > 0 or org.isAdministrator) \n";
-			sql += "else 0 end > 0 \n";
-		}
-
-		return sql;
 	}
 
 }

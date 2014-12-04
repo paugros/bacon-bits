@@ -44,4 +44,6 @@ public abstract class Constants {
 
 	public static final int MAX_DATA_ROWS = 2000;
 
+	public static final String GCS_PREFIX = "http://storage.googleapis.com/baconbits-production/documents/";
+
 }

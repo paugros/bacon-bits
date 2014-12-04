@@ -13,6 +13,7 @@ import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagService;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
@@ -23,6 +24,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class TagGroupPage implements Page {
@@ -55,9 +57,9 @@ public final class TagGroupPage implements Page {
 				for (Tag tag : result) {
 					TileConfig uc = new TileConfig().setText(tag.getName()).setCount(tag.getCount());
 					if (tag.getImageId() != null) {
-						uc.setImageId(tag.getImageId());
+						uc.setImage(new Image(ClientUtils.createDocumentUrl(tag.getImageId(), tag.getImageExtension())));
 					} else {
-						uc.setImageResource(MainImageBundle.INSTANCE.defaultImage());
+						uc.setImage(new Image(MainImageBundle.INSTANCE.defaultImage()));
 					}
 					String url = null;
 					switch (type) {

@@ -54,13 +54,15 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private String facilityName;
 
 	// auxilliary
+	private Integer imageId;
+	private Integer smallImageId;
+	private String imageExtension;
 	private double groupMarkupPercent;
 	private double groupMarkupDollars;
 	private boolean groupMarkupOverride;
 	private boolean newlyAdded;
 	private boolean saveAllInSeries;
 	private boolean markupChanged;
-	private String tagImages;
 
 	private int cloneFromId;
 	private int currentUserParticipantCount;
@@ -220,6 +222,14 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return groupName;
 	}
 
+	public String getImageExtension() {
+		return imageExtension;
+	}
+
+	public Integer getImageId() {
+		return imageId;
+	}
+
 	@Override
 	public double getLat() {
 		return lat;
@@ -325,6 +335,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		return seriesId;
 	}
 
+	public Integer getSmallImageId() {
+		return smallImageId;
+	}
+
 	public Date getStartDate() {
 		return startDate;
 	}
@@ -337,10 +351,6 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	@Override
 	public String getStreet() {
 		return street;
-	}
-
-	public String getTagImages() {
-		return tagImages;
 	}
 
 	public String getTitle() {
@@ -481,6 +491,14 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		this.groupName = groupName;
 	}
 
+	public void setImageExtension(String imageExtension) {
+		this.imageExtension = imageExtension;
+	}
+
+	public void setImageId(Integer imageId) {
+		this.imageId = imageId;
+	}
+
 	@Override
 	public void setLat(double lat) {
 		this.lat = lat;
@@ -583,6 +601,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 		this.seriesId = seriesId;
 	}
 
+	public void setSmallImageId(Integer smallImageId) {
+		this.smallImageId = smallImageId;
+	}
+
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
@@ -595,10 +617,6 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	@Override
 	public void setStreet(String street) {
 		this.street = street;
-	}
-
-	public void setTagImages(String tagImages) {
-		this.tagImages = tagImages;
 	}
 
 	public void setTitle(String title) {

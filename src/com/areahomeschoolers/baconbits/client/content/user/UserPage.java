@@ -32,6 +32,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
@@ -87,6 +88,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -217,7 +219,7 @@ public class UserPage implements Page {
 
 					ImageResource r = user.getSex().equals("m") ? MainImageBundle.INSTANCE.blankProfileMale() : MainImageBundle.INSTANCE.blankProfileFemale();
 					EditableImage image = new EditableImage(DocumentLinkType.PROFILE, user.getId());
-					image.setImageId(user.getImageId());
+					image.setImage(new Image(ClientUtils.createDocumentUrl(user.getImageId(), user.getImageExtension())));
 					image.setImageResource(r);
 					image.setEnabled(canEditUser(user));
 					image.populate();
