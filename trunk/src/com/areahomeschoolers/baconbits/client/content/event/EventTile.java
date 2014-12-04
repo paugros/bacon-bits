@@ -46,9 +46,10 @@ public class EventTile extends Composite {
 		link.addStyleName("bold");
 		String text = link.toString() + "<br>";
 		text += Formatter.formatDateTime(item.getStartDate()) + "<br>";
-		text += item.getDescription() + "<br>";
+		text += new HTML(item.getDescription()).getText() + "<br>";
 
 		HTML h = new HTML(text);
+		h.setHeight("85px");
 		h.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 		h.getElement().getStyle().setOverflow(Overflow.HIDDEN);
 		h.getElement().getStyle().setWidth(190, Unit.PX);
