@@ -118,7 +118,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setStreet(rs.getString("street"));
 			event.setLat(rs.getDouble("lat"));
 			event.setLng(rs.getDouble("lng"));
-			event.setTagImages(rs.getString("tagImages"));
+			event.setImageId(rs.getInt("imageId"));
+			event.setSmallImageId(rs.getInt("smallImageId"));
+			event.setImageExtension(rs.getString("fileExtension"));
 			return event;
 		}
 	}
@@ -158,6 +160,26 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 			save(event);
 		}
+	}
+
+	@Override
+	public String createWhere() {
+		int userId = ServerContext.getCurrentUserId();
+
+		String sql = "left join userGroupMembers ugm on ugm.groupId = e.groupId and ugm.userId = " + userId + " \n";
+		sql += "left join userGroupMembers org on org.groupId = e.owningOrgId and org.userId = " + userId + " \n";
+		sql += "where 1 = 1 \n";
+
+		int auth = ServerContext.isAuthenticated() ? 1 : 0;
+		if (!ServerContext.isSystemAdministrator()) {
+			sql += "and case e.visibilityLevelId ";
+			sql += "when 1 then 1 ";
+			sql += "when 2 then " + auth + " \n";
+			sql += "when 4 then (ugm.id > 0 or org.isAdministrator) \n";
+			sql += "else 0 end > 0 \n";
+		}
+
+		return sql;
 	}
 
 	@Override
@@ -322,7 +344,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		ArticleDao ad = ServerContext.getDaoImpl("article");
 		pd.setArticleCount(ad.getCount());
 
-		String sql = "select count(*) from events e " + createWhere() + " and e.endDate > now() and e.active = 1";
+		String sql = "select count(*) from events e ";
+		sql += TagDaoImpl.createWhere(TagMappingType.EVENT);
 		pd.setEventCount(queryForInt(sql));
 
 		return pd;
@@ -1052,9 +1075,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		if (!Common.isNullOrBlank(specialCols)) {
 			sql += specialCols;
 		}
-		sql += "(select group_concat(t.smallImageId) from tagEventMapping tm \n";
-		sql += "left join tags t on t.id = tm.tagId and t.smallImageId is not null \n";
-		sql += "where tm.eventId = e.id) as tagImages, \n";
 		sql += "(select group_concat(price + markup) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {
@@ -1065,34 +1085,18 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		}
 		sql += "(select count(id) from documentEventMapping where eventId = e.id) as documentCount, \n";
 		sql += "(e.addedDate >= date_add(now(), interval -2 week) and (e.seriesId = e.id or e.seriesId is null)) as newlyAdded, \n";
+		sql += "t.imageId, t.smallImageId, d.fileExtension, \n";
 		sql += "(e.endDate < now()) as finished, isActive(e.registrationStartDate, e.registrationEndDate) as registrationOpen \n";
 		sql += "from events e \n";
 		sql += "left join groups g on g.id = e.groupId \n";
+		sql += "left join tags t on t.id = e.firstTagId \n";
+		sql += "left join documents d on d.id = t.imageId \n";
 		sql += "join groups gg on gg.id = e.owningOrgId \n";
 		sql += "join eventCategories c on c.id = e.categoryId \n";
 		sql += "join users u on u.id = e.addedById \n";
 		sql += "join itemVisibilityLevels l on l.id = e.visibilityLevelId \n";
 
 		sql += createWhere();
-
-		return sql;
-	}
-
-	private String createWhere() {
-		int userId = ServerContext.getCurrentUserId();
-
-		String sql = "left join userGroupMembers ugm on ugm.groupId = e.groupId and ugm.userId = " + userId + " \n";
-		sql += "left join userGroupMembers org on org.groupId = e.owningOrgId and org.userId = " + userId + " \n";
-		sql += "where 1 = 1 \n";
-
-		int auth = ServerContext.isAuthenticated() ? 1 : 0;
-		if (!ServerContext.isSystemAdministrator()) {
-			sql += "and case e.visibilityLevelId ";
-			sql += "when 1 then 1 ";
-			sql += "when 2 then " + auth + " \n";
-			sql += "when 4 then (ugm.id > 0 or org.isAdministrator) \n";
-			sql += "else 0 end > 0 \n";
-		}
 
 		return sql;
 	}

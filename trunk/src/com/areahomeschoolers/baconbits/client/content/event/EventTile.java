@@ -2,11 +2,10 @@ package com.areahomeschoolers.baconbits.client.content.event;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
-import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -38,9 +37,8 @@ public class EventTile extends Composite {
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.EVENT.getColor());
 
 		Image i = new Image(MainImageBundle.INSTANCE.logo());
-		if (item.getTagImages() != null) {
-			int imageId = Integer.parseInt(Common.split(item.getTagImages(), ",").get(0));
-			i = new Image(Document.toUrl(imageId));
+		if (item.getSmallImageId() != null) {
+			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
 		}
 		hp.add(new HTML(i.toString()));
 

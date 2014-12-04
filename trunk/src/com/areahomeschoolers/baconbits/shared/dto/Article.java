@@ -30,10 +30,13 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	private int documentCount;
 	private int tagCount;
 	private GroupPolicy groupPolicy;
-	private int imageDocumentId;
+	private int userImageId;
 	private int commentCount;
 	private Date lastCommentDate;
-	private String tagImages;
+
+	private Integer imageId;
+	private Integer smallImageId;
+	private String imageExtension;
 
 	public Article() {
 
@@ -94,8 +97,15 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return groupPolicy;
 	}
 
-	public int getImageDocumentId() {
-		return imageDocumentId;
+	public int getUserImageId() {
+		return userImageId;
+	}
+
+	public Integer getImageId() {
+		if (imageId == null || imageId == 0) {
+			return null;
+		}
+		return imageId;
 	}
 
 	public Date getLastCommentDate() {
@@ -111,6 +121,13 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return owningOrgId;
 	}
 
+	public Integer getSmallImageId() {
+		if (smallImageId == null || smallImageId == 0) {
+			return null;
+		}
+		return smallImageId;
+	}
+
 	public Date getStartDate() {
 		return startDate;
 	}
@@ -119,8 +136,8 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return tagCount;
 	}
 
-	public String getTagImages() {
-		return tagImages;
+	public String getImageExtension() {
+		return imageExtension;
 	}
 
 	public String getTitle() {
@@ -193,8 +210,12 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		this.groupPolicy = groupPolicy;
 	}
 
-	public void setImageDocumentId(int imageDocumentId) {
-		this.imageDocumentId = imageDocumentId;
+	public void setUserImageId(int userImageId) {
+		this.userImageId = userImageId;
+	}
+
+	public void setImageId(Integer imageId) {
+		this.imageId = imageId;
 	}
 
 	public void setLastCommentDate(Date lastCommentDate) {
@@ -210,6 +231,10 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		this.owningOrgId = organizationId;
 	}
 
+	public void setSmallImageId(Integer smallImageId) {
+		this.smallImageId = smallImageId;
+	}
+
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
@@ -218,8 +243,8 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		this.tagCount = tagCount;
 	}
 
-	public void setTagImages(String tagImages) {
-		this.tagImages = tagImages;
+	public void setImageExtension(String imageExtension) {
+		this.imageExtension = imageExtension;
 	}
 
 	public void setTitle(String title) {

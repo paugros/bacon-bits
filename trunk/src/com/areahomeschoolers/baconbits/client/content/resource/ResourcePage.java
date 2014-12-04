@@ -8,9 +8,11 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
@@ -43,6 +45,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -341,7 +344,12 @@ public class ResourcePage implements Page {
 		pp.setWidth("100%");
 		if (resource.isSaved()) {
 			EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, resource.getId());
-			image.setImageId(resource.getImageId());
+
+			if (resource.getImageId() != null) {
+				image.setImage(new Image(ClientUtils.createDocumentUrl(resource.getImageId(), resource.getImageExtension())));
+			} else {
+				image.setImage(new Image(MainImageBundle.INSTANCE.logo()));
+			}
 			image.populate();
 			image.getElement().getStyle().setMarginRight(10, Unit.PX);
 			pp.add(image);

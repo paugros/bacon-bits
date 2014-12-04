@@ -329,6 +329,7 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 		GcsFilename gf = new GcsFilename(GCS_BUCKET, getGcsFileName(d));
 		GcsFileOptions.getDefaultInstance();
 		Builder b = new GcsFileOptions.Builder();
+		b.acl("public-read");
 		b.mimeType(d.getFileType());
 		try {
 			GcsOutputChannel go = gcsService.createOrReplace(gf, b.build());

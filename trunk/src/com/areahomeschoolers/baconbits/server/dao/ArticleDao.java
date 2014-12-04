@@ -10,6 +10,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
 
 public interface ArticleDao {
+	public String createWhere();
+
 	public Article getById(int articleId);
 
 	public ArrayList<BlogComment> getComments(ArgMap<ArticleArg> args);

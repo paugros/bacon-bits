@@ -32,6 +32,7 @@ public class Tag extends EntityDto<Tag> {
 	private int addedById;
 	private Integer imageId;
 	private Integer smallImageId;
+	private String imageExtension;
 
 	// mapping
 	private int entityId;
@@ -56,6 +57,10 @@ public class Tag extends EntityDto<Tag> {
 
 	public int getEntityId() {
 		return entityId;
+	}
+
+	public String getImageExtension() {
+		return imageExtension;
 	}
 
 	public Integer getImageId() {
@@ -117,6 +122,10 @@ public class Tag extends EntityDto<Tag> {
 
 	public void setEntityId(int entityId) {
 		this.entityId = entityId;
+	}
+
+	public void setImageExtension(String imageExtension) {
+		this.imageExtension = imageExtension;
 	}
 
 	public void setImageId(Integer imageId) {

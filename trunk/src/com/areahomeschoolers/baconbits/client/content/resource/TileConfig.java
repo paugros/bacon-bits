@@ -3,16 +3,15 @@ package com.areahomeschoolers.baconbits.client.content.resource;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
-import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.ui.Image;
 
 public class TileConfig {
 	private String text;
 	private String url;
 	private Integer count;
 	private String color;
-	private int imageId;
-	private ImageResource imageResource;
 	private TagMappingType tagType;
+	private Image image;
 
 	public TileConfig() {
 	}
@@ -25,12 +24,8 @@ public class TileConfig {
 		return count;
 	}
 
-	public int getImageId() {
-		return imageId;
-	}
-
-	public ImageResource getImageResource() {
-		return imageResource;
+	public Image getImage() {
+		return image;
 	}
 
 	public TagMappingType getTagType() {
@@ -55,13 +50,8 @@ public class TileConfig {
 		return this;
 	}
 
-	public TileConfig setImageId(int imageId) {
-		this.imageId = imageId;
-		return this;
-	}
-
-	public TileConfig setImageResource(ImageResource imageResource) {
-		this.imageResource = imageResource;
+	public TileConfig setImage(Image image) {
+		this.image = image;
 		return this;
 	}
 

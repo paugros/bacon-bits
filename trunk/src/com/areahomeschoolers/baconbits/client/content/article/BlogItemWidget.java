@@ -60,7 +60,7 @@ public class BlogItemWidget extends Composite {
 			int thumbNailPixelHeight = 70;
 			int thumbNailPixelWidth = 70;
 
-			int imageId = item.getImageDocumentId();
+			int imageId = item.getUserImageId();
 			if (imageId > 0) {
 				userPhoto.setUrl(Document.toUrl(imageId));
 			} else {

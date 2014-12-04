@@ -73,12 +73,14 @@ public class EditableImage extends Composite {
 	}
 
 	public void populate() {
-		if (imageId != null && imageId != 0) {
-			image = new Image(Constants.DOCUMENT_URL_PREFIX + imageId);
-		} else if (imageResource != null) {
-			image = new Image(imageResource);
-		} else {
-			image = new Image(MainImageBundle.INSTANCE.logo());
+		if (image == null) {
+			if (imageId != null && imageId != 0) {
+				image = new Image(Constants.DOCUMENT_URL_PREFIX + imageId);
+			} else if (imageResource != null) {
+				image = new Image(imageResource);
+			} else {
+				image = new Image(MainImageBundle.INSTANCE.logo());
+			}
 		}
 
 		initWidget(image);
@@ -99,6 +101,10 @@ public class EditableImage extends Composite {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public void setImage(Image image) {
+		this.image = image;
 	}
 
 	public void setImageId(Integer imageId) {

@@ -2,10 +2,10 @@ package com.areahomeschoolers.baconbits.client.content.book;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -37,7 +37,7 @@ public class BookTile extends Composite {
 
 		Image i = new Image(MainImageBundle.INSTANCE.logo());
 		if (item.getSmallImageId() != null) {
-			i = new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
+			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
 		}
 
 		hp.add(new HTML("<div style=\"width: 80px; margin-right: 10px; text-align: center;\">" + i.toString() + "</div>"));

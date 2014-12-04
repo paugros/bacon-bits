@@ -29,6 +29,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 @Repository
 public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Suggestible {
@@ -63,7 +64,13 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			ad.setTagCount(rs.getInt("tagCount"));
 			ad.setAddressScope(rs.getString("addressScope"));
 			ad.setEmail(rs.getString("email"));
-			ad.setTagImages(rs.getString("tagImages"));
+			ad.setImageExtension(rs.getString("fileExtension"));
+
+			if (ad.getImageId() == null) {
+				ad.setImageExtension(rs.getString("tagFileExtension"));
+				ad.setImageId(rs.getInt("tagImageId"));
+				ad.setSmallImageId(rs.getInt("tagSmallImageId"));
+			}
 
 			return ad;
 		}
@@ -84,14 +91,15 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	}
 
 	public String createSqlBase() {
-		String sql = "select r.*, u.firstName, u.lastName, s.scope as addressScope, \n";
-		sql += "(select group_concat(t.smallImageId) from tagResourceMapping tm \n";
-		sql += "left join tags t on t.id = tm.tagId and t.smallImageId is not null \n";
-		sql += "where tm.resourceId = r.id) as tagImages, \n";
+		String sql = "select r.*, u.firstName, u.lastName, s.scope as addressScope, d.fileExtension, ";
+		sql += "t.imageId as tagImageId, t.smallImageId as tagSmallImageId, dd.fileExtension as tagFileExtension, \n";
 		sql += "(select count(id) from tagResourceMapping where resourceId = r.id) as tagCount \n";
 		sql += "from resources r \n";
 		sql += "join users u on u.id = r.addedById \n";
+		sql += "left join tags t on t.id = r.firstTagId \n";
+		sql += "left join documents dd on dd.id = t.imageId \n";
 		sql += "left join addressScope s on s.id = r.addressScopeId \n";
+		sql += "left join documents d on d.id = r.imageId \n";
 		return sql;
 	}
 
@@ -104,7 +112,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 	@Override
 	public int getCount() {
-		String sql = "select count(*) from resources r where isActive(r.startDate, r.endDate) = 1 and r.showInAds = 0";
+		String sql = "select count(*) from resources r " + TagDaoImpl.createWhere(TagMappingType.RESOURCE);
 
 		return queryForInt(0, sql);
 	}

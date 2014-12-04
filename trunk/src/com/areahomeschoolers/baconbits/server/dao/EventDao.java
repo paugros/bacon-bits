@@ -23,6 +23,8 @@ public interface EventDao {
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void createSeries(Event event);
 
+	public String createWhere();
+
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void deleteAgeGroup(EventAgeGroup ageGroup);
 

@@ -18,12 +18,16 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import com.areahomeschoolers.baconbits.server.dao.ArticleDao;
+import com.areahomeschoolers.baconbits.server.dao.EventDao;
 import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.dao.TagDao;
+import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
@@ -33,6 +37,39 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 @Repository
 public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
+
+	public static String createWhere(TagMappingType type) {
+		String sql = "";
+		switch (type) {
+		case ARTICLE:
+			ArticleDao ad = ServerContext.getDaoImpl("article");
+			sql += ad.createWhere();
+			sql += "and a.newsItem = 0 and isActive(a.startDate, a.endDate) = 1 \n";
+			break;
+		case BOOK:
+			sql += "join users u on u.id = b.userId \n";
+			sql += "where b.statusId = 1 \n";
+			sql += "and b.userId in(select userId from userGroupMembers where groupId = " + Constants.ONLINE_BOOK_SELLERS_GROUP_ID + ") \n";
+			sql += "and isActive(u.startDate, u.endDate) = 1 \n";
+			break;
+		case EVENT:
+			EventDao ed = ServerContext.getDaoImpl("event");
+			sql += ed.createWhere() + " and e.endDate > now() and e.active = 1 \n";
+			break;
+		case RESOURCE:
+			sql += "where isActive(r.startDate, r.endDate) = 1 and r.showInAds = 0 and r.firstTagId is not null \n";
+			break;
+		case USER:
+			UserDao ud = ServerContext.getDaoImpl("user");
+			sql += ud.createWhere() + " ";
+			sql += "and isActive(u.startDate, u.endDate) = 1 \n";
+			break;
+		default:
+			break;
+		}
+
+		return sql;
+	}
 
 	@Autowired
 	public TagDaoImpl(DataSource dataSource) {
@@ -57,6 +94,9 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		args.put(TagArg.MAPPING_TYPE, tag.getMappingType().toString());
 		Tag mapped = list(args).get(0);
 		mapped.setEntityId(tag.getEntityId());
+
+		updateFirstTagColumn(tag);
+
 		return mapped;
 	}
 
@@ -69,6 +109,8 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 	public void deleteMapping(Tag tag) {
 		String sql = "delete from " + tag.getMappingTable() + " where id = ?";
 		update(sql, tag.getMappingId());
+
+		updateFirstTagColumn(tag);
 	}
 
 	@Override
@@ -99,7 +141,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		int mappingId = args.getInt(TagArg.MAPPING_ID);
 
 		// tags
-		String always = "t.id, t.name, t.addedDate, t.addedById, t.imageId, t.smallImageId \n";
+		String always = "t.id, t.name, t.addedDate, t.addedById, t.imageId, t.smallImageId, d.fileExtension \n";
 		String sql = "select " + always;
 
 		if (mappingType != null) {
@@ -113,6 +155,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			sql += ", tm.count \n";
 		}
 		sql += "from tags t \n";
+		sql += "left join documents d on d.id = t.imageId \n";
 		if (getAllCounts) {
 			sql += "left join (select tagId, count(id) as count from (\n";
 			EnumSet<TagMappingType> types = EnumSet.allOf(TagMappingType.class);
@@ -135,6 +178,11 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 
 		if (mappingType != null) {
 			sql += "join tag" + Common.ucWords(mappingType.toString()) + "Mapping tm on tm.tagId = t.id \n";
+			// add in joins for tag type
+			String alias = mappingType.toString().substring(0, 1).toLowerCase();
+			String lc = mappingType.toString().toLowerCase();
+			sql += "join " + lc + "s " + alias + " on " + alias + ".id = tm." + lc + "Id \n";
+
 			if (entityId > 0) {
 				sql += "and tm." + mappingType.toString().toLowerCase() + "Id = ? \n";
 				sqlArgs.add(entityId);
@@ -145,7 +193,11 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				sqlArgs.add(mappingId);
 			}
 
-			sql += where;
+			if (tagId > 0) {
+				sql += where;
+			} else {
+				sql += createWhere(mappingType);
+			}
 			if (getCounts) {
 				sql += "group by " + always;
 				sql += "order by count(tm.id) desc, t.name";
@@ -167,6 +219,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				t.setAddedById(rs.getInt("addedById"));
 				t.setImageId(rs.getInt("imageId"));
 				t.setSmallImageId(rs.getInt("smallImageId"));
+				t.setImageExtension(rs.getString("fileExtension"));
 				if (entityId > 0) {
 					t.setEntityId(entityId);
 				}
@@ -253,6 +306,14 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		}
 
 		return tag;
+	}
+
+	private void updateFirstTagColumn(Tag tag) {
+		String col = Common.ucWords(tag.getMappingType().toString());
+		String sql = "update " + col.toLowerCase() + "s tbl set firstTagId = ";
+		sql += "(select tagId from tag" + col + "Mapping tm where " + tag.getMappingColumn() + " = tbl.id order by tm.id limit 1) ";
+		sql += "where id = ?";
+		update(sql, tag.getEntityId());
 	}
 
 }

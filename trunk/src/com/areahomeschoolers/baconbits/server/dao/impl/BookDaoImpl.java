@@ -89,6 +89,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			book.setCondition(rs.getString("bookCondition"));
 			book.setImageId(rs.getInt("imageId"));
 			book.setSmallImageId(rs.getInt("smallImageId"));
+			book.setImageExtension(rs.getString("fileExtension"));
 			book.setUserEmail(rs.getString("email"));
 			book.setSoldAtBookSale(rs.getBoolean("soldAtBookSale"));
 			book.setAuthor(rs.getString("author"));
@@ -102,6 +103,11 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			book.setInMyShoppingCart(rs.getBoolean("inMyShoppingCart"));
 			book.setShippingFrom(rs.getString("shippingFrom"));
 			book.setAddedDate(rs.getTimestamp("addedDate"));
+			if (book.getImageId() == null) {
+				book.setImageId(rs.getInt("tagImageId"));
+				book.setSmallImageId(rs.getInt("smallImageId"));
+				book.setImageExtension(rs.getString("tagFileExtension"));
+			}
 			return book;
 		}
 	}
@@ -154,10 +160,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	@Override
 	public int getCount() {
 		String sql = "select count(*) from books b ";
-		sql += "join users u on u.id = b.userId ";
-		sql += "where b.statusId = 1 ";
-		sql += "and b.userId in(select userId from userGroupMembers where groupId = " + Constants.ONLINE_BOOK_SELLERS_GROUP_ID + ") ";
-		sql += "and isActive(u.startDate, u.endDate) = 1";
+		sql += TagDaoImpl.createWhere(TagMappingType.BOOK);
 		return queryForInt(0, sql);
 	}
 
@@ -490,15 +493,19 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	private String createSqlBase(String specialCols) {
-		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, case when bsc.id is null then 0 else 1 end as inMyShoppingCart, ";
+		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, case when bsc.id is null then 0 else 1 end as inMyShoppingCart, d.fileExtension, ";
 		if (!Common.isNullOrBlank(specialCols)) {
 			sql += specialCols;
 		}
+		sql += "t.imageId as tagImageId, t.smallImageId as tagSmallImageId, dd.fileExtension as tagFileExtension, \n";
 		sql += "u.firstName, u.lastName, u.email, concat(u.city, ', ', u.state) as shippingFrom, bo.bookCondition \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
 		sql += "join bookStatus bs on bs.id = b.statusId \n";
 		sql += "join bookCategories bc on bc.id = b.categoryId \n";
+		sql += "left join documents d on d.id = b.imageId \n";
+		sql += "left join tags t on t.id = b.firstTagId \n";
+		sql += "left join documents dd on dd.id = t.imageId \n";
 		sql += "left join bookGradeLevels ba on ba.id = b.gradeLevelId \n";
 		sql += "left join bookConditions bo on bo.id = b.conditionId \n";
 		sql += "left join bookShoppingCart bsc on bsc.bookId = b.id and bsc.userId = " + ServerContext.getCurrentUserId() + " \n";

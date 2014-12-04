@@ -32,6 +32,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class HomePage implements Page {
@@ -188,29 +189,29 @@ public class HomePage implements Page {
 				PaddedPanel pp = new PaddedPanel(20);
 
 				TileConfig ec = new TileConfig().setTagType(TagMappingType.EVENT).setCount(pageData.getEventCount());
-				ec.setImageResource(MainImageBundle.INSTANCE.eventTile());
+				ec.setImage(new Image(MainImageBundle.INSTANCE.eventTile()));
 				pp.add(new Tile(ec));
 
 				TileConfig uc = new TileConfig().setTagType(TagMappingType.USER).setCount(pageData.getUserCount());
-				uc.setImageResource(MainImageBundle.INSTANCE.userTile());
+				uc.setImage(new Image(MainImageBundle.INSTANCE.userTile()));
 				pp.add(new Tile(uc));
 
 				TileConfig bc = new TileConfig().setTagType(TagMappingType.BOOK).setCount(pageData.getBookCount());
-				bc.setImageResource(MainImageBundle.INSTANCE.bookTile());
+				bc.setImage(new Image(MainImageBundle.INSTANCE.bookTile()));
 				pp.add(new Tile(bc));
 
 				PaddedPanel ppp = new PaddedPanel(20);
 
 				TileConfig bbc = new TileConfig().setTagType(TagMappingType.ARTICLE).setText("Blog");
-				bbc.setImageResource(MainImageBundle.INSTANCE.blogTile()).setUrl(PageUrl.blog(0));
+				bbc.setImage(new Image(MainImageBundle.INSTANCE.blogTile())).setUrl(PageUrl.blog(0));
 				ppp.add(new Tile(bbc));
 
 				TileConfig rc = new TileConfig().setTagType(TagMappingType.RESOURCE).setCount(pageData.getResourceCount());
-				rc.setImageResource(MainImageBundle.INSTANCE.resourceTile());
+				rc.setImage(new Image(MainImageBundle.INSTANCE.resourceTile()));
 				ppp.add(new Tile(rc));
 
 				TileConfig ac = new TileConfig().setTagType(TagMappingType.ARTICLE).setCount(pageData.getArticleCount());
-				ac.setImageResource(MainImageBundle.INSTANCE.articleTile());
+				ac.setImage(new Image(MainImageBundle.INSTANCE.articleTile()));
 				ppp.add(new Tile(ac));
 
 				centerPanel.add(pp);

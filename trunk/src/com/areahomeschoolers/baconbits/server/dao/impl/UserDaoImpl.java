@@ -207,6 +207,19 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
+	public String createWhere() {
+		String sql = "where 1 = 1 ";
+		if (!ServerContext.isAuthenticated()) {
+			sql += "and u.directoryOptOut = 0 \n";
+		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
+			int id = ServerContext.getCurrentUserId();
+			sql += "and (u.directoryOptOut = 0 or u.id = " + id + " or u.parentId = " + id + ") \n";
+		}
+
+		return sql;
+	}
+
+	@Override
 	public void deleteMenuItem(MainMenuItem item) {
 		String sql = "delete from menuItems where id = ?";
 		update(sql, item.getId());
@@ -238,7 +251,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		// otherwise we won't be able to initialize a logging-in user
 		String sql = createSqlBase();
 		if (useSecureMapper) {
-			sql += createSqlWhere();
+			sql += createWhere();
 		} else {
 			sql += "where 1 = 1 ";
 		}
@@ -269,8 +282,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 	@Override
 	public int getCount() {
-		String sql = "select count(*) from users u " + createSqlWhere() + " ";
-		sql += "and isActive(u.startDate, u.endDate) = 1 ";
+		String sql = "select count(*) from users u ";
+		sql += TagDaoImpl.createWhere(TagMappingType.USER);
 
 		return queryForInt(sql);
 	}
@@ -533,7 +546,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "left join eventRegistrationParticipants p on p.userId = u.id and p.eventRegistrationId = ? \n";
 			sqlArgs.add(registrationId);
 		}
-		sql += createSqlWhere();
+		sql += createWhere();
 
 		if (!Common.isNullOrEmpty(tagIds)) {
 			sql += "and u.id in(select tm.userId from tagUserMapping tm ";
@@ -1238,7 +1251,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	private String createSqlBase(String specialCols) {
 		int currentUserId = ServerContext.getCurrentUserId();
 		String sql = "select isActive(u.startDate, u.endDate) as isEnabled, u.*, uu.firstName as parentFirstName, uu.lastName as parentLastName, \n";
-		sql += "case when u.birthDate < date_add(now(), interval -18 year) then 0 else 1 end as isChild, i.commonInterests, \n";
+		sql += "case when u.birthDate < date_add(now(), interval -18 year) then 0 else 1 end as isChild, i.commonInterests, d.fileExtension, \n";
 		sql += "floor(datediff(now(), u.birthDate) / 365.25) as age, \n";
 		if (!Common.isNullOrBlank(specialCols)) {
 			sql += specialCols;
@@ -1253,6 +1266,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		sql += "left join groups gg on gg.id = p.groupId \n";
 		sql += "where p.userId = u.id) as privacyPrefs \n";
 		sql += "from users u \n";
+		sql += "left join documents d on d.id = u.imageId \n";
 		sql += "left join users uu on uu.id = u.parentId \n";
 		// common interests
 		sql += "left join ( \n";
@@ -1260,18 +1274,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		sql += "select tagId from tagUserMapping where userId = " + currentUserId + ") and userId != " + currentUserId + " \n";
 		sql += "group by userId \n";
 		sql += ") as i on i.userId = u.id \n";
-
-		return sql;
-	}
-
-	private String createSqlWhere() {
-		String sql = "where 1 = 1 ";
-		if (!ServerContext.isAuthenticated()) {
-			sql += "and u.directoryOptOut = 0 \n";
-		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
-			int id = ServerContext.getCurrentUserId();
-			sql += "and (u.directoryOptOut = 0 or u.id = " + id + " or u.parentId = " + id + ") \n";
-		}
 
 		return sql;
 	}
@@ -1388,6 +1390,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		user.setAge(rs.getInt("age"));
 		user.setImageId(rs.getInt("imageId"));
 		user.setSmallImageId(rs.getInt("smallImageId"));
+		user.setImageExtension(rs.getString("fileExtension"));
 		user.setDirectoryOptOut(rs.getBoolean("directoryOptOut"));
 		user.setReceiveNews(rs.getBoolean("receiveNews"));
 		return user;
