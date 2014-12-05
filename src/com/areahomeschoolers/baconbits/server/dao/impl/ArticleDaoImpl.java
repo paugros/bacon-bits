@@ -264,6 +264,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		} else if (top > 0) {
 			sql += "order by a.id desc limit ?";
 			sqlArgs.add(top);
+		} else {
+			sql += "order by a.title ";
 		}
 
 		ArrayList<Article> data = query(sql, new ArticleMapper(), sqlArgs.toArray());
