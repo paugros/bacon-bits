@@ -54,7 +54,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			break;
 		case EVENT:
 			EventDao ed = ServerContext.getDaoImpl("event");
-			sql += ed.createWhere() + " and e.endDate > now() and e.active = 1 \n";
+			sql += ed.createWhere() + " and e.endDate > now() and e.active = 1 and e.firstTagId is not null \n";
 			break;
 		case RESOURCE:
 			sql += "where isActive(r.startDate, r.endDate) = 1 and r.showInAds = 0 and r.firstTagId is not null \n";
@@ -193,15 +193,12 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 				sqlArgs.add(mappingId);
 			}
 
-			if (tagId > 0) {
-				sql += where;
-			} else {
-				sql += createWhere(mappingType);
-			}
 			if (getCounts) {
+				sql += createWhere(mappingType);
 				sql += "group by " + always;
 				sql += "order by count(tm.id) desc, t.name";
 			} else {
+				sql += where;
 				sql += "order by tm.id";
 			}
 		} else {

@@ -181,6 +181,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 		if (random) {
 			sql += "order by rand() ";
+		} else {
+			sql += "order by r.name ";
 		}
 
 		if (limit > 0) {

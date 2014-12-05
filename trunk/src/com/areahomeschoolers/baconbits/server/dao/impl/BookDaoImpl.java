@@ -339,7 +339,9 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		} else if (newNumber > 0) {
 			sql += "order by b.addedDate desc limit " + newNumber;
 		} else if (inMyCart) {
-			sql += "order by b.userId";
+			sql += "order by b.userId ";
+		} else {
+			sql += "order by b.title ";
 		}
 
 		ArrayList<Book> data = query(sql, new BookMapper(), sqlArgs.toArray());
