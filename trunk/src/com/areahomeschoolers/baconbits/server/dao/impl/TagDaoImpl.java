@@ -103,6 +103,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 	@Override
 	public void delete(int tagId) {
 		update("delete from tags where id = ?", tagId);
+		updateFirstTags();
 	}
 
 	@Override
@@ -253,6 +254,8 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 
 		update("delete from tags where id in(" + Common.join(tagIds, ", ") + ")");
 
+		updateFirstTags();
+
 		ArgMap<TagArg> args = new ArgMap<>(TagArg.TAG_ID, newTag.getId());
 		args.put(TagArg.GET_ALL_COUNTS);
 
@@ -308,9 +311,18 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 	private void updateFirstTagColumn(Tag tag) {
 		String col = Common.ucWords(tag.getMappingType().toString());
 		String sql = "update " + col.toLowerCase() + "s tbl set firstTagId = ";
-		sql += "(select tagId from tag" + col + "Mapping tm where " + tag.getMappingColumn() + " = tbl.id order by tm.id limit 1) ";
+		sql += "(select tagId from tag" + col + "Mapping tm where " + tag.getMappingColumn() + " = tbl.id order by tm.id limit 1)";
 		sql += "where id = ?";
 		update(sql, tag.getEntityId());
+	}
+
+	private void updateFirstTags() {
+		for (TagMappingType t : TagMappingType.values()) {
+			String tbl = t.toString().toLowerCase();
+			String sql = "update " + tbl + "s tbl set firstTagId = ";
+			sql += "(select tagId from tag" + Common.ucWords(tbl) + "Mapping tm where " + tbl + "Id = tbl.id order by tm.id limit 1) where firstTagId is null";
+			update(sql);
+		}
 	}
 
 }
