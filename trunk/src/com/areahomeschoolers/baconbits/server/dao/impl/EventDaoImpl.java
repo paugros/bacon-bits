@@ -344,7 +344,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		pd.setResourceCount(rd.getCount());
 
 		ArgMap<ResourceArg> args = new ArgMap<>(ResourceArg.AD);
-		args.put(ResourceArg.LIMIT, 4);
+		args.put(ResourceArg.LIMIT, 7);
+		args.setStatus(Status.ACTIVE);
 		args.put(ResourceArg.RANDOM);
 		pd.setAds(rd.list(args));
 
