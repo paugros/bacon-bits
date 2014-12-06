@@ -19,8 +19,8 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
+import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
@@ -118,24 +118,6 @@ public class ResourcePage implements Page {
 			}
 		});
 		ft.addField(titleField);
-
-		final HTML descriptionDisplay = new HTML();
-		final DefaultTextArea descriptionInput = new DefaultTextArea();
-		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
-		descriptionField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				descriptionDisplay.setHTML(Formatter.formatNoteText(resource.getDescription()));
-				descriptionInput.setText(resource.getDescription());
-			}
-		});
-		descriptionField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				resource.setDescription(descriptionInput.getText());
-			}
-		});
-		ft.addField(descriptionField);
 
 		final Anchor urlDisplay = new Anchor();
 		final RequiredTextBox urlInput = new RequiredTextBox();
@@ -310,6 +292,27 @@ public class ResourcePage implements Page {
 			});
 			ft.addField(scopeField);
 		}
+
+		final HTML descriptionDisplay = new HTML();
+		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
+		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
+		descriptionDisplay.getElement().getStyle().setPadding(10, Unit.PX);
+		descriptionDisplay.setWidth("800px");
+		descriptionField.setRequired(true);
+		descriptionField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				descriptionDisplay.setHTML(resource.getDescription());
+				descriptionInput.getTextArea().setHTML(resource.getDescription());
+			}
+		});
+		descriptionField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setDescription(descriptionInput.getTextArea().getHTML());
+			}
+		});
+		ft.addSpanningWidget(descriptionField);
 
 		if (resource.isSaved() && (resource.hasTags() || allowEdit())) {
 			TagSection ts = new TagSection(TagMappingType.RESOURCE, resource.getId());
