@@ -214,7 +214,7 @@ public class DocumentDaoImpl extends SpringWrapper implements DocumentDao {
 					ServerContext.setCurrentOrg(g);
 					update(newsql, document.getId(), document.getLinkId());
 				} else if (type == DocumentLinkType.RESOURCE) {
-					String newsql = "update resources set documentId = ? where id = ?";
+					String newsql = "update resources set imageId = ? where id = ?";
 					update(newsql, document.getId(), document.getLinkId());
 					// this scales the document we just inserted
 					scaleImageToMaximumSize(document, 80, 80);
