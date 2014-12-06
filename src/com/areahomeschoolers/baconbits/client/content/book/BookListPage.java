@@ -24,6 +24,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -48,8 +49,8 @@ public final class BookListPage implements Page {
 			args.put(BookArg.ONLINE_ONLY);
 		}
 
-		if (!Common.isNullOrBlank(Url.getParameter("tagIds"))) {
-			args.put(BookArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			args.put(BookArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
 
 		if (sellerId > 0) {
@@ -58,7 +59,12 @@ public final class BookListPage implements Page {
 
 		Hyperlink home = new Hyperlink("Home", PageUrl.home());
 		Hyperlink cat = new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK"));
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString() + "&nbsp;>&nbsp;Books";
+		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString();
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			ccText += "&nbsp;>&nbsp;" + URL.decode(Url.getParameter("tn"));
+		} else {
+			ccText += "&nbsp;>&nbsp;Books";
+		}
 		HTML cc = new HTML(ccText);
 		cc.addStyleName("hugeText");
 		page.add(cc);

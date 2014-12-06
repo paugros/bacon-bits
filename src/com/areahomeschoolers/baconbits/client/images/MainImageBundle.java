@@ -41,9 +41,13 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource circleRed();
 
+	ImageResource citrusGirl();
+
 	ImageResource collapse();
 
-	ImageResource defaultImage();
+	ImageResource defaultLarge();
+
+	ImageResource defaultSmall();
 
 	ImageResource edit();
 

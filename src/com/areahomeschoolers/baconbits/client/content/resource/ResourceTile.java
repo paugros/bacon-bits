@@ -32,9 +32,12 @@ public class ResourceTile extends Composite {
 		hp.setWidth((textWidth + 80) + "px");
 		hp.setHeight("100px");
 		hp.addStyleName("itemTile");
+		if (item.getShowInAds()) {
+			hp.getElement().getStyle().setOpacity(1);
+		}
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.RESOURCE.getColor());
 
-		Image i = new Image(MainImageBundle.INSTANCE.logo());
+		Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
 		if (item.getSmallImageId() != null) {
 			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
 		}

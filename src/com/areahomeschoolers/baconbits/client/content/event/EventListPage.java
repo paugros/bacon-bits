@@ -29,6 +29,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
@@ -58,14 +59,19 @@ public final class EventListPage implements Page {
 		if (newlyAdded) {
 			args.put(EventArg.NEWLY_ADDED);
 		}
-		if (!Common.isNullOrBlank(Url.getParameter("tagIds"))) {
-			args.put(EventArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			args.put(EventArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
 		final String title = showCommunity ? "Community Events" : "Events";
 
 		Hyperlink home = new Hyperlink("Home", PageUrl.home());
 		Hyperlink cat = new Hyperlink("Events By Type", PageUrl.tagGroup("EVENT"));
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString() + "&nbsp;>&nbsp;Events";
+		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString();
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			ccText += "&nbsp;>&nbsp;" + URL.decode(Url.getParameter("tn"));
+		} else {
+			ccText += "&nbsp;>&nbsp;Events";
+		}
 		HTML cc = new HTML(ccText);
 		cc.addStyleName("hugeText");
 		page.add(cc);

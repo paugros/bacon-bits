@@ -10,6 +10,7 @@ public class HomePageData implements IsSerializable {
 	private ArrayList<Event> newlyAddedEvents;
 	private ArrayList<Event> myUpcomingEvents;
 	private ArrayList<Data> groups;
+	private ArrayList<Resource> ads;
 	private Article partners;
 	private Article intro;
 	private int eventCount;
@@ -20,6 +21,10 @@ public class HomePageData implements IsSerializable {
 
 	public HomePageData() {
 
+	}
+
+	public ArrayList<Resource> getAds() {
+		return ads;
 	}
 
 	public int getArticleCount() {
@@ -68,6 +73,10 @@ public class HomePageData implements IsSerializable {
 
 	public int getUserCount() {
 		return userCount;
+	}
+
+	public void setAds(ArrayList<Resource> ads) {
+		this.ads = ads;
 	}
 
 	public void setArticleCount(int articleCount) {

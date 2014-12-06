@@ -249,8 +249,10 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(menu, "Event Listing", PageUrl.eventList());
 		addLinkToMenu(menu, "Calendar", PageUrl.eventCalendar());
 
-		menu.addSeparator();
-		addLinkToMenu(menu, "Add Event", PageUrl.event(0));
+		if (Application.isAuthenticated()) {
+			menu.addSeparator();
+			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
+		}
 
 		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
 			addLinkToMenu(menu, "Registration Management", PageUrl.registrationManagement());

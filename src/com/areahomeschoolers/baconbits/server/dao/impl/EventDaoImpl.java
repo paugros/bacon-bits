@@ -34,6 +34,7 @@ import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -121,6 +122,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setImageId(rs.getInt("imageId"));
 			event.setSmallImageId(rs.getInt("smallImageId"));
 			event.setImageExtension(rs.getString("fileExtension"));
+			event.setDirectoryPriority(rs.getBoolean("directoryPriority"));
 			return event;
 		}
 	}
@@ -340,6 +342,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 		ResourceDao rd = ServerContext.getDaoImpl("resource");
 		pd.setResourceCount(rd.getCount());
+
+		ArgMap<ResourceArg> args = new ArgMap<>(ResourceArg.AD);
+		args.put(ResourceArg.LIMIT, 4);
+		args.put(ResourceArg.RANDOM);
+		pd.setAds(rd.list(args));
 
 		ArticleDao ad = ServerContext.getDaoImpl("article");
 		pd.setArticleCount(ad.getCount());
@@ -759,7 +766,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "having distance < " + withinMiles + " ";
 		}
 
-		sql += "order by e.startDate ";
+		sql += "order by e.directoryPriority desc, e.startDate ";
 		if (upcoming > 0) {
 			sql += "limit ? ";
 			sqlArgs.add(upcoming);
@@ -829,7 +836,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, requiresRegistration = :requiresRegistration, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
-			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, ";
+			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, directoryPriority = :directoryPriority, ";
 			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price, phone = :phone, website = :website ";
 			sql += "where id = :id";
 			update(sql, namedParams);
@@ -843,16 +850,18 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 				}
 			}
 		} else {
+			event.setRegistrationStartDate(new Date());
+			event.setRegistrationEndDate(event.getStartDate());
 			event.setAddedById(ServerContext.getCurrentUserId());
 			event.setOwningOrgId(ServerContext.getCurrentOrgId());
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
-			sql += "markupOverride, markupPercent, markupDollars, facilityName, ";
+			sql += "markupOverride, markupPercent, markupDollars, facilityName, directoryPriority, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, notificationEmail, owningOrgId, ";
 			sql += "address, street, city, state, zip, lat, lng, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, :markup, ";
-			sql += ":markupOverride, :markupPercent, :markupDollars, :facilityName, ";
+			sql += ":markupOverride, :markupPercent, :markupDollars, :facilityName, :directoryPriority, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :notificationEmail, :owningOrgId, ";
 			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";

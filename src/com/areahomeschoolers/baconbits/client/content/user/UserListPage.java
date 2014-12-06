@@ -28,6 +28,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -57,7 +58,12 @@ public final class UserListPage implements Page {
 
 		Hyperlink home = new Hyperlink("Home", PageUrl.home());
 		Hyperlink cat = new Hyperlink("Homeschoolers By Interests", PageUrl.tagGroup("USER"));
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString() + "&nbsp;>&nbsp;Homeschoolers";
+		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString();
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			ccText += "&nbsp;>&nbsp;" + URL.decode(Url.getParameter("tn"));
+		} else {
+			ccText += "&nbsp;>&nbsp;Homeschoolers";
+		}
 		HTML cc = new HTML(ccText);
 		cc.addStyleName("hugeText");
 		page.add(cc);
@@ -73,8 +79,8 @@ public final class UserListPage implements Page {
 	private ArgMap<UserArg> getDefaultArgs() {
 		ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 		args.put(UserArg.PARENTS);
-		if (!Common.isNullOrBlank(Url.getParameter("tagIds"))) {
-			args.put(UserArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			args.put(UserArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
 		return args;
 	}

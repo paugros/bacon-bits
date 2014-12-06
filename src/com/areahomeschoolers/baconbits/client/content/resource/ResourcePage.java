@@ -37,6 +37,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -180,6 +182,33 @@ public class ResourcePage implements Page {
 				}
 			});
 			ft.addField(adField);
+
+			final Label priorityDisplay = new Label();
+			final DefaultListBox priorityInput = new DefaultListBox();
+			priorityInput.addItem("Yes");
+			priorityInput.addItem("No");
+			FormField priorityField = form.createFormField("Directory listing priority:", priorityInput, priorityDisplay);
+			priorityField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					priorityDisplay.setText(resource.getDirectoryPriority() ? "Yes" : "No");
+					priorityInput.setValue(resource.getDirectoryPriority() ? "Yes" : "No");
+				}
+			});
+			priorityField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					resource.setDirectoryPriority(priorityInput.getValue().equals("Yes"));
+				}
+			});
+			ft.addField(priorityField);
+
+			adInput.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					priorityInput.setValue(adInput.getValue());
+				}
+			});
 		}
 
 		if (resource.isSaved() && resource.getShowInAds()) {
@@ -351,7 +380,7 @@ public class ResourcePage implements Page {
 			if (resource.getImageId() != null) {
 				image.setImage(new Image(ClientUtils.createDocumentUrl(resource.getImageId(), resource.getImageExtension())));
 			} else {
-				image.setImage(new Image(MainImageBundle.INSTANCE.logo()));
+				image.setImage(new Image(MainImageBundle.INSTANCE.defaultLarge()));
 			}
 			image.populate();
 			image.getElement().getStyle().setMarginRight(10, Unit.PX);

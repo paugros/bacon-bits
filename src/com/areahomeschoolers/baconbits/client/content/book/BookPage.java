@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
@@ -95,7 +96,11 @@ public class BookPage implements Page {
 
 		boolean editable = Application.administratorOf(book);
 		final EditableImage image = new EditableImage(DocumentLinkType.BOOK, book.getId());
-		image.setImage(new Image(ClientUtils.createDocumentUrl(book.getImageId(), book.getImageExtension())));
+		if (book.getImageId() != null) {
+			image.setImage(new Image(ClientUtils.createDocumentUrl(book.getImageId(), book.getImageExtension())));
+		} else {
+			image.setImage(new Image(MainImageBundle.INSTANCE.defaultLarge()));
+		}
 		image.setEnabled(editable);
 		image.populate();
 		image.addStyleName("profilePic");

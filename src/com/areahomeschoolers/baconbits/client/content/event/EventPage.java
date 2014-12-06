@@ -1,7 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
@@ -18,7 +17,6 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
-import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
@@ -28,7 +26,6 @@ import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
-import com.areahomeschoolers.baconbits.client.widgets.DateTimeBox;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EmailDialog;
@@ -39,9 +36,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.GoogleMapWidget;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.MarkupTextBox;
-import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
-import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
@@ -59,7 +54,6 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
-import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.dom.client.Style.Unit;
@@ -232,7 +226,18 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(facilityField);
 
-		FormField addressField = new AddressField(calendarEvent).getFormField();
+		AddressField af = new AddressField(calendarEvent);
+		final FormField addressField = af.getFormField();
+		af.getInputPanel().setSpacing(6);
+		CheckBox cb = new CheckBox("This is a virtual/online event");
+		cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				addressField.setRequired(!event.getValue());
+			}
+		});
+		af.getInputPanel().insert(cb, 0);
+		addressField.getInputWidget();
 		addressField.setRequired(true);
 		form.addField(addressField);
 		fieldTable.addField(addressField);
@@ -262,6 +267,28 @@ public class EventPage implements Page {
 			fieldTable.addField(websiteField);
 		}
 
+		if (Application.isSystemAdministrator()) {
+			final Label priorityDisplay = new Label();
+			final DefaultListBox priorityInput = new DefaultListBox();
+			priorityInput.addItem("Yes");
+			priorityInput.addItem("No");
+			FormField priorityField = form.createFormField("Directory listing priority:", priorityInput, priorityDisplay);
+			priorityField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					priorityDisplay.setText(calendarEvent.getDirectoryPriority() ? "Yes" : "No");
+					priorityInput.setValue(calendarEvent.getDirectoryPriority() ? "Yes" : "No");
+				}
+			});
+			priorityField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setDirectoryPriority(priorityInput.getValue().equals("Yes"));
+				}
+			});
+			fieldTable.addField(priorityField);
+		}
+
 		if (Application.administratorOf(calendarEvent) || !Common.isNullOrBlank(calendarEvent.getPhone())) {
 			final Label phoneDisplay = new Label();
 			final PhoneTextBox phoneInput = new PhoneTextBox();
@@ -282,26 +309,26 @@ public class EventPage implements Page {
 			fieldTable.addField(phoneField);
 		}
 
-		if (Application.administratorOf(calendarEvent) && Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
-			final Label costDisplay = new Label();
-			final NumericTextBox costInput = new NumericTextBox(2);
-			costInput.setMaxLength(10);
-			FormField costField = form.createFormField("Cost:", costInput, costDisplay);
-			costField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					costDisplay.setText(Formatter.formatCurrency(calendarEvent.getCost()));
-					costInput.setValue(calendarEvent.getCost());
-				}
-			});
-			costField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setCost(costInput.getDouble());
-				}
-			});
-			fieldTable.addField(costField);
-		}
+		// if (Application.administratorOf(calendarEvent) && Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
+		// final Label costDisplay = new Label();
+		// final NumericTextBox costInput = new NumericTextBox(2);
+		// costInput.setMaxLength(10);
+		// FormField costField = form.createFormField("Cost:", costInput, costDisplay);
+		// costField.setInitializer(new Command() {
+		// @Override
+		// public void execute() {
+		// costDisplay.setText(Formatter.formatCurrency(calendarEvent.getCost()));
+		// costInput.setValue(calendarEvent.getCost());
+		// }
+		// });
+		// costField.setDtoUpdater(new Command() {
+		// @Override
+		// public void execute() {
+		// calendarEvent.setCost(costInput.getDouble());
+		// }
+		// });
+		// fieldTable.addField(costField);
+		// }
 
 		// final Label categoryDisplay = new Label();
 		// final RequiredListBox categoryInput = new RequiredListBox();
@@ -337,23 +364,23 @@ public class EventPage implements Page {
 		// });
 		// fieldTable.addField(categoryField);
 
-		if (Application.isSystemAdministrator()) {
-			MarkupField mf = new MarkupField(calendarEvent);
-			markupField = mf.getFormField();
-			if (!calendarEvent.isSaved()) {
-				mf.setChangeCommand(new Command() {
-					@Override
-					public void execute() {
-						markupField.updateDto();
-						priceField.updateDto();
-						priceField.initialize();
-					}
-				});
-			}
-
-			form.addField(markupField);
-			fieldTable.addField(markupField);
-		}
+		// if (Application.isSystemAdministrator()) {
+		// MarkupField mf = new MarkupField(calendarEvent);
+		// markupField = mf.getFormField();
+		// if (!calendarEvent.isSaved()) {
+		// mf.setChangeCommand(new Command() {
+		// @Override
+		// public void execute() {
+		// markupField.updateDto();
+		// priceField.updateDto();
+		// priceField.initialize();
+		// }
+		// });
+		// }
+		//
+		// form.addField(markupField);
+		// fieldTable.addField(markupField);
+		// }
 
 		if (calendarEvent.getRequiresRegistration()) {
 			if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
@@ -402,59 +429,59 @@ public class EventPage implements Page {
 		}
 
 		if (Application.administratorOf(calendarEvent)) {
-			final Label instructionsDisplay = new Label();
-			final MaxLengthTextArea instructionsInput = new MaxLengthTextArea(300);
-			instructionsInput.setVisibleLines(2);
-			FormField instructionsField = form.createFormField("Registration instructions:", instructionsInput, instructionsDisplay);
-			instructionsField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					instructionsDisplay.setText(Common.getDefaultIfNull(calendarEvent.getRegistrationInstructions()));
-					instructionsInput.setText(calendarEvent.getRegistrationInstructions());
-				}
-			});
-			instructionsField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setRegistrationInstructions(instructionsInput.getText().trim());
-				}
-			});
-			fieldTable.addField(instructionsField);
+			// final Label instructionsDisplay = new Label();
+			// final MaxLengthTextArea instructionsInput = new MaxLengthTextArea(300);
+			// instructionsInput.setVisibleLines(2);
+			// FormField instructionsField = form.createFormField("Registration instructions:", instructionsInput, instructionsDisplay);
+			// instructionsField.setInitializer(new Command() {
+			// @Override
+			// public void execute() {
+			// instructionsDisplay.setText(Common.getDefaultIfNull(calendarEvent.getRegistrationInstructions()));
+			// instructionsInput.setText(calendarEvent.getRegistrationInstructions());
+			// }
+			// });
+			// instructionsField.setDtoUpdater(new Command() {
+			// @Override
+			// public void execute() {
+			// calendarEvent.setRegistrationInstructions(instructionsInput.getText().trim());
+			// }
+			// });
+			// fieldTable.addField(instructionsField);
 
-			final Label registrationDatesDisplay = new Label();
-			final DateTimeRangeBox registrationDatesInput = new DateTimeRangeBox();
-			FormField registrationDatesField = form.createFormField("Registration open/close:", registrationDatesInput, registrationDatesDisplay);
-			registrationDatesField.setRequired(true);
-			registrationDatesField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					registrationDatesDisplay.setText(Formatter.formatDateTime(calendarEvent.getRegistrationStartDate()) + " to "
-							+ Formatter.formatDateTime(calendarEvent.getRegistrationEndDate()));
-					registrationDatesInput.setStartDate(calendarEvent.getRegistrationStartDate());
-					registrationDatesInput.setEndDate(calendarEvent.getRegistrationEndDate());
-				}
-			});
-			registrationDatesField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setRegistrationStartDate(registrationDatesInput.getStartDate());
-					calendarEvent.setRegistrationEndDate(registrationDatesInput.getEndDate());
-				}
-			});
-			fieldTable.addField(registrationDatesField);
-
-			eventDatesInput.addEndValueChangeHandler(new ValueChangeHandler<Date>() {
-				@Override
-				public void onValueChange(ValueChangeEvent<Date> event) {
-					Date d = event.getValue();
-					if (d == null) {
-						return;
-					}
-
-					registrationDatesInput.setEndDate(ClientDateUtils.addHours(d, (-14 * 24) + 3));
-					registrationDatesInput.setStartDate(ClientDateUtils.addHours(d, (-28 * 24) + 3));
-				}
-			});
+			// final Label registrationDatesDisplay = new Label();
+			// final DateTimeRangeBox registrationDatesInput = new DateTimeRangeBox();
+			// FormField registrationDatesField = form.createFormField("Registration open/close:", registrationDatesInput, registrationDatesDisplay);
+			// registrationDatesField.setRequired(true);
+			// registrationDatesField.setInitializer(new Command() {
+			// @Override
+			// public void execute() {
+			// registrationDatesDisplay.setText(Formatter.formatDateTime(calendarEvent.getRegistrationStartDate()) + " to "
+			// + Formatter.formatDateTime(calendarEvent.getRegistrationEndDate()));
+			// registrationDatesInput.setStartDate(calendarEvent.getRegistrationStartDate());
+			// registrationDatesInput.setEndDate(calendarEvent.getRegistrationEndDate());
+			// }
+			// });
+			// registrationDatesField.setDtoUpdater(new Command() {
+			// @Override
+			// public void execute() {
+			// calendarEvent.setRegistrationStartDate(registrationDatesInput.getStartDate());
+			// calendarEvent.setRegistrationEndDate(registrationDatesInput.getEndDate());
+			// }
+			// });
+			// fieldTable.addField(registrationDatesField);
+			//
+			// eventDatesInput.addEndValueChangeHandler(new ValueChangeHandler<Date>() {
+			// @Override
+			// public void onValueChange(ValueChangeEvent<Date> event) {
+			// Date d = event.getValue();
+			// if (d == null) {
+			// return;
+			// }
+			//
+			// registrationDatesInput.setEndDate(ClientDateUtils.addHours(d, (-14 * 24) + 3));
+			// registrationDatesInput.setStartDate(ClientDateUtils.addHours(d, (-28 * 24) + 3));
+			// }
+			// });
 
 			// final Label adultDisplay = new Label();
 			// final DefaultListBox adultInput = new DefaultListBox();
@@ -476,24 +503,24 @@ public class EventPage implements Page {
 			// });
 			// fieldTable.addField(adultField);
 
-			final Label publishDateDisplay = new Label();
-			final DateTimeBox publishDateInput = new DateTimeBox();
-			FormField publishDateField = form.createFormField("Publish date:", publishDateInput, publishDateDisplay);
-			publishDateField.setRequired(true);
-			publishDateField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					publishDateDisplay.setText(Formatter.formatDate(calendarEvent.getPublishDate()));
-					publishDateInput.setValue(calendarEvent.getPublishDate());
-				}
-			});
-			publishDateField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setPublishDate(publishDateInput.getValue());
-				}
-			});
-			fieldTable.addField(publishDateField);
+			// final Label publishDateDisplay = new Label();
+			// final DateTimeBox publishDateInput = new DateTimeBox();
+			// FormField publishDateField = form.createFormField("Publish date:", publishDateInput, publishDateDisplay);
+			// publishDateField.setRequired(true);
+			// publishDateField.setInitializer(new Command() {
+			// @Override
+			// public void execute() {
+			// publishDateDisplay.setText(Formatter.formatDate(calendarEvent.getPublishDate()));
+			// publishDateInput.setValue(calendarEvent.getPublishDate());
+			// }
+			// });
+			// publishDateField.setDtoUpdater(new Command() {
+			// @Override
+			// public void execute() {
+			// calendarEvent.setPublishDate(publishDateInput.getValue());
+			// }
+			// });
+			// fieldTable.addField(publishDateField);
 
 			final Label activeDisplay = new Label();
 			final DefaultListBox activeInput = new DefaultListBox();
@@ -520,7 +547,7 @@ public class EventPage implements Page {
 			emailInput.setMultiEmail(true);
 			emailInput.setMaxLength(200);
 			emailInput.setVisibleLength(60);
-			FormField emailField = form.createFormField("Notification email(s) (separate with commas):", emailInput, emailDisplay);
+			FormField emailField = form.createFormField("Email registrations to (list with commas):", emailInput, emailDisplay);
 			emailField.setRequired(true);
 			emailField.setInitializer(new Command() {
 				@Override
@@ -755,18 +782,18 @@ public class EventPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			if (Application.administratorOf(calendarEvent)) {
-				tabPanel.add("Fields", false, new TabPageCommand() {
-					@Override
-					public void execute(VerticalPanel tabBody) {
-						tabBody.add(new EventFieldsTab(pageData));
-
-						tabPanel.selectTabNow(tabBody);
-					}
-				});
-			} else {
-				tabPanel.addSkipIndex();
-			}
+			// if (Application.administratorOf(calendarEvent)) {
+			// tabPanel.add("Fields", false, new TabPageCommand() {
+			// @Override
+			// public void execute(VerticalPanel tabBody) {
+			// tabBody.add(new EventFieldsTab(pageData));
+			//
+			// tabPanel.selectTabNow(tabBody);
+			// }
+			// });
+			// } else {
+			// tabPanel.addSkipIndex();
+			// }
 
 			if (calendarEvent.getRequiresRegistration() && Application.administratorOf(calendarEvent)) {
 				tabPanel.add("Participants", false, new TabPageCommand() {

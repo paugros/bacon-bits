@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.resource.ResourceTile;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
 import com.areahomeschoolers.baconbits.client.content.resource.TileConfig;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -17,14 +18,15 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
+import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -32,6 +34,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -186,36 +189,47 @@ public class HomePage implements Page {
 
 				// UserGroup org = Application.getCurrentOrg();
 
-				PaddedPanel pp = new PaddedPanel(20);
-
-				TileConfig ec = new TileConfig().setTagType(TagMappingType.EVENT).setCount(pageData.getEventCount());
-				ec.setImage(new Image(MainImageBundle.INSTANCE.eventTile()));
-				pp.add(new Tile(ec));
-
-				TileConfig uc = new TileConfig().setTagType(TagMappingType.USER).setCount(pageData.getUserCount());
-				uc.setImage(new Image(MainImageBundle.INSTANCE.userTile()));
-				pp.add(new Tile(uc));
-
-				TileConfig bc = new TileConfig().setTagType(TagMappingType.BOOK).setCount(pageData.getBookCount());
-				bc.setImage(new Image(MainImageBundle.INSTANCE.bookTile()));
-				pp.add(new Tile(bc));
-
-				PaddedPanel ppp = new PaddedPanel(20);
-
-				TileConfig bbc = new TileConfig().setTagType(TagMappingType.ARTICLE).setText("Blog");
-				bbc.setImage(new Image(MainImageBundle.INSTANCE.blogTile())).setUrl(PageUrl.blog(0));
-				ppp.add(new Tile(bbc));
+				Grid g = new Grid(2, 3);
+				g.setCellSpacing(10);
 
 				TileConfig rc = new TileConfig().setTagType(TagMappingType.RESOURCE).setCount(pageData.getResourceCount());
 				rc.setImage(new Image(MainImageBundle.INSTANCE.resourceTile()));
-				ppp.add(new Tile(rc));
+				g.setWidget(0, 0, new Tile(rc));
+
+				TileConfig bc = new TileConfig().setTagType(TagMappingType.BOOK).setCount(pageData.getBookCount());
+				bc.setImage(new Image(MainImageBundle.INSTANCE.bookTile()));
+				g.setWidget(0, 1, new Tile(bc));
+
+				TileConfig uc = new TileConfig().setTagType(TagMappingType.USER).setCount(pageData.getUserCount());
+				uc.setImage(new Image(MainImageBundle.INSTANCE.userTile()));
+				g.setWidget(0, 2, new Tile(uc));
+
+				TileConfig ec = new TileConfig().setTagType(TagMappingType.EVENT).setCount(pageData.getEventCount());
+				ec.setImage(new Image(MainImageBundle.INSTANCE.eventTile()));
+				g.setWidget(1, 0, new Tile(ec));
+
+				TileConfig bbc = new TileConfig().setTagType(TagMappingType.ARTICLE).setText("Blog");
+				bbc.setImage(new Image(MainImageBundle.INSTANCE.blogTile())).setUrl(PageUrl.blog(0));
+				g.setWidget(1, 1, new Tile(bbc));
 
 				TileConfig ac = new TileConfig().setTagType(TagMappingType.ARTICLE).setCount(pageData.getArticleCount());
 				ac.setImage(new Image(MainImageBundle.INSTANCE.articleTile()));
-				ppp.add(new Tile(ac));
+				g.setWidget(1, 2, new Tile(ac));
 
-				centerPanel.add(pp);
-				centerPanel.add(ppp);
+				VerticalPanel adPanel = new VerticalPanel();
+				adPanel.getElement().getStyle().setMarginTop(6, Unit.PX);
+				for (Resource ad : pageData.getAds()) {
+					ResourceTile tile = new ResourceTile(ad);
+
+					tile.getElement().getStyle().setMarginBottom(10, Unit.PX);
+					adPanel.add(tile);
+				}
+
+				HorizontalPanel hp = new HorizontalPanel();
+				hp.add(g);
+				hp.add(adPanel);
+
+				centerPanel.add(hp);
 
 				// if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(org.getId()) == null) {
 				// centerPanel.add(new RequestMembershipLink(org));

@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -59,24 +60,25 @@ public final class TagGroupPage implements Page {
 					if (tag.getImageId() != null) {
 						uc.setImage(new Image(ClientUtils.createDocumentUrl(tag.getImageId(), tag.getImageExtension())));
 					} else {
-						uc.setImage(new Image(MainImageBundle.INSTANCE.defaultImage()));
+						uc.setImage(new Image(MainImageBundle.INSTANCE.citrusGirl()));
 					}
 					String url = null;
+					String extras = "&tagId=" + tag.getId() + "&tn=" + URL.encode(tag.getName());
 					switch (type) {
 					case ARTICLE:
-						url = PageUrl.articleList() + "&tagIds=" + tag.getId();
+						url = PageUrl.articleList() + extras;
 						break;
 					case BOOK:
-						url = PageUrl.bookList() + "&tagIds=" + tag.getId();
+						url = PageUrl.bookList() + extras;
 						break;
 					case EVENT:
-						url = PageUrl.eventList() + "&tagIds=" + tag.getId();
+						url = PageUrl.eventList() + extras;
 						break;
 					case RESOURCE:
-						url = PageUrl.resourceList() + "&tagIds=" + tag.getId();
+						url = PageUrl.resourceList() + extras;
 						break;
 					case USER:
-						url = PageUrl.userList() + "&tagIds=" + tag.getId();
+						url = PageUrl.userList() + extras;
 						break;
 					default:
 						break;
