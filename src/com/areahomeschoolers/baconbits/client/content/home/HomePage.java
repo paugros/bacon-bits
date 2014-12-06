@@ -189,32 +189,32 @@ public class HomePage implements Page {
 
 				// UserGroup org = Application.getCurrentOrg();
 
-				Grid g = new Grid(2, 3);
+				Grid g = new Grid(3, 2);
 				g.setCellSpacing(10);
 
 				TileConfig rc = new TileConfig().setTagType(TagMappingType.RESOURCE).setCount(pageData.getResourceCount());
 				rc.setImage(new Image(MainImageBundle.INSTANCE.resourceTile()));
 				g.setWidget(0, 0, new Tile(rc));
 
-				TileConfig bc = new TileConfig().setTagType(TagMappingType.BOOK).setCount(pageData.getBookCount());
-				bc.setImage(new Image(MainImageBundle.INSTANCE.bookTile()));
-				g.setWidget(0, 1, new Tile(bc));
+				TileConfig ec = new TileConfig().setTagType(TagMappingType.EVENT).setCount(pageData.getEventCount());
+				ec.setImage(new Image(MainImageBundle.INSTANCE.eventTile()));
+				g.setWidget(0, 1, new Tile(ec));
 
 				TileConfig uc = new TileConfig().setTagType(TagMappingType.USER).setCount(pageData.getUserCount());
 				uc.setImage(new Image(MainImageBundle.INSTANCE.userTile()));
-				g.setWidget(0, 2, new Tile(uc));
-
-				TileConfig ec = new TileConfig().setTagType(TagMappingType.EVENT).setCount(pageData.getEventCount());
-				ec.setImage(new Image(MainImageBundle.INSTANCE.eventTile()));
-				g.setWidget(1, 0, new Tile(ec));
+				g.setWidget(1, 0, new Tile(uc));
 
 				TileConfig bbc = new TileConfig().setTagType(TagMappingType.ARTICLE).setText("Blog");
 				bbc.setImage(new Image(MainImageBundle.INSTANCE.blogTile())).setUrl(PageUrl.blog(0));
 				g.setWidget(1, 1, new Tile(bbc));
 
+				TileConfig bc = new TileConfig().setTagType(TagMappingType.BOOK).setCount(pageData.getBookCount());
+				bc.setImage(new Image(MainImageBundle.INSTANCE.bookTile()));
+				g.setWidget(2, 0, new Tile(bc));
+
 				TileConfig ac = new TileConfig().setTagType(TagMappingType.ARTICLE).setCount(pageData.getArticleCount());
 				ac.setImage(new Image(MainImageBundle.INSTANCE.articleTile()));
-				g.setWidget(1, 2, new Tile(ac));
+				g.setWidget(2, 1, new Tile(ac));
 
 				VerticalPanel adPanel = new VerticalPanel();
 				adPanel.getElement().getStyle().setMarginTop(6, Unit.PX);
