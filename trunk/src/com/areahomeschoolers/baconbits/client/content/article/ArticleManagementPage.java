@@ -25,8 +25,8 @@ public final class ArticleManagementPage implements Page {
 		}
 
 		ArgMap<ArticleArg> args = new ArgMap<ArticleArg>();
-		if (!Common.isNullOrBlank(Url.getParameter("tagIds"))) {
-			args.put(ArticleArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			args.put(ArticleArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
 		final String title = "Articles";
 		final ArticleTable table = new ArticleTable(args);

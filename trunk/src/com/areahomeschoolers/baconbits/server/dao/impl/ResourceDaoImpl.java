@@ -65,6 +65,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			ad.setAddressScope(rs.getString("addressScope"));
 			ad.setEmail(rs.getString("email"));
 			ad.setImageExtension(rs.getString("fileExtension"));
+			ad.setDirectoryPriority(rs.getBoolean("directoryPriority"));
 
 			if (ad.getImageId() == null) {
 				ad.setImageExtension(rs.getString("tagFileExtension"));
@@ -182,7 +183,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		if (random) {
 			sql += "order by rand() ";
 		} else {
-			sql += "order by r.name ";
+			sql += "order by r.directoryPriority desc, r.name ";
 		}
 
 		if (limit > 0) {
@@ -197,11 +198,14 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	@Override
 	public Resource save(Resource r) {
 		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(r);
+		if (r.getShowInAds()) {
+			r.setDirectoryPriority(true);
+		}
 
 		if (r.isSaved()) {
 			String sql = "update resources set name = :name, startDate = :startDate, endDate = :endDate, url = :url, description = :description, showInAds = :showInAds, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone, email = :email, ";
-			sql += "urlDisplay = :urlDisplay, addressScopeId = :addressScopeId ";
+			sql += "urlDisplay = :urlDisplay, addressScopeId = :addressScopeId, directoryPriority = :directoryPriority ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -211,9 +215,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			r.setAddedById(ServerContext.getCurrentUserId());
 
 			String sql = "insert into resources (addedById, startDate, endDate, addedDate, name, url, description, ";
-			sql += "address, street, city, state, zip, lat, lng, phone, showInAds, email, urlDisplay, addressScopeId) ";
+			sql += "address, street, city, state, zip, lat, lng, phone, showInAds, email, urlDisplay, addressScopeId, directoryPriority) ";
 			sql += "values(:addedById, :startDate, :endDate, now(), :name, :url, :description, ";
-			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds, :email, :urlDisplay, :addressScopeId)";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds, :email, :urlDisplay, :addressScopeId, :directoryPriority)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

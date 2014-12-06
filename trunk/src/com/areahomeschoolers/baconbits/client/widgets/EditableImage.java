@@ -35,7 +35,7 @@ public class EditableImage extends Composite {
 			@Override
 			public void onUploadComplete(int documentId) {
 				imageId = documentId;
-				image.setUrl(Constants.DOCUMENT_URL_PREFIX + documentId);
+				image.setUrl(Document.toUrl(documentId));
 				if (uploadCompleteHandler != null) {
 					uploadCompleteHandler.onUploadComplete(documentId);
 				}
@@ -79,7 +79,7 @@ public class EditableImage extends Composite {
 			} else if (imageResource != null) {
 				image = new Image(imageResource);
 			} else {
-				image = new Image(MainImageBundle.INSTANCE.logo());
+				image = new Image(MainImageBundle.INSTANCE.defaultSmall());
 			}
 		}
 

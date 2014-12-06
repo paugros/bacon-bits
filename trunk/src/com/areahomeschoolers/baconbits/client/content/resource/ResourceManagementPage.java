@@ -29,8 +29,8 @@ public final class ResourceManagementPage implements Page {
 		final String title = "Resources";
 
 		final ResourceTable table = new ResourceTable(args);
-		if (!Common.isNullOrBlank(Url.getParameter("tagIds"))) {
-			args.put(ResourceArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			args.put(ResourceArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
 
 		table.setTitle(title);

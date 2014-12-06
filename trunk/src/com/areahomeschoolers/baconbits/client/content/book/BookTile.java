@@ -35,7 +35,7 @@ public class BookTile extends Composite {
 		hp.addStyleName("itemTile");
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.BOOK.getColor());
 
-		Image i = new Image(MainImageBundle.INSTANCE.logo());
+		Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
 		if (item.getSmallImageId() != null) {
 			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
 		}

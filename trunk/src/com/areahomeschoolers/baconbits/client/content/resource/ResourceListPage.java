@@ -16,6 +16,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -28,13 +29,18 @@ public final class ResourceListPage implements Page {
 	public ResourceListPage(final VerticalPanel page) {
 		final String title = "Resources";
 
-		if (!Common.isNullOrBlank(Url.getParameter("tagIds"))) {
-			args.put(ResourceArg.HAS_TAGS, Url.getIntListParameter("tagIds"));
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			args.put(ResourceArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
 
 		Hyperlink home = new Hyperlink("Home", PageUrl.home());
 		Hyperlink cat = new Hyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE"));
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString() + "&nbsp;>&nbsp;Resources";
+		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString();
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			ccText += "&nbsp;>&nbsp;" + URL.decode(Url.getParameter("tn"));
+		} else {
+			ccText += "&nbsp;>&nbsp;Resources";
+		}
 		HTML cc = new HTML(ccText);
 		cc.addStyleName("hugeText");
 		page.add(cc);

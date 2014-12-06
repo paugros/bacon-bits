@@ -29,7 +29,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private boolean active = true;
 	private boolean finished, registrationOpen;
 	private boolean sendSurvey;
-	private boolean requiresRegistration = true;
+	private boolean requiresRegistration = false;
 	private int minimumParticipants, maximumParticipants;
 	private String notificationEmail;
 	private String website;
@@ -42,6 +42,7 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	private double markupPercent;
 	private double markupDollars;
 	private boolean markupOverride;
+	private boolean directoryPriority;
 	// address
 	private String address;
 	private String street;
@@ -174,6 +175,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public String getDescription() {
 		return description;
+	}
+
+	public boolean getDirectoryPriority() {
+		return directoryPriority;
 	}
 
 	@Override
@@ -452,6 +457,10 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public void setDirectoryPriority(boolean directoryPriority) {
+		this.directoryPriority = directoryPriority;
 	}
 
 	public void setDocumentCount(int documentCount) {

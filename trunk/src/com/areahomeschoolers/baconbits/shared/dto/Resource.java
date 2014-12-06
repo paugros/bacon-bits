@@ -32,6 +32,7 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	private Date endDate;
 
 	private boolean showInAds;
+	private boolean directoryPriority;
 
 	// address
 	private String address;
@@ -88,6 +89,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public String getDescription() {
 		return description;
+	}
+
+	public boolean getDirectoryPriority() {
+		return directoryPriority;
 	}
 
 	public String getEmail() {
@@ -214,6 +219,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public void setDirectoryPriority(boolean directoryPriority) {
+		this.directoryPriority = directoryPriority;
 	}
 
 	public void setEmail(String email) {

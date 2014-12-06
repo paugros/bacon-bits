@@ -39,6 +39,17 @@ public class AddressField {
 				String address = item.getAddress();
 				if (!Common.isNullOrBlank(item.getStreet()) || !Common.isNullOrBlank(item.getZip())) {
 					address = item.getStreet() + " " + item.getZip();
+				} else {
+					item.setAddress("");
+					item.setCity(null);
+					item.setLat(0);
+					item.setLng(0);
+					item.setState(null);
+					item.setStreet(null);
+					item.setZip(null);
+					item.setAddressChanged(true);
+					saveCommand.execute();
+					return;
 				}
 
 				GeocoderRequest request = GeocoderRequest.create();
@@ -86,12 +97,15 @@ public class AddressField {
 		return input;
 	}
 
+	private VerticalPanel vp = new VerticalPanel();
+
 	private FormField addressField;
 
 	public AddressField(final HasAddress address) {
 		final FieldDisplayLink addressDisplay = new FieldDisplayLink();
 		addressDisplay.setTarget("_blank");
 		PaddedPanel addressInput = new PaddedPanel();
+		vp.add(addressInput);
 		// street input
 		final TextBox street = new TextBox();
 		street.setMaxLength(100);
@@ -114,7 +128,7 @@ public class AddressField {
 		addressInput.add(streetPanel);
 		addressInput.add(zipPanel);
 
-		addressField = new FormField("Address:", addressInput, addressDisplay);
+		addressField = new FormField("Address:", vp, addressDisplay);
 		addressField.setInitializer(new Command() {
 			@Override
 			public void execute() {
@@ -142,6 +156,10 @@ public class AddressField {
 
 	public FormField getFormField() {
 		return addressField;
+	}
+
+	public VerticalPanel getInputPanel() {
+		return vp;
 	}
 
 }
