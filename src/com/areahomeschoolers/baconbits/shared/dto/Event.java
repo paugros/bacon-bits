@@ -232,6 +232,9 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	}
 
 	public Integer getImageId() {
+		if (imageId == null || imageId == 0) {
+			return null;
+		}
 		return imageId;
 	}
 
@@ -341,6 +344,9 @@ public final class Event extends EntityDto<Event> implements HasDocuments, HasGr
 	}
 
 	public Integer getSmallImageId() {
+		if (smallImageId == null || smallImageId == 0) {
+			return null;
+		}
 		return smallImageId;
 	}
 
