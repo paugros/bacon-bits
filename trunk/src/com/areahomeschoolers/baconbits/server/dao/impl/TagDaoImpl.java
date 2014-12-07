@@ -44,7 +44,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		case ARTICLE:
 			ArticleDao ad = ServerContext.getDaoImpl("article");
 			sql += ad.createWhere();
-			sql += "and a.newsItem = 0 and isActive(a.startDate, a.endDate) = 1 \n";
+			sql += "and a.newsItem = 0 and isActive(a.startDate, a.endDate) = 1 and a.firstTagId is not null \n";
 			break;
 		case BOOK:
 			sql += "join users u on u.id = b.userId \n";

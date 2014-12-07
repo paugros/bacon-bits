@@ -697,8 +697,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		List<Object> sqlArgs = new ArrayList<Object>();
 		List<Integer> tagIds = args.getIntList(EventArg.HAS_TAGS);
 		int upcoming = args.getInt(EventArg.UPCOMING_NUMBER);
-		boolean showCommunity = args.getBoolean(EventArg.ONLY_COMMUNITY);
-		boolean includeCommunity = args.getBoolean(EventArg.INCLUDE_COMMUNITY);
+		// boolean showCommunity = args.getBoolean(EventArg.ONLY_COMMUNITY);
+		// boolean includeCommunity = args.getBoolean(EventArg.INCLUDE_COMMUNITY);
 		int seriesId = args.getInt(EventArg.SERIES_ID);
 		boolean newlyAdded = args.getBoolean(EventArg.NEWLY_ADDED);
 		int registeredByOrAddedForId = args.getInt(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID);
@@ -738,13 +738,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 				ids.addAll(ServerContext.getCurrentUser().getOrganizationIds());
 			}
 
-			String idString = Common.join(ids, ", ");
+			// String idString = Common.join(ids, ", ");
 
-			if (showCommunity) {
-				sql += "and (e.categoryId = 6 or e.owningOrgId not in(" + idString + ")) ";
-			} else if (!includeCommunity) {
-				sql += "and (e.categoryId != 6 and e.owningOrgId in(" + idString + ")) ";
-			}
+			// if (showCommunity) {
+			// sql += "and (e.categoryId = 6 or e.owningOrgId not in(" + idString + ")) ";
+			// } else if (!includeCommunity) {
+			// sql += "and (e.categoryId != 6 and e.owningOrgId in(" + idString + ")) ";
+			// }
 		}
 
 		if (seriesId > 0) {
