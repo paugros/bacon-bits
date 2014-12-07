@@ -53,6 +53,7 @@ public abstract class Callback<T> implements AsyncCallback<T> {
 			if (GWT.isProdMode()) {
 				Window.Location.reload();
 			} else {
+				caught.printStackTrace();
 				String message = "This version of the application is out of date. Click below to update.";
 				Label label = new Label(message);
 				label.setWidth("300px");

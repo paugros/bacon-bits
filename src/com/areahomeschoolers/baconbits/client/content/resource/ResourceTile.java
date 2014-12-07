@@ -13,6 +13,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -30,7 +31,7 @@ public class ResourceTile extends Composite {
 		HorizontalPanel hp = new HorizontalPanel();
 		int textWidth = 200;
 		hp.setWidth((textWidth + 80) + "px");
-		hp.setHeight("100px");
+		hp.setHeight("115px");
 		hp.addStyleName("itemTile");
 		if (item.getShowInAds()) {
 			hp.getElement().getStyle().setOpacity(1);
@@ -41,7 +42,13 @@ public class ResourceTile extends Composite {
 		if (item.getSmallImageId() != null) {
 			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
 		}
-		hp.add(new HTML("<div style=\"width: 80px; margin-right: 10px; text-align: center;\">" + i.toString() + "</div>"));
+		String imageText = "<div style=\"width: 80px; margin-right: 10px; text-align: center;\">" + i.toString() + "</div>";
+		if (!Common.isNullOrBlank(item.getUrl())) {
+			imageText += "<div><a href=\"" + item.getUrl() + "\" target=_blank>Visit web site</a></div>";
+		}
+		HTML image = new HTML(imageText);
+		hp.add(image);
+		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_MIDDLE);
 
 		Hyperlink link = new Hyperlink(item.getName(), PageUrl.resource(item.getId()));
 		link.addStyleName("bold");
@@ -50,21 +57,28 @@ public class ResourceTile extends Composite {
 
 		// address
 		if (!Common.isNullOrBlank(item.getAddress())) {
-			String a = "";
+			String a = "<div style=\"font-style: italic;\">";
 			if (!Common.isNullOrBlank(item.getCity())) {
-				a += item.getCity() + " ";
+				a += item.getCity();
+				if (!Common.isNullOrBlank(item.getState())) {
+					a += ", ";
+				}
 			}
 			if (!Common.isNullOrBlank(item.getState())) {
 				a += item.getState();
 			}
-			text += a + "<br>";
-		} else if (!Common.isNullOrBlank(item.getPhone())) {
-			text += item.getPhone() + "<br>";
+			text += a + "</div>";
 		}
+
 		text += "</div>";
 
 		// description
-		text += "<div class=smallText style=\"overflow: hidden; max-height: 41px; width: " + textWidth + "px;\">" + item.getDescription() + "</div>";
+		String desc = new HTML(item.getDescription().replaceAll("<br>", " ")).getText();
+		int height = 60;
+		if (Common.isNullOrBlank(item.getAddress())) {
+			height += 15;
+		}
+		text += "<div class=smallText style=\"overflow: hidden; max-height: " + height + "px; width: " + textWidth + "px;\">" + desc + "</div>";
 
 		HTML h = new HTML(text);
 

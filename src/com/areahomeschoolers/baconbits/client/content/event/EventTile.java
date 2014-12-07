@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -40,13 +41,15 @@ public class EventTile extends Composite {
 		if (item.getSmallImageId() != null) {
 			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
 		}
-		hp.add(new HTML(i.toString()));
+		HTML image = new HTML(i.toString());
+		hp.add(image);
+		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_MIDDLE);
 
 		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.event(item.getId()));
 		link.addStyleName("bold");
 		String text = link.toString() + "<br>";
 		text += Formatter.formatDateTime(item.getStartDate()) + "<br>";
-		text += new HTML(item.getDescription()).getText() + "<br>";
+		text += new HTML(item.getDescription().replaceAll("<br>", " ")).getText() + "<br>";
 
 		HTML h = new HTML(text);
 		h.setHeight("85px");
