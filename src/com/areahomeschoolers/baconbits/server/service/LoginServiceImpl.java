@@ -1,5 +1,6 @@
 package com.areahomeschoolers.baconbits.server.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import com.areahomeschoolers.baconbits.server.dao.UserDao;
 import com.areahomeschoolers.baconbits.server.dao.impl.UserDaoImpl;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
+import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
@@ -31,6 +33,9 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @Controller
 @RequestMapping("/login")
@@ -51,11 +56,29 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		ServerContext.setCurrentOrg();
 
 		User user = ServerContext.getCurrentUser();
+		// default location
+		String location = "";
+		if (user != null && user.getZip() != null) {
+			location = user.getZip();
+		} else {
+			try {
+				String stringData = ServerUtils.getUrlContents("http://ip-api.com/json/" + ServerContext.getRequest().getRemoteAddr());
+				JsonObject data = new JsonParser().parse(stringData).getAsJsonObject();
+				String status = ServerUtils.getStringFromJsonObject(data, "status");
+				if (status != null && status.equals("success")) {
+					location = ServerUtils.getStringFromJsonObject(data, "zip");
+				}
+			} catch (IOException e) {
+			}
+		}
+		ServerContext.setCurrentLocation(location);
+
 		ApplicationData ap = new ApplicationData();
 		ap.setCurrentOrg(ServerContext.getCurrentOrg());
 		ap.setCurrentUser(user);
 		ap.setAdultBirthYear(Calendar.getInstance().get(Calendar.YEAR) - 18);
 		ap.setUserActivity(UserDaoImpl.getAllUserActivity());
+		ap.setCurrentLocation(location);
 
 		UserDao userDao = ServerContext.getDaoImpl("user");
 		ap.setDynamicMenuItems(userDao.getMenuItems(new ArgMap<UserArg>(UserArg.ORGANIZATION_ID, ServerContext.getCurrentOrgId())));

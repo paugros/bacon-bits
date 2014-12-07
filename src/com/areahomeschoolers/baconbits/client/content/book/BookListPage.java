@@ -41,6 +41,7 @@ public final class BookListPage implements Page {
 	private int sellerId = Url.getIntegerParameter("sellerId");
 	private TilePanel fp = new TilePanel();
 	private VerticalPanel page;
+	private GeocoderTextBox locationInput = new GeocoderTextBox();
 
 	public BookListPage(final VerticalPanel p) {
 		fp.setWidth("100%");
@@ -70,13 +71,16 @@ public final class BookListPage implements Page {
 		page.add(cc);
 
 		page.add(optionsPanel);
-		populateOptionsPanel();
+		populateOptionsPanel(new Command() {
+			@Override
+			public void execute() {
+				locationInput.populate(Application.getCurrentLocation());
+			}
+		});
 
 		page.add(fp);
 
 		Application.getLayout().setPage("Books", page);
-
-		populate();
 	}
 
 	private void populate() {
@@ -92,7 +96,7 @@ public final class BookListPage implements Page {
 		});
 	}
 
-	private void populateOptionsPanel() {
+	private void populateOptionsPanel(final Command command) {
 		optionsPanel.addStyleName("boxedBlurb");
 		optionsPanel.setSpacing(8);
 		Label label = new Label("Show");
@@ -166,7 +170,6 @@ public final class BookListPage implements Page {
 
 				// within miles
 				final DefaultListBox milesInput = new DefaultListBox();
-				final GeocoderTextBox locationInput = new GeocoderTextBox();
 				milesInput.addItem("5", 5);
 				milesInput.addItem("10", 10);
 				milesInput.addItem("25", 25);
@@ -213,6 +216,8 @@ public final class BookListPage implements Page {
 
 				optionsPanel.add(top);
 				optionsPanel.add(bottom);
+
+				command.execute();
 			}
 		});
 	}

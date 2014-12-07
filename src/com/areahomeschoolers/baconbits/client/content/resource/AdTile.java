@@ -19,6 +19,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -50,10 +51,12 @@ public class AdTile extends Composite {
 
 		vp.addStyleName("tile");
 		vp.setHeight("267px");
+		vp.setWidth("238px");
 		vp.getElement().getStyle().setBackgroundColor(TagMappingType.RESOURCE.getColor());
 
 		SimplePanel sp = new SimplePanel();
 		sp.getElement().getStyle().setHeight(200, Unit.PX);
+		sp.getElement().getStyle().setWidth(200, Unit.PX);
 		sp.getElement().getStyle().setMarginTop(12, Unit.PX);
 		Image image = new Image(ClientUtils.createDocumentUrl(ad.getImageId(), ad.getImageExtension()));
 
@@ -67,11 +70,8 @@ public class AdTile extends Composite {
 
 		String url = ad.getUrl();
 
-		String textSize = null;
 		int width = 215;
-		textSize = "largeText";
-
-		String htmlText = "<a href=\"" + url + "\" class=\"" + textSize + "\" style=\"color: black;\">" + ad.getName() + "</a>";
+		String htmlText = "<a href=\"" + url + "\" style=\"text-size: 14px; font-weight: bold;\">" + ad.getName() + "</a>";
 		HTML link = new HTML(htmlText);
 
 		link.setWordWrap(false);
@@ -81,15 +81,18 @@ public class AdTile extends Composite {
 
 		if (!Common.isNullOrBlank(ad.getAdDescription())) {
 			Label description = new Label(ad.getAdDescription());
+			description.getElement().getStyle().setFontSize(13, Unit.PX);
 			description.setWordWrap(false);
 			description.setWidth(width + "px");
 			description.getElement().getStyle().setOverflow(Overflow.HIDDEN);
 			vvp.add(description);
 		} else {
-			link.getElement().getStyle().setMarginBottom(12, Unit.PX);
+			link.getElement().getStyle().setMarginBottom(13, Unit.PX);
 		}
 
+		vvp.getElement().getStyle().setMarginBottom(10, Unit.PX);
 		vp.add(vvp);
+		vp.setCellVerticalAlignment(vvp, HasVerticalAlignment.ALIGN_MIDDLE);
 
 		initWidget(vp);
 	}

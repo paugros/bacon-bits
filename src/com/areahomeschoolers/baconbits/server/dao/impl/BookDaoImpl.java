@@ -516,27 +516,13 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		return sql;
 	}
 
-	private String getGoogleBookQueryResults(String query) throws IOException {
-		URL url = new URL(GOOGLE_QUERY_URL + query);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-		String line;
-
-		StringBuffer buffer = new StringBuffer();
-		while ((line = reader.readLine()) != null) {
-			buffer.append(line);
-		}
-		reader.close();
-
-		return buffer.toString();
-	}
-
 	private ServerSuggestionData getGoogleBookSuggestions(String token) {
 		ServerSuggestionData sdata = new ServerSuggestionData();
 		ArrayList<ServerSuggestion> results = new ArrayList<ServerSuggestion>();
 		sdata.setSuggestions(results);
 
 		try {
-			String data = getGoogleBookQueryResults("intitle:" + URLEncoder.encode(token, "UTF-8"));
+			String data = ServerUtils.getUrlContents(GOOGLE_QUERY_URL + "intitle:" + URLEncoder.encode(token, "UTF-8"));
 			JsonElement jelement = new JsonParser().parse(data);
 
 			if (jelement == null) {
@@ -559,9 +545,9 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 					continue;
 				}
 
-				String title = getStringFromJsonObject(volumeInfo, "title", 60);
-				String date = getStringFromJsonObject(volumeInfo, "publishedDate", 0);
-				String publisher = getStringFromJsonObject(volumeInfo, "publisher", 40);
+				String title = ServerUtils.getStringFromJsonObject(volumeInfo, "title", 60);
+				String date = ServerUtils.getStringFromJsonObject(volumeInfo, "publishedDate", 0);
+				String publisher = ServerUtils.getStringFromJsonObject(volumeInfo, "publisher", 40);
 				JsonArray authors = volumeInfo.getAsJsonArray("authors");
 
 				String extra = "";
@@ -599,13 +585,13 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 				for (int j = 0; j < isbns.size(); j++) {
 					JsonObject item = isbns.get(j).getAsJsonObject();
-					String type = getStringFromJsonObject(item, "type", 0);
+					String type = ServerUtils.getStringFromJsonObject(item, "type", 0);
 					if (type == null) {
 						continue;
 					}
 
 					if (type.startsWith("ISBN")) {
-						isbn = getStringFromJsonObject(item, "identifier", 0);
+						isbn = ServerUtils.getStringFromJsonObject(item, "identifier", 0);
 					}
 				}
 
@@ -631,19 +617,6 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		JsonElement item = obj.get(key);
 		if (item != null) {
 			return item.getAsInt();
-		}
-
-		return null;
-	}
-
-	private String getStringFromJsonObject(JsonObject obj, String key, int maxLength) {
-		JsonElement item = obj.get(key);
-		if (item != null) {
-			String text = item.getAsString();
-			if (maxLength > 0 && text.length() > maxLength) {
-				text = text.substring(0, maxLength);
-			}
-			return text;
 		}
 
 		return null;
@@ -703,7 +676,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 				return deadBook;
 			}
 
-			JsonElement jelement = new JsonParser().parse(getGoogleBookQueryResults("isbn:" + b.getIsbn()));
+			JsonElement jelement = new JsonParser().parse(ServerContext.getUrlContents(GOOGLE_QUERY_URL + "isbn:" + b.getIsbn()));
 			if (jelement == null) {
 				logger.warning("Root element was null when looking up Google Book info.");
 				return deadBook;
@@ -723,16 +696,16 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 				return deadBook;
 			}
 
-			b.setTitle(getStringFromJsonObject(volumeInfo, "title", 200));
-			b.setSubTitle(getStringFromJsonObject(volumeInfo, "subtitle", 200));
-			b.setPublisher(getStringFromJsonObject(volumeInfo, "publisher", 200));
-			b.setDescription(getStringFromJsonObject(volumeInfo, "description", 10000));
+			b.setTitle(ServerUtils.getStringFromJsonObject(volumeInfo, "title", 200));
+			b.setSubTitle(ServerUtils.getStringFromJsonObject(volumeInfo, "subtitle", 200));
+			b.setPublisher(ServerUtils.getStringFromJsonObject(volumeInfo, "publisher", 200));
+			b.setDescription(ServerUtils.getStringFromJsonObject(volumeInfo, "description", 10000));
 			Integer pageCount = getIntegerFromJsonObject(volumeInfo, "pageCount");
 			if (pageCount != null) {
 				b.setPageCount(pageCount);
 			}
 
-			String dateText = getStringFromJsonObject(volumeInfo, "publishedDate", 0);
+			String dateText = ServerUtils.getStringFromJsonObject(volumeInfo, "publishedDate", 0);
 			if (dateText != null) {
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 				try {
@@ -771,7 +744,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			JsonObject images = volumeInfo.getAsJsonObject("imageLinks");
 
 			if (images != null) {
-				String imageLink = getStringFromJsonObject(images, "thumbnail", 0);
+				String imageLink = ServerUtils.getStringFromJsonObject(images, "thumbnail", 0);
 				b.setImageUrl(imageLink);
 			} else {
 				b.setImageUrl(null);

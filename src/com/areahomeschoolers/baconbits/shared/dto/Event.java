@@ -9,7 +9,7 @@ import com.areahomeschoolers.baconbits.shared.HasMarkup;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 
-public final class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwnership, HasMarkup, HasAddress {
+public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwnership, HasMarkup, HasAddress {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {

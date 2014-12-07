@@ -1,7 +1,9 @@
 package com.areahomeschoolers.baconbits.server.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -30,6 +32,9 @@ import org.w3c.dom.NodeList;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestion;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 /**
  * A repository of useful static methods, constants, etc. for use only on the server side
@@ -238,12 +243,43 @@ public abstract class ServerUtils {
 		return clause;
 	}
 
+	public static String getStringFromJsonObject(JsonObject obj, String key) {
+		return getStringFromJsonObject(obj, key, 0);
+	}
+
+	public static String getStringFromJsonObject(JsonObject obj, String key, int maxLength) {
+		JsonElement item = obj.get(key);
+		if (item != null) {
+			String text = item.getAsString();
+			if (maxLength > 0 && text.length() > maxLength) {
+				text = text.substring(0, maxLength);
+			}
+			return text;
+		}
+
+		return null;
+	}
+
 	public static RowMapper<String> getStringRowMapper() {
 		return stringRowMapper;
 	}
 
 	public static RowMapper<ServerSuggestion> getSuggestionMapper() {
 		return suggestionMapper;
+	}
+
+	public static String getUrlContents(String urlText) throws IOException {
+		URL url = new URL(urlText);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+		String line;
+
+		StringBuffer buffer = new StringBuffer();
+		while ((line = reader.readLine()) != null) {
+			buffer.append(line);
+		}
+		reader.close();
+
+		return buffer.toString();
 	}
 
 	private ServerUtils() {

@@ -333,8 +333,6 @@ img {
 
 .tile {
 	border: 1px solid #cccccc;
-	min-width: 250px;
-	min-height: 250px;
 	opacity: 0.8;
 }
 

@@ -127,7 +127,25 @@ public final class Layout {
 		headerPanel.add(spacer);
 		headerPanel.setCellWidth(spacer, "100%");
 
+		// VerticalPanel svp = new VerticalPanel();
+
 		searchBox = new SearchBox();
+		// svp.add(searchBox);
+		//
+		// HorizontalPanel lp = new PaddedPanel();
+		// lp.getElement().getStyle().setMarginLeft(5, Unit.PX);
+		// Label zip = new Label("Your location: " + Application.getCurrentLocation());
+		// lp.add(zip);
+		// ClickLabel chl = new ClickLabel("[edit]", new ClickHandler() {
+		// @Override
+		// public void onClick(ClickEvent event) {
+		//
+		// }
+		// });
+		// lp.add(chl);
+		//
+		// svp.add(lp);
+
 		headerPanel.add(searchBox);
 
 		LinkPanel sessionPanel = new LinkPanel();
