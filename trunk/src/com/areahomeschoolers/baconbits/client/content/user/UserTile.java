@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -40,8 +41,9 @@ public class UserTile extends Composite {
 		i.getElement().getStyle().setBorderColor("#c7c7c7");
 		i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 		i.getElement().getStyle().setBorderWidth(1, Unit.PX);
-
-		hp.add(new HTML(i.toString()));
+		HTML image = new HTML(i.toString());
+		hp.add(image);
+		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_MIDDLE);
 
 		Hyperlink link = new Hyperlink(item.getFullName(), PageUrl.user(item.getId()));
 		link.addStyleName("largeText bold");
