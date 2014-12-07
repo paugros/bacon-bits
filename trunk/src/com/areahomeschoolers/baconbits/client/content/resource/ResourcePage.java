@@ -122,6 +122,7 @@ public class ResourcePage implements Page {
 		ft.addField(titleField);
 
 		final Anchor urlDisplay = new Anchor();
+		urlDisplay.setTarget("_blank");
 		final RequiredTextBox urlInput = new RequiredTextBox();
 		urlInput.setMaxLength(500);
 		urlInput.setVisibleLength(50);
