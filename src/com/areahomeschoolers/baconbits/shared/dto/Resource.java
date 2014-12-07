@@ -21,6 +21,7 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 	private String urlDisplay;
 	private String name;
 	private int addressScopeId;
+	private String adDescription;
 
 	private int clickCount;
 	private Date lastClickDate;
@@ -58,6 +59,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public Date getAddedDate() {
 		return addedDate;
+	}
+
+	public String getAdDescription() {
+		return adDescription;
 	}
 
 	@Override
@@ -188,6 +193,10 @@ public final class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setAddedDate(Date addedDate) {
 		this.addedDate = addedDate;
+	}
+
+	public void setAdDescription(String adDescription) {
+		this.adDescription = adDescription;
 	}
 
 	@Override

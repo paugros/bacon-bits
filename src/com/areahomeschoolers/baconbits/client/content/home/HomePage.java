@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.resource.ResourceTile;
+import com.areahomeschoolers.baconbits.client.content.resource.AdTile;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
 import com.areahomeschoolers.baconbits.client.content.resource.TileConfig;
 import com.areahomeschoolers.baconbits.client.generated.Page;
@@ -22,11 +22,9 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
-import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -34,7 +32,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -189,7 +186,7 @@ public class HomePage implements Page {
 
 				// UserGroup org = Application.getCurrentOrg();
 
-				Grid g = new Grid(3, 2);
+				Grid g = new Grid(3, 3);
 				g.setCellSpacing(10);
 
 				TileConfig rc = new TileConfig().setTagType(TagMappingType.RESOURCE).setCount(pageData.getResourceCount());
@@ -200,6 +197,8 @@ public class HomePage implements Page {
 				ec.setImage(new Image(MainImageBundle.INSTANCE.eventTile()));
 				g.setWidget(0, 1, new Tile(ec));
 
+				g.setWidget(0, 2, new AdTile(pageData.getAds().get(0)));
+
 				TileConfig uc = new TileConfig().setTagType(TagMappingType.USER).setCount(pageData.getUserCount());
 				uc.setImage(new Image(MainImageBundle.INSTANCE.userTile()));
 				g.setWidget(1, 0, new Tile(uc));
@@ -207,6 +206,8 @@ public class HomePage implements Page {
 				TileConfig bbc = new TileConfig().setTagType(TagMappingType.ARTICLE).setText("Blog");
 				bbc.setImage(new Image(MainImageBundle.INSTANCE.blogTile())).setUrl(PageUrl.blog(0));
 				g.setWidget(1, 1, new Tile(bbc));
+
+				g.setWidget(1, 2, new AdTile(pageData.getAds().get(1)));
 
 				TileConfig bc = new TileConfig().setTagType(TagMappingType.BOOK).setCount(pageData.getBookCount());
 				bc.setImage(new Image(MainImageBundle.INSTANCE.bookTile()));
@@ -216,20 +217,9 @@ public class HomePage implements Page {
 				ac.setImage(new Image(MainImageBundle.INSTANCE.articleTile()));
 				g.setWidget(2, 1, new Tile(ac));
 
-				VerticalPanel adPanel = new VerticalPanel();
-				adPanel.getElement().getStyle().setMarginTop(6, Unit.PX);
-				for (Resource ad : pageData.getAds()) {
-					ResourceTile tile = new ResourceTile(ad);
+				g.setWidget(2, 2, new AdTile(pageData.getAds().get(2)));
 
-					tile.getElement().getStyle().setMarginBottom(10, Unit.PX);
-					adPanel.add(tile);
-				}
-
-				HorizontalPanel hp = new HorizontalPanel();
-				hp.add(g);
-				hp.add(adPanel);
-
-				centerPanel.add(hp);
+				centerPanel.add(g);
 
 				// if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(org.getId()) == null) {
 				// centerPanel.add(new RequestMembershipLink(org));

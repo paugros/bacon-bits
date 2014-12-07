@@ -37,43 +37,44 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	private final class ResourceMapper implements RowMapper<Resource> {
 		@Override
 		public Resource mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Resource ad = new Resource();
-			ad.setId(rs.getInt("id"));
-			ad.setUrlDisplay(rs.getString("urlDisplay"));
-			ad.setAddedById(rs.getInt("addedById"));
-			ad.setStartDate(rs.getTimestamp("startDate"));
-			ad.setEndDate(rs.getTimestamp("endDate"));
-			ad.setAddedDate(rs.getTimestamp("addedDate"));
-			ad.setName(rs.getString("name"));
-			ad.setClickCount(rs.getInt("clickCount"));
-			ad.setAddressScopeId(rs.getInt("addressScopeId"));
-			ad.setLastClickDate(rs.getTimestamp("lastClickDate"));
-			ad.setUrl(rs.getString("url"));
-			ad.setImageId(rs.getInt("imageId"));
-			ad.setSmallImageId(rs.getInt("smallImageId"));
-			ad.setDescription(rs.getString("description"));
-			ad.setPhone(rs.getString("phone"));
-			ad.setCity(rs.getString("city"));
-			ad.setZip(rs.getString("zip"));
-			ad.setState(rs.getString("state"));
-			ad.setAddress(rs.getString("address"));
-			ad.setStreet(rs.getString("street"));
-			ad.setLat(rs.getDouble("lat"));
-			ad.setLng(rs.getDouble("lng"));
-			ad.setShowInAds(rs.getBoolean("showInAds"));
-			ad.setTagCount(rs.getInt("tagCount"));
-			ad.setAddressScope(rs.getString("addressScope"));
-			ad.setEmail(rs.getString("email"));
-			ad.setImageExtension(rs.getString("fileExtension"));
-			ad.setDirectoryPriority(rs.getBoolean("directoryPriority"));
+			Resource resource = new Resource();
+			resource.setId(rs.getInt("id"));
+			resource.setUrlDisplay(rs.getString("urlDisplay"));
+			resource.setAddedById(rs.getInt("addedById"));
+			resource.setStartDate(rs.getTimestamp("startDate"));
+			resource.setEndDate(rs.getTimestamp("endDate"));
+			resource.setAddedDate(rs.getTimestamp("addedDate"));
+			resource.setName(rs.getString("name"));
+			resource.setClickCount(rs.getInt("clickCount"));
+			resource.setAddressScopeId(rs.getInt("addressScopeId"));
+			resource.setLastClickDate(rs.getTimestamp("lastClickDate"));
+			resource.setUrl(rs.getString("url"));
+			resource.setImageId(rs.getInt("imageId"));
+			resource.setSmallImageId(rs.getInt("smallImageId"));
+			resource.setDescription(rs.getString("description"));
+			resource.setPhone(rs.getString("phone"));
+			resource.setCity(rs.getString("city"));
+			resource.setZip(rs.getString("zip"));
+			resource.setState(rs.getString("state"));
+			resource.setAddress(rs.getString("address"));
+			resource.setStreet(rs.getString("street"));
+			resource.setLat(rs.getDouble("lat"));
+			resource.setLng(rs.getDouble("lng"));
+			resource.setShowInAds(rs.getBoolean("showInAds"));
+			resource.setTagCount(rs.getInt("tagCount"));
+			resource.setAddressScope(rs.getString("addressScope"));
+			resource.setEmail(rs.getString("email"));
+			resource.setImageExtension(rs.getString("fileExtension"));
+			resource.setDirectoryPriority(rs.getBoolean("directoryPriority"));
+			resource.setAdDescription(rs.getString("adDescription"));
 
-			if (ad.getImageId() == null) {
-				ad.setImageExtension(rs.getString("tagFileExtension"));
-				ad.setImageId(rs.getInt("tagImageId"));
-				ad.setSmallImageId(rs.getInt("tagSmallImageId"));
+			if (resource.getImageId() == null) {
+				resource.setImageExtension(rs.getString("tagFileExtension"));
+				resource.setImageId(rs.getInt("tagImageId"));
+				resource.setSmallImageId(rs.getInt("tagSmallImageId"));
 			}
 
-			return ad;
+			return resource;
 		}
 	}
 
@@ -205,7 +206,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		if (r.isSaved()) {
 			String sql = "update resources set name = :name, startDate = :startDate, endDate = :endDate, url = :url, description = :description, showInAds = :showInAds, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone, email = :email, ";
-			sql += "urlDisplay = :urlDisplay, addressScopeId = :addressScopeId, directoryPriority = :directoryPriority ";
+			sql += "urlDisplay = :urlDisplay, addressScopeId = :addressScopeId, directoryPriority = :directoryPriority, adDescription = :adDescription ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -214,9 +215,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			}
 			r.setAddedById(ServerContext.getCurrentUserId());
 
-			String sql = "insert into resources (addedById, startDate, endDate, addedDate, name, url, description, ";
+			String sql = "insert into resources (addedById, startDate, endDate, addedDate, name, url, description, adDescription, ";
 			sql += "address, street, city, state, zip, lat, lng, phone, showInAds, email, urlDisplay, addressScopeId, directoryPriority) ";
-			sql += "values(:addedById, :startDate, :endDate, now(), :name, :url, :description, ";
+			sql += "values(:addedById, :startDate, :endDate, now(), :name, :url, :description, :adDescription, ";
 			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds, :email, :urlDisplay, :addressScopeId, :directoryPriority)";
 
 			KeyHolder keys = new GeneratedKeyHolder();

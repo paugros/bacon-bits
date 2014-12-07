@@ -209,6 +209,26 @@ public class ResourcePage implements Page {
 					priorityInput.setValue(adInput.getValue());
 				}
 			});
+
+			final RequiredTextBox adDescriptionInput = new RequiredTextBox();
+			final Label adDescriptionDisplay = new Label();
+			adDescriptionInput.setVisibleLength(35);
+			adDescriptionInput.setMaxLength(100);
+			FormField adDescriptionField = form.createFormField("Ad description:", adDescriptionInput, adDescriptionDisplay);
+			adDescriptionField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					adDescriptionDisplay.setText(Common.getDefaultIfNull(resource.getAdDescription()));
+					adDescriptionInput.setText(resource.getAdDescription());
+				}
+			});
+			adDescriptionField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					resource.setAdDescription(adDescriptionInput.getText().trim());
+				}
+			});
+			ft.addField(adDescriptionField);
 		}
 
 		if (resource.isSaved() && resource.getShowInAds()) {
