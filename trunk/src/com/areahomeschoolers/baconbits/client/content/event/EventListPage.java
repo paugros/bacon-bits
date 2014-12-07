@@ -51,6 +51,7 @@ public final class EventListPage implements Page {
 	private ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 	private ArrayList<Event> events;
 	private boolean runOnce;
+	private GeocoderTextBox locationInput = new GeocoderTextBox();
 
 	public EventListPage(final VerticalPanel page) {
 		if (showCommunity) {
@@ -135,7 +136,6 @@ public final class EventListPage implements Page {
 			PaddedPanel bottom = new PaddedPanel(15);
 			// within miles
 			final DefaultListBox milesInput = new DefaultListBox();
-			final GeocoderTextBox locationInput = new GeocoderTextBox();
 			milesInput.addItem("5", 5);
 			milesInput.addItem("10", 10);
 			milesInput.addItem("25", 25);
@@ -214,7 +214,7 @@ public final class EventListPage implements Page {
 		page.add(fp);
 		Application.getLayout().setPage(title, page);
 
-		populate();
+		locationInput.populate(Application.getCurrentLocation());
 	}
 
 	private void applyTableFilter() {

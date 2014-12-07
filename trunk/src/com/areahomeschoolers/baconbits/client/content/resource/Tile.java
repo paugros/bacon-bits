@@ -34,6 +34,7 @@ public class Tile extends Composite {
 
 		vp.addStyleName("tile");
 		vp.setHeight("267px");
+		vp.setWidth("238px");
 		vp.setSpacing(12);
 		vp.getElement().getStyle().setBackgroundColor(config.getColor());
 

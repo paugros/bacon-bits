@@ -109,6 +109,13 @@ public class GeocoderTextBox extends Composite {
 		return input.getText();
 	}
 
+	public void populate(String text) {
+		lastLocationText = "0000000000";
+		input.setFocus(true);
+		input.setText(text);
+		input.setFocus(false);
+	}
+
 	public void setChangeCommand(Command command) {
 		changeCommand = command;
 	}

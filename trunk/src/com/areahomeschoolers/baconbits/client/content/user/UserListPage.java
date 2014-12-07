@@ -45,6 +45,7 @@ public final class UserListPage implements Page {
 	private TilePanel fp = new TilePanel();
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private VerticalPanel page;
+	private GeocoderTextBox locationInput = new GeocoderTextBox();
 
 	public UserListPage(final VerticalPanel page) {
 		this.page = page;
@@ -73,7 +74,7 @@ public final class UserListPage implements Page {
 		page.add(fp);
 		Application.getLayout().setPage(title, page);
 
-		populate();
+		locationInput.populate(Application.getCurrentLocation());
 	}
 
 	private ArgMap<UserArg> getDefaultArgs() {
@@ -170,7 +171,6 @@ public final class UserListPage implements Page {
 
 		// within miles
 		final DefaultListBox milesInput = new DefaultListBox();
-		final GeocoderTextBox locationInput = new GeocoderTextBox();
 		milesInput.addItem("5", 5);
 		milesInput.addItem("10", 10);
 		milesInput.addItem("25", 25);

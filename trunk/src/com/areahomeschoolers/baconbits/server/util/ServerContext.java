@@ -1,5 +1,9 @@
 package com.areahomeschoolers.baconbits.server.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.logging.Level;
 
 import javax.servlet.ServletContext;
@@ -78,6 +82,10 @@ public class ServerContext implements ApplicationContextAware {
 		return cache;
 	}
 
+	public static String getCurrentLocation() {
+		return (String) getSession().getAttribute("location");
+	}
+
 	public static UserGroup getCurrentOrg() {
 		HttpSession session = ServerContext.getSession();
 
@@ -152,6 +160,20 @@ public class ServerContext implements ApplicationContextAware {
 		return tl.get().request.getSession();
 	}
 
+	public static String getUrlContents(String urlText) throws IOException {
+		URL url = new URL(urlText);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+		String line;
+
+		StringBuffer buffer = new StringBuffer();
+		while ((line = reader.readLine()) != null) {
+			buffer.append(line);
+		}
+		reader.close();
+
+		return buffer.toString();
+	}
+
 	public static boolean isAuthenticated() {
 		HttpSession session = ServerContext.getSession();
 
@@ -200,6 +222,10 @@ public class ServerContext implements ApplicationContextAware {
 			LoginService loginService = (LoginService) getApplicationContext().getBean("LoginServiceImpl");
 			loginService.logout();
 		}
+	}
+
+	public static void setCurrentLocation(String location) {
+		getSession().setAttribute("location", location);
 	}
 
 	public static void setCurrentOrg() {

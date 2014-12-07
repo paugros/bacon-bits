@@ -172,6 +172,10 @@ public final class Application implements ValueChangeHandler<String> {
 		return applicationData;
 	}
 
+	public static String getCurrentLocation() {
+		return applicationData.getCurrentLocation();
+	}
+
 	public static UserGroup getCurrentOrg() {
 		return applicationData.getCurrentOrg();
 	}

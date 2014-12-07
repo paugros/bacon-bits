@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.areahomeschoolers.baconbits.shared.HasAddress;
 
-public final class Resource extends EntityDto<Resource> implements HasAddress {
+public class Resource extends EntityDto<Resource> implements HasAddress {
 	private static final long serialVersionUID = 1L;
 
 	public static long getSerialversionuid() {
