@@ -210,7 +210,7 @@ public class ResourcePage implements Page {
 				}
 			});
 
-			final RequiredTextBox adDescriptionInput = new RequiredTextBox();
+			final TextBox adDescriptionInput = new TextBox();
 			final Label adDescriptionDisplay = new Label();
 			adDescriptionInput.setVisibleLength(35);
 			adDescriptionInput.setMaxLength(100);
