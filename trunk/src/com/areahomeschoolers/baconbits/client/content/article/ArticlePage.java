@@ -55,6 +55,8 @@ public class ArticlePage implements Page {
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private boolean noTitle = Url.getBooleanParameter("noTitle");
 	private Sidebar sidebar = new Sidebar();
+	private TagSection tagSection;
+	private FormField tagField;
 
 	public ArticlePage(VerticalPanel page) {
 		int articleId = Url.getIntegerParameter("articleId");
@@ -162,12 +164,8 @@ public class ArticlePage implements Page {
 			fieldTable.addField(endDateField);
 		}
 
-		if (article.isSaved() && (article.hasTags() || allowEdit())) {
-			TagSection ts = new TagSection(TagMappingType.ARTICLE, article.getId());
-			ts.setEditingEnabled(allowEdit());
-			fieldTable.addField("Tags:", ts);
-			ts.populate();
-		}
+		createTagSection();
+		fieldTable.addField(tagField);
 
 		final ControlledRichTextArea dataInput = new ControlledRichTextArea();
 		final HTML dataDisplay = new HTML();
@@ -237,6 +235,16 @@ public class ArticlePage implements Page {
 		Application.getLayout().setPage(title, page);
 	}
 
+	private void createTagSection() {
+		tagSection = new TagSection(TagMappingType.ARTICLE, article.getId());
+		tagSection.setEditingEnabled(allowEdit());
+		tagSection.setRequired(true);
+		tagSection.populate();
+
+		tagField = form.createFormField("Tags:", tagSection);
+		tagField.removeEditLabel();
+	}
+
 	private void createTextPage() {
 		HTML h = new HTML(article.getArticle());
 		h.setWidth("1000px");
@@ -259,12 +267,17 @@ public class ArticlePage implements Page {
 	private void save(final FormField field) {
 		articleService.save(article, new Callback<Article>() {
 			@Override
-			protected void doOnSuccess(Article a) {
+			protected void doOnSuccess(final Article a) {
 				if (!Url.isParamValidId("articleId")) {
 					if (article.getGroupPolicy() != null) {
 						Application.getCurrentOrg().setPolicyId(article.getGroupPolicy(), article.getId());
 					}
-					HistoryToken.set(PageUrl.article(a.getId()));
+					tagSection.saveAll(a.getId(), new Callback<Void>() {
+						@Override
+						protected void doOnSuccess(Void result) {
+							HistoryToken.set(PageUrl.article(a.getId()));
+						}
+					});
 				} else {
 					article = a;
 					form.setDto(a);

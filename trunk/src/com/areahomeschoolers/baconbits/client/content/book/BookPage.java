@@ -7,7 +7,6 @@ import com.areahomeschoolers.baconbits.client.content.Sidebar;
 import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
-import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
@@ -29,7 +28,6 @@ import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -121,11 +119,6 @@ public class BookPage implements Page {
 			ivp.add(change);
 		}
 
-		TagSection ts = new TagSection(TagMappingType.BOOK, book.getId(), pageData.getTags());
-		ts.setEditingEnabled(editable);
-		ts.populate();
-		fieldTable.addField("Tags:", ts);
-
 		pp.add(fieldTable);
 
 		VerticalPanel vp = new VerticalPanel();
@@ -144,13 +137,18 @@ public class BookPage implements Page {
 	private void save(final FormField field) {
 		bookService.save(book, new Callback<Book>() {
 			@Override
-			protected void doOnSuccess(Book result) {
+			protected void doOnSuccess(final Book b) {
 				if (!Url.isParamValidId("bookId")) {
-					HistoryToken.set(PageUrl.book(result.getId()));
+					fieldTable.getTagSection().saveAll(b.getId(), new Callback<Void>() {
+						@Override
+						protected void doOnSuccess(Void result) {
+							HistoryToken.set(PageUrl.book(b.getId()));
+						}
+					});
 				} else {
-					book = result;
-					form.setDto(result);
-					fieldTable.setBook(result);
+					book = b;
+					form.setDto(b);
+					fieldTable.setBook(b);
 					field.setInputVisibility(false);
 				}
 			}

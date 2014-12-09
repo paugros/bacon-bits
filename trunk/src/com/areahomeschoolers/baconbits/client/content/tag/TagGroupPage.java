@@ -93,7 +93,8 @@ public final class TagGroupPage implements Page {
 		});
 
 		Hyperlink home = new Hyperlink("Home", PageUrl.home());
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + type.getName() + " By Type";
+		String typeText = type.equals(TagMappingType.USER) ? "Interests" : "Type";
+		String ccText = home.toString() + "&nbsp;>&nbsp;" + type.getName() + " By " + typeText;
 		HTML cc = new HTML(ccText);
 		cc.addStyleName("hugeText");
 		page.add(cc);

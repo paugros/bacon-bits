@@ -38,6 +38,11 @@ public class BookEditDialog extends EntityEditDialog<Book> implements LazyLoadDi
 				bookService.save(entity, new Callback<Book>() {
 					@Override
 					protected void doOnSuccess(Book result) {
+						fieldTable.getTagSection().saveAll(result.getId(), new Callback<Void>() {
+							@Override
+							protected void doOnSuccess(Void result) {
+							}
+						});
 						setEntity(new Book());
 						form.initialize();
 
