@@ -174,6 +174,7 @@ public final class BookListPage implements Page {
 				milesInput.addItem("10", 10);
 				milesInput.addItem("25", 25);
 				milesInput.addItem("50", 50);
+				milesInput.setValue(25);
 				milesInput.addChangeHandler(new ChangeHandler() {
 					@Override
 					public void onChange(ChangeEvent event) {

@@ -1,7 +1,9 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
+import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.EntitySuggestBox;
+import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
@@ -24,6 +26,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -47,6 +50,8 @@ public class BookFieldTable extends FieldTable {
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
 	private BookEditDialog dialog;
 	private FormField isbnField;
+	private TagSection tagSection;
+	private FormField tagField;
 
 	public BookFieldTable(Form f, Book b, BookPageData pd) {
 		this.book = b;
@@ -241,6 +246,11 @@ public class BookFieldTable extends FieldTable {
 		});
 		addField(priceField);
 
+		createTagSection();
+		if (!book.isSaved()) {
+			addField(tagField);
+		}
+
 		final Label ageDisplay = new Label();
 		final DefaultListBox ageInput = new DefaultListBox();
 		ageInput.addItem("", 0);
@@ -421,6 +431,13 @@ public class BookFieldTable extends FieldTable {
 		});
 		addField(notesField);
 
+		if (book.isSaved()) {
+			addField(tagField);
+		}
+	}
+
+	public TagSection getTagSection() {
+		return tagSection;
 	}
 
 	public void setBook(Book b) {
@@ -429,6 +446,16 @@ public class BookFieldTable extends FieldTable {
 
 	public void setDialog(BookEditDialog dialog) {
 		this.dialog = dialog;
+	}
+
+	private void createTagSection() {
+		tagSection = new TagSection(TagMappingType.BOOK, book.getId());
+		tagSection.setEditingEnabled(Application.administratorOf(book));
+		tagSection.setRequired(true);
+		tagSection.populate(pageData.getTags());
+
+		tagField = form.createFormField("Tags:", tagSection);
+		tagField.removeEditLabel();
 	}
 
 	private void lookupByIsbn() {

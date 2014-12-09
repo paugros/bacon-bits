@@ -136,6 +136,8 @@ public class UserPage implements Page {
 	private EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private Set<PrivacyPreferenceWidget> privacyPreferenceWidgets = new HashSet<PrivacyPreferenceWidget>();
 	private BookEditDialog bookDialog;
+	private TagSection tagSection;
+	private FormField tagField;
 
 	public UserPage(final VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
@@ -200,6 +202,15 @@ public class UserPage implements Page {
 		fieldTable.setWidth("100%");
 	}
 
+	private void createTagSection() {
+		tagSection = new TagSection(TagMappingType.USER, user.getId());
+		tagSection.setEditingEnabled(canEditUser(user));
+		tagSection.populate(pageData.getInterests());
+
+		tagField = form.createFormField("Interests:", tagSection);
+		tagField.removeEditLabel();
+	}
+
 	private void initializePage() {
 		final String title = user.isSaved() ? user.getFullName() : "New User";
 		createFieldTable();
@@ -250,10 +261,8 @@ public class UserPage implements Page {
 						tabBody.add(tp);
 					}
 
-					TagSection ts = new TagSection(TagMappingType.USER, user.getId(), pageData.getInterests());
-					ts.setEditingEnabled(canEditUser(user));
-					ts.populate();
-					tabBody.add(ts);
+					createTagSection();
+					fieldTable.addField(tagField);
 
 					tabPanel.selectTabNow(tabBody);
 				}

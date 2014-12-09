@@ -78,13 +78,17 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 
 	@Override
 	public Tag addMapping(Tag tag) {
-		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(tag);
-		String sql = "";
 		if (!tag.isSaved()) {
 			tag = addNewTag(tag);
 		}
 
-		sql = "insert into " + tag.getMappingTable() + "(" + tag.getMappingColumn() + ", tagId) ";
+		// this is when we're adding tags on an add page
+		if (tag.getEntityId() == 0) {
+			return tag;
+		}
+
+		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(tag);
+		String sql = "insert into " + tag.getMappingTable() + "(" + tag.getMappingColumn() + ", tagId) ";
 		sql += "values(:entityId, :id)";
 
 		KeyHolder keys = new GeneratedKeyHolder();
@@ -98,6 +102,14 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		updateFirstTagColumn(tag);
 
 		return mapped;
+	}
+
+	@Override
+	public void addMappings(int entityId, ArrayList<Tag> tags) {
+		for (Tag tag : tags) {
+			tag.setEntityId(entityId);
+			addMapping(tag);
+		}
 	}
 
 	@Override

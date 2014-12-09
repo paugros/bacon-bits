@@ -30,7 +30,6 @@ import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
@@ -67,8 +66,10 @@ public class ResourcePage implements Page {
 	private VerticalPanel page;
 	private FieldTable ft = new FieldTable();
 	private Resource resource = new Resource();
-	private ResourcePageData pd;
+	// private ResourcePageData pd;
 	private ResourceServiceAsync resourceService = (ResourceServiceAsync) ServiceCache.getService(ResourceService.class);
+	private TagSection tagSection;
+	private FormField tagField;
 
 	public ResourcePage(VerticalPanel page) {
 		int resourceId = Url.getIntegerParameter("resourceId");
@@ -88,7 +89,7 @@ public class ResourcePage implements Page {
 					return;
 				}
 				resource = result.getResource();
-				pd = result;
+				// pd = result;
 				initializePage();
 			}
 		});
@@ -142,6 +143,11 @@ public class ResourcePage implements Page {
 			}
 		});
 		ft.addField(urlField);
+
+		createTagSection();
+		if (!resource.isSaved()) {
+			ft.addField(tagField);
+		}
 
 		if (Application.isSystemAdministrator()) {
 			final Label urlTextDisplay = new Label();
@@ -320,29 +326,29 @@ public class ResourcePage implements Page {
 		form.addField(addressField);
 		ft.addField(addressField);
 
-		if (Application.isSystemAdministrator()) {
-			final Label scopeDisplay = new Label();
-			final DefaultListBox scopeInput = new DefaultListBox();
-			scopeInput.addItem("N/A", 0);
-			for (Data d : pd.getAddressScopes()) {
-				scopeInput.addItem(d.get("scope"), d.getId());
-			}
-			FormField scopeField = form.createFormField("Address scope:", scopeInput, scopeDisplay);
-			scopeField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					scopeDisplay.setText(Common.getDefaultIfNull(resource.getAddressScope(), "N/A"));
-					scopeInput.setValue(resource.getAddressScopeId());
-				}
-			});
-			scopeField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					resource.setAddressScopeId(scopeInput.getIntValue());
-				}
-			});
-			ft.addField(scopeField);
-		}
+		// if (Application.isSystemAdministrator()) {
+		// final Label scopeDisplay = new Label();
+		// final DefaultListBox scopeInput = new DefaultListBox();
+		// scopeInput.addItem("N/A", 0);
+		// for (Data d : pd.getAddressScopes()) {
+		// scopeInput.addItem(d.get("scope"), d.getId());
+		// }
+		// FormField scopeField = form.createFormField("Address scope:", scopeInput, scopeDisplay);
+		// scopeField.setInitializer(new Command() {
+		// @Override
+		// public void execute() {
+		// scopeDisplay.setText(Common.getDefaultIfNull(resource.getAddressScope(), "N/A"));
+		// scopeInput.setValue(resource.getAddressScopeId());
+		// }
+		// });
+		// scopeField.setDtoUpdater(new Command() {
+		// @Override
+		// public void execute() {
+		// resource.setAddressScopeId(scopeInput.getIntValue());
+		// }
+		// });
+		// ft.addField(scopeField);
+		// }
 
 		final HTML descriptionDisplay = new HTML();
 		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
@@ -365,11 +371,8 @@ public class ResourcePage implements Page {
 		});
 		ft.addSpanningWidget(descriptionField);
 
-		if (resource.isSaved() && (resource.hasTags() || allowEdit())) {
-			TagSection ts = new TagSection(TagMappingType.RESOURCE, resource.getId());
-			ts.setEditingEnabled(allowEdit());
-			ft.addField("Tags:", ts);
-			ts.populate();
+		if (resource.isSaved()) {
+			ft.addField(tagField);
 		}
 
 		Button cancelButton = new Button("Cancel", new ClickHandler() {
@@ -380,6 +383,16 @@ public class ResourcePage implements Page {
 		});
 
 		form.getButtonPanel().insertCenterButton(cancelButton, 0);
+	}
+
+	private void createTagSection() {
+		tagSection = new TagSection(TagMappingType.RESOURCE, resource.getId());
+		tagSection.setEditingEnabled(allowEdit());
+		tagSection.setRequired(true);
+		tagSection.populate();
+
+		tagField = form.createFormField("Tags:", tagSection);
+		tagField.removeEditLabel();
 	}
 
 	private void initializePage() {
@@ -426,12 +439,17 @@ public class ResourcePage implements Page {
 	private void save(final FormField field) {
 		resourceService.save(resource, new Callback<Resource>() {
 			@Override
-			protected void doOnSuccess(Resource a) {
+			protected void doOnSuccess(final Resource r) {
 				if (!Url.isParamValidId("resourceId")) {
-					HistoryToken.set(PageUrl.resource(a.getId()));
+					tagSection.saveAll(r.getId(), new Callback<Void>() {
+						@Override
+						protected void doOnSuccess(Void result) {
+							HistoryToken.set(PageUrl.resource(r.getId()));
+						}
+					});
 				} else {
-					resource = a;
-					form.setDto(a);
+					resource = r;
+					form.setDto(r);
 					field.setInputVisibility(false);
 				}
 			}

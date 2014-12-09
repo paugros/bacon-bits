@@ -109,13 +109,13 @@ public class FormField extends Composite {
 	private final Label requiredLabel = new Label("*");
 	private boolean isRequired;
 	private ValidationErrorHandler errorHandler;
-	private final List<Widget> inputPartners = new ArrayList<Widget>();
 	private boolean hasDisplayWidget;
 	private final Set<FormField> subFields = new LinkedHashSet<FormField>();
 	private FieldTable subFieldTable;
 	private WidgetCreator inputCreator;
 	private FieldTable parentFieldTable;
 	private LinkPanel linkPanel;
+	private boolean showEditLabel = true;
 
 	public FormField(String label, Widget inputWidget, Widget displayWidget) {
 		fieldLabel.setText(label);
@@ -170,16 +170,6 @@ public class FormField extends Composite {
 				toggleHandlers.remove(formToggleHandler);
 			}
 		};
-	}
-
-	/**
-	 * Adds a Widget whose visibility will be toggled along with the input widget.
-	 * 
-	 * @param partner
-	 */
-	public void addInputPartner(Widget partner) {
-		inputPartners.add(partner);
-		partner.setVisible(inputWidget.isVisible());
 	}
 
 	public void addSubField(FormField field) {
@@ -263,14 +253,18 @@ public class FormField extends Composite {
 		}
 
 		isEmancipated = true;
-		editLabel.setVisible(true);
 		submitButton.setVisible(true);
 
-		placeButton();
+		if (hasDisplayWidget) {
+			placeButton();
+		}
+
 		setInputVisibility(!hasDisplayWidget, false);
 
 		getLinkPanel().setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		linkPanel.add(editLabel);
+		if (showEditLabel) {
+			linkPanel.add(editLabel);
+		}
 
 		fieldGrid.setWidget(0, 1, linkPanel);
 		fieldGrid.getCellFormatter().setVerticalAlignment(0, 1, HasVerticalAlignment.ALIGN_TOP);
@@ -415,7 +409,8 @@ public class FormField extends Composite {
 	}
 
 	public void removeEditLabel() {
-		linkPanel.removeWidget(editLabel);
+		showEditLabel = false;
+		editLabel.removeFromParent();
 	}
 
 	public void removeEmancipation() {
@@ -485,7 +480,6 @@ public class FormField extends Composite {
 	}
 
 	public void setEnabled(boolean enabled, boolean alwaysChangeVisibility) {
-		this.enabled = enabled;
 		if (!enabled) {
 			removeStyleDependentName("emancipated");
 			addStyleDependentName("disabled");
@@ -499,7 +493,7 @@ public class FormField extends Composite {
 			}
 		}
 
-		if (validator != null) {
+		if (validator != null && this.enabled != enabled) {
 			if (enabled) {
 				setRequired(validator.isRequired());
 			} else {
@@ -514,9 +508,11 @@ public class FormField extends Composite {
 			((FocusWidget) inputWidget).setEnabled(enabled);
 		}
 
-		if (isEmancipated) {
+		if (isEmancipated && showEditLabel) {
 			editLabel.setVisible(enabled);
 		}
+
+		this.enabled = enabled;
 	}
 
 	/**
@@ -607,15 +603,10 @@ public class FormField extends Composite {
 			submitButton.setVisible(setVisible);
 			submitButton.setEnabled(true);
 
-			// set visibility of all widgets that need to follow the visibility of the input widget
-			for (Widget partner : inputPartners) {
-				partner.setVisible(setVisible);
-			}
-
 			if (setVisible) {
 				editLabelText = editLabel.getText();
 				editLabel.setText("Cancel");
-				if (parentFieldTable != null) {
+				if (parentFieldTable != null && hasDisplayWidget) {
 					parentFieldTable.addRowStyle(this, "editing");
 				}
 				// focus on the input widget if we can
@@ -703,7 +694,6 @@ public class FormField extends Composite {
 		// if the input widget has validation, extract its controller for later use, and mirror its required state
 		if (inputWidget instanceof HasValidator) {
 			setValidator(((HasValidator) inputWidget).getValidator());
-			setRequired(validator.isRequired());
 		}
 	}
 

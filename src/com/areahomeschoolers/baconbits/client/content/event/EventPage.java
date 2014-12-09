@@ -100,6 +100,8 @@ public class EventPage implements Page {
 	private EmailDialog emailDialog;
 	private FormField priceField;
 	private FormField markupField;
+	private TagSection tagSection;
+	private FormField tagField;
 
 	public EventPage(final VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -241,6 +243,57 @@ public class EventPage implements Page {
 		addressField.setRequired(true);
 		form.addField(addressField);
 		fieldTable.addField(addressField);
+
+		if (Application.administratorOf(calendarEvent)) {
+			final Label emailDisplay = new Label();
+			final EmailTextBox emailInput = new EmailTextBox();
+			emailInput.setMultiEmail(true);
+			emailInput.setMaxLength(200);
+			emailInput.setVisibleLength(60);
+			FormField emailField = form.createFormField("Email registrations to (list with commas):", emailInput, emailDisplay);
+			emailField.setRequired(true);
+			emailField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					emailDisplay.setText(calendarEvent.getNotificationEmail());
+					emailInput.setText(calendarEvent.getNotificationEmail());
+				}
+			});
+			emailField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setNotificationEmail(emailInput.getText());
+				}
+			});
+			fieldTable.addField(emailField);
+		}
+
+		if (Common.isNullOrEmpty(pageData.getAgeGroups()) || Application.administratorOf(calendarEvent) || !calendarEvent.getRequiresRegistration()) {
+			final NumericRangeBox participantInput = new NumericRangeBox();
+			final Label participantDisplay = new Label();
+			participantInput.setAllowZeroForNoLimit(true);
+			FormField participantField = form.createFormField("Min / max participants:", participantInput, participantDisplay);
+			participantField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					participantDisplay.setText(Formatter.formatNumberRange(calendarEvent.getMinimumParticipants(), calendarEvent.getMaximumParticipants()));
+					participantInput.setRange(calendarEvent.getMinimumParticipants(), calendarEvent.getMaximumParticipants());
+				}
+			});
+			participantField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setMinimumParticipants((int) participantInput.getFromValue());
+					calendarEvent.setMaximumParticipants((int) participantInput.getToValue());
+				}
+			});
+			fieldTable.addField(participantField);
+		}
+
+		createTagSection();
+		if (!calendarEvent.isSaved()) {
+			fieldTable.addField(tagField);
+		}
 
 		if (Application.administratorOf(calendarEvent) || !Common.isNullOrBlank(calendarEvent.getWebsite())) {
 			final HTML websiteDisplay = new HTML();
@@ -542,50 +595,6 @@ public class EventPage implements Page {
 			});
 			fieldTable.addField(activeField);
 
-			final Label emailDisplay = new Label();
-			final EmailTextBox emailInput = new EmailTextBox();
-			emailInput.setMultiEmail(true);
-			emailInput.setMaxLength(200);
-			emailInput.setVisibleLength(60);
-			FormField emailField = form.createFormField("Email registrations to (list with commas):", emailInput, emailDisplay);
-			emailField.setRequired(true);
-			emailField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					emailDisplay.setText(calendarEvent.getNotificationEmail());
-					emailInput.setText(calendarEvent.getNotificationEmail());
-				}
-			});
-			emailField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					calendarEvent.setNotificationEmail(emailInput.getText());
-				}
-			});
-			fieldTable.addField(emailField);
-
-			if ((Common.isNullOrEmpty(pageData.getAgeGroups()) || Application.administratorOf(calendarEvent)) || !calendarEvent.getRequiresRegistration()) {
-				final NumericRangeBox participantInput = new NumericRangeBox();
-				final Label participantDisplay = new Label();
-				participantInput.setAllowZeroForNoLimit(true);
-				FormField participantField = form.createFormField("Min / max participants:", participantInput, participantDisplay);
-				participantField.setInitializer(new Command() {
-					@Override
-					public void execute() {
-						participantDisplay.setText(Formatter.formatNumberRange(calendarEvent.getMinimumParticipants(), calendarEvent.getMaximumParticipants()));
-						participantInput.setRange(calendarEvent.getMinimumParticipants(), calendarEvent.getMaximumParticipants());
-					}
-				});
-				participantField.setDtoUpdater(new Command() {
-					@Override
-					public void execute() {
-						calendarEvent.setMinimumParticipants((int) participantInput.getFromValue());
-						calendarEvent.setMaximumParticipants((int) participantInput.getToValue());
-					}
-				});
-				fieldTable.addField(participantField);
-			}
-
 			final Label registerDisplay = new Label();
 			final DefaultListBox registerInput = new DefaultListBox();
 			registerInput.addItem("No", 0);
@@ -639,11 +648,8 @@ public class EventPage implements Page {
 			}
 		}
 
-		if (calendarEvent.isSaved() && (!pageData.getTags().isEmpty() || Application.administratorOf(calendarEvent))) {
-			TagSection ts = new TagSection(TagMappingType.EVENT, calendarEvent.getId(), pageData.getTags());
-			ts.setEditingEnabled(Application.administratorOf(calendarEvent));
-			fieldTable.addField("Tags:", ts);
-			ts.populate();
+		if (calendarEvent.isSaved()) {
+			fieldTable.addField(tagField);
 		}
 
 		final HTML descriptionDisplay = new HTML();
@@ -673,6 +679,16 @@ public class EventPage implements Page {
 			fieldTable.addField("Documents:", ds);
 		}
 
+	}
+
+	private void createTagSection() {
+		tagSection = new TagSection(TagMappingType.EVENT, calendarEvent.getId());
+		tagSection.setEditingEnabled(Application.administratorOf(calendarEvent));
+		tagSection.setRequired(true);
+		tagSection.populate(pageData.getTags());
+
+		tagField = form.createFormField("Tags:", tagSection);
+		tagField.removeEditLabel();
 	}
 
 	private void initializePage() {
@@ -1054,9 +1070,14 @@ public class EventPage implements Page {
 
 		eventService.save(calendarEvent, new Callback<Event>() {
 			@Override
-			protected void doOnSuccess(Event e) {
+			protected void doOnSuccess(final Event e) {
 				if (!isSaved) {
-					HistoryToken.set(PageUrl.event(e.getId()));
+					tagSection.saveAll(e.getId(), new Callback<Void>() {
+						@Override
+						protected void doOnSuccess(Void result) {
+							HistoryToken.set(PageUrl.event(e.getId()));
+						}
+					});
 				} else {
 					calendarEvent = e;
 					form.setDto(e);

@@ -708,7 +708,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		String distanceCols = "";
 
 		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
-			distanceCols = ServerUtils.getDistanceSql("u", withinMiles, withinLat, withinLng);
+			distanceCols = ServerUtils.getDistanceSql("e", withinMiles, withinLat, withinLng);
 		}
 
 		String sql = createSqlBase(distanceCols);

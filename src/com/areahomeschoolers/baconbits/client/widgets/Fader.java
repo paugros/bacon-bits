@@ -38,6 +38,9 @@ public class Fader {
 		fadeOutTimer = new Timer() {
 			@Override
 			public void run() {
+				if (object == null) {
+					throw new RuntimeException("The object provided is null.");
+				}
 				currentOpacity -= fadeStep;
 				if (currentOpacity < 0) {
 					currentOpacity = 0;
