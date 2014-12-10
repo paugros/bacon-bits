@@ -82,6 +82,14 @@ public class ServerContext implements ApplicationContextAware {
 		return cache;
 	}
 
+	public static double getCurrentLat() {
+		return (double) getSession().getAttribute("lat");
+	}
+
+	public static double getCurrentLng() {
+		return (double) getSession().getAttribute("lng");
+	}
+
 	public static String getCurrentLocation() {
 		return (String) getSession().getAttribute("location");
 	}
@@ -222,6 +230,14 @@ public class ServerContext implements ApplicationContextAware {
 			LoginService loginService = (LoginService) getApplicationContext().getBean("LoginServiceImpl");
 			loginService.logout();
 		}
+	}
+
+	public static void setCurrentLat(double lat) {
+		getSession().setAttribute("lat", lat);
+	}
+
+	public static void setCurrentLng(double lng) {
+		getSession().setAttribute("lng", lng);
 	}
 
 	public static void setCurrentLocation(String location) {

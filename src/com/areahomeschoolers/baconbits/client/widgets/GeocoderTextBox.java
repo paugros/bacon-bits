@@ -36,8 +36,7 @@ public class GeocoderTextBox extends Composite {
 					return;
 				}
 				input.setText("");
-				input.getElement().getStyle().setColor("#000000");
-				input.getElement().getStyle().setFontStyle(FontStyle.NORMAL);
+				setNormalStyle();
 			}
 		});
 
@@ -124,6 +123,11 @@ public class GeocoderTextBox extends Composite {
 		clearCommand = command;
 	}
 
+	public void setText(String text) {
+		setNormalStyle();
+		input.setText(text);
+	}
+
 	private void reset() {
 		if (!input.getText().isEmpty()) {
 			return;
@@ -131,6 +135,11 @@ public class GeocoderTextBox extends Composite {
 		input.setText(defaultSearchText);
 		input.getElement().getStyle().setColor("#666666");
 		input.getElement().getStyle().setFontStyle(FontStyle.ITALIC);
+	}
+
+	private void setNormalStyle() {
+		input.getElement().getStyle().setColor("#000000");
+		input.getElement().getStyle().setFontStyle(FontStyle.NORMAL);
 	}
 
 }

@@ -17,6 +17,8 @@ public class ApplicationData implements IsSerializable {
 	private ArrayList<Tag> interests = new ArrayList<Tag>();
 	private ArrayList<MainMenuItem> dynamicMenuItems = new ArrayList<MainMenuItem>();
 	private String currentLocation;
+	private double currentLat;
+	private double currentLng;
 
 	public ApplicationData() {
 
@@ -24,6 +26,14 @@ public class ApplicationData implements IsSerializable {
 
 	public int getAdultBirthYear() {
 		return adultBirthYear;
+	}
+
+	public double getCurrentLat() {
+		return currentLat;
+	}
+
+	public double getCurrentLng() {
+		return currentLng;
 	}
 
 	public String getCurrentLocation() {
@@ -64,6 +74,14 @@ public class ApplicationData implements IsSerializable {
 
 	public void setAdultBirthYear(int adultBirthYear) {
 		this.adultBirthYear = adultBirthYear;
+	}
+
+	public void setCurrentLat(double currentLat) {
+		this.currentLat = currentLat;
+	}
+
+	public void setCurrentLng(double currentLng) {
+		this.currentLng = currentLng;
 	}
 
 	public void setCurrentLocation(String currentLocation) {

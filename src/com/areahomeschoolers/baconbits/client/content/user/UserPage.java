@@ -178,10 +178,10 @@ public class UserPage implements Page {
 	}
 
 	private native void createBarcode(String bookId) /*-{
-		$wnd.$('#barcode_' + bookId).barcode({
-			code : 'code39'
-		});
-	}-*/;
+														$wnd.$('#barcode_' + bookId).barcode({
+														code : 'code39'
+														});
+														}-*/;
 
 	private Widget createBreadCrumb() {
 		PaddedPanel pp = new PaddedPanel();
@@ -230,7 +230,9 @@ public class UserPage implements Page {
 
 					ImageResource r = user.getSex().equals("m") ? MainImageBundle.INSTANCE.blankProfileMale() : MainImageBundle.INSTANCE.blankProfileFemale();
 					EditableImage image = new EditableImage(DocumentLinkType.PROFILE, user.getId());
-					image.setImage(new Image(ClientUtils.createDocumentUrl(user.getImageId(), user.getImageExtension())));
+					if (user.getImageId() != null) {
+						image.setImage(new Image(ClientUtils.createDocumentUrl(user.getImageId(), user.getImageExtension())));
+					}
 					image.setImageResource(r);
 					image.setEnabled(canEditUser(user));
 					image.populate();
@@ -243,23 +245,25 @@ public class UserPage implements Page {
 
 					tabBody.add(WidgetFactory.newSection("Basic Information", hp, ContentWidth.MAXWIDTH1100PX));
 					// interests
-					if (!pageData.getInterests().isEmpty() || canEditUser(user)) {
-						VerticalPanel tp = new VerticalPanel();
-						Label heading = new Label("Interests");
-						heading.addStyleName("hugeText");
-						tp.add(heading);
-						String txt = "Interests can be anything: hobbies, academic topics, religions, curriculum publishers, teaching styles, recreational activities, sports, or whatever else. ";
-						txt += "We'll use these interests to help you find other homeschoolers with similar interests, and to show you events, articles and books relating to your interests. ";
-						txt += "The most useful interests are neither too general nor too specific.";
-						Label sub = new Label(txt);
-						sub.getElement().getStyle().setColor("#666666");
-						if (viewingSelf()) {
-							tp.add(sub);
-						}
-						tp.setWidth("600px");
-
-						tabBody.add(tp);
-					}
+					// if (!pageData.getInterests().isEmpty() || canEditUser(user)) {
+					// VerticalPanel tp = new VerticalPanel();
+					// Label heading = new Label("Interests");
+					// heading.addStyleName("hugeText");
+					// tp.add(heading);
+					// String txt =
+					// "Interests can be anything: hobbies, academic topics, religions, curriculum publishers, teaching styles, recreational activities, sports, or whatever else. ";
+					// txt +=
+					// "We'll use these interests to help you find other homeschoolers with similar interests, and to show you events, articles and books relating to your interests. ";
+					// txt += "The most useful interests are neither too general nor too specific.";
+					// Label sub = new Label(txt);
+					// sub.getElement().getStyle().setColor("#666666");
+					// if (viewingSelf()) {
+					// tp.add(sub);
+					// }
+					// tp.setWidth("600px");
+					//
+					// tabBody.add(tp);
+					// }
 
 					createTagSection();
 					fieldTable.addField(tagField);

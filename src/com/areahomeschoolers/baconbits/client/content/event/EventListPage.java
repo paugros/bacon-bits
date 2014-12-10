@@ -20,6 +20,7 @@ import com.areahomeschoolers.baconbits.client.widgets.MonthPicker;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -51,7 +52,6 @@ public final class EventListPage implements Page {
 	private ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 	private ArrayList<Event> events;
 	private boolean runOnce;
-	private GeocoderTextBox locationInput = new GeocoderTextBox();
 
 	public EventListPage(final VerticalPanel page) {
 		if (showCommunity) {
@@ -63,6 +63,13 @@ public final class EventListPage implements Page {
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			args.put(EventArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
+
+		if (Application.hasLocation()) {
+			args.put(EventArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
+			args.put(EventArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
+			args.put(EventArg.WITHIN_MILES, Constants.defaultSearchRadius);
+		}
+
 		final String title = showCommunity ? "Community Events" : "Events";
 
 		Hyperlink home = new Hyperlink("Home", PageUrl.home());
@@ -134,7 +141,13 @@ public final class EventListPage implements Page {
 			}
 
 			PaddedPanel bottom = new PaddedPanel(15);
+
 			// within miles
+			final GeocoderTextBox locationInput = new GeocoderTextBox();
+			if (Application.hasLocation()) {
+				locationInput.setText(Application.getCurrentLocation());
+			}
+
 			final DefaultListBox milesInput = new DefaultListBox();
 			milesInput.addItem("5", 5);
 			milesInput.addItem("10", 10);
@@ -215,7 +228,7 @@ public final class EventListPage implements Page {
 		page.add(fp);
 		Application.getLayout().setPage(title, page);
 
-		locationInput.populate(Application.getCurrentLocation());
+		populate();
 	}
 
 	private void applyTableFilter() {

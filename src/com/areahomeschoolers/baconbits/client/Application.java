@@ -44,6 +44,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
 import com.areahomeschoolers.baconbits.client.widgets.UserAgreementDialog;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -172,6 +173,14 @@ public final class Application implements ValueChangeHandler<String> {
 		return applicationData;
 	}
 
+	public static double getCurrentLat() {
+		return applicationData.getCurrentLat();
+	}
+
+	public static double getCurrentLng() {
+		return applicationData.getCurrentLng();
+	}
+
 	public static String getCurrentLocation() {
 		return applicationData.getCurrentLocation();
 	}
@@ -224,6 +233,10 @@ public final class Application implements ValueChangeHandler<String> {
 
 	public static Data getUserPreferences() {
 		return applicationData.getUserPreferences();
+	}
+
+	public static boolean hasLocation() {
+		return !Common.isNullOrBlank(applicationData.getCurrentLocation());
 	}
 
 	public static boolean hasRole(AccessLevel level) {
