@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -41,7 +42,6 @@ public final class BookListPage implements Page {
 	private int sellerId = Url.getIntegerParameter("sellerId");
 	private TilePanel fp = new TilePanel();
 	private VerticalPanel page;
-	private GeocoderTextBox locationInput = new GeocoderTextBox();
 
 	public BookListPage(final VerticalPanel p) {
 		fp.setWidth("100%");
@@ -58,6 +58,12 @@ public final class BookListPage implements Page {
 			args.put(BookArg.USER_ID, sellerId);
 		}
 
+		if (Application.hasLocation()) {
+			args.put(BookArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
+			args.put(BookArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
+			args.put(BookArg.WITHIN_MILES, Constants.defaultSearchRadius);
+		}
+
 		Hyperlink home = new Hyperlink("Home", PageUrl.home());
 		Hyperlink cat = new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK"));
 		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString();
@@ -71,14 +77,11 @@ public final class BookListPage implements Page {
 		page.add(cc);
 
 		page.add(optionsPanel);
-		populateOptionsPanel(new Command() {
-			@Override
-			public void execute() {
-				locationInput.populate(Application.getCurrentLocation());
-			}
-		});
+		populateOptionsPanel();
 
 		page.add(fp);
+
+		populate();
 
 		Application.getLayout().setPage("Books", page);
 	}
@@ -96,7 +99,7 @@ public final class BookListPage implements Page {
 		});
 	}
 
-	private void populateOptionsPanel(final Command command) {
+	private void populateOptionsPanel() {
 		optionsPanel.addStyleName("boxedBlurb");
 		optionsPanel.setSpacing(8);
 		Label label = new Label("Show");
@@ -168,6 +171,11 @@ public final class BookListPage implements Page {
 					top.setCellVerticalAlignment(top.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
 				}
 
+				final GeocoderTextBox locationInput = new GeocoderTextBox();
+				if (Application.hasLocation()) {
+					locationInput.setText(Application.getCurrentLocation());
+				}
+
 				// within miles
 				final DefaultListBox milesInput = new DefaultListBox();
 				milesInput.addItem("5", 5);
@@ -217,8 +225,6 @@ public final class BookListPage implements Page {
 
 				optionsPanel.add(top);
 				optionsPanel.add(bottom);
-
-				command.execute();
 			}
 		});
 	}

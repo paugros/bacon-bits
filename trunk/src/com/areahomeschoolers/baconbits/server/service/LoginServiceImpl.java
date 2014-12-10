@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +28,7 @@ import com.areahomeschoolers.baconbits.server.dao.impl.UserDaoImpl;
 import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
@@ -56,29 +59,19 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		ServerContext.setCurrentOrg();
 
 		User user = ServerContext.getCurrentUser();
-		// default location
-		String location = "";
-		if (user != null && user.getZip() != null) {
-			location = user.getZip();
-		} else {
-			try {
-				String stringData = ServerUtils.getUrlContents("http://ip-api.com/json/" + ServerContext.getRequest().getRemoteAddr());
-				JsonObject data = new JsonParser().parse(stringData).getAsJsonObject();
-				String status = ServerUtils.getStringFromJsonObject(data, "status");
-				if (status != null && status.equals("success")) {
-					location = ServerUtils.getStringFromJsonObject(data, "zip");
-				}
-			} catch (IOException e) {
-			}
-		}
-		ServerContext.setCurrentLocation(location);
+		initLocation(user);
 
 		ApplicationData ap = new ApplicationData();
 		ap.setCurrentOrg(ServerContext.getCurrentOrg());
 		ap.setCurrentUser(user);
 		ap.setAdultBirthYear(Calendar.getInstance().get(Calendar.YEAR) - 18);
 		ap.setUserActivity(UserDaoImpl.getAllUserActivity());
-		ap.setCurrentLocation(location);
+		if (!Common.isNullOrBlank(ServerContext.getCurrentLocation())) {
+			ap.setCurrentLocation(ServerContext.getCurrentLocation());
+			ap.setCurrentLat(ServerContext.getCurrentLat());
+			ap.setCurrentLng(ServerContext.getCurrentLng());
+		}
+		ap.setLive(ServerContext.isLive());
 
 		UserDao userDao = ServerContext.getDaoImpl("user");
 		ap.setDynamicMenuItems(userDao.getMenuItems(new ArgMap<UserArg>(UserArg.ORGANIZATION_ID, ServerContext.getCurrentOrgId())));
@@ -171,5 +164,43 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 	@Override
 	public boolean sendPasswordResetEmail(String username) {
 		return userDao.sendPasswordResetEmail(username);
+	}
+
+	private void initLocation(User user) {
+		// System.out.println("Initializing location data...");
+		if (user != null && user.getZip() != null) {
+			// System.out.println("Using user location...");
+			ServerContext.setCurrentLocation(user.getZip());
+			ServerContext.setCurrentLat(user.getLat());
+			ServerContext.setCurrentLng(user.getLng());
+			return;
+		}
+
+		// default location
+		String location = ServerContext.getCurrentLocation();
+
+		if (location != null) {
+			// System.out.println("Using existing session location...");
+			return;
+		}
+
+		location = "";
+		try {
+			// System.out.println("Looking up location...");
+			String stringData = ServerUtils.getUrlContents("http://ip-api.com/json/" + ServerContext.getRequest().getRemoteAddr());
+			JsonObject locationData = new JsonParser().parse(stringData).getAsJsonObject();
+			String status = ServerUtils.getStringFromJsonObject(locationData, "status");
+			if (status != null && status.equals("success")) {
+				location = ServerUtils.getStringFromJsonObject(locationData, "zip");
+				ServerContext.setCurrentLat(Double.parseDouble(ServerUtils.getStringFromJsonObject(locationData, "lat")));
+				ServerContext.setCurrentLng(Double.parseDouble(ServerUtils.getStringFromJsonObject(locationData, "lng")));
+			}
+		} catch (IOException e) {
+			Logger logger = Logger.getLogger(this.getClass().toString());
+			logger.log(Level.WARNING, e.getMessage());
+		}
+
+		ServerContext.setCurrentLocation(location);
+
 	}
 }

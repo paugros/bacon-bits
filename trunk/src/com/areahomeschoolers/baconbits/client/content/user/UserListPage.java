@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -41,14 +42,11 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class UserListPage implements Page {
 	private VerticalPanel optionsPanel = new VerticalPanel();
-	private ArgMap<UserArg> args = getDefaultArgs();
+	private ArgMap<UserArg> args;
 	private TilePanel fp = new TilePanel();
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
-	private VerticalPanel page;
-	private GeocoderTextBox locationInput = new GeocoderTextBox();
 
 	public UserListPage(final VerticalPanel page) {
-		this.page = page;
 		fp.setWidth("100%");
 		if (!Application.isAuthenticated()) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
@@ -69,17 +67,26 @@ public final class UserListPage implements Page {
 		cc.addStyleName("hugeText");
 		page.add(cc);
 
+		page.add(optionsPanel);
+
 		populateOptionsPanel();
+
+		args = getDefaultArgs();
 
 		page.add(fp);
 		Application.getLayout().setPage(title, page);
 
-		locationInput.populate(Application.getCurrentLocation());
+		populate();
 	}
 
 	private ArgMap<UserArg> getDefaultArgs() {
 		ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 		args.put(UserArg.PARENTS);
+		if (Application.hasLocation()) {
+			args.put(UserArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
+			args.put(UserArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
+			args.put(UserArg.WITHIN_MILES, Constants.defaultSearchRadius);
+		}
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			args.put(UserArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
@@ -102,7 +109,6 @@ public final class UserListPage implements Page {
 	private void populateOptionsPanel() {
 		optionsPanel.addStyleName("boxedBlurb");
 		optionsPanel.setSpacing(8);
-		page.add(optionsPanel);
 		PaddedPanel top = new PaddedPanel(10);
 
 		Label label = new Label("Show");
@@ -170,12 +176,17 @@ public final class UserListPage implements Page {
 		});
 
 		// within miles
+		final GeocoderTextBox locationInput = new GeocoderTextBox();
+		if (Application.hasLocation()) {
+			locationInput.setText(Application.getCurrentLocation());
+		}
+
 		final DefaultListBox milesInput = new DefaultListBox();
 		milesInput.addItem("5", 5);
 		milesInput.addItem("10", 10);
 		milesInput.addItem("25", 25);
 		milesInput.addItem("50", 50);
-		milesInput.setValue(25);
+		milesInput.setValue(Constants.defaultSearchRadius);
 		milesInput.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {

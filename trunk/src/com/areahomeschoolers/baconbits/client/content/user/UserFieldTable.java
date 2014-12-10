@@ -148,7 +148,7 @@ public class UserFieldTable extends FieldTable {
 		final RequiredListBox sexInput = new RequiredListBox();
 		sexInput.addItem("Female", "f");
 		sexInput.addItem("Male", "m");
-		FormField sexField = f.createFormField("Sex:", sexInput, sexDisplay);
+		FormField sexField = f.createFormField("Gender:", sexInput, sexDisplay);
 		sexField.setInitializer(new Command() {
 			@Override
 			public void execute() {

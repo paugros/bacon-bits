@@ -273,7 +273,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		String distanceCols = "";
 
 		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
-			distanceCols = ServerUtils.getDistanceSql("b", withinMiles, withinLat, withinLng);
+			distanceCols = ServerUtils.getDistanceSql("u", withinMiles, withinLat, withinLng);
 		}
 
 		String sql = createSqlBase(distanceCols);

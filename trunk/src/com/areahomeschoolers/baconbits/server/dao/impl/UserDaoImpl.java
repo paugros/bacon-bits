@@ -469,6 +469,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		sql += "limit " + Integer.toString(limit + 1);
 
 		String search = "%" + token + "%";
+
 		data.setSuggestions(query(sql, ServerUtils.getSuggestionMapper(), search, search));
 
 		return data;
@@ -560,7 +561,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 		// start directory logic //
 		if (onlyParents) {
-			sql += "and u.birthDate < date_add(now(), interval -18 year) ";
+			sql += "and u.birthDate < date_add(now(), interval -18 year) and u.passwordDigest is not null ";
 			if (ages.size() > 1) {
 				sql += "and (select count(id) from users where parentId = u.id ";
 				sql += "and (datediff(now(), birthDate) / 365.25) between " + minAge + " and " + maxAge + ") > 0 ";
