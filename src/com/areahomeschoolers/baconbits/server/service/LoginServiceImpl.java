@@ -192,8 +192,14 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 			String status = ServerUtils.getStringFromJsonObject(locationData, "status");
 			if (status != null && status.equals("success")) {
 				location = ServerUtils.getStringFromJsonObject(locationData, "zip");
-				ServerContext.setCurrentLat(Double.parseDouble(ServerUtils.getStringFromJsonObject(locationData, "lat")));
-				ServerContext.setCurrentLng(Double.parseDouble(ServerUtils.getStringFromJsonObject(locationData, "lng")));
+				String lat = ServerUtils.getStringFromJsonObject(locationData, "lat");
+				String lng = ServerUtils.getStringFromJsonObject(locationData, "lon");
+				if (lat != null) {
+					ServerContext.setCurrentLat(Double.parseDouble(lat));
+				}
+				if (lng != null) {
+					ServerContext.setCurrentLng(Double.parseDouble(lng));
+				}
 			}
 		} catch (IOException e) {
 			Logger logger = Logger.getLogger(this.getClass().toString());
