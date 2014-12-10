@@ -39,7 +39,6 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		public Resource mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Resource resource = new Resource();
 			resource.setId(rs.getInt("id"));
-			resource.setUrlDisplay(rs.getString("urlDisplay"));
 			resource.setAddedById(rs.getInt("addedById"));
 			resource.setStartDate(rs.getTimestamp("startDate"));
 			resource.setEndDate(rs.getTimestamp("endDate"));
@@ -206,7 +205,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		if (r.isSaved()) {
 			String sql = "update resources set name = :name, startDate = :startDate, endDate = :endDate, url = :url, description = :description, showInAds = :showInAds, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone, email = :email, ";
-			sql += "urlDisplay = :urlDisplay, addressScopeId = :addressScopeId, directoryPriority = :directoryPriority, adDescription = :adDescription ";
+			sql += "addressScopeId = :addressScopeId, directoryPriority = :directoryPriority, adDescription = :adDescription ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -216,9 +215,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			r.setAddedById(ServerContext.getCurrentUserId());
 
 			String sql = "insert into resources (addedById, startDate, endDate, addedDate, name, url, description, adDescription, ";
-			sql += "address, street, city, state, zip, lat, lng, phone, showInAds, email, urlDisplay, addressScopeId, directoryPriority) ";
+			sql += "address, street, city, state, zip, lat, lng, phone, showInAds, email, addressScopeId, directoryPriority) ";
 			sql += "values(:addedById, :startDate, :endDate, now(), :name, :url, :description, :adDescription, ";
-			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds, :email, :urlDisplay, :addressScopeId, :directoryPriority)";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds, :email, :addressScopeId, :directoryPriority)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

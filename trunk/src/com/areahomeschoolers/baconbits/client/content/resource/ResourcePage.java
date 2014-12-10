@@ -150,26 +150,6 @@ public class ResourcePage implements Page {
 		}
 
 		if (Application.isSystemAdministrator()) {
-			final Label urlTextDisplay = new Label();
-			final TextBox urlTextInput = new TextBox();
-			urlTextInput.setVisibleLength(30);
-			urlTextInput.setMaxLength(100);
-			FormField urlTextField = form.createFormField("Link display text:", urlTextInput, urlTextDisplay);
-			urlTextField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					urlTextDisplay.setText(Common.getDefaultIfNull(resource.getUrlDisplay()));
-					urlTextInput.setText(resource.getUrlDisplay());
-				}
-			});
-			urlTextField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					resource.setUrlDisplay(urlTextInput.getText());
-				}
-			});
-			ft.addField(urlTextField);
-
 			final Label adDisplay = new Label();
 			final DefaultListBox adInput = new DefaultListBox();
 			adInput.addItem("Yes");
