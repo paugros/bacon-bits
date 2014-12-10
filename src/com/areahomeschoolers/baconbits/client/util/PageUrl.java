@@ -20,7 +20,7 @@ public class PageUrl {
 	}
 
 	public static String blog(int id) {
-		String url = "page=News";
+		String url = "page=Blog";
 		return (id == 0) ? url : url + "&postId=" + id;
 	}
 

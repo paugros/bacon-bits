@@ -346,7 +346,7 @@ public final class Application implements ValueChangeHandler<String> {
 			new RegistrationManagementPage(vp);
 		} else if ("ArticleList".equals(page)) {
 			new ArticleListPage(vp);
-		} else if ("News".equals(page)) {
+		} else if ("Blog".equals(page)) {
 			new BlogPage(vp);
 		} else if ("ResourceManagement".equals(page)) {
 			new ResourceManagementPage(vp);
