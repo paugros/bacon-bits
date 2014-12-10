@@ -18,7 +18,6 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 	private String description;
 	private String phone;
 	private String email;
-	private String urlDisplay;
 	private String name;
 	private int addressScopeId;
 	private String adDescription;
@@ -174,10 +173,6 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		return url;
 	}
 
-	public String getUrlDisplay() {
-		return urlDisplay;
-	}
-
 	@Override
 	public String getZip() {
 		return zip;
@@ -300,10 +295,6 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	public void setUrlDisplay(String urlDisplay) {
-		this.urlDisplay = urlDisplay;
 	}
 
 	@Override
