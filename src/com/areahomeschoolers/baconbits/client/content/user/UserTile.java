@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.HistoryToken;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
@@ -37,7 +38,10 @@ public class UserTile extends Composite {
 		hp.addStyleName("itemTile");
 		hp.getElement().getStyle().setBackgroundColor(TagMappingType.USER.getColor());
 
-		Image i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
+		Image i = new Image(item.getSex().equals("m") ? MainImageBundle.INSTANCE.blankProfileMaleSmall() : MainImageBundle.INSTANCE.blankProfileFemaleSmall());
+		if (item.getSmallImageId() != null) {
+			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
+		}
 		i.getElement().getStyle().setBorderColor("#c7c7c7");
 		i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 		i.getElement().getStyle().setBorderWidth(1, Unit.PX);
