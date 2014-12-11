@@ -126,6 +126,7 @@ public class GeocoderTextBox extends Composite {
 	public void setText(String text) {
 		setNormalStyle();
 		input.setText(text);
+		lastLocationText = text;
 	}
 
 	private void reset() {
