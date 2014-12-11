@@ -10,7 +10,6 @@ import com.areahomeschoolers.baconbits.shared.HasAddress;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.maps.gwt.client.Geocoder;
@@ -37,9 +36,7 @@ public class AddressField {
 			@Override
 			public void execute() {
 				String address = item.getAddress();
-				if (!Common.isNullOrBlank(item.getStreet()) || !Common.isNullOrBlank(item.getZip())) {
-					address = item.getStreet() + " " + item.getZip();
-				} else {
+				if (Common.isNullOrBlank(address)) {
 					item.setAddress("");
 					item.setCity(null);
 					item.setLat(0);
@@ -104,52 +101,33 @@ public class AddressField {
 	public AddressField(final HasAddress address) {
 		final FieldDisplayLink addressDisplay = new FieldDisplayLink();
 		addressDisplay.setTarget("_blank");
-		PaddedPanel addressInput = new PaddedPanel();
-		vp.add(addressInput);
 		// street input
-		final TextBox street = new TextBox();
-		street.setMaxLength(100);
-		Label streetLabel = new Label("Number and street");
-		streetLabel.addStyleName("smallText");
-		VerticalPanel streetPanel = new VerticalPanel();
-		streetPanel.add(streetLabel);
-		streetPanel.add(street);
+		final TextBox addressInput = new TextBox();
+		addressInput.setVisibleLength(50);
+		addressInput.setMaxLength(200);
 
-		// zip input
-		final NumericTextBox zip = new NumericTextBox();
-		zip.setMaxLength(5);
-		zip.setVisibleLength(5);
-		Label zipLabel = new Label("Zip");
-		zipLabel.addStyleName("smallText");
-		VerticalPanel zipPanel = new VerticalPanel();
-		zipPanel.add(zipLabel);
-		zipPanel.add(zip);
+		vp.add(addressInput);
 
-		addressInput.add(streetPanel);
-		addressInput.add(zipPanel);
-
-		addressField = new FormField("Address:", vp, addressDisplay);
+		addressField = new FormField("Address:", addressInput, addressDisplay);
 		addressField.setInitializer(new Command() {
 			@Override
 			public void execute() {
 				addressDisplay.setText(Common.getDefaultIfNull(address.getAddress()));
 				addressDisplay.setHref("http://maps.google.com/maps?q=" + address.getAddress());
-				street.setText(address.getStreet());
-				zip.setText(address.getZip());
+				addressInput.setText(address.getAddress());
 			}
 		});
 		addressField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				address.setStreet(street.getText());
-				address.setZip(zip.getText());
+				address.setAddress(addressInput.getText());
 				address.setAddressChanged(true);
 			}
 		});
-		addressField.setValidator(new Validator(street, new ValidatorCommand() {
+		addressField.setValidator(new Validator(addressInput, new ValidatorCommand() {
 			@Override
 			public void validate(Validator validator) {
-				validator.setError(addressField.isRequired() && street.getText().isEmpty() && zip.getText().isEmpty());
+				validator.setError(addressField.isRequired() && addressInput.getText().isEmpty());
 			}
 		}));
 	}
