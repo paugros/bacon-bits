@@ -60,6 +60,9 @@ public class UserTile extends Composite {
 			text += item.getCommonInterestCount() + " common interests<br>";
 		}
 
+		UserStatusIndicator indicator = new UserStatusIndicator(item.getId());
+		text += indicator.toString();
+
 		HTML h = new HTML(text);
 		h.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 		h.getElement().getStyle().setOverflow(Overflow.HIDDEN);

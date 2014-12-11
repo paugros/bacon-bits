@@ -149,6 +149,47 @@ public class ResourcePage implements Page {
 			ft.addField(tagField);
 		}
 
+		FormField addressField = new AddressField(resource).getFormField();
+		form.addField(addressField);
+		ft.addField(addressField);
+
+		final Label emailDisplay = new Label();
+		final EmailTextBox emailInput = new EmailTextBox();
+		emailInput.setMaxLength(100);
+		FormField emailField = form.createFormField("Email:", emailInput, emailDisplay);
+		emailField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				emailDisplay.setText(Common.getDefaultIfNull(resource.getEmail()));
+				emailInput.setText(resource.getEmail());
+			}
+		});
+		emailField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setEmail(emailInput.getText());
+			}
+		});
+		ft.addField(emailField);
+
+		final Label phoneDisplay = new Label();
+		final PhoneTextBox phoneInput = new PhoneTextBox();
+		FormField phoneField = form.createFormField("Phone:", phoneInput, phoneDisplay);
+		phoneField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				phoneDisplay.setText(Common.getDefaultIfNull(resource.getPhone()));
+				phoneInput.setText(resource.getPhone());
+			}
+		});
+		phoneField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setPhone(phoneInput.getText());
+			}
+		});
+		ft.addField(phoneField);
+
 		if (Application.isSystemAdministrator()) {
 			final Label adDisplay = new Label();
 			final DefaultListBox adInput = new DefaultListBox();
@@ -264,47 +305,6 @@ public class ResourcePage implements Page {
 			});
 			ft.addField(endDateField);
 		}
-
-		final Label emailDisplay = new Label();
-		final EmailTextBox emailInput = new EmailTextBox();
-		emailInput.setMaxLength(100);
-		FormField emailField = form.createFormField("Email:", emailInput, emailDisplay);
-		emailField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				emailDisplay.setText(Common.getDefaultIfNull(resource.getEmail()));
-				emailInput.setText(resource.getEmail());
-			}
-		});
-		emailField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				resource.setEmail(emailInput.getText());
-			}
-		});
-		ft.addField(emailField);
-
-		final Label phoneDisplay = new Label();
-		final PhoneTextBox phoneInput = new PhoneTextBox();
-		FormField phoneField = form.createFormField("Phone:", phoneInput, phoneDisplay);
-		phoneField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				phoneDisplay.setText(Common.getDefaultIfNull(resource.getPhone()));
-				phoneInput.setText(resource.getPhone());
-			}
-		});
-		phoneField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				resource.setPhone(phoneInput.getText());
-			}
-		});
-		ft.addField(phoneField);
-
-		FormField addressField = new AddressField(resource).getFormField();
-		form.addField(addressField);
-		ft.addField(addressField);
 
 		// if (Application.isSystemAdministrator()) {
 		// final Label scopeDisplay = new Label();

@@ -17,6 +17,7 @@
   
   <extend-property name="locale" values="en_US"/>
   <set-property name="locale" value="en_US"/>
+  <add-linker name="xsiframe"/>
   
   <extend-configuration-property name="rpc.blacklist"	value="com.google.gwt.user.client.ui.ChangeListenerCollection" />
   <extend-configuration-property name="rpc.blacklist"	value="com.google.gwt.user.client.ui.ClickListenerCollection" />
@@ -25,8 +26,7 @@
 
   <stylesheet src="BaconBits.css" />
   <stylesheet src="gwt-cal-google.css" />
-  <script src="jquery-1.3.2.js" />
-  <script src="jquery.barcode.0.3.js" />
+
   <!-- Specify the app entry point class.                         -->
   <entry-point class="com.areahomeschoolers.baconbits.client.BaconBitsEntryPoint"></entry-point>
 
