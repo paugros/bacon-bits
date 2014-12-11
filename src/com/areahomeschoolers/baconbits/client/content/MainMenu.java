@@ -146,14 +146,17 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getAdminMenu() {
 		MenuBar menu = new MenuBar(true);
 
+		addLinkToMenu(menu, "Add Resource", PageUrl.resource(0));
+		addLinkToMenu(menu, "Add Event", PageUrl.event(0));
 		addLinkToMenu(menu, "Add Article", PageUrl.article(0));
-		addLinkToMenu(menu, "List Articles", PageUrl.articleManagement());
 		addLinkToMenu(menu, "Add User", PageUrl.user(0));
-		addLinkToMenu(menu, "List Groups", PageUrl.userGroupList());
+		addLinkToMenu(menu, "Article Management", PageUrl.articleManagement());
+		addLinkToMenu(menu, "Group Management", PageUrl.userGroupList());
 
 		if (Application.isSystemAdministrator()) {
-			addLinkToMenu(menu, "Resource Management", PageUrl.resourceManagement());
 			addLinkToMenu(menu, "Tag Management", PageUrl.tagManagement());
+			addLinkToMenu(menu, "Resource Management", PageUrl.resourceManagement());
+			menu.addSeparator();
 			menu.addItem("Change Logo", new ScheduledCommand() {
 				@Override
 				public void execute() {
