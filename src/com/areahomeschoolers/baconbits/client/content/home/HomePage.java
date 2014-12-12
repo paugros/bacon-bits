@@ -31,44 +31,13 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class HomePage implements Page {
-
-	// private class HomeContentPanel extends Composite {
-	// private HorizontalPanel hp = new HorizontalPanel();
-	// private VerticalPanel lp = new VerticalPanel();
-	// private VerticalPanel rp = new VerticalPanel();
-	//
-	// public HomeContentPanel() {
-	// hp.add(lp);
-	// hp.add(rp);
-	// initWidget(hp);
-	// }
-	//
-	// public void add(Widget w) {
-	// Style style = w.getElement().getStyle();
-	//
-	// if (lp.getOffsetHeight() > rp.getOffsetHeight()) {
-	// rp.add(w);
-	// } else {
-	// lp.add(w);
-	// style.setMarginRight(10, Unit.PX);
-	// }
-	//
-	// style.setMarginBottom(10, Unit.PX);
-	// style.setWidth(250, Unit.PX);
-	// }
-	// }
-
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
 	private VerticalPanel page = new VerticalPanel();
-	private Grid grid = new Grid(1, 3);
-	// private VerticalPanel leftPanel = new PaddedVerticalPanel();
 	private VerticalPanel centerPanel = new VerticalPanel();
-	// private VerticalPanel rightPanel = new PaddedVerticalPanel();
 	private HomePageData pageData;
 
 	public HomePage(VerticalPanel p) {
@@ -97,10 +66,6 @@ public class HomePage implements Page {
 			});
 		}
 
-		// if (Url.getBooleanParameter("bookSaleSignup") && !signedUpForBooks()) {
-		// new SellBooksMiniModule().showDialog();
-		// }
-
 		if (Url.getIntegerParameter("aagrp") > 0 && Application.isAuthenticated() && !Application.memberOf(Url.getIntegerParameter("aagrp"))) {
 			final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 			userService.listGroups(new ArgMap<UserGroupArg>(UserGroupArg.ID, Url.getIntegerParameter("aagrp")), new Callback<ArrayList<UserGroup>>(false) {
@@ -124,67 +89,13 @@ public class HomePage implements Page {
 		}
 
 		centerPanel.setSpacing(10);
-		// grid.setWidget(0, 0, leftPanel);
-		grid.setWidget(0, 0, centerPanel);
-		// grid.setWidget(0, 1, rightPanel);
-		// grid.getCellFormatter().setWidth(0, 0, "250px");
-		// grid.getCellFormatter().setWidth(0, 2, "250px");
-		grid.getCellFormatter().setVerticalAlignment(0, 0, HasVerticalAlignment.ALIGN_TOP);
-		// grid.getCellFormatter().setVerticalAlignment(0, 1, HasVerticalAlignment.ALIGN_TOP);
-		// grid.getCellFormatter().setVerticalAlignment(0, 2, HasVerticalAlignment.ALIGN_TOP);
-		page.add(grid);
+		centerPanel.setWidth("100%");
+		page.add(centerPanel);
 
 		eventService.getHomePageData(new Callback<HomePageData>() {
 			@Override
 			protected void doOnSuccess(HomePageData result) {
 				pageData = result;
-
-				// citrus link
-				// leftPanel.add(new CitrusMiniModule());
-
-				// book promo
-				// if (!Application.isAuthenticated() || !signedUpForBooks()) {
-				// leftPanel.add(new SellBooksMiniModule());
-				// }
-
-				// community
-				// leftPanel.add(new CommunityEventsMiniModule(pageData.getCommunityEvents()));
-
-				// partner logos/links
-				// HTML logos = new HTML(pageData.getPartners().getArticle());
-				// leftPanel.add(logos);
-				// leftPanel.setCellHorizontalAlignment(logos, HasHorizontalAlignment.ALIGN_CENTER);
-
-				// ad
-				// rightPanel.add(new AdsMiniModule());
-
-				// links
-				// rightPanel.add(new LinksMiniModule());
-
-				// upcoming
-				// rightPanel.add(new UpcomingEventsMiniModule(pageData.getUpcomingEvents()));
-
-				// new users
-				// if (Application.isAuthenticated()) {
-				// rightPanel.add(new NewUsersMiniModule());
-				// }
-
-				// new books
-				// rightPanel.add(new NewBooksMiniModule());
-
-				// active users
-				// if (Application.isAuthenticated()) {
-				// rightPanel.add(new ActiveUsersMiniModule());
-				// }
-
-				// my events
-				// if (Application.isAuthenticated()) {
-				// if (!Common.isNullOrEmpty(pageData.getMyUpcomingEvents())) {
-				// rightPanel.add(new MyEventsMiniModule(pageData.getMyUpcomingEvents()));
-				// }
-				// }
-
-				// UserGroup org = Application.getCurrentOrg();
 
 				Grid g = new Grid(3, 3);
 				g.setCellSpacing(10);
@@ -220,101 +131,13 @@ public class HomePage implements Page {
 				g.setWidget(2, 2, new AdTile(pageData.getAds().get(2)));
 
 				centerPanel.add(g);
-
-				// if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(org.getId()) == null) {
-				// centerPanel.add(new RequestMembershipLink(org));
-				// }
-
-				// introduction
-				// centerPanel.add(new ArticleWidget(pageData.getIntro()));
-
-				// raffle
-				// centerPanel.add(createRaffleWidget());
-
-				// news
-				// centerPanel.add(new NewsModule());
-
-				// our groups
-				// if (Application.isCitrus()) {
-				// centerPanel.add(createGroupsTable());
-				// }
+				// centerPanel.setCellHorizontalAlignment(g, HasHorizontalAlignment.ALIGN_CENTER);
 
 				Application.getLayout().setPage("Home", page);
 			}
 		});
 
 	}
-
-	// private Widget createGroupsTable() {
-	// GenericCellTable groupsTable = new GenericCellTable() {
-	// @Override
-	// protected void fetchData() {
-	//
-	// }
-	//
-	// @Override
-	// protected void setColumns() {
-	// addCompositeWidgetColumn("Group Name", new WidgetCellCreator<Data>() {
-	// @Override
-	// protected Widget createWidget(Data item) {
-	// String url = "http://www." + item.get("orgDomain");
-	// if (Constants.CG_DOMAIN.equals(item.get("orgDomain")) || "myhomeschoolgroups.com".equals(item.get("orgDomain"))) {
-	// url = "http://" + item.get("orgSubDomain") + "." + item.get("orgDomain");
-	// }
-	// Anchor link = new Anchor(item.get("groupName"), url);
-	// return link;
-	// }
-	// });
-	//
-	// addTextColumn("Description", new ValueGetter<String, Data>() {
-	// @Override
-	// public String get(Data item) {
-	// return item.get("description");
-	// }
-	// });
-	//
-	// addNumberColumn("Members", new ValueGetter<Number, Data>() {
-	// @Override
-	// public Number get(Data item) {
-	// return item.getInt("memberCount");
-	// }
-	// }).setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
-	// }
-	// };
-	//
-	// groupsTable.populate(pageData.getGroups());
-	// groupsTable.disablePaging();
-	// groupsTable.setTitle("Our Groups");
-	//
-	// return WidgetFactory.newSection(groupsTable, ContentWidth.MAXWIDTH750PX);
-	// }
-
-	// private Widget createRaffleWidget() {
-	// // rafflecopter
-	// String html =
-	// "<div id=raffle><a class=\"rafl\" href=\"http://www.rafflecopter.com/rafl/display/797bf8a71/\" id=\"rc-797bf8a71\" rel=\"nofollow\">a Rafflecopter giveaway</a></div>";
-	//
-	// HTML raffle = new HTML(html);
-	// raffle.addAttachHandler(new Handler() {
-	// @Override
-	// public void onAttachOrDetach(AttachEvent event) {
-	// if (event.isAttached()) {
-	// Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-	// @Override
-	// public void execute() {
-	// Element head = Document.get().getElementById("raffle");
-	// ScriptElement sce = Document.get().createScriptElement();
-	// sce.setType("text/javascript");
-	// sce.setSrc("//widget.rafflecopter.com/load.js");
-	// head.appendChild(sce);
-	// }
-	// });
-	// }
-	// }
-	// });
-	//
-	// return raffle;
-	// }
 
 	private boolean signedUpForBooks() {
 		if (!Application.isAuthenticated()) {

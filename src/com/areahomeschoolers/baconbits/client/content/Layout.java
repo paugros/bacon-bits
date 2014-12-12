@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
+import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -56,7 +57,6 @@ import com.google.gwt.user.client.ui.Widget;
  * Accessor class (available through Application) to major page layout components.
  */
 public final class Layout {
-
 	class MainLayoutDock extends DockLayoutPanel {
 		public MainLayoutDock(Unit unit) {
 			super(unit);
@@ -73,17 +73,15 @@ public final class Layout {
 		}
 	}
 
-	private static final int HEADER_HEIGHT = 53;
-	// private static final int HEADER_HEIGHT = 172;
+	private static final int HEADER_HEIGHT = 54;
 	private static final int MENU_HEIGHT = 35;
-	private static final int LOGO_DIV_WIDTH = 115;
+	private static final int LOGO_DIV_WIDTH = 191;
 	private final MainLayoutDock dock = new MainLayoutDock(Unit.PX);
 	private final SearchBox searchBox;
 	private final SimplePanel mobileBodyPanel = new SimplePanel();
 	private final MainMenu menu;
 	private final ScrollPanel bodyPanel = new ScrollPanel();
 	private final AbsolutePanel ap = new AbsolutePanel();
-	// private final User currentUser = Application.getCurrentUser();
 	private boolean headerIsVisible = true;
 	// Holds a reference to the latest panel queued to be displayed on the page when setPage is called
 	private VerticalPanel currentPagePanel;
@@ -127,24 +125,7 @@ public final class Layout {
 		headerPanel.add(spacer);
 		headerPanel.setCellWidth(spacer, "100%");
 
-		// VerticalPanel svp = new VerticalPanel();
-
 		searchBox = new SearchBox();
-		// svp.add(searchBox);
-		//
-		// HorizontalPanel lp = new PaddedPanel();
-		// lp.getElement().getStyle().setMarginLeft(5, Unit.PX);
-		// Label zip = new Label("Your location: " + Application.getCurrentLocation());
-		// lp.add(zip);
-		// ClickLabel chl = new ClickLabel("[edit]", new ClickHandler() {
-		// @Override
-		// public void onClick(ClickEvent event) {
-		//
-		// }
-		// });
-		// lp.add(chl);
-		//
-		// svp.add(lp);
 
 		headerPanel.add(searchBox);
 
@@ -291,7 +272,6 @@ public final class Layout {
 		hp.setCellWidth(logoDiv, LOGO_DIV_WIDTH + "px");
 		hp.setHeight(HEADER_HEIGHT + MENU_HEIGHT + "px");
 		hp.addStyleName("headerPanel");
-		// hp.getElement().getStyle().setBackgroundImage("url(images/headerBackground.png)");
 
 		VerticalPanel vp = new VerticalPanel();
 		vp.setWidth("100%");
@@ -308,7 +288,7 @@ public final class Layout {
 			RootPanel.get().add(vvp);
 		} else {
 			dock.addStyleName("Dock");
-			dock.addNorth(hp, HEADER_HEIGHT + MENU_HEIGHT);
+			dock.addNorth(hp, HEADER_HEIGHT + MENU_HEIGHT + 1);
 			dock.add(bodyPanel);
 			RootLayoutPanel.get().add(dock);
 		}
@@ -361,15 +341,19 @@ public final class Layout {
 	}
 
 	public void setLogo(Integer documentId) {
-		Image logo;
+		String text = "";
 
-		if (documentId == null) {
-			logo = new Image(MainImageBundle.INSTANCE.logo());
+		if (Application.isCitrus() || documentId == null) {
+			CitrusMiniModule cm = new CitrusMiniModule();
+			cm.getElement().getStyle().setMarginLeft(20, Unit.PX);
+			text += cm;
 		} else {
-			logo = new Image(Constants.DOCUMENT_URL_PREFIX + documentId);
+			text += "<a href=\"" + PageUrl.home() + "\">";
+			text += new Image(Constants.DOCUMENT_URL_PREFIX + documentId);
+			text += "</a>";
 		}
 
-		logoDiv.setHTML("<a href=\"#" + PageUrl.home() + "\">" + logo + "</a>");
+		logoDiv.setHTML(text);
 	}
 
 	public void setPage(String title, Sidebar sidebar, VerticalPanel page) {

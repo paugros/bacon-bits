@@ -66,7 +66,8 @@ public final class MainMenu extends MenuBar {
 	public MainMenu() {
 		// prevents auto-selection bug
 		setFocusOnHoverEnabled(false);
-		addStyleName("MainMenu");
+		setAutoOpen(true);
+		setAnimationEnabled(true);
 		addCloseHandler(new CloseHandler<PopupPanel>() {
 			@Override
 			public void onClose(CloseEvent<PopupPanel> event) {
@@ -110,12 +111,18 @@ public final class MainMenu extends MenuBar {
 		return super.addItem(text, popup);
 	}
 
+	private void addCommandToMenu(MenuBar menu, String text, ScheduledCommand command) {
+		MenuItem mi = menu.addItem(text, command);
+		mi.addStyleName("menuCommandItem");
+	}
+
 	private void addDynamicItems(final List<MainMenuItem> items, MenuBar parentMenu, final MainMenuItem parentItem, int depth) {
 		for (MainMenuItem item : items) {
 			if (item.isSubMenu()) {
 				final MenuBar menu = new MenuBar(true);
 				addDynamicItems(item.getItems(), menu, item, depth + 1);
-				parentMenu.addItem(item.getName(), menu);
+				MenuItem mi = parentMenu.addItem(item.getName(), menu);
+				mi.addStyleName("menuCommandItem");
 			} else {
 				String url = "";
 				if (item.getArticleIds() != null) {
@@ -143,6 +150,11 @@ public final class MainMenu extends MenuBar {
 		}
 	}
 
+	private void addMenuToMenu(MenuBar menu, String text, MenuBar subMenu) {
+		MenuItem mi = menu.addItem(text, subMenu);
+		mi.addStyleName("menuCommandItem");
+	}
+
 	private MenuBar getAdminMenu() {
 		MenuBar menu = new MenuBar(true);
 
@@ -157,7 +169,7 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "Tag Management", PageUrl.tagManagement());
 			addLinkToMenu(menu, "Resource Management", PageUrl.resourceManagement());
 			menu.addSeparator();
-			menu.addItem("Change Logo", new ScheduledCommand() {
+			addCommandToMenu(menu, "Change Logo", new ScheduledCommand() {
 				@Override
 				public void execute() {
 					final FileUploadDialog dialog = new FileUploadDialog(DocumentLinkType.LOGO, Application.getCurrentOrgId(), false,
@@ -189,7 +201,7 @@ public final class MainMenu extends MenuBar {
 			});
 		}
 
-		menu.addItem("Edit Main Menu", new ScheduledCommand() {
+		addCommandToMenu(menu, "Edit Main Menu", new ScheduledCommand() {
 			@Override
 			public void execute() {
 				MainMenuEditDialog dialog = new MainMenuEditDialog(Application.getApplicationData().getDynamicMenuItems(), null);
@@ -206,11 +218,12 @@ public final class MainMenu extends MenuBar {
 			}
 			addLinkToMenu(pol, gp.getTitle(), url);
 		}
-		menu.addItem("Group Policies", pol);
+
+		addMenuToMenu(menu, "Group Policies", pol);
 
 		menu.addSeparator();
 
-		menu.addItem("Reload Page", new ScheduledCommand() {
+		addCommandToMenu(menu, "Reload Page", new ScheduledCommand() {
 			@Override
 			public void execute() {
 				Application.reloadPage();
@@ -299,7 +312,7 @@ public final class MainMenu extends MenuBar {
 
 		menu.addSeparator();
 
-		menu.addItem("Change Password", new ScheduledCommand() {
+		addCommandToMenu(menu, "Change Password", new ScheduledCommand() {
 			@Override
 			public void execute() {
 				GWT.runAsync(new RunAsyncCallback() {
@@ -315,7 +328,7 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
-		menu.addItem("Log Out", new ScheduledCommand() {
+		addCommandToMenu(menu, "Log Out", new ScheduledCommand() {
 			@Override
 			public void execute() {
 				LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
