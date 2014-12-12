@@ -383,25 +383,13 @@ img {
 }
 
 .headerPanel {
-	background-image: url(images/headerBackground.jpg);
-	color: #000000;
-}
-
-.headerPanel {
-	background: rgb(104,157,255); /* Old browsers */
-	background: -moz-linear-gradient(top,  rgba(104,157,255,1) 0%, rgba(44,83,158,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(104,157,255,1)), color-stop(100%,rgba(44,83,158,1))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  rgba(104,157,255,1) 0%,rgba(44,83,158,1) 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  rgba(104,157,255,1) 0%,rgba(44,83,158,1) 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  rgba(104,157,255,1) 0%,rgba(44,83,158,1) 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  rgba(104,157,255,1) 0%,rgba(44,83,158,1) 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#689dff', endColorstr='#2c539e',GradientType=0 ); /* IE6-9 */
-	
-	color: #ffffff;
+	background-color: #f9f9f9;
+	color: #555555;
+	border-bottom: 1px solid #b4b4b4;
 }
 
 .headerPanel .ClickLabel, .headerPanel a {
-	color: #ffffff;
+	color: #555555;
 }
 
 .bodyPanel {
@@ -768,26 +756,57 @@ img {
 }
 
 .gwt-MenuBar-horizontal .gwt-MenuItem {
-	-webkit-border-radius: 6px;
-	-moz-border-radius: 6px;
-	border-radius: 6px;
-	padding: 5px 15px 5px 15px;
+	font-size: 14px;
+	font-weight: bold;
+	font-family: arial, sans-serif;
+	color: #555555;
+	padding: 4px 25px 4px 25px;
 	vertical-align: bottom;
-	font-weight: normal;
-	color: white;
+	white-space: nowrap;
 	cursor: pointer;
 }
 
-.gwt-MenuBar-vertical .gwt-MenuItem, .menuLink, .menuLink:visited, .menuLink:hover {
-	padding: 5px 40px 5px 15px;
-	color: black;
+.gwt-MenuBar-vertical .gwt-MenuItem, .menuLink, .menuLink:visited {
+	color: #555555;
+	padding: 4px 40px 4px 15px;
+	white-space: nowrap;
 	cursor: pointer;
 	display: block;
 	text-decoration: none;
 }
 
+.menuLink:hover {
+	padding: 4px 40px 4px 15px;
+	cursor: pointer;
+	display: block;
+	color: #4aaa48;
+	text-decoration: underline;
+}
+
+.menuCommandItem {
+	
+}
+
+.menuCommandItem:hover {
+	font-style: underline;
+	text-decoration: underline;
+}
+
 .gwt-MenuBar-horizontal .gwt-MenuItem-selected {
-	color: black;
+	color: #4aaa48;
+	background-color: transparent;
+	font-style: normal;
+}
+
+.gwt-MenuBar .gwt-MenuItem-selected {
+  	color: #4aaa48;
+ 	background: transparent;
+/* 	text-decoration: underline; */
+/* 	font-style: underline; */
+}
+
+.gwt-MenuBar-vertical .subMenuIcon-selected {
+  	background: transparent;
 }
 
 .gwt-TextBoxError {
