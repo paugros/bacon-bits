@@ -29,6 +29,8 @@ import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.event.logical.shared.CloseEvent;
@@ -68,6 +70,7 @@ public final class MainMenu extends MenuBar {
 		setFocusOnHoverEnabled(false);
 		setAutoOpen(true);
 		setAnimationEnabled(true);
+
 		addCloseHandler(new CloseHandler<PopupPanel>() {
 			@Override
 			public void onClose(CloseEvent<PopupPanel> event) {
@@ -80,9 +83,9 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
-		addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this, null, 0);
+		// addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this, null, 0);
 
-		addItem("News", getBlogMenu());
+		addItem("News", getNewsMenu());
 		addItem("Events", getEventsMenu());
 		addItem("Book Store", getBooksMenu());
 
@@ -90,9 +93,9 @@ public final class MainMenu extends MenuBar {
 			addItem("Members", getMembersMenu());
 		}
 
-		if (Application.isAuthenticated()) {
-			addItem("My Items", getMyItemsMenu());
-		}
+		// if (Application.isAuthenticated()) {
+		// addItem("My Items", getMyItemsMenu());
+		// }
 
 		if (Application.administratorOfCurrentOrg()) {
 			addItem("Admin", getAdminMenu());
@@ -102,6 +105,13 @@ public final class MainMenu extends MenuBar {
 
 	@Override
 	public MenuItem addItem(String text, final MenuBar popup) {
+		popup.addDomHandler(new MouseOutHandler() {
+			@Override
+			public void onMouseOut(MouseOutEvent event) {
+				closeAllChildren(false);
+			}
+		}, MouseOutEvent.getType());
+
 		popup.addAttachHandler(new Handler() {
 			@Override
 			public void onAttachOrDetach(AttachEvent event) {
@@ -233,19 +243,6 @@ public final class MainMenu extends MenuBar {
 		return menu;
 	}
 
-	private MenuBar getBlogMenu() {
-		MenuBar menu = new MenuBar(true);
-
-		addLinkToMenu(menu, "News Blog", PageUrl.blog(0));
-		addLinkToMenu(menu, "Events Calendar", PageUrl.eventCalendar());
-
-		if (Application.hasRole(AccessLevel.BLOG_CONTRIBUTORS)) {
-			menu.addSeparator();
-			addLinkToMenu(menu, "Add Blog Post", PageUrl.blog(0) + "&postId=0");
-		}
-		return menu;
-	}
-
 	private MenuBar getBooksMenu() {
 		MenuBar menu = new MenuBar(true);
 		addLinkToMenu(menu, "Search Books", PageUrl.tagGroup(TagMappingType.BOOK.toString()));
@@ -341,6 +338,19 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
+		return menu;
+	}
+
+	private MenuBar getNewsMenu() {
+		MenuBar menu = new MenuBar(true);
+
+		addLinkToMenu(menu, "News Blog", PageUrl.blog(0));
+		addLinkToMenu(menu, "Events Calendar", PageUrl.eventCalendar());
+
+		if (Application.hasRole(AccessLevel.BLOG_CONTRIBUTORS)) {
+			menu.addSeparator();
+			addLinkToMenu(menu, "Add Blog Post", PageUrl.blog(0) + "&postId=0");
+		}
 		return menu;
 	}
 

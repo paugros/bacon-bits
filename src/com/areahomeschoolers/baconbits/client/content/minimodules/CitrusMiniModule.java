@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.minimodules;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Constants;
 
@@ -12,7 +13,7 @@ import com.google.gwt.user.client.ui.Image;
 
 public class CitrusMiniModule extends Composite {
 	public CitrusMiniModule() {
-		String url = Application.isCitrus() ? PageUrl.home() : Constants.CG_URL;
+		String url = Application.isCitrus() ? Url.getBaseUrl() + "#" + PageUrl.home() : Constants.CG_URL;
 		Image image = new Image(MainImageBundle.INSTANCE.littleLogo());
 		String logo = "<a href=\"" + url + "\">" + image + "</a>";
 		String text = "<a href=\"" + url + "\" style=\"color: #f06000; font-size: 14px; font-weight: bold;\">";
