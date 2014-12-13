@@ -1,6 +1,10 @@
 package com.areahomeschoolers.baconbits.client.content;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
@@ -25,6 +29,7 @@ import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.StatusPanel;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 
@@ -377,20 +382,40 @@ public final class Layout {
 
 	private void addPageToBodyPanel(String title, Widget page) {
 		String yr = Formatter.formatDate(new Date(), "yyyy");
-		HTML footer = new HTML("Copyright &copy; 2013-" + yr + " Citrus Groups. All rights reserved.");
-		footer.setStylePrimaryName("footer");
+		HTML copyright = new HTML("Copyright &copy; 2013-" + yr + " Citrus Groups. All rights reserved.");
+		copyright.setStylePrimaryName("footer");
 
-		String txt = "<a href=\"" + Constants.TOS_URL + "&noTitle=true\">Terms of service</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
-		txt += "<a href=\"" + Constants.PRIVACY_POLICY_URL + "&noTitle=true\">Privacy policy</a>";
+		Map<Integer, String> items = new LinkedHashMap<>();
+		items.put(83, "About Us");
+		items.put(78, "Services");
+		items.put(101, "Advertise With Us");
+		items.put(76, "FAQs");
+		items.put(84, "Contact Us");
+
+		String txt = "";
+
+		List<String> linkItems = new ArrayList<>();
+		for (Integer id : items.keySet()) {
+			Hyperlink link = new Hyperlink(items.get(id), PageUrl.article(id));
+			linkItems.add(link.toString());
+		}
+		txt += Common.join(linkItems, "&nbsp;&nbsp;|&nbsp;&nbsp;");
+
+		String legalText = "<a href=\"" + Constants.TOS_URL + "&noTitle=true\">Terms of service</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+		legalText += "<a href=\"" + Constants.PRIVACY_POLICY_URL + "&noTitle=true\">Privacy policy</a>";
 
 		HTML links = new HTML(txt);
 		links.setStylePrimaryName("footer");
 
+		HTML legal = new HTML(legalText);
+		legal.setStylePrimaryName("footer");
+
 		VerticalPanel vp = new VerticalPanel();
 		vp.setWidth("100%");
 		vp.add(page);
-		vp.add(footer);
 		vp.add(links);
+		vp.add(copyright);
+		vp.add(legal);
 
 		Application.setTitle(title);
 		if (isMobileBrowser) {

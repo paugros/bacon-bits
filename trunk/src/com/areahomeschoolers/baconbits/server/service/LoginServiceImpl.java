@@ -31,7 +31,6 @@ import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -73,8 +72,8 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		}
 		ap.setLive(ServerContext.isLive());
 
-		UserDao userDao = ServerContext.getDaoImpl("user");
-		ap.setDynamicMenuItems(userDao.getMenuItems(new ArgMap<UserArg>(UserArg.ORGANIZATION_ID, ServerContext.getCurrentOrgId())));
+		// UserDao userDao = ServerContext.getDaoImpl("user");
+		// ap.setDynamicMenuItems(userDao.getMenuItems(new ArgMap<UserArg>(UserArg.ORGANIZATION_ID, ServerContext.getCurrentOrgId())));
 
 		if (user != null) {
 			UserDaoImpl.updateUserActivity(user.getId());
