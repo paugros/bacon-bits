@@ -73,7 +73,7 @@ public final class BookListPage implements Page {
 			ccText += "&nbsp;>&nbsp;Books";
 		}
 		HTML cc = new HTML(ccText);
-		cc.addStyleName("hugeText");
+		cc.addStyleName("largeText");
 		page.add(cc);
 
 		page.add(optionsPanel);

@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
@@ -49,7 +50,6 @@ public final class MainMenu extends MenuBar {
 		setFocusOnHoverEnabled(false);
 		setAutoOpen(true);
 		setAnimationEnabled(true);
-
 		addMenuHandlers(this);
 
 		addCloseHandler(new CloseHandler<PopupPanel>() {
@@ -64,19 +64,19 @@ public final class MainMenu extends MenuBar {
 			}
 		});
 
+		setWidth("1%");
+		getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
+
 		// addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this, null, 0);
 
-		addLinkToMenu(this, "Blog", PageUrl.blog(0));
 		addLinkToMenu(this, "Books", PageUrl.tagGroup(TagMappingType.BOOK.toString()));
 		addItem("Events", getEventsMenu());
+		addLinkToMenu(this, "Resources", PageUrl.tagGroup(TagMappingType.RESOURCE.toString()));
+		addLinkToMenu(this, "Blog", PageUrl.blog(0));
 
 		if (Application.isAuthenticated()) {
-			addItem("Members", getMembersMenu());
+			addLinkToMenu(this, "Homeschoolers", PageUrl.tagGroup(TagMappingType.USER.toString()));
 		}
-
-		// if (Application.isAuthenticated()) {
-		// addItem("My Items", getMyItemsMenu());
-		// }
 
 		if (Application.administratorOfCurrentOrg() || Application.administratorOf(17)) {
 			addItem("Admin", getAdminMenu());
@@ -290,73 +290,6 @@ public final class MainMenu extends MenuBar {
 
 		return menu;
 	}
-
-	private MenuBar getMembersMenu() {
-		MenuBar menu = new MenuBar(true);
-
-		addLinkToMenu(menu, "Member Directory", PageUrl.userList());
-		menu.addSeparator();
-		addLinkToMenu(menu, "My Profile", PageUrl.user(Application.getCurrentUserId()));
-		if (!Application.getCurrentUser().isChild()) {
-			addLinkToMenu(menu, "My Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=3");
-		}
-		addLinkToMenu(menu, "Privacy Settings", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
-		return menu;
-	}
-
-	// private MenuBar getMyItemsMenu() {
-	// MenuBar menu = new MenuBar(true);
-	// addLinkToMenu(menu, "Profile", PageUrl.user(Application.getCurrentUserId()));
-	// addLinkToMenu(menu, "Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1");
-	// if (!Application.getCurrentUser().isChild()) {
-	// addLinkToMenu(menu, "Family", PageUrl.user(Application.getCurrentUserId()) + "&tab=3");
-	// }
-	// if (Application.getCurrentUser().memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
-	// addLinkToMenu(menu, "Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=4");
-	// }
-	// if (!Application.getCurrentUser().isChild()) {
-	// addLinkToMenu(menu, "Payments", PageUrl.user(Application.getCurrentUserId()) + "&tab=5");
-	// }
-	// addLinkToMenu(menu, "Calendar", PageUrl.user(Application.getCurrentUserId()) + "&tab=6");
-	// addLinkToMenu(menu, "Privacy", PageUrl.user(Application.getCurrentUserId()) + "&tab=7");
-	//
-	// if (!Application.getCurrentUser().isChild()) {
-	// addLinkToMenu(menu, "Shopping Cart", PageUrl.payment());
-	// }
-	//
-	// menu.addSeparator();
-	//
-	// addCommandToMenu(menu, "Change Password", new ScheduledCommand() {
-	// @Override
-	// public void execute() {
-	// GWT.runAsync(new RunAsyncCallback() {
-	// @Override
-	// public void onFailure(Throwable caught) {
-	// }
-	//
-	// @Override
-	// public void onSuccess() {
-	// new ResetPasswordDialog(true).center();
-	// }
-	// });
-	// }
-	// });
-	//
-	// addCommandToMenu(menu, "Log Out", new ScheduledCommand() {
-	// @Override
-	// public void execute() {
-	// LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
-	// loginService.logout(new Callback<Void>(false) {
-	// @Override
-	// protected void doOnSuccess(Void result) {
-	// Window.Location.reload();
-	// }
-	// });
-	// }
-	// });
-	//
-	// return menu;
-	// }
 
 	private void handleClose() {
 		MenuItem item = getSelectedItem();

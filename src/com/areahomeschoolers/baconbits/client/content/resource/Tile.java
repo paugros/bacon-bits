@@ -59,7 +59,7 @@ public class Tile extends Composite {
 		if (config.getCount() != null) {
 			countLength = Integer.toString(config.getCount()).length();
 		}
-		int width = 215;
+		int width = 205;
 		textSize = "largeText";
 		width -= countLength * 10;
 

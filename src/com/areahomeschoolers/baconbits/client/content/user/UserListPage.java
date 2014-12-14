@@ -64,7 +64,7 @@ public final class UserListPage implements Page {
 			ccText += "&nbsp;>&nbsp;Homeschoolers";
 		}
 		HTML cc = new HTML(ccText);
-		cc.addStyleName("hugeText");
+		cc.addStyleName("largeText");
 		page.add(cc);
 
 		page.add(optionsPanel);

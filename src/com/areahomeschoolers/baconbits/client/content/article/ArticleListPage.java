@@ -41,7 +41,7 @@ public final class ArticleListPage implements Page {
 			ccText += "&nbsp;>&nbsp;Articles";
 		}
 		HTML cc = new HTML(ccText);
-		cc.addStyleName("hugeText");
+		cc.addStyleName("largeText");
 		page.add(cc);
 
 		page.add(fp);
