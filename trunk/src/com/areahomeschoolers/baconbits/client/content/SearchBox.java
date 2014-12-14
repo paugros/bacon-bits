@@ -33,6 +33,7 @@ public final class SearchBox extends Composite {
 	private HtmlSuggestion currentSuggestion;
 	private String defaultSearchText = "Search...";
 	private TextBox textBox;
+	private Command selectionHandler;
 
 	public SearchBox() {
 		HorizontalPanel hPanel = new HorizontalPanel();
@@ -49,6 +50,7 @@ public final class SearchBox extends Composite {
 		final ServerSuggestOracle oracle = new ServerSuggestOracle(types);
 
 		textBox = new TextBox();
+		textBox.setVisibleLength(20);
 		searchSuggestBox = new SuggestBox(oracle, textBox);
 		textBox.setStyleName("searchBox");
 
@@ -113,10 +115,22 @@ public final class SearchBox extends Composite {
 		hPanel.add(searchSuggestBox);
 	}
 
+	public void addBlurHandler(BlurHandler bh) {
+		textBox.addBlurHandler(bh);
+	}
+
 	public void reset() {
 		searchSuggestBox.setText(defaultSearchText);
 		textBox.getElement().getStyle().setColor("#666666");
 		textBox.getElement().getStyle().setFontStyle(FontStyle.ITALIC);
+	}
+
+	public void setFocus(boolean focus) {
+		textBox.setFocus(focus);
+	}
+
+	public void setSelectionHandler(Command selectionHandler) {
+		this.selectionHandler = selectionHandler;
 	}
 
 	private void hideSuggestions() {
@@ -125,6 +139,9 @@ public final class SearchBox extends Composite {
 	}
 
 	private void loadEntityViewPage(HtmlSuggestion suggestion) {
+		if (selectionHandler != null) {
+			selectionHandler.execute();
+		}
 		String entityType = suggestion.getEntityType();
 
 		String url = "page=" + entityType + "&" + entityType.substring(0, 1).toLowerCase() + entityType.substring(1) + "Id=" + suggestion.getEntityId();

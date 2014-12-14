@@ -1,55 +1,63 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
+import com.areahomeschoolers.baconbits.shared.Common;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.dom.client.AnchorElement;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.EventTarget;
-import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.VerticalAlign;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Event.NativePreviewEvent;
-import com.google.gwt.user.client.Event.NativePreviewHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InlineHyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
-public class DropDownMenu extends Composite implements MouseDownHandler, NativePreviewHandler {
+public class DropDownMenu extends Composite {
+	private final VerticalPanel vp = new VerticalPanel() {
+		@Override
+		public void add(Widget w) {
+			w.getElement().getStyle().setDisplay(Display.BLOCK);
+			super.add(w);
+		}
+	};
+	private PopupPanel popup = new PopupPanel();
+	private HorizontalPanel hp = new PaddedPanel(5);
+	private Timer closeTimer = new Timer() {
+		@Override
+		public void run() {
+			popup.hide();
+		}
+	};
 
-	private final VerticalPanel popup = new VerticalPanel();
-
-	private final FocusPanel fp;
-	private HandlerRegistration hr;
-	// private HorizontalAlignmentConstant alignment = HasHorizontalAlignment.ALIGN_RIGHT;
-	private boolean isOpen = false;
-
-	public DropDownMenu() {
-		this(true);
-	}
-
-	public DropDownMenu(boolean hasLabel) {
-		this(hasLabel ? "Options" : null);
-	}
-
-	public DropDownMenu(String label) {
-		HorizontalPanel hp = new HorizontalPanel();
+	public DropDownMenu(String text) {
+		popup.addDomHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				popup.hide();
+			}
+		}, ClickEvent.getType());
 		hp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 
-		if (!com.areahomeschoolers.baconbits.shared.Common.isNullOrBlank(label)) {
-			Label optLabel = new Label(label);
+		if (!Common.isNullOrBlank(text)) {
+			Label optLabel = new Label(text);
 			optLabel.getElement().getStyle().setPaddingLeft(4, Unit.PX);
 			hp.add(optLabel);
 		}
@@ -58,84 +66,57 @@ public class DropDownMenu extends Composite implements MouseDownHandler, NativeP
 		arrow.getElement().getStyle().setVerticalAlign(VerticalAlign.MIDDLE);
 		hp.add(arrow);
 
-		fp = new FocusPanel(hp);
-		fp.setStylePrimaryName("DropDownMenu");
-		initWidget(fp);
+		hp.setStylePrimaryName("DropDownMenu");
+		initWidget(hp);
 
-		fp.addMouseDownHandler(this);
-		popup.setStylePrimaryName("DropDownMenu-popup");
+		addDomHandler(new MouseOverHandler() {
+			@Override
+			public void onMouseOver(MouseOverEvent event) {
+				closeTimer.cancel();
+				show();
+			}
+		}, MouseOverEvent.getType());
+
+		addDomHandler(new MouseOutHandler() {
+			@Override
+			public void onMouseOut(MouseOutEvent event) {
+				closeTimer.schedule(300);
+			}
+		}, MouseOutEvent.getType());
+
+		popup.addDomHandler(new MouseOverHandler() {
+			@Override
+			public void onMouseOver(MouseOverEvent event) {
+				closeTimer.cancel();
+			}
+		}, MouseOverEvent.getType());
+
+		popup.addDomHandler(new MouseOutHandler() {
+			@Override
+			public void onMouseOut(MouseOutEvent event) {
+				closeTimer.schedule(300);
+			}
+		}, MouseOutEvent.getType());
+
+		vp.setStylePrimaryName("DropDownMenu-popup");
+		popup.removeStyleName(popup.getStylePrimaryName());
+		popup.getElement().getStyle().setBackgroundColor("#f9f9f9");
+		popup.setWidget(vp);
 	}
 
 	public ClickLabel addItem(ClickLabel link) {
-		link.getElement().addClassName("item");
-		popup.add(link);
+		link.addStyleName("item");
+		vp.add(link);
 		return link;
 	}
 
 	public Hyperlink addItem(Hyperlink link) {
-		AnchorElement ae = (AnchorElement) link.getElement().getChild(0);
-		ae.addClassName("item");
-		popup.add(link);
+		link.addStyleName("item");
+		vp.add(link);
 		return link;
 	}
 
 	public Label addItem(String text, final Command cmd) {
-		Label item = createItem(text, cmd);
-		popup.add(item);
-		return item;
-	}
-
-	public void addSeparator() {
-		HTML hr = new HTML("<hr>");
-		popup.add(hr);
-		return;
-	}
-
-	public void hide() {
-		if (isOpen) {
-			isOpen = false;
-			fp.removeStyleDependentName("open");
-			// Application.getLayout().removePositionOnPage(popup);
-			hr.removeHandler();
-		}
-	}
-
-	public Label insertItem(String text, final Command cmd, int beforeIndex) throws IndexOutOfBoundsException {
-		Label item = createItem(text, cmd);
-		popup.insert(item, beforeIndex);
-		return item;
-	}
-
-	@Override
-	public void onMouseDown(MouseDownEvent event) {
-		show();
-	}
-
-	@Override
-	public void onPreviewNativeEvent(final NativePreviewEvent event) {
-		Event nativeEvent = Event.as(event.getNativeEvent());
-		if (nativeEvent.getTypeInt() == Event.ONMOUSEDOWN) {
-
-			if (!eventTargetsPopup(nativeEvent)) {
-				hide();
-			}
-		}
-	}
-
-	// public void setHorizontalAlignment(HorizontalAlignmentConstant alignment) {
-	// this.alignment = alignment;
-	// }
-
-	public void show() {
-		if (!isOpen) {
-			isOpen = true;
-			fp.addStyleDependentName("open");
-			// Application.getLayout().positionRelativeTo(popup, fp, alignment);
-			hr = Event.addNativePreviewHandler(DropDownMenu.this);
-		}
-	}
-
-	private Label createItem(final String text, final Command cmd) {
 		final Label item = new Label(text);
 		item.setStylePrimaryName("item");
 		item.addMouseDownHandler(new MouseDownHandler() {
@@ -144,26 +125,32 @@ public class DropDownMenu extends Composite implements MouseDownHandler, NativeP
 				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 					@Override
 					public void execute() {
-						hide();
 						cmd.execute();
-
-						// hack to get IE to stop highlighting selected item
-						Label dup = createItem(text, cmd);
-						popup.insert(dup, popup.getWidgetIndex(item));
-						popup.remove(item);
 					}
 				});
 			}
 		});
-
+		vp.add(item);
 		return item;
 	}
 
-	private boolean eventTargetsPopup(NativeEvent event) {
-		EventTarget target = event.getEventTarget();
-		if (Element.is(target)) {
-			return popup.getElement().isOrHasChild(Element.as(target));
-		}
-		return false;
+	public Hyperlink addItem(String text, String url) {
+		Hyperlink link = new InlineHyperlink(text, url);
+		return addItem(link);
 	}
+
+	public void addSeparator() {
+		HTML hr = new HTML("<hr>");
+		vp.add(hr);
+		return;
+	}
+
+	public void show() {
+		if (popup.isShowing()) {
+			return;
+		}
+		popup.showRelativeTo(this);
+		popup.setPopupPosition(popup.getAbsoluteLeft(), popup.getAbsoluteTop() + 5);
+	}
+
 }

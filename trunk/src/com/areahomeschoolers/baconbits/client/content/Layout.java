@@ -9,7 +9,6 @@ import java.util.Map;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
@@ -23,8 +22,8 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.DropDownMenu;
 import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
-import com.areahomeschoolers.baconbits.client.widgets.LinkPanel;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog.LoginHandler;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
@@ -34,14 +33,21 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Cursor;
+import com.google.gwt.dom.client.Style.FontWeight;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
@@ -50,11 +56,11 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -78,11 +84,9 @@ public final class Layout {
 		}
 	}
 
-	private static final int HEADER_HEIGHT = 54;
-	private static final int MENU_HEIGHT = 35;
-	private static final int LOGO_DIV_WIDTH = 191;
+	private static final int HEADER_HEIGHT = 89;
+	private static final int LOGO_DIV_WIDTH = 90;
 	private final MainLayoutDock dock = new MainLayoutDock(Unit.PX);
-	private final SearchBox searchBox;
 	private final SimplePanel mobileBodyPanel = new SimplePanel();
 	private final MainMenu menu;
 	private final ScrollPanel bodyPanel = new ScrollPanel();
@@ -91,16 +95,13 @@ public final class Layout {
 	// Holds a reference to the latest panel queued to be displayed on the page when setPage is called
 	private VerticalPanel currentPagePanel;
 	private final HorizontalPanel headerPanel = new HorizontalPanel();
-	private final HorizontalPanel menuPanel = new HorizontalPanel();
 	private boolean isMobileBrowser = false;
 	private HTML logoDiv;
 
-	/**
-	 *
-	 */
 	public Layout() {
 		isMobileBrowser = ClientUtils.isMobileBrowser();
-
+		headerPanel.setWidth("100%");
+		headerPanel.getElement().getStyle().setOverflowX(Overflow.AUTO);
 		headerPanel.setHeight(HEADER_HEIGHT + "px");
 		headerPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		if (!isMobileBrowser) {
@@ -113,95 +114,88 @@ public final class Layout {
 		RootPanel.get().add(sp);
 
 		logoDiv = new HTML();
+		logoDiv.getElement().getStyle().setMarginRight(25, Unit.PX);
 		setLogo(Application.getCurrentOrg().getLogoId());
 
-		logoDiv.addClickHandler(new ClickHandler() {
+		if (!Application.isCitrus()) {
+			logoDiv.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					if ("Home".equals(HistoryToken.getElement("page"))) {
+						Application.reloadPage();
+					} else {
+						HistoryToken.set(PageUrl.home());
+					}
+				}
+			});
+		}
+
+		menu = new MainMenu();
+		headerPanel.add(menu);
+		headerPanel.setCellVerticalAlignment(menu, HasVerticalAlignment.ALIGN_BOTTOM);
+		headerPanel.setCellWidth(menu, "100%");
+
+		final PaddedPanel searchPanel = new PaddedPanel();
+		Image search = new Image(MainImageBundle.INSTANCE.searchLarge());
+		search.getElement().getStyle().setMarginRight(2, Unit.PX);
+
+		Label searchText = new Label("Search");
+		searchText.getElement().getStyle().setColor("#555555");
+		searchText.getElement().getStyle().setFontSize(14, Unit.PX);
+		searchText.getElement().getStyle().setFontWeight(FontWeight.BOLD);
+
+		searchPanel.getElement().getStyle().setCursor(Cursor.POINTER);
+		searchPanel.add(search);
+		searchPanel.setCellVerticalAlignment(search, HasVerticalAlignment.ALIGN_MIDDLE);
+		searchPanel.add(searchText);
+		searchPanel.getElement().getStyle().setMarginRight(20, Unit.PX);
+		searchPanel.setCellVerticalAlignment(searchText, HasVerticalAlignment.ALIGN_MIDDLE);
+
+		searchPanel.addDomHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if ("Home".equals(HistoryToken.getElement("page"))) {
-					Application.reloadPage();
-				} else {
-					HistoryToken.set(PageUrl.home());
-				}
-			}
-		});
+				final SearchBox searchBox = new SearchBox();
 
-		SimplePanel spacer = new SimplePanel();
-		headerPanel.add(spacer);
-		headerPanel.setCellWidth(spacer, "100%");
+				headerPanel.insert(searchBox, headerPanel.getWidgetIndex(searchPanel));
+				searchPanel.removeFromParent();
 
-		searchBox = new SearchBox();
-
-		headerPanel.add(searchBox);
-
-		LinkPanel sessionPanel = new LinkPanel();
-		sessionPanel.addStyleName("sessionPanel");
-
-		headerPanel.add(sessionPanel);
-
-		final ClickLabel logInOrOut = new ClickLabel();
-		if (Application.isAuthenticated()) {
-			HorizontalPanel upn = new PaddedPanel(4);
-			final Hyperlink name = new Hyperlink("Hello, " + Application.getCurrentUser().getFirstName(), PageUrl.user(Application.getCurrentUserId()));
-			name.addStyleName("nowrap");
-
-			if (Application.canSwitchUser()) {
-				final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
-				final EntitySuggestBox userSearchBox = new EntitySuggestBox("User");
-				userSearchBox.setSelectionHandler(new ParameterHandler<HtmlSuggestion>() {
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 					@Override
-					public void execute(HtmlSuggestion sug) {
-						userService.switchToUser(sug.getEntityId(), new Callback<Void>() {
-							@Override
-							protected void doOnSuccess(Void result) {
-								Window.Location.reload();
-							}
-						});
+					public void execute() {
+						searchBox.setFocus(true);
 					}
 				});
-				userSearchBox.setResetHandler(new ParameterHandler<SuggestBox>() {
+
+				searchBox.addBlurHandler(new BlurHandler() {
 					@Override
-					public void execute(SuggestBox suggestBox) {
-						name.setVisible(true);
-						userSearchBox.setVisible(false);
-						userSearchBox.getTextBox().setFocus(false);
+					public void onBlur(BlurEvent event) {
+						headerPanel.insert(searchPanel, headerPanel.getWidgetIndex(searchBox));
+						searchBox.removeFromParent();
 					}
 				});
-				userSearchBox.getElement().getStyle().setMarginLeft(20, Unit.PX);
-				userSearchBox.setClearOnFocus(true);
 
-				userSearchBox.setVisible(false);
-				Image swap = new Image(MainImageBundle.INSTANCE.swap());
-				swap.setTitle("Switch user");
-				swap.getElement().getStyle().setCursor(Cursor.POINTER);
-				swap.addClickHandler(new ClickHandler() {
+				searchBox.setSelectionHandler(new Command() {
 					@Override
-					public void onClick(ClickEvent event) {
-						boolean show = name.isVisible();
-
-						if (show) {
-							name.setVisible(false);
-							userSearchBox.setVisible(true);
-							userSearchBox.getTextBox().setFocus(true);
-						} else {
-							name.setVisible(true);
-							userSearchBox.setVisible(false);
-							userSearchBox.getTextBox().setFocus(false);
+					public void execute() {
+						if (searchBox.isAttached()) {
+							headerPanel.insert(searchPanel, headerPanel.getWidgetIndex(searchBox));
+							searchBox.removeFromParent();
 						}
 					}
 				});
-
-				upn.add(swap);
-				upn.add(userSearchBox);
 			}
+		}, ClickEvent.getType());
 
-			upn.add(name);
-			sessionPanel.add(upn);
+		headerPanel.add(searchPanel);
+		headerPanel.setCellVerticalAlignment(search, HasVerticalAlignment.ALIGN_MIDDLE);
 
-			logInOrOut.setText("Log out");
-			logInOrOut.addClickHandler(new ClickHandler() {
+		if (Application.isAuthenticated()) {
+			final DropDownMenu dm = new DropDownMenu(Application.getCurrentUser().getFirstName());
+			dm.getElement().getStyle().setMarginRight(15, Unit.PX);
+			dm.addItem("My Profile", PageUrl.user(Application.getCurrentUserId()));
+			dm.addItem("Log out", new Command() {
 				@Override
-				public void onClick(ClickEvent event) {
+				public void execute() {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
 					loginService.logout(new Callback<Void>(false) {
 						@Override
@@ -211,9 +205,55 @@ public final class Layout {
 					});
 				}
 			});
+
+			if (Application.canSwitchUser()) {
+				dm.addItem("Switch User", new Command() {
+					@Override
+					public void execute() {
+						final DecoratedPopupPanel popup = new DecoratedPopupPanel();
+						popup.setAutoHideEnabled(true);
+
+						final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
+						final EntitySuggestBox userSearchBox = new EntitySuggestBox("User");
+						userSearchBox.setSelectionHandler(new ParameterHandler<HtmlSuggestion>() {
+							@Override
+							public void execute(HtmlSuggestion sug) {
+								userService.switchToUser(sug.getEntityId(), new Callback<Void>() {
+									@Override
+									protected void doOnSuccess(Void result) {
+										Window.Location.reload();
+									}
+								});
+							}
+						});
+
+						PaddedPanel pp = new PaddedPanel();
+						Label text = new Label("Switch to:");
+						pp.add(text);
+						pp.setCellVerticalAlignment(text, HasVerticalAlignment.ALIGN_MIDDLE);
+						pp.add(userSearchBox);
+						pp.getElement().getStyle().setMargin(20, Unit.PX);
+						popup.setWidget(pp);
+
+						popup.showRelativeTo(dm);
+						popup.setPopupPosition(popup.getAbsoluteLeft(), popup.getAbsoluteTop() + 4);
+
+						Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+							@Override
+							public void execute() {
+								userSearchBox.getTextBox().setFocus(true);
+								popup.setPopupPosition(popup.getAbsoluteLeft(), popup.getAbsoluteTop() + 2);
+							}
+						});
+					}
+				});
+			}
+			headerPanel.add(dm);
+			headerPanel.setCellVerticalAlignment(dm, HasVerticalAlignment.ALIGN_MIDDLE);
 		} else {
-			logInOrOut.setText("Log in / Create account");
-			logInOrOut.addClickHandler(new ClickHandler() {
+			final ClickLabel login = new ClickLabel("", null);
+			login.setText("Log in / Create account");
+			login.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
@@ -241,15 +281,16 @@ public final class Layout {
 					});
 
 					if (isMobileBrowser) {
-						ld.showRelativeTo(logInOrOut);
+						ld.showRelativeTo(login);
 					} else {
 						ld.center();
 					}
 				}
 			});
+
+			login.setWordWrap(false);
+			headerPanel.add(login);
 		}
-		logInOrOut.setWordWrap(false);
-		sessionPanel.add(logInOrOut);
 
 		if (!isMobileBrowser) {
 			ap.setHeight("100%");
@@ -258,15 +299,9 @@ public final class Layout {
 			bodyPanel.add(ap);
 		}
 
-		menu = new MainMenu();
-		menuPanel.setHeight(MENU_HEIGHT + "px");
-		menuPanel.setWidth("100%");
-		menuPanel.add(menu);
-		menuPanel.setCellWidth(menu, "100%");
-
 		if (Application.isAuthenticated()) {
-			BalanceBox bb = new BalanceBox();
-			menuPanel.add(bb);
+			// BalanceBox bb = new BalanceBox();
+			// menuPanel.add(bb);
 		}
 
 		HorizontalPanel hp = new HorizontalPanel();
@@ -275,13 +310,12 @@ public final class Layout {
 		hp.setCellHorizontalAlignment(logoDiv, HasHorizontalAlignment.ALIGN_CENTER);
 		hp.setCellVerticalAlignment(logoDiv, HasVerticalAlignment.ALIGN_MIDDLE);
 		hp.setCellWidth(logoDiv, LOGO_DIV_WIDTH + "px");
-		hp.setHeight(HEADER_HEIGHT + MENU_HEIGHT + "px");
+		hp.setHeight(HEADER_HEIGHT + "px");
 		hp.addStyleName("headerPanel");
 
 		VerticalPanel vp = new VerticalPanel();
 		vp.setWidth("100%");
 		vp.add(headerPanel);
-		vp.add(menuPanel);
 		hp.add(vp);
 		if (isMobileBrowser) {
 			mobileBodyPanel.addStyleName("bodyPanel");
@@ -293,7 +327,7 @@ public final class Layout {
 			RootPanel.get().add(vvp);
 		} else {
 			dock.addStyleName("Dock");
-			dock.addNorth(hp, HEADER_HEIGHT + MENU_HEIGHT + 1);
+			dock.addNorth(hp, HEADER_HEIGHT + 1);
 			dock.add(bodyPanel);
 			RootLayoutPanel.get().add(dock);
 		}
@@ -316,10 +350,6 @@ public final class Layout {
 		return currentPagePanel;
 	}
 
-	public SearchBox getSearchBox() {
-		return searchBox;
-	}
-
 	public void setHeaderVisible(boolean visible) {
 		if (isMobileBrowser) {
 			headerPanel.setVisible(visible);
@@ -331,14 +361,8 @@ public final class Layout {
 		}
 		if (!visible) {
 			dock.setWidgetSize(headerPanel, 0);
-			if (menu != null) {
-				dock.setWidgetSize(menuPanel, 0);
-			}
 		} else {
 			dock.setWidgetSize(headerPanel, HEADER_HEIGHT);
-			if (menu != null) {
-				dock.setWidgetSize(menuPanel, MENU_HEIGHT);
-			}
 		}
 		dock.forceLayout();
 

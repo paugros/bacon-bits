@@ -1,7 +1,5 @@
-/** Add css rules here for your application. */
+/** top, right,bottom, left **/
 
-
-/** Example rules used by the template application (remove for your app) */
 h1 {
   font-size: 2em;
   font-weight: bold;
@@ -147,16 +145,12 @@ img {
 
 .DropDownMenu {
 	font-weight: bold;
-	cursor: hand;
-}
-
-.DropDownMenu-open,.DropDownMenu:hover {
-	background: #e2f2ff;
+	cursor: pointer;
 }
 
 .DropDownMenu-popup {
-	background-color: white;
-	border: 2px solid #8cb3df;
+	background-color: f9f9f9;
+	border: 1px solid #b4b4b4;
 	padding: 2px;
 }
 
@@ -164,12 +158,17 @@ img {
 	padding: 4px;
 	color: black;
 	cursor: pointer;
+	padding-right: 45px;
+	padding-left: 20px;
 	text-decoration: none;
 	display: block;
+	background: #f9f9f9;
 }
 
 .DropDownMenu-popup .item:hover {
-	background: #e3e8f3;
+	color: #4aaa48;
+	font-style: underline;
+	text-decoration: underline;
 }
 
 .mainMenuItemEdit {
@@ -180,7 +179,7 @@ img {
 	white-space: nowrap;
 	overflow: hidden;
 	padding: 10px;
-	background-color: #e3e8f3;
+	background-color: #f9f9f9;
 }
 
 .selectedWidget {
@@ -372,13 +371,10 @@ img {
 	padding-left: 23px;
   	border: 1px solid #ccc;
 	border-top: 1px solid #999;
-	width: 223px;
 	font-size: 100%;
 	font-family: Arial Unicode MS, Arial, sans-serif;
 	background-image: url(images/search.png);
 	background-repeat: no-repeat;
-/* 	background-attachment: fixed; */
-	/* left top */
 	background-position: 3px 5px;
 }
 
@@ -483,7 +479,10 @@ img {
 	background-color: #fef0a7;
 	border: 1px solid #ffcc35;
 	font-weight: bold;
-	padding: 4px;
+	padding-right: 20px;
+	padding-left: 20px;
+	padding-top: 6px;
+	padding-bottom: 6px;
 	position: fixed;
 	top: 1px;
 	left: 50%;
@@ -746,13 +745,25 @@ img {
 	display: inline;
 }
 
+.menuTopBorder {
+	border-top: 1px solid #c8c8c8;
+}
+
+.gwt-MenuBar {
+	background: #f9f9f9;
+}
+
 .gwt-MenuBar-horizontal {
 	border-top: none;
 	border-bottom: none;
 	border-right: none;
 	border-left: none;
 	background: none;
-	height: 20px;
+}
+
+.gwt-MenuBarPopup .menuPopupTopCenter, .gwt-MenuBarPopup .menuPopupTopLeft, .gwt-MenuBarPopup .menuPopupTopRight {
+	height: 0px;
+	display: none;
 }
 
 .gwt-MenuBar-horizontal .gwt-MenuItem {
@@ -760,10 +771,42 @@ img {
 	font-weight: bold;
 	font-family: arial, sans-serif;
 	color: #555555;
-	padding: 4px 25px 4px 25px;
+	padding: 4px 20px 34px 20px;
 	vertical-align: bottom;
 	white-space: nowrap;
 	cursor: pointer;
+}
+
+.gwt-MenuBar-vertical .gwt-MenuItemSeparator {
+	background-color: #f9f9f9;
+}
+
+.gwt-MenuBarPopup .menuPopupBottomCenter {
+  background: url(images/hborder_gray.png) 0px -13px repeat-x;
+}
+
+.gwt-MenuBarPopup .menuPopupMiddleRight {
+  background: url(images/vborder_gray.png) -13px 0px repeat-y;
+}
+
+.gwt-MenuBarPopup .menuPopupMiddleLeft {
+  background: url(images/vborder_gray.png) -12px 0px repeat-y;
+}
+
+.gwt-MenuBarPopup .menuPopupTopLeft {
+  background: url(images/corner_gray.png) no-repeat 0px -36px;
+}
+
+.gwt-MenuBarPopup .menuPopupTopRight {
+  background: url(images/corner_gray.png) no-repeat -5px -36px;
+}
+
+.gwt-MenuBarPopup .menuPopupBottomLeft {
+  background: url(images/corner_gray.png) no-repeat 0px -41px;
+}
+
+.gwt-MenuBarPopup .menuPopupBottomRight {
+  background: url(images/corner_gray.png) no-repeat -5px -41px;
 }
 
 .gwt-MenuBar-vertical .gwt-MenuItem, .menuLink, .menuLink:visited {
@@ -776,11 +819,16 @@ img {
 }
 
 .menuLink:hover {
-	padding: 4px 40px 4px 15px;
-	cursor: pointer;
-	display: block;
 	color: #4aaa48;
 	text-decoration: underline;
+}
+
+.rootMenuLink {
+	padding: 4px 20px 34px 20px;
+}
+
+.rootMenuLink:hover {
+	text-decoration: none;
 }
 
 .menuCommandItem {
@@ -801,8 +849,6 @@ img {
 .gwt-MenuBar .gwt-MenuItem-selected {
   	color: #4aaa48;
  	background: transparent;
-/* 	text-decoration: underline; */
-/* 	font-style: underline; */
 }
 
 .gwt-MenuBar-vertical .subMenuIcon-selected {
