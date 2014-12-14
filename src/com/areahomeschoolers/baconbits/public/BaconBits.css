@@ -143,6 +143,14 @@ img {
 	border-bottom: 1px solid #cccccc;
 }
 
+.CitrusMiniModule {
+	
+}
+
+.CitrusMiniModule a:hover {
+	text-decoration: none;
+}
+
 .DropDownMenu {
 	font-weight: bold;
 	cursor: pointer;

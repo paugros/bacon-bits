@@ -16,15 +16,6 @@ public class CitrusMiniModule extends Composite {
 		text += "<td>Citrus<br>Groups</a></td></tr></table>";
 		HTML html = new HTML(text);
 		initWidget(html);
-
-		// String url = "#" + PageUrl.home();
-		// Image image = new Image(MainImageBundle.INSTANCE.littleLogo());
-		// String logo = "<a href=\"" + url + "\">" + image + "</a>";
-		// String text = "<a href=\"" + url + "\" style=\"color: #f06000; font-size: 14px; font-weight: bold;\">";
-		// text += "Citrus<br>Groups</a>";
-		// PaddedPanel linkPanel = new PaddedPanel();
-		// linkPanel.add(new HTML(logo));
-		// linkPanel.add(new HTML(text));
-		// initWidget(linkPanel);
+		addStyleName("CitrusMiniModule");
 	}
 }

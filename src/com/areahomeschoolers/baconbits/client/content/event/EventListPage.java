@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.MonthPicker;
@@ -26,6 +27,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -83,6 +85,12 @@ public final class EventListPage implements Page {
 		HTML cc = new HTML(ccText);
 		cc.addStyleName("largeText");
 		page.add(cc);
+
+		if (Application.isAuthenticated()) {
+			AddLink link = new AddLink("Add Event", PageUrl.event(0));
+			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
+			page.add(link);
+		}
 
 		if (!showCommunity) {
 			VerticalPanel vp = new VerticalPanel();

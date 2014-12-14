@@ -10,12 +10,14 @@ import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -43,6 +45,12 @@ public final class ArticleListPage implements Page {
 		HTML cc = new HTML(ccText);
 		cc.addStyleName("largeText");
 		page.add(cc);
+
+		if (Application.memberOf(33)) {
+			AddLink link = new AddLink("Add Resource", PageUrl.resource(0));
+			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
+			page.add(link);
+		}
 
 		page.add(fp);
 		Application.getLayout().setPage(title, page);

@@ -16,12 +16,15 @@ import com.areahomeschoolers.baconbits.client.rpc.service.TagServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -95,9 +98,43 @@ public final class TagGroupPage implements Page {
 		Hyperlink home = new Hyperlink("Home", PageUrl.home());
 		String typeText = type.equals(TagMappingType.USER) ? "Interests" : "Type";
 		String ccText = home.toString() + "&nbsp;>&nbsp;" + type.getName() + " By " + typeText;
+
 		HTML cc = new HTML(ccText);
 		cc.addStyleName("largeText");
 		page.add(cc);
+
+		if (Application.isAuthenticated()) {
+			String url = null;
+			switch (type) {
+			case ARTICLE:
+				if (Application.memberOf(33)) {
+					url = PageUrl.article(0);
+				}
+				break;
+			case BOOK:
+				break;
+			case EVENT:
+				url = PageUrl.event(0);
+				break;
+			case RESOURCE:
+				url = PageUrl.resource(0);
+				break;
+			case USER:
+				if (Application.isSystemAdministrator()) {
+					url = PageUrl.user(0);
+				}
+				break;
+			default:
+				break;
+			}
+
+			if (url != null) {
+				String name = Common.ucWords(type.getName()).substring(0, type.getName().length() - 1);
+				AddLink link = new AddLink("Add " + name, url);
+				link.getElement().getStyle().setMarginLeft(10, Unit.PX);
+				page.add(link);
+			}
+		}
 
 		page.add(fp);
 

@@ -155,6 +155,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		List<Integer> tagIds = args.getIntList(ResourceArg.HAS_TAGS);
 		int id = args.getInt(ResourceArg.ID);
 		int limit = args.getInt(ResourceArg.LIMIT);
+		String nameLike = args.getString(ResourceArg.NAME_LIKE);
 		boolean random = args.getBoolean(ResourceArg.RANDOM);
 		boolean ad = args.getBoolean(ResourceArg.AD);
 
@@ -167,6 +168,11 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 		if (ad) {
 			sql += "and r.showInAds = 1 ";
+		}
+
+		if (!Common.isNullOrBlank(nameLike)) {
+			sql += "and levenshtein(r.name, ?) < 4 ";
+			sqlArgs.add(nameLike);
 		}
 
 		if (!Common.isNullOrEmpty(tagIds)) {
@@ -182,6 +188,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 		if (random) {
 			sql += "order by rand() ";
+		} else if (!Common.isNullOrBlank(nameLike)) {
+			sql += "order by levenshtein(r.name, ?) ";
+			sqlArgs.add(nameLike);
 		} else {
 			sql += "order by r.directoryPriority desc, r.name ";
 		}
