@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
@@ -23,6 +24,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -66,6 +68,12 @@ public final class UserListPage implements Page {
 		HTML cc = new HTML(ccText);
 		cc.addStyleName("largeText");
 		page.add(cc);
+
+		if (Application.isSystemAdministrator()) {
+			AddLink link = new AddLink("Add User", PageUrl.user(0));
+			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
+			page.add(link);
+		}
 
 		page.add(optionsPanel);
 

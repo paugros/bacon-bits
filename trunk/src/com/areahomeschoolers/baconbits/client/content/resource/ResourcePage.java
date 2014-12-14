@@ -1,5 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.resource;
 
+import java.util.ArrayList;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
@@ -30,12 +32,18 @@ import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
+import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -46,6 +54,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -102,11 +111,61 @@ public class ResourcePage implements Page {
 	private void createFieldTable() {
 		ft.setWidth("100%");
 
+		final VerticalPanel titleVp = new VerticalPanel();
 		final RequiredTextBox titleInput = new RequiredTextBox();
+		titleVp.add(titleInput);
+		final VerticalPanel dupePanel = new VerticalPanel();
+		dupePanel.setSpacing(6);
+		titleVp.add(dupePanel);
+		dupePanel.getElement().getStyle().setBackgroundColor("#e2a7c1");
+
+		if (!resource.isSaved()) {
+			titleInput.addBlurHandler(new BlurHandler() {
+				@Override
+				public void onBlur(BlurEvent event) {
+					dupePanel.clear();
+
+					if (titleInput.getText().trim().isEmpty()) {
+						return;
+					}
+
+					ArgMap<ResourceArg> args = new ArgMap<>(Status.ACTIVE);
+					args.put(ResourceArg.NAME_LIKE, titleInput.getText().trim());
+					args.put(ResourceArg.LIMIT, 5);
+					resourceService.list(args, new Callback<ArrayList<Resource>>(false) {
+						@Override
+						protected void doOnSuccess(ArrayList<Resource> result) {
+							if (result.isEmpty()) {
+								dupePanel.getElement().getStyle().setDisplay(Display.NONE);
+								return;
+							}
+
+							dupePanel.getElement().getStyle().setDisplay(Display.BLOCK);
+
+							String text = "The following resource";
+							if (result.size() == 1) {
+								text += " has a ";
+							} else {
+								text += "s have a ";
+							}
+							text += "similar name:";
+							Label message = new Label(text);
+
+							dupePanel.add(message);
+
+							for (Resource r : result) {
+								Hyperlink link = new Hyperlink(r.getName(), PageUrl.resource(r.getId()));
+								dupePanel.add(link);
+							}
+						}
+					});
+				}
+			});
+		}
 		final Label titleDisplay = new Label();
 		titleInput.setVisibleLength(35);
 		titleInput.setMaxLength(50);
-		FormField titleField = form.createFormField("Name:", titleInput, titleDisplay);
+		FormField titleField = form.createFormField("Name:", titleVp, titleDisplay);
 		titleField.setInitializer(new Command() {
 			@Override
 			public void execute() {
