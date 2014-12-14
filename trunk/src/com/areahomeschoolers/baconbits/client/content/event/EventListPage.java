@@ -81,7 +81,7 @@ public final class EventListPage implements Page {
 			ccText += "&nbsp;>&nbsp;Events";
 		}
 		HTML cc = new HTML(ccText);
-		cc.addStyleName("hugeText");
+		cc.addStyleName("largeText");
 		page.add(cc);
 
 		if (!showCommunity) {

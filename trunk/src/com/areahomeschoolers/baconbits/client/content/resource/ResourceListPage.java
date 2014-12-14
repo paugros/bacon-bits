@@ -42,7 +42,7 @@ public final class ResourceListPage implements Page {
 			ccText += "&nbsp;>&nbsp;Resources";
 		}
 		HTML cc = new HTML(ccText);
-		cc.addStyleName("hugeText");
+		cc.addStyleName("largeText");
 		page.add(cc);
 
 		page.add(fp);

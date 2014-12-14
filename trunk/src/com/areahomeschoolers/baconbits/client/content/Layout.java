@@ -85,7 +85,6 @@ public final class Layout {
 	}
 
 	private static final int HEADER_HEIGHT = 89;
-	private static final int LOGO_DIV_WIDTH = 90;
 	private final MainLayoutDock dock = new MainLayoutDock(Unit.PX);
 	private final SimplePanel mobileBodyPanel = new SimplePanel();
 	private final MainMenu menu;
@@ -101,6 +100,7 @@ public final class Layout {
 	public Layout() {
 		isMobileBrowser = ClientUtils.isMobileBrowser();
 		headerPanel.setWidth("100%");
+		headerPanel.addStyleName("headerPanel");
 		headerPanel.getElement().getStyle().setOverflowX(Overflow.AUTO);
 		headerPanel.setHeight(HEADER_HEIGHT + "px");
 		headerPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
@@ -114,8 +114,11 @@ public final class Layout {
 		RootPanel.get().add(sp);
 
 		logoDiv = new HTML();
-		logoDiv.getElement().getStyle().setMarginRight(25, Unit.PX);
+		logoDiv.getElement().getStyle().setMarginRight(20, Unit.PX);
 		setLogo(Application.getCurrentOrg().getLogoId());
+
+		headerPanel.add(logoDiv);
+		headerPanel.setCellWidth(logoDiv, "1%");
 
 		if (!Application.isCitrus()) {
 			logoDiv.addClickHandler(new ClickHandler() {
@@ -133,7 +136,7 @@ public final class Layout {
 		menu = new MainMenu();
 		headerPanel.add(menu);
 		headerPanel.setCellVerticalAlignment(menu, HasVerticalAlignment.ALIGN_BOTTOM);
-		headerPanel.setCellWidth(menu, "100%");
+		// headerPanel.setCellWidth(menu, "100%");
 
 		final PaddedPanel searchPanel = new PaddedPanel();
 		Image search = new Image(MainImageBundle.INSTANCE.searchLarge());
@@ -148,15 +151,16 @@ public final class Layout {
 		searchPanel.add(search);
 		searchPanel.setCellVerticalAlignment(search, HasVerticalAlignment.ALIGN_MIDDLE);
 		searchPanel.add(searchText);
-		searchPanel.getElement().getStyle().setMarginRight(20, Unit.PX);
 		searchPanel.setCellVerticalAlignment(searchText, HasVerticalAlignment.ALIGN_MIDDLE);
+
+		final PaddedPanel rightPanel = new PaddedPanel(15);
 
 		searchPanel.addDomHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				final SearchBox searchBox = new SearchBox();
 
-				headerPanel.insert(searchBox, headerPanel.getWidgetIndex(searchPanel));
+				rightPanel.insert(searchBox, rightPanel.getWidgetIndex(searchPanel));
 				searchPanel.removeFromParent();
 
 				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
@@ -169,7 +173,7 @@ public final class Layout {
 				searchBox.addBlurHandler(new BlurHandler() {
 					@Override
 					public void onBlur(BlurEvent event) {
-						headerPanel.insert(searchPanel, headerPanel.getWidgetIndex(searchBox));
+						rightPanel.insert(searchPanel, rightPanel.getWidgetIndex(searchBox));
 						searchBox.removeFromParent();
 					}
 				});
@@ -178,7 +182,7 @@ public final class Layout {
 					@Override
 					public void execute() {
 						if (searchBox.isAttached()) {
-							headerPanel.insert(searchPanel, headerPanel.getWidgetIndex(searchBox));
+							rightPanel.insert(searchPanel, rightPanel.getWidgetIndex(searchBox));
 							searchBox.removeFromParent();
 						}
 					}
@@ -186,12 +190,14 @@ public final class Layout {
 			}
 		}, ClickEvent.getType());
 
-		headerPanel.add(searchPanel);
-		headerPanel.setCellVerticalAlignment(search, HasVerticalAlignment.ALIGN_MIDDLE);
+		rightPanel.add(searchPanel);
+		headerPanel.add(rightPanel);
+		headerPanel.setCellHorizontalAlignment(rightPanel, HasHorizontalAlignment.ALIGN_RIGHT);
+		rightPanel.setCellVerticalAlignment(searchPanel, HasVerticalAlignment.ALIGN_MIDDLE);
+		headerPanel.setCellVerticalAlignment(rightPanel, HasVerticalAlignment.ALIGN_MIDDLE);
 
 		if (Application.isAuthenticated()) {
 			final DropDownMenu dm = new DropDownMenu(Application.getCurrentUser().getFirstName());
-			dm.getElement().getStyle().setMarginRight(15, Unit.PX);
 			dm.addItem("My Profile", PageUrl.user(Application.getCurrentUserId()));
 			dm.addItem("Log out", new Command() {
 				@Override
@@ -248,8 +254,8 @@ public final class Layout {
 					}
 				});
 			}
-			headerPanel.add(dm);
-			headerPanel.setCellVerticalAlignment(dm, HasVerticalAlignment.ALIGN_MIDDLE);
+			rightPanel.add(dm);
+			rightPanel.setCellVerticalAlignment(dm, HasVerticalAlignment.ALIGN_MIDDLE);
 		} else {
 			final ClickLabel login = new ClickLabel("Log in / Create account");
 			login.getElement().getStyle().setMarginRight(15, Unit.PX);
@@ -289,7 +295,8 @@ public final class Layout {
 			});
 
 			login.setWordWrap(false);
-			headerPanel.add(login);
+			rightPanel.add(login);
+			rightPanel.setCellVerticalAlignment(login, HasVerticalAlignment.ALIGN_MIDDLE);
 		}
 
 		if (!isMobileBrowser) {
@@ -304,30 +311,17 @@ public final class Layout {
 			// menuPanel.add(bb);
 		}
 
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setWidth("100%");
-		hp.add(logoDiv);
-		hp.setCellHorizontalAlignment(logoDiv, HasHorizontalAlignment.ALIGN_CENTER);
-		hp.setCellVerticalAlignment(logoDiv, HasVerticalAlignment.ALIGN_MIDDLE);
-		hp.setCellWidth(logoDiv, LOGO_DIV_WIDTH + "px");
-		hp.setHeight(HEADER_HEIGHT + "px");
-		hp.addStyleName("headerPanel");
-
-		VerticalPanel vp = new VerticalPanel();
-		vp.setWidth("100%");
-		vp.add(headerPanel);
-		hp.add(vp);
 		if (isMobileBrowser) {
 			mobileBodyPanel.addStyleName("bodyPanel");
 			mobileBodyPanel.setWidth("100%");
 			VerticalPanel vvp = new VerticalPanel();
 			vvp.setWidth("100%");
-			vvp.add(hp);
+			vvp.add(headerPanel);
 			vvp.add(mobileBodyPanel);
 			RootPanel.get().add(vvp);
 		} else {
 			dock.addStyleName("Dock");
-			dock.addNorth(hp, HEADER_HEIGHT + 1);
+			dock.addNorth(headerPanel, HEADER_HEIGHT + 1);
 			dock.add(bodyPanel);
 			RootLayoutPanel.get().add(dock);
 		}

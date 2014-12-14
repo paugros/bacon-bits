@@ -96,7 +96,7 @@ public final class TagGroupPage implements Page {
 		String typeText = type.equals(TagMappingType.USER) ? "Interests" : "Type";
 		String ccText = home.toString() + "&nbsp;>&nbsp;" + type.getName() + " By " + typeText;
 		HTML cc = new HTML(ccText);
-		cc.addStyleName("hugeText");
+		cc.addStyleName("largeText");
 		page.add(cc);
 
 		page.add(fp);
