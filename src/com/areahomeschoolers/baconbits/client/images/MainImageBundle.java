@@ -89,8 +89,6 @@ public interface MainImageBundle extends ClientBundle {
 	@Source("file/zip.png")
 	ImageResource fileIconZip();
 
-	ImageResource headerBackground();
-
 	ImageResource littleLogo();
 
 	ImageResource logo();
@@ -108,6 +106,8 @@ public interface MainImageBundle extends ClientBundle {
 	ImageResource resourceTile();
 
 	ImageResource search();
+
+	ImageResource searchLarge();
 
 	ImageResource shoppingCart();
 

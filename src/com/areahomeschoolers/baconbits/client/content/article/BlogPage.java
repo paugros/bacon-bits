@@ -118,7 +118,7 @@ public class BlogPage implements Page {
 			initSinglePage();
 		}
 
-		Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.ADS);
+		Sidebar sb = Sidebar.create(MiniModule.ADS);
 		Application.getLayout().setPage("Blog", sb, page);
 	}
 

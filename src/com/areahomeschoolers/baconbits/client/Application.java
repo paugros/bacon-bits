@@ -377,7 +377,6 @@ public final class Application implements ValueChangeHandler<String> {
 			new ErrorPage(PageError.PAGE_NOT_FOUND);
 		}
 
-		layout.getSearchBox().reset();
 	}
 
 	private static void setLayout(Layout layout) {
