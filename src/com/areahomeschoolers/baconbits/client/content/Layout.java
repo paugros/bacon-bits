@@ -251,8 +251,7 @@ public final class Layout {
 			headerPanel.add(dm);
 			headerPanel.setCellVerticalAlignment(dm, HasVerticalAlignment.ALIGN_MIDDLE);
 		} else {
-			final ClickLabel login = new ClickLabel("", null);
-			login.setText("Log in / Create account");
+			final ClickLabel login = new ClickLabel("Log in / Create account");
 			login.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
