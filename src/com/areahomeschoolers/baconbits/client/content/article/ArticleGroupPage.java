@@ -32,7 +32,7 @@ public class ArticleGroupPage implements Page {
 					page.add(new ArticleWidget(item));
 				}
 
-				Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.NEW_EVENTS, MiniModule.UPCOMING_EVENTS);
+				Sidebar sb = Sidebar.create(MiniModule.ADS);
 				Application.getLayout().setPage("Articles", sb, page);
 			}
 		});

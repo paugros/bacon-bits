@@ -253,7 +253,7 @@ public class ArticlePage implements Page {
 	}
 
 	private void initializePage() {
-		sidebar.add(MiniModule.CITRUS, MiniModule.LINKS, MiniModule.MY_EVENTS, MiniModule.NEW_EVENTS, MiniModule.UPCOMING_EVENTS);
+		sidebar.add(MiniModule.ADS);
 
 		if (noTitle) {
 			createTextPage();

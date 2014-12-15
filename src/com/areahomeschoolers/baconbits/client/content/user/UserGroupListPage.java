@@ -43,7 +43,7 @@ public final class UserGroupListPage implements Page {
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
 			public void onDataReturn() {
-				Sidebar sb = Sidebar.create(MiniModule.CITRUS, MiniModule.ACTIVE_USERS, MiniModule.NEW_USERS, MiniModule.UPCOMING_EVENTS);
+				Sidebar sb = Sidebar.create(MiniModule.ACTIVE_USERS, MiniModule.NEW_USERS);
 				Application.getLayout().setPage(title, sb, page);
 			}
 		});

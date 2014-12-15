@@ -25,14 +25,22 @@ import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class HomePage implements Page {
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
@@ -137,6 +145,33 @@ public class HomePage implements Page {
 			}
 		});
 
+	}
+
+	@SuppressWarnings("unused")
+	private Widget createRaffleWidget() {
+		// rafflecopter
+		String html = "<div id=raffle><a class=\"rafl\" href=\"http://www.rafflecopter.com/rafl/display/797bf8a71/\" id=\"rc-797bf8a71\" rel=\"nofollow\">a Rafflecopter giveaway</a></div>";
+
+		HTML raffle = new HTML(html);
+		raffle.addAttachHandler(new Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+						@Override
+						public void execute() {
+							Element head = Document.get().getElementById("raffle");
+							ScriptElement sce = Document.get().createScriptElement();
+							sce.setType("text/javascript");
+							sce.setSrc("//widget.rafflecopter.com/load.js");
+							head.appendChild(sce);
+						}
+					});
+				}
+			}
+		});
+
+		return raffle;
 	}
 
 	private boolean signedUpForBooks() {
