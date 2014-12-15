@@ -171,7 +171,10 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		}
 
 		if (!Common.isNullOrBlank(nameLike)) {
-			sql += "and levenshtein(r.name, ?) < 4 ";
+			nameLike = nameLike.toLowerCase();
+			sql += "and lower(r.name) like ? or lower(?) like concat('%', r.name, '%') ";
+
+			sqlArgs.add("%" + nameLike + "%");
 			sqlArgs.add(nameLike);
 		}
 

@@ -40,7 +40,6 @@ import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
-import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -54,7 +53,6 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -116,7 +114,6 @@ public class ResourcePage implements Page {
 		titleVp.add(titleInput);
 		final VerticalPanel dupePanel = new VerticalPanel();
 		dupePanel.setSpacing(6);
-		titleVp.add(dupePanel);
 		dupePanel.getElement().getStyle().setBackgroundColor("#e2a7c1");
 
 		if (!resource.isSaved()) {
@@ -136,11 +133,11 @@ public class ResourcePage implements Page {
 						@Override
 						protected void doOnSuccess(ArrayList<Resource> result) {
 							if (result.isEmpty()) {
-								dupePanel.getElement().getStyle().setDisplay(Display.NONE);
+								dupePanel.removeFromParent();
 								return;
 							}
 
-							dupePanel.getElement().getStyle().setDisplay(Display.BLOCK);
+							titleVp.add(dupePanel);
 
 							String text = "The following resource";
 							if (result.size() == 1) {
@@ -148,13 +145,15 @@ public class ResourcePage implements Page {
 							} else {
 								text += "s have a ";
 							}
-							text += "similar name:";
+							text += "similar name";
 							Label message = new Label(text);
+							message.addStyleName("bold");
 
 							dupePanel.add(message);
 
 							for (Resource r : result) {
-								Hyperlink link = new Hyperlink(r.getName(), PageUrl.resource(r.getId()));
+								Anchor link = new Anchor(r.getName(), Url.getBaseUrl() + "#" + PageUrl.resource(0));
+								link.setTarget("_blank");
 								dupePanel.add(link);
 							}
 						}
@@ -166,6 +165,7 @@ public class ResourcePage implements Page {
 		titleInput.setVisibleLength(35);
 		titleInput.setMaxLength(50);
 		FormField titleField = form.createFormField("Name:", titleVp, titleDisplay);
+		titleField.setValidator(titleInput.getValidator());
 		titleField.setInitializer(new Command() {
 			@Override
 			public void execute() {

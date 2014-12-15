@@ -190,20 +190,19 @@ public final class MainMenu extends MenuBar {
 	private MenuBar getAdminMenu() {
 		final MenuBar menu = new MenuBar(true);
 
-		if (Application.administratorOf(17)) {
-			addLinkToMenu(menu, "Create Book Receipt", PageUrl.bookReceipt());
-			if (!Application.administratorOfCurrentOrg()) {
-				return menu;
-			}
+		if (Application.administratorOfCurrentOrg()) {
+			addLinkToMenu(menu, "Add Resource", PageUrl.resource(0));
+			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
+			addLinkToMenu(menu, "Add Article", PageUrl.article(0));
+			addLinkToMenu(menu, "Add User", PageUrl.user(0));
+			addLinkToMenu(menu, "Article Management", PageUrl.articleManagement());
+			addLinkToMenu(menu, "Group Management", PageUrl.userGroupList());
+			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
 		}
 
-		addLinkToMenu(menu, "Add Resource", PageUrl.resource(0));
-		addLinkToMenu(menu, "Add Event", PageUrl.event(0));
-		addLinkToMenu(menu, "Add Article", PageUrl.article(0));
-		addLinkToMenu(menu, "Add User", PageUrl.user(0));
-		addLinkToMenu(menu, "Article Management", PageUrl.articleManagement());
-		addLinkToMenu(menu, "Group Management", PageUrl.userGroupList());
-		addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
+		if (Application.administratorOf(17)) {
+			addLinkToMenu(menu, "Create Book Receipt", PageUrl.bookReceipt());
+		}
 
 		if (Application.isSystemAdministrator()) {
 			addLinkToMenu(menu, "Tag Management", PageUrl.tagManagement());
@@ -242,34 +241,38 @@ public final class MainMenu extends MenuBar {
 			});
 		}
 
-		addCommandToMenu(menu, "Edit Main Menu", new ScheduledCommand() {
-			@Override
-			public void execute() {
-				MainMenuEditDialog dialog = new MainMenuEditDialog(Application.getApplicationData().getDynamicMenuItems(), null);
-				dialog.center();
-			}
-		});
+		if (Application.administratorOfCurrentOrg()) {
+			addCommandToMenu(menu, "Edit Main Menu", new ScheduledCommand() {
+				@Override
+				public void execute() {
+					MainMenuEditDialog dialog = new MainMenuEditDialog(Application.getApplicationData().getDynamicMenuItems(), null);
+					dialog.center();
+				}
+			});
 
-		MenuBar pol = new MenuBar(true);
-		for (GroupPolicy gp : GroupPolicy.values()) {
-			int id = Application.getCurrentOrg().getPolicyId(gp);
-			String url = PageUrl.article(id);
-			if (id == 0) {
-				url += "&gp=" + gp.toString();
+			MenuBar pol = new MenuBar(true);
+			for (GroupPolicy gp : GroupPolicy.values()) {
+				int id = Application.getCurrentOrg().getPolicyId(gp);
+				String url = PageUrl.article(id);
+				if (id == 0) {
+					url += "&gp=" + gp.toString();
+				}
+				addLinkToMenu(pol, gp.getTitle(), url);
 			}
-			addLinkToMenu(pol, gp.getTitle(), url);
+
+			addMenuToMenu(menu, "Group Policies", pol);
 		}
 
-		addMenuToMenu(menu, "Group Policies", pol);
+		if (Application.isSystemAdministrator()) {
+			menu.addSeparator();
 
-		menu.addSeparator();
-
-		addCommandToMenu(menu, "Reload Page", new ScheduledCommand() {
-			@Override
-			public void execute() {
-				Application.reloadPage();
-			}
-		});
+			addCommandToMenu(menu, "Reload Page", new ScheduledCommand() {
+				@Override
+				public void execute() {
+					Application.reloadPage();
+				}
+			});
+		}
 
 		return menu;
 	}

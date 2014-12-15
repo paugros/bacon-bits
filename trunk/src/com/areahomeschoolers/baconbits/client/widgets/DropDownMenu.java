@@ -8,6 +8,7 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.VerticalAlign;
+import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -35,6 +36,7 @@ public class DropDownMenu extends Composite {
 		@Override
 		public void add(Widget w) {
 			w.getElement().getStyle().setDisplay(Display.BLOCK);
+			w.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 			super.add(w);
 		}
 	};
@@ -67,6 +69,18 @@ public class DropDownMenu extends Composite {
 		hp.add(arrow);
 
 		hp.setStylePrimaryName("DropDownMenu");
+
+		hp.addDomHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (popup.isShowing()) {
+					popup.hide();
+				} else {
+					show();
+				}
+			}
+		}, ClickEvent.getType());
+
 		initWidget(hp);
 
 		addDomHandler(new MouseOverHandler() {

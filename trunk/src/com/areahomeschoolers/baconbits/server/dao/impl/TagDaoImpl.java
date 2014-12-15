@@ -305,13 +305,15 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		}
 
 		String nameout = Common.join(words, " ");
-		int tagId = queryForInt(0, "select id from tags where lower(name) = ?", nameout.toLowerCase());
-		if (tagId > 0) {
-			tag.setId(tagId);
+		String sql = "select id, name from tags where lower(name) = ? or lower(name) = ? limit 1";
+		Data existingName = queryForObject(sql, ServerUtils.getGenericRowMapper(), nameout.toLowerCase(), nameout.toLowerCase() + "s");
+		if (existingName != null) {
+			tag.setId(existingName.getId());
+			tag.setName(existingName.get("name"));
 		} else {
 			tag.setName(nameout);
 			tag.setAddedById(ServerContext.getCurrentUserId());
-			String sql = "insert into tags (name, addedById) values(:name, :addedById)";
+			sql = "insert into tags (name, addedById) values(:name, :addedById)";
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
 			tag.setId(ServerUtils.getIdFromKeys(keys));
