@@ -62,10 +62,13 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			resource.setShowInAds(rs.getBoolean("showInAds"));
 			resource.setTagCount(rs.getInt("tagCount"));
 			resource.setAddressScope(rs.getString("addressScope"));
-			resource.setEmail(rs.getString("email"));
+			resource.setContactEmail(rs.getString("contactEmail"));
 			resource.setImageExtension(rs.getString("fileExtension"));
 			resource.setDirectoryPriority(rs.getBoolean("directoryPriority"));
 			resource.setAdDescription(rs.getString("adDescription"));
+			resource.setContactName(rs.getString("contactName"));
+			resource.setFacilityName(rs.getString("facilityName"));
+			resource.setFacebookUrl(rs.getString("facebookUrl"));
 
 			if (resource.getImageId() == null) {
 				resource.setImageExtension(rs.getString("tagFileExtension"));
@@ -216,8 +219,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 		if (r.isSaved()) {
 			String sql = "update resources set name = :name, startDate = :startDate, endDate = :endDate, url = :url, description = :description, showInAds = :showInAds, ";
-			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone, email = :email, ";
-			sql += "addressScopeId = :addressScopeId, directoryPriority = :directoryPriority, adDescription = :adDescription ";
+			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone, contactEmail = :contactEmail, ";
+			sql += "addressScopeId = :addressScopeId, directoryPriority = :directoryPriority, adDescription = :adDescription,  ";
+			sql += "contactName = :contactName, facilityName = :facilityName, facebookUrl = :facebookUrl ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -227,9 +231,11 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			r.setAddedById(ServerContext.getCurrentUserId());
 
 			String sql = "insert into resources (addedById, startDate, endDate, addedDate, name, url, description, adDescription, ";
-			sql += "address, street, city, state, zip, lat, lng, phone, showInAds, email, addressScopeId, directoryPriority) ";
+			sql += "address, street, city, state, zip, lat, lng, phone, showInAds, contactEmail, addressScopeId, directoryPriority, ";
+			sql += "contactName, facilityName, facebookUrl) ";
 			sql += "values(:addedById, :startDate, :endDate, now(), :name, :url, :description, :adDescription, ";
-			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds, :email, :addressScopeId, :directoryPriority)";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds, :contactEmail, :addressScopeId, :directoryPriority, ";
+			sql += ":contactName, :facilityName, :facebookUrl)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

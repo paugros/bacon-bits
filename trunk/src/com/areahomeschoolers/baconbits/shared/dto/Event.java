@@ -43,6 +43,9 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private double markupDollars;
 	private boolean markupOverride;
 	private boolean directoryPriority;
+	private String contactName;
+	private String contactEmail;
+
 	// address
 	private String address;
 	private String street;
@@ -163,6 +166,14 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 
 	public int getCloneFromId() {
 		return cloneFromId;
+	}
+
+	public String getContactEmail() {
+		return contactEmail;
+	}
+
+	public String getContactName() {
+		return contactName;
 	}
 
 	public double getCost() {
@@ -451,6 +462,14 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 
 	public void setCloneFromId(int cloneFromId) {
 		this.cloneFromId = cloneFromId;
+	}
+
+	public void setContactEmail(String contactEmail) {
+		this.contactEmail = contactEmail;
+	}
+
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
 	}
 
 	public void setCost(double cost) {

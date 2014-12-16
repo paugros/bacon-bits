@@ -81,6 +81,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setMaximumParticipants(rs.getInt("maximumParticipants"));
 			event.setMinimumParticipants(rs.getInt("minimumParticipants"));
 			event.setNotificationEmail(rs.getString("notificationEmail"));
+			event.setContactEmail(rs.getString("contactEmail"));
+			event.setContactName(rs.getString("contactName"));
 			event.setPublishDate(rs.getTimestamp("publishDate"));
 			event.setRegistrationEndDate(rs.getTimestamp("registrationEndDate"));
 			event.setRegistrationStartDate(rs.getTimestamp("registrationStartDate"));
@@ -838,6 +840,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, requiresRegistration = :requiresRegistration, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
 			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, directoryPriority = :directoryPriority, ";
+			sql += "contactName = :contactName, contactEmail = :contactEmail, ";
 			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price, phone = :phone, website = :website ";
 			sql += "where id = :id";
 			update(sql, namedParams);
@@ -857,12 +860,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setOwningOrgId(ServerContext.getCurrentOrgId());
 
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
-			sql += "markupOverride, markupPercent, markupDollars, facilityName, directoryPriority, ";
+			sql += "markupOverride, markupPercent, markupDollars, facilityName, directoryPriority, contactName, contactEmail, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, notificationEmail, owningOrgId, ";
 			sql += "address, street, city, state, zip, lat, lng, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, :markup, ";
-			sql += ":markupOverride, :markupPercent, :markupDollars, :facilityName, :directoryPriority, ";
+			sql += ":markupOverride, :markupPercent, :markupDollars, :facilityName, :directoryPriority, :contactName, :contactEmail, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :notificationEmail, :owningOrgId, ";
 			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
