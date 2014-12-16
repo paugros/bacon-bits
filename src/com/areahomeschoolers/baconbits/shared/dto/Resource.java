@@ -17,7 +17,7 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 	private String url;
 	private String description;
 	private String phone;
-	private String email;
+	private String contactEmail;
 	private String name;
 	private int addressScopeId;
 	private String adDescription;
@@ -27,6 +27,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 	private Integer imageId;
 	private Integer smallImageId;
 	private String imageExtension;
+
+	private String contactName;
+	private String facilityName;
+	private String facebookUrl;
 
 	private Date startDate;
 	private Date endDate;
@@ -91,6 +95,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		return clickCount;
 	}
 
+	public String getContactName() {
+		return contactName;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -99,12 +107,20 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		return directoryPriority;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getContactEmail() {
+		return contactEmail;
 	}
 
 	public Date getEndDate() {
 		return endDate;
+	}
+
+	public String getFacebookUrl() {
+		return facebookUrl;
+	}
+
+	public String getFacilityName() {
+		return facilityName;
 	}
 
 	public String getImageExtension() {
@@ -221,6 +237,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		this.clickCount = clickCount;
 	}
 
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -229,12 +249,20 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		this.directoryPriority = directoryPriority;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setContactEmail(String email) {
+		this.contactEmail = email;
 	}
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public void setFacebookUrl(String facebookUrl) {
+		this.facebookUrl = facebookUrl;
+	}
+
+	public void setFacilityName(String facilityName) {
+		this.facilityName = facilityName;
 	}
 
 	public void setImageExtension(String imageExtension) {

@@ -212,6 +212,44 @@ public class ResourcePage implements Page {
 		form.addField(addressField);
 		ft.addField(addressField);
 
+		final Label facilityDisplay = new Label();
+		final TextBox facilityInput = new TextBox();
+		facilityInput.setMaxLength(100);
+		FormField facilityField = form.createFormField("Facility name:", facilityInput, facilityDisplay);
+		facilityField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				facilityDisplay.setText(resource.getFacilityName());
+				facilityInput.setText(resource.getFacilityName());
+			}
+		});
+		facilityField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setFacilityName(facilityInput.getText());
+			}
+		});
+		ft.addField(facilityField);
+
+		final Label contactDisplay = new Label();
+		final TextBox contactInput = new TextBox();
+		contactInput.setMaxLength(100);
+		FormField contactField = form.createFormField("Contact name:", contactInput, contactDisplay);
+		contactField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				contactDisplay.setText(resource.getContactName());
+				contactInput.setText(resource.getContactName());
+			}
+		});
+		contactField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setContactName(contactInput.getText());
+			}
+		});
+		ft.addField(contactField);
+
 		final Label emailDisplay = new Label();
 		final EmailTextBox emailInput = new EmailTextBox();
 		emailInput.setMaxLength(100);
@@ -219,20 +257,20 @@ public class ResourcePage implements Page {
 		emailField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				emailDisplay.setText(Common.getDefaultIfNull(resource.getEmail()));
-				emailInput.setText(resource.getEmail());
+				emailDisplay.setText(Common.getDefaultIfNull(resource.getContactEmail()));
+				emailInput.setText(resource.getContactEmail());
 			}
 		});
 		emailField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				resource.setEmail(emailInput.getText());
+				resource.setContactEmail(emailInput.getText());
 			}
 		});
 		ft.addField(emailField);
 
 		final Label phoneDisplay = new Label();
-		final PhoneTextBox phoneInput = new PhoneTextBox();
+		final PhoneTextBox phoneInput = new PhoneTextBox(true);
 		FormField phoneField = form.createFormField("Phone:", phoneInput, phoneDisplay);
 		phoneField.setInitializer(new Command() {
 			@Override
@@ -248,6 +286,26 @@ public class ResourcePage implements Page {
 			}
 		});
 		ft.addField(phoneField);
+
+		final Label facebookDisplay = new Label();
+		final TextBox facebookInput = new TextBox();
+		facebookInput.setVisibleLength(50);
+		facebookInput.setMaxLength(200);
+		FormField facebookField = form.createFormField("Facebook URL:", facebookInput, facebookDisplay);
+		facebookField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				facebookDisplay.setText(resource.getFacebookUrl());
+				facebookInput.setText(resource.getFacebookUrl());
+			}
+		});
+		facebookField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setFacebookUrl(facebookInput.getText());
+			}
+		});
+		ft.addField(facebookField);
 
 		if (Application.isSystemAdministrator()) {
 			final Label adDisplay = new Label();
@@ -450,6 +508,7 @@ public class ResourcePage implements Page {
 		pp.setWidth("100%");
 		if (resource.isSaved()) {
 			EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, resource.getId());
+			image.setEnabled(Application.isSystemAdministrator());
 
 			if (resource.getImageId() != null) {
 				image.setImage(new Image(ClientUtils.createDocumentUrl(resource.getImageId(), resource.getImageExtension())));

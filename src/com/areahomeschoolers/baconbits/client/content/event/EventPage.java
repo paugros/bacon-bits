@@ -228,6 +228,44 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(facilityField);
 
+		final Label contactNameDisplay = new Label();
+		final TextBox contactNameInput = new TextBox();
+		contactNameInput.setMaxLength(100);
+		FormField contactNameField = form.createFormField("Contact name:", contactNameInput, contactNameDisplay);
+		contactNameField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				contactNameDisplay.setText(calendarEvent.getContactName());
+				contactNameInput.setText(calendarEvent.getContactName());
+			}
+		});
+		contactNameField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				calendarEvent.setContactName(contactNameInput.getText());
+			}
+		});
+		fieldTable.addField(contactNameField);
+
+		final Label contactEmailDisplay = new Label();
+		final TextBox contactEmailInput = new TextBox();
+		contactEmailInput.setMaxLength(100);
+		FormField contactEmailField = form.createFormField("Contact email:", contactEmailInput, contactEmailDisplay);
+		contactEmailField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				contactEmailDisplay.setText(calendarEvent.getContactEmail());
+				contactEmailInput.setText(calendarEvent.getContactEmail());
+			}
+		});
+		contactEmailField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				calendarEvent.setContactEmail(contactEmailInput.getText());
+			}
+		});
+		fieldTable.addField(contactEmailField);
+
 		AddressField af = new AddressField(calendarEvent);
 		final FormField addressField = af.getFormField();
 		af.getInputPanel().setSpacing(6);
@@ -344,7 +382,7 @@ public class EventPage implements Page {
 
 		if (Application.administratorOf(calendarEvent) || !Common.isNullOrBlank(calendarEvent.getPhone())) {
 			final Label phoneDisplay = new Label();
-			final PhoneTextBox phoneInput = new PhoneTextBox();
+			final PhoneTextBox phoneInput = new PhoneTextBox(true);
 			FormField phoneField = form.createFormField("Phone:", phoneInput, phoneDisplay);
 			phoneField.setInitializer(new Command() {
 				@Override
