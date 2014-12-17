@@ -6,7 +6,8 @@ import com.areahomeschoolers.baconbits.shared.Common;
 
 public class Tag extends EntityDto<Tag> {
 	public enum TagMappingType {
-		USER("#e4ed81"), ARTICLE("#eca575"), EVENT("#80c87d"), BOOK("#f28e76"), RESOURCE("#92ceef");
+		// USER("#e4ed81"), ARTICLE("#eca575"), EVENT("#80c87d"), BOOK("#f28e76"), RESOURCE("#92ceef");
+		USER("#03a03e"), ARTICLE("#982395"), EVENT("#24a8ac"), BOOK("#ffa203"), RESOURCE("#0387cb");
 
 		private String color;
 
