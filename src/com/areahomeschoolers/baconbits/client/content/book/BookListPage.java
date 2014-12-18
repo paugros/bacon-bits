@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
@@ -64,16 +65,13 @@ public final class BookListPage implements Page {
 			args.put(BookArg.WITHIN_MILES, Constants.defaultSearchRadius);
 		}
 
-		Hyperlink home = new Hyperlink("Home", PageUrl.home());
-		Hyperlink cat = new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK"));
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString();
+		CookieCrumb cc = new CookieCrumb();
+		cc.add(new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			ccText += "&nbsp;>&nbsp;" + URL.decode(Url.getParameter("tn"));
+			cc.add(URL.decode(Url.getParameter("tn")));
 		} else {
-			ccText += "&nbsp;>&nbsp;Books";
+			cc.add("Books");
 		}
-		HTML cc = new HTML(ccText);
-		cc.addStyleName("largeText");
 		page.add(cc);
 
 		page.add(optionsPanel);

@@ -13,6 +13,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
+import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
@@ -35,7 +36,6 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -57,16 +57,13 @@ public final class UserListPage implements Page {
 
 		final String title = "Directory";
 
-		Hyperlink home = new Hyperlink("Home", PageUrl.home());
-		Hyperlink cat = new Hyperlink("Homeschoolers By Interests", PageUrl.tagGroup("USER"));
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString();
+		CookieCrumb cc = new CookieCrumb();
+		cc.add(new Hyperlink("Homeschoolers By Interests", PageUrl.tagGroup("USER")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			ccText += "&nbsp;>&nbsp;" + URL.decode(Url.getParameter("tn"));
+			cc.add(URL.decode(Url.getParameter("tn")));
 		} else {
-			ccText += "&nbsp;>&nbsp;Homeschoolers";
+			cc.add("Homeschoolers");
 		}
-		HTML cc = new HTML(ccText);
-		cc.addStyleName("largeText");
 		page.add(cc);
 
 		if (Application.isSystemAdministrator()) {

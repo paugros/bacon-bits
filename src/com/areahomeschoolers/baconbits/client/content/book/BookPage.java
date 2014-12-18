@@ -29,7 +29,6 @@ import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -107,17 +106,6 @@ public class BookPage implements Page {
 		pp.add(ivp);
 		pp.setCellWidth(ivp, "220px");
 		ivp.add(image);
-		if (editable) {
-			ClickLabel change = new ClickLabel("Change image...", new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					image.click();
-				}
-			});
-			change.getElement().getStyle().setMarginLeft(10, Unit.PX);
-			change.addStyleName("smallText");
-			ivp.add(change);
-		}
 
 		pp.add(fieldTable);
 

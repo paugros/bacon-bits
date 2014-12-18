@@ -15,6 +15,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class EditableImage extends Composite {
 	private Image image;
@@ -24,6 +25,7 @@ public class EditableImage extends Composite {
 	private DocumentLinkType linkType;
 	private boolean enabled = true;
 	private ImageResource imageResource;
+	private VerticalPanel vp = new VerticalPanel();
 
 	public EditableImage(DocumentLinkType documentLinkType, int entityId) {
 		itemId = entityId;
@@ -83,7 +85,9 @@ public class EditableImage extends Composite {
 			}
 		}
 
-		initWidget(image);
+		vp.add(image);
+
+		initWidget(vp);
 
 		if (!enabled) {
 			return;
@@ -91,12 +95,17 @@ public class EditableImage extends Composite {
 
 		image.addStyleName("pointer");
 
-		image.addClickHandler(new ClickHandler() {
+		ClickHandler cl = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				click();
 			}
-		});
+		};
+		image.addClickHandler(cl);
+
+		ClickLabel label = new ClickLabel("Change picture...", cl);
+		label.addStyleName("smallText");
+		vp.add(label);
 	}
 
 	public void setEnabled(boolean enabled) {

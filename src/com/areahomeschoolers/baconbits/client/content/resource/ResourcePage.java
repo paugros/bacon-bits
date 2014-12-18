@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
@@ -18,16 +19,16 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
+import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
@@ -41,6 +42,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -52,7 +54,10 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -77,8 +82,9 @@ public class ResourcePage implements Page {
 	private ResourceServiceAsync resourceService = (ResourceServiceAsync) ServiceCache.getService(ResourceService.class);
 	private TagSection tagSection;
 	private FormField tagField;
+	private String title;
 
-	public ResourcePage(VerticalPanel page) {
+	public ResourcePage(VerticalPanel p) {
 		int resourceId = Url.getIntegerParameter("resourceId");
 
 		if (!Application.isAuthenticated() && resourceId < 0) {
@@ -86,7 +92,7 @@ public class ResourcePage implements Page {
 			return;
 		}
 
-		this.page = page;
+		this.page = p;
 
 		resourceService.getPageData(resourceId, new Callback<ResourcePageData>() {
 			@Override
@@ -95,15 +101,75 @@ public class ResourcePage implements Page {
 					new ErrorPage(PageError.PAGE_NOT_FOUND);
 					return;
 				}
+
 				resource = result.getResource();
+
+				title = resource.isSaved() ? resource.getName() : "New Resource";
+
+				CookieCrumb cc = new CookieCrumb();
+				cc.add(new Hyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE")));
+				cc.add(new Hyperlink("Resources", PageUrl.articleList()));
+				if (Url.getBooleanParameter("details")) {
+					cc.add(new Hyperlink("Resource", PageUrl.resource(resource.getId())));
+					cc.add("Edit details");
+				} else {
+					cc.add("Resource");
+				}
+				page.add(cc);
+
 				// pd = result;
-				initializePage();
+				if (resource.isSaved() && !Url.getBooleanParameter("details")) {
+					createViewPage();
+				} else {
+					createDetailsPage();
+				}
+
+				Application.getLayout().setPage(title, page);
 			}
 		});
 	}
 
 	private boolean allowEdit() {
 		return Application.isAuthenticated();
+	}
+
+	private void createDetailsPage() {
+		createFieldTable();
+		form.initialize();
+
+		if (!resource.isSaved()) {
+			form.configureForAdd(ft);
+		} else {
+			form.emancipate();
+		}
+
+		HorizontalPanel pp = new HorizontalPanel();
+		pp.setWidth("100%");
+		if (resource.isSaved()) {
+			EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, resource.getId());
+			image.setEnabled(Application.isSystemAdministrator());
+
+			if (resource.getImageId() != null) {
+				image.setImage(new Image(ClientUtils.createDocumentUrl(resource.getImageId(), resource.getImageExtension())));
+			} else {
+				image.setImage(new Image(MainImageBundle.INSTANCE.defaultLarge()));
+			}
+			image.populate();
+			image.getElement().getStyle().setMarginRight(10, Unit.PX);
+			pp.add(image);
+
+			image.addStyleName("profilePic");
+			ft.removeStyleName("sectionContent");
+			pp.addStyleName("sectionContent");
+			pp.add(image);
+		}
+
+		pp.add(ft);
+
+		pp.setWidth("1000px");
+		page.add(pp);
+
+		form.setEnabled(allowEdit());
 	}
 
 	private void createFieldTable() {
@@ -219,7 +285,7 @@ public class ResourcePage implements Page {
 		facilityField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				facilityDisplay.setText(resource.getFacilityName());
+				facilityDisplay.setText(Common.getDefaultIfNull(resource.getFacilityName()));
 				facilityInput.setText(resource.getFacilityName());
 			}
 		});
@@ -238,7 +304,7 @@ public class ResourcePage implements Page {
 		contactField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				contactDisplay.setText(resource.getContactName());
+				contactDisplay.setText(Common.getDefaultIfNull(resource.getContactName()));
 				contactInput.setText(resource.getContactName());
 			}
 		});
@@ -295,7 +361,7 @@ public class ResourcePage implements Page {
 		facebookField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				facebookDisplay.setText(resource.getFacebookUrl());
+				facebookDisplay.setText(Common.getDefaultIfNull(resource.getFacebookUrl()));
 				facebookInput.setText(resource.getFacebookUrl());
 			}
 		});
@@ -492,46 +558,111 @@ public class ResourcePage implements Page {
 		tagField.removeEditLabel();
 	}
 
-	private void initializePage() {
-		String title = resource.isSaved() ? resource.getName() : "New Resource";
-
-		createFieldTable();
-		form.initialize();
-
-		if (!resource.isSaved()) {
-			form.configureForAdd(ft);
-		} else {
-			form.emancipate();
-		}
-
+	private void createViewPage() {
 		HorizontalPanel pp = new HorizontalPanel();
-		pp.setWidth("100%");
-		if (resource.isSaved()) {
-			EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, resource.getId());
-			image.setEnabled(Application.isSystemAdministrator());
 
-			if (resource.getImageId() != null) {
-				image.setImage(new Image(ClientUtils.createDocumentUrl(resource.getImageId(), resource.getImageExtension())));
-			} else {
-				image.setImage(new Image(MainImageBundle.INSTANCE.defaultLarge()));
-			}
-			image.populate();
-			image.getElement().getStyle().setMarginRight(10, Unit.PX);
-			pp.add(image);
+		EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, resource.getId());
+		if (resource.getImageId() != null) {
+			image.setImage(new Image(ClientUtils.createDocumentUrl(resource.getImageId(), resource.getImageExtension())));
+		} else {
+			image.setImage(new Image(MainImageBundle.INSTANCE.defaultLarge()));
+		}
+		image.setEnabled(Application.isSystemAdministrator());
+		image.populate();
+		pp.add(image);
+		pp.setCellWidth(image, "1%");
 
-			image.addStyleName("profilePic");
-			ft.removeStyleName("sectionContent");
-			pp.addStyleName("sectionContent");
-			pp.add(image);
+		VerticalPanel vp = new VerticalPanel();
+
+		Label titleLabel = new Label(resource.getName());
+		titleLabel.addStyleName("hugeText");
+
+		vp.add(titleLabel);
+
+		if (!Common.isNullOrBlank(resource.getFacilityName())) {
+			vp.add(new Label(resource.getFacilityName()));
 		}
 
-		pp.add(ft);
+		if (!Common.isNullOrBlank(resource.getAddress())) {
+			Anchor address = new Anchor(resource.getAddress(), "http://maps.google.com/maps?q=" + resource.getAddress());
+			address.setTarget("_blank");
 
-		page.add(WidgetFactory.newSection(title, pp, ContentWidth.MAXWIDTH1000PX));
+			vp.add(address);
+		}
 
-		form.setEnabled(allowEdit());
+		String text = "";
+		if (!Common.isNullOrBlank(resource.getContactName())) {
+			text += resource.getContactName() + "<br>";
+		}
 
-		Application.getLayout().setPage(title, page);
+		if (!Common.isNullOrBlank(resource.getContactEmail())) {
+			text += "<a href=\"mailto:" + resource.getContactEmail() + "\">" + resource.getContactEmail() + "</a><br>";
+		}
+
+		if (!Common.isNullOrBlank(resource.getPhone())) {
+			text += resource.getPhone() + "<br>";
+		}
+
+		PaddedPanel lp = new PaddedPanel();
+		if (!Common.isNullOrBlank(resource.getFacebookUrl())) {
+			Image fb = new Image(MainImageBundle.INSTANCE.faceBook());
+			fb.getElement().getStyle().setMarginTop(5, Unit.PX);
+			String fbLink = "<a href=\"" + resource.getFacebookUrl() + "\" target=_blank>" + fb + "</a>";
+			lp.add(new HTML(fbLink));
+		}
+
+		if (!Common.isNullOrBlank(resource.getUrl())) {
+			HTML web = new HTML("<a href=\"" + resource.getUrl() + "\" target=_blank>Web site</a>");
+			lp.add(web);
+			lp.setCellVerticalAlignment(web, HasVerticalAlignment.ALIGN_MIDDLE);
+		}
+
+		if (lp.getWidgetCount() > 0) {
+			text += lp;
+		}
+
+		if (!text.isEmpty()) {
+			HTML contactInfo = new HTML();
+			contactInfo.getElement().getStyle().setPadding(10, Unit.PX);
+			contactInfo.setHTML(text);
+
+			vp.add(contactInfo);
+		}
+
+		TagSection ts = new TagSection(TagMappingType.RESOURCE, resource.getId());
+		ts.setEditingEnabled(false);
+		ts.populate();
+
+		vp.add(ts);
+
+		pp.add(vp);
+
+		if (allowEdit()) {
+			Hyperlink edit = new Hyperlink("Edit details", PageUrl.resource(resource.getId()) + "&details=true");
+			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
+			pp.add(edit);
+			pp.setCellHorizontalAlignment(edit, HasHorizontalAlignment.ALIGN_RIGHT);
+		}
+
+		pp.setSpacing(10);
+
+		VerticalPanel ovp = new VerticalPanel();
+		ovp.addStyleName("sectionContent");
+
+		ovp.add(pp);
+
+		HTML description = new HTML(resource.getDescription());
+		description.getElement().getStyle().setMarginLeft(15, Unit.PX);
+		description.getElement().getStyle().setMarginRight(15, Unit.PX);
+		description.getElement().getStyle().setMarginBottom(15, Unit.PX);
+		ovp.add(description);
+		ovp.setWidth("700px");
+
+		PaddedPanel outerPanel = new PaddedPanel(10);
+		outerPanel.add(new AdsMiniModule());
+		outerPanel.add(ovp);
+
+		page.add(outerPanel);
 	}
 
 	private void save(final FormField field) {

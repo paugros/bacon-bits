@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
+import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
@@ -19,7 +20,6 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -34,20 +34,17 @@ public final class ArticleListPage implements Page {
 		}
 		final String title = "Articles";
 
-		Hyperlink home = new Hyperlink("Home", PageUrl.home());
-		Hyperlink cat = new Hyperlink("Articles By Type", PageUrl.tagGroup("ARTICLE"));
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString();
+		CookieCrumb cc = new CookieCrumb();
+		cc.add(new Hyperlink("Articles By Type", PageUrl.tagGroup("ARTICLE")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			ccText += "&nbsp;>&nbsp;" + URL.decode(Url.getParameter("tn"));
+			cc.add(URL.decode(Url.getParameter("tn")));
 		} else {
-			ccText += "&nbsp;>&nbsp;Articles";
+			cc.add("Articles");
 		}
-		HTML cc = new HTML(ccText);
-		cc.addStyleName("largeText");
 		page.add(cc);
 
 		if (Application.memberOf(33)) {
-			AddLink link = new AddLink("Add Resource", PageUrl.resource(0));
+			AddLink link = new AddLink("Add Article", PageUrl.article(0));
 			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
 			page.add(link);
 		}
