@@ -178,10 +178,10 @@ public class UserPage implements Page {
 	}
 
 	private native void createBarcode(String bookId) /*-{
-														$wnd.$('#barcode_' + bookId).barcode({
-														code : 'code39'
-														});
-														}-*/;
+		$wnd.$('#barcode_' + bookId).barcode({
+			code : 'code39'
+		});
+	}-*/;
 
 	private Widget createBreadCrumb() {
 		PaddedPanel pp = new PaddedPanel();
@@ -475,7 +475,7 @@ public class UserPage implements Page {
 								}
 							}));
 
-							table.getTitleBar().addLinkWidget(new Label("Print labels:"));
+							table.getTitleBar().addLink(new Label("Print labels:"));
 
 							table.getTitleBar().addLink(new ClickLabel("all", new ClickHandler() {
 								@Override

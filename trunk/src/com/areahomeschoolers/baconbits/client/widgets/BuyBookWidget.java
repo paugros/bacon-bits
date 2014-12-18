@@ -33,7 +33,9 @@ public class BuyBookWidget extends Composite {
 		cartPanel.clear();
 
 		if (book.getInMyShoppingCart()) {
-			cartPanel.add(new Label("Added to cart - "));
+			Label add = new Label("Added to cart - ");
+			add.setWordWrap(false);
+			cartPanel.add(add);
 			Hyperlink link = new Hyperlink("checkout", PageUrl.payment());
 			cartPanel.add(link);
 			return;

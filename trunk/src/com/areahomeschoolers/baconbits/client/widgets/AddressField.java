@@ -108,7 +108,7 @@ public class AddressField {
 
 		vp.add(addressInput);
 
-		addressField = new FormField("Address:", addressInput, addressDisplay);
+		addressField = new FormField("Address:", vp, addressDisplay);
 		addressField.setInitializer(new Command() {
 			@Override
 			public void execute() {

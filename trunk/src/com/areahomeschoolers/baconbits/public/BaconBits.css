@@ -574,12 +574,13 @@ img {
 /* 	border-bottom: none; */
 }
 
-.titleBarLink {
+.linkPanelItem {
 /* 	background: rgba(255,255,255,.5); */
 /* 	-webkit-border-radius: 2px; */
 /* 	-moz-border-radius: 2px; */
 /* 	border-radius: 2px; */
 	white-space: nowrap;
+	font-weight: bold;
 	display: inline-block;
 	padding: 1px 5px;
 	margin: 0px;
