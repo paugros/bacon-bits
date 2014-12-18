@@ -414,8 +414,8 @@ public class BookFieldTable extends FieldTable {
 		final Label notesDisplay = new Label();
 		final TextBox notesInput = new TextBox();
 		notesInput.setVisibleLength(50);
-		notesInput.setMaxLength(1000);
-		FormField notesField = form.createFormField("Notes:", notesInput, notesDisplay);
+		notesInput.setMaxLength(100);
+		FormField notesField = form.createFormField("Seller notes:", notesInput, notesDisplay);
 		notesField.setInitializer(new Command() {
 			@Override
 			public void execute() {

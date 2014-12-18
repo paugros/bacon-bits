@@ -41,6 +41,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
+import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -110,10 +111,10 @@ public class ResourcePage implements Page {
 				cc.add(new Hyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE")));
 				cc.add(new Hyperlink("Resources", PageUrl.resourceList()));
 				if (Url.getBooleanParameter("details")) {
-					cc.add(new Hyperlink("Resource", PageUrl.resource(resource.getId())));
+					cc.add(new Hyperlink(resource.getName(), PageUrl.resource(resource.getId())));
 					cc.add("Edit details");
 				} else {
-					cc.add("Resource");
+					cc.add(resource.getName());
 				}
 				page.add(cc);
 
@@ -158,7 +159,6 @@ public class ResourcePage implements Page {
 			image.getElement().getStyle().setMarginRight(10, Unit.PX);
 			pp.add(image);
 
-			image.addStyleName("profilePic");
 			ft.removeStyleName("sectionContent");
 			pp.addStyleName("sectionContent");
 			pp.add(image);
@@ -559,7 +559,9 @@ public class ResourcePage implements Page {
 	}
 
 	private void createViewPage() {
-		HorizontalPanel pp = new HorizontalPanel();
+		PaddedPanel pp = new PaddedPanel(10);
+		pp.getElement().getStyle().setMarginTop(10, Unit.PX);
+		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
 
 		EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, resource.getId());
 		if (resource.getImageId() != null) {
@@ -592,15 +594,15 @@ public class ResourcePage implements Page {
 
 		String text = "";
 		if (!Common.isNullOrBlank(resource.getContactName())) {
-			text += resource.getContactName() + "<br>";
+			text += Formatter.formatNoteText(resource.getContactName()) + "<br>";
 		}
 
 		if (!Common.isNullOrBlank(resource.getContactEmail())) {
-			text += "<a href=\"mailto:" + resource.getContactEmail() + "\">" + resource.getContactEmail() + "</a><br>";
+			text += "<a href=\"mailto:" + resource.getContactEmail() + "\">" + Formatter.formatNoteText(resource.getContactEmail()) + "</a><br>";
 		}
 
 		if (!Common.isNullOrBlank(resource.getPhone())) {
-			text += resource.getPhone() + "<br>";
+			text += Formatter.formatNoteText(resource.getPhone()) + "<br>";
 		}
 
 		PaddedPanel lp = new PaddedPanel();
@@ -629,12 +631,6 @@ public class ResourcePage implements Page {
 			vp.add(contactInfo);
 		}
 
-		TagSection ts = new TagSection(TagMappingType.RESOURCE, resource.getId());
-		ts.setEditingEnabled(false);
-		ts.populate();
-
-		vp.add(ts);
-
 		pp.add(vp);
 
 		if (allowEdit()) {
@@ -644,18 +640,31 @@ public class ResourcePage implements Page {
 			pp.setCellHorizontalAlignment(edit, HasHorizontalAlignment.ALIGN_RIGHT);
 		}
 
-		pp.setSpacing(10);
-
 		VerticalPanel ovp = new VerticalPanel();
 		ovp.addStyleName("sectionContent");
 
 		ovp.add(pp);
 
-		HTML description = new HTML(resource.getDescription());
-		description.getElement().getStyle().setMarginLeft(15, Unit.PX);
-		description.getElement().getStyle().setMarginRight(15, Unit.PX);
-		description.getElement().getStyle().setMarginBottom(15, Unit.PX);
-		ovp.add(description);
+		TagSection ts = new TagSection(TagMappingType.RESOURCE, resource.getId());
+		ts.setEditingEnabled(false);
+		ts.populate();
+
+		ovp.add(ts);
+
+		if (!Common.isNullOrBlank(resource.getDescription())) {
+			HTML desc = new HTML(Formatter.formatNoteText(resource.getDescription()));
+			desc.getElement().getStyle().setMarginLeft(15, Unit.PX);
+			desc.getElement().getStyle().setMarginRight(15, Unit.PX);
+			desc.getElement().getStyle().setMarginBottom(15, Unit.PX);
+			desc.getElement().getStyle().setPadding(10, Unit.PX);
+			desc.getElement().getStyle().setBackgroundColor("#ffffff");
+			desc.getElement().getStyle().setBorderColor("#cccccc");
+			desc.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+			desc.getElement().getStyle().setBorderWidth(1, Unit.PX);
+
+			ovp.add(desc);
+		}
+
 		ovp.setWidth("700px");
 
 		PaddedPanel outerPanel = new PaddedPanel(10);

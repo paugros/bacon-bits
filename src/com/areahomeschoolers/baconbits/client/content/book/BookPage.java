@@ -3,8 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.book;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.Sidebar;
-import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
@@ -16,21 +15,17 @@ import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
-import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
-import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
-import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -62,34 +57,41 @@ public class BookPage implements Page {
 				pageData = result;
 
 				book = result.getBook();
+				final String title = book.isSaved() ? book.getTitle() : "New Book";
 
-				initializePage();
+				CookieCrumb cc = new CookieCrumb();
+				cc.add(new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
+				cc.add(new Hyperlink("Books", PageUrl.bookList()));
+				if (Url.getBooleanParameter("details")) {
+					cc.add(new Hyperlink(book.getTitle(), PageUrl.book(book.getId())));
+					cc.add("Edit details");
+				} else {
+					cc.add(book.getTitle());
+				}
+				page.add(cc);
+
+				if (book.isSaved() && !Url.getBooleanParameter("details")) {
+					createViewPage();
+				} else {
+					createDetailsPage();
+				}
+
+				Application.getLayout().setPage(title, page);
 			}
 		});
 	}
 
-	private void initializePage() {
-		final String title = book.isSaved() ? book.getTitle() : "New Book";
+	private void createDetailsPage() {
 		fieldTable = new BookFieldTable(form, book, pageData);
 		form.initialize();
 
-		PaddedPanel pp = new PaddedPanel();
-
+		HorizontalPanel pp = new HorizontalPanel();
+		pp.setWidth("100%");
 		if (!book.isSaved()) {
 			form.configureForAdd(fieldTable);
 		} else {
 			form.emancipate();
 		}
-
-		TitleBar tb = new TitleBar(title, TitleBarStyle.SECTION);
-		tb.addLink(new ClickLabel("Contact seller", new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				BookTable.showEmailDialog(book);
-			}
-		}));
-		Hyperlink link = new Hyperlink("More from this seller", PageUrl.bookList() + "&sellerId=" + book.getUserId());
-		tb.addLink(link);
 
 		boolean editable = Application.administratorOf(book);
 		final EditableImage image = new EditableImage(DocumentLinkType.BOOK, book.getId());
@@ -100,26 +102,38 @@ public class BookPage implements Page {
 		}
 		image.setEnabled(editable);
 		image.populate();
-		image.addStyleName("profilePic");
 		fieldTable.removeStyleName("sectionContent");
-		VerticalPanel ivp = new VerticalPanel();
-		pp.add(ivp);
-		pp.setCellWidth(ivp, "220px");
-		ivp.add(image);
+		pp.addStyleName("sectionContent");
+		image.getElement().getStyle().setMargin(10, Unit.PX);
+		pp.add(image);
+		pp.setCellWidth(image, "1%");
 
 		pp.add(fieldTable);
 
 		VerticalPanel vp = new VerticalPanel();
-		vp.addStyleName("sectionContent");
-		vp.setWidth("100%");
+		vp.setWidth("1000px");
 		vp.add(pp);
 
-		page.add(WidgetFactory.newSection(tb, vp, ContentWidth.MAXWIDTH1000PX));
+		page.add(vp);
 
 		form.setEnabled(Application.administratorOf(book));
+	}
 
-		Sidebar sb = Sidebar.create(MiniModule.ADS, MiniModule.SELL_BOOKS);
-		Application.getLayout().setPage(title, sb, page);
+	private void createViewPage() {
+		HorizontalPanel pp = new HorizontalPanel();
+
+		BookDetailsPanel bp = new BookDetailsPanel(book);
+		pp.add(bp);
+
+		pp.addStyleName("sectionContent");
+
+		PaddedPanel outerPanel = new PaddedPanel(10);
+		outerPanel.add(new AdsMiniModule());
+		outerPanel.add(pp);
+		outerPanel.setCellWidth(pp, "800px");
+
+		page.add(outerPanel);
+
 	}
 
 	private void save(final FormField field) {

@@ -16,14 +16,12 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,7 +46,7 @@ public class TitleBar extends Composite {
 	private Label titleLabel = new Label();
 	protected HorizontalPanel totalPanel = new HorizontalPanel();
 	private HorizontalPanel widgetPanel = new HorizontalPanel();
-	private PaddedPanel linkPanel = new PaddedPanel();
+	private TitleBarLinkPanel linkPanel = new TitleBarLinkPanel();
 	protected PaddedPanel controlPanel = new PaddedPanel();
 	protected String titleText;
 	private Widget titleWidget, contents;
@@ -130,20 +128,8 @@ public class TitleBar extends Composite {
 		controlPanel.add(control);
 	}
 
-	/**
-	 * Adds a link to the left {@link LinkPanel}.
-	 * 
-	 * @param link
-	 */
 	public void addLink(Widget link) {
-		if (link instanceof Anchor || link instanceof Hyperlink || link instanceof ClickLabel) {
-			link.addStyleName("titleBarLink");
-		}
 		linkPanel.add(link);
-	}
-
-	public void addLinkWidget(Widget w) {
-		linkPanel.add(w);
 	}
 
 	public void addTotalWidget(Widget w) {
@@ -241,10 +227,6 @@ public class TitleBar extends Composite {
 
 			}
 		});
-	}
-
-	public void clearLinks() {
-		linkPanel.clear();
 	}
 
 	public void collapseContents() {

@@ -16,6 +16,7 @@ import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
 import com.google.gwt.dom.client.Style.Unit;
@@ -25,7 +26,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class ResourceListPage implements Page {
 	private ResourceServiceAsync resourceService = (ResourceServiceAsync) ServiceCache.getService(ResourceService.class);
-	private ArgMap<ResourceArg> args = new ArgMap<ResourceArg>();
+	private ArgMap<ResourceArg> args = new ArgMap<ResourceArg>(Status.ACTIVE);
 	private TilePanel fp = new TilePanel();
 
 	public ResourceListPage(final VerticalPanel page) {
