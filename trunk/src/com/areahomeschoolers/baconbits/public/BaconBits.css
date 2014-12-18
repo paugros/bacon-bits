@@ -408,12 +408,15 @@ img {
 .sectionContent {
 	width: 100%;
 	padding: 6px 2px;
-	background: #f8f8f8;
+	background: #f9f9f9;
 	border: 1px solid #cccccc;
-	border-top: none;
-	-webkit-border-radius: 0px 0px 14px 14px;
-	-moz-border-radius: 0px 0px 14px 14px;
-	border-radius: 0px 0px 14px 14px;
+/* 	border-top: none; */
+/* 	-webkit-border-radius: 14px; */
+/* 	-moz-border-radius: 14px; */
+/* 	border-radius: 14px; */
+/* 	-webkit-border-radius: 0px 0px 14px 14px; */
+/* 	-moz-border-radius: 0px 0px 14px 14px; */
+/* 	border-radius: 0px 0px 14px 14px; */
 }
 
 .profilePic {
@@ -547,35 +550,36 @@ img {
 }
 
 .TitleBar {
-	-webkit-border-radius: 14px 14px 0px 0px; 
-	-moz-border-radius: 14px 14px 0px 0px;
-	border-radius: 14px 14px 0px 0px;
+/* 	-webkit-border-radius: 14px 14px 0px 0px;  */
+/* 	-moz-border-radius: 14px 14px 0px 0px; */
+/* 	border-radius: 14px 14px 0px 0px; */
 	font-weight: bold;
 	width: 100%;
-	padding: 4px;
+	padding: 8px;
 }
 
 .TitleBar-section {
-	background-color: #7ba7f9;
-	border: 1px solid #4377d7;
+/* 	background-color: #7ba7f9; */
+/* 	border: 1px solid #4377d7; */
 }
 
 .TitleBar-subSection {
-	background-color: #ecf4fd;
-	border: 1px solid #bcc4cd;
+/* 	background-color: #ecf4fd; */
+/* 	border: 1px solid #bcc4cd; */
 }
 
 .TitleBar-cellTable {
-	background-color: #7ba7f9;
-	border: 1px solid #4377d7;
-	border-bottom: none;
+/* 	background-color: #7ba7f9; */
+/* 	border: 1px solid #4377d7; */
+/* 	border-bottom: none; */
 }
 
 .titleBarLink {
-	background: rgba(255,255,255,.5);
-	-webkit-border-radius: 2px;
-	-moz-border-radius: 2px;
-	border-radius: 2px;
+/* 	background: rgba(255,255,255,.5); */
+/* 	-webkit-border-radius: 2px; */
+/* 	-moz-border-radius: 2px; */
+/* 	border-radius: 2px; */
+	white-space: nowrap;
 	display: inline-block;
 	padding: 1px 5px;
 	margin: 0px;

@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
+import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.MonthPicker;
@@ -35,7 +36,6 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -74,16 +74,13 @@ public final class EventListPage implements Page {
 
 		final String title = showCommunity ? "Community Events" : "Events";
 
-		Hyperlink home = new Hyperlink("Home", PageUrl.home());
-		Hyperlink cat = new Hyperlink("Events By Type", PageUrl.tagGroup("EVENT"));
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + cat.toString();
+		CookieCrumb cc = new CookieCrumb();
+		cc.add(new Hyperlink("Events By Type", PageUrl.tagGroup("EVENT")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			ccText += "&nbsp;>&nbsp;" + URL.decode(Url.getParameter("tn"));
+			cc.add(URL.decode(Url.getParameter("tn")));
 		} else {
-			ccText += "&nbsp;>&nbsp;Events";
+			cc.add("Events");
 		}
-		HTML cc = new HTML(ccText);
-		cc.addStyleName("largeText");
 		page.add(cc);
 
 		if (Application.isAuthenticated()) {

@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
+import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
@@ -26,8 +27,6 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -95,12 +94,10 @@ public final class TagGroupPage implements Page {
 			}
 		});
 
-		Hyperlink home = new Hyperlink("Home", PageUrl.home());
+		CookieCrumb cc = new CookieCrumb();
 		String typeText = type.equals(TagMappingType.USER) ? "Interests" : "Type";
-		String ccText = home.toString() + "&nbsp;>&nbsp;" + type.getName() + " By " + typeText;
+		cc.add(type.getName() + " By " + typeText);
 
-		HTML cc = new HTML(ccText);
-		cc.addStyleName("largeText");
 		page.add(cc);
 
 		if (Application.isAuthenticated()) {

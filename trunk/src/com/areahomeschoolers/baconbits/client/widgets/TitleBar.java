@@ -70,7 +70,9 @@ public class TitleBar extends Composite {
 	 */
 	public TitleBar(String titleText, TitleBarStyle type) {
 		this(type);
+		titlePanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		setTitleText(titleText);
+		titleLabel.getElement().getStyle().setFontSize(16, Unit.PX);
 		titlePanel.add(titleLabel);
 		titleLabel.getElement().getStyle().setPadding(2, Unit.PX);
 	}

@@ -235,7 +235,7 @@ public class EventPage implements Page {
 		contactNameField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				contactNameDisplay.setText(calendarEvent.getContactName());
+				contactNameDisplay.setText(Common.getDefaultIfNull(calendarEvent.getContactName()));
 				contactNameInput.setText(calendarEvent.getContactName());
 			}
 		});
@@ -254,7 +254,7 @@ public class EventPage implements Page {
 		contactEmailField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				contactEmailDisplay.setText(calendarEvent.getContactEmail());
+				contactEmailDisplay.setText(Common.getDefaultIfNull(calendarEvent.getContactEmail()));
 				contactEmailInput.setText(calendarEvent.getContactEmail());
 			}
 		});
