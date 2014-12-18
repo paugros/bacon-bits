@@ -108,7 +108,7 @@ public class ResourcePage implements Page {
 
 				CookieCrumb cc = new CookieCrumb();
 				cc.add(new Hyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE")));
-				cc.add(new Hyperlink("Resources", PageUrl.articleList()));
+				cc.add(new Hyperlink("Resources", PageUrl.resourceList()));
 				if (Url.getBooleanParameter("details")) {
 					cc.add(new Hyperlink("Resource", PageUrl.resource(resource.getId())));
 					cc.add("Edit details");
@@ -623,7 +623,7 @@ public class ResourcePage implements Page {
 
 		if (!text.isEmpty()) {
 			HTML contactInfo = new HTML();
-			contactInfo.getElement().getStyle().setPadding(10, Unit.PX);
+			contactInfo.getElement().getStyle().setMarginTop(10, Unit.PX);
 			contactInfo.setHTML(text);
 
 			vp.add(contactInfo);
