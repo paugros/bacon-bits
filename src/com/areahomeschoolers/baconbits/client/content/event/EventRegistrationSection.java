@@ -64,6 +64,8 @@ public class EventRegistrationSection extends Composite {
 	private HTML payLink = new HTML();
 
 	public EventRegistrationSection(EventPageData pd) {
+		vp.addStyleName("sectionContent");
+		vp.getElement().getStyle().setMarginBottom(10, Unit.PX);
 		initWidget(vp);
 		vp.setWidth("600px");
 		pageData = pd;
@@ -76,7 +78,7 @@ public class EventRegistrationSection extends Composite {
 	}
 
 	private void addParticipantSection() {
-		TitleBar tb = new TitleBar("Registered Participants", TitleBarStyle.SUBSECTION);
+		TitleBar tb = new TitleBar("Your Registration", TitleBarStyle.SUBSECTION);
 
 		if (pageData.getEvent().allowRegistrations() && (pageData.getEvent().getGroupId() == null || Application.memberOf(pageData.getEvent().getGroupId()))) {
 			tb.addLink(new ClickLabel("Add another", new ClickHandler() {

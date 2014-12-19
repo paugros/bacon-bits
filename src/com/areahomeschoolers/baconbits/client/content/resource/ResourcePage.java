@@ -119,7 +119,6 @@ public class ResourcePage implements Page {
 				}
 				page.add(cc);
 
-				// pd = result;
 				if (resource.isSaved() && !Url.getBooleanParameter("details")) {
 					createViewPage();
 				} else {
@@ -561,6 +560,7 @@ public class ResourcePage implements Page {
 
 	private void createViewPage() {
 		PaddedPanel pp = new PaddedPanel(10);
+		pp.setWidth("100%");
 		pp.getElement().getStyle().setMarginTop(10, Unit.PX);
 		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
 
@@ -637,6 +637,7 @@ public class ResourcePage implements Page {
 		if (allowEdit()) {
 			Hyperlink edit = new Hyperlink("Edit details", PageUrl.resource(resource.getId()) + "&details=true");
 			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
+			edit.getElement().getStyle().setMarginRight(5, Unit.PX);
 			pp.add(edit);
 			pp.setCellHorizontalAlignment(edit, HasHorizontalAlignment.ALIGN_RIGHT);
 		}
