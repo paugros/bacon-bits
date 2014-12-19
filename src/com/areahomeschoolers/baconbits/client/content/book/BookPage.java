@@ -130,7 +130,6 @@ public class BookPage implements Page {
 		PaddedPanel outerPanel = new PaddedPanel(10);
 		outerPanel.add(new AdsMiniModule());
 		outerPanel.add(pp);
-		outerPanel.setCellWidth(pp, "800px");
 
 		page.add(outerPanel);
 

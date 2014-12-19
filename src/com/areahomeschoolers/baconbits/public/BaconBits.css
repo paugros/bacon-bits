@@ -566,6 +566,9 @@ img {
 .TitleBar-subSection {
 /* 	background-color: #ecf4fd; */
 /* 	border: 1px solid #bcc4cd; */
+	font-size: 14px;
+	padding: 0px;
+	padding-right: 8px;
 }
 
 .TitleBar-cellTable {

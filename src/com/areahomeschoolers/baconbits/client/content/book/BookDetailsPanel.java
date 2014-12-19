@@ -16,6 +16,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.BorderStyle;
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -148,6 +149,8 @@ public class BookDetailsPanel extends Composite {
 
 		if (!Common.isNullOrBlank(book.getDescription())) {
 			HTML desc = new HTML(Formatter.formatNoteText(book.getDescription()));
+			desc.setWidth("750px");
+			desc.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
 			desc.getElement().getStyle().setMargin(15, Unit.PX);
 			desc.getElement().getStyle().setPadding(10, Unit.PX);
 			desc.getElement().getStyle().setBackgroundColor("#ffffff");
