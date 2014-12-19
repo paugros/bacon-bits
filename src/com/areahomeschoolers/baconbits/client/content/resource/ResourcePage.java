@@ -652,7 +652,7 @@ public class ResourcePage implements Page {
 		ovp.add(ts);
 
 		if (!Common.isNullOrBlank(resource.getDescription())) {
-			HTML desc = new HTML(Formatter.formatNoteText(resource.getDescription()));
+			HTML desc = new HTML(resource.getDescription());
 			desc.getElement().getStyle().setMarginLeft(15, Unit.PX);
 			desc.getElement().getStyle().setMarginRight(15, Unit.PX);
 			desc.getElement().getStyle().setMarginBottom(15, Unit.PX);
