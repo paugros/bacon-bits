@@ -6,24 +6,29 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.Sidebar;
 import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
+import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -32,13 +37,21 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
+import com.google.gwt.dom.client.Style.BorderStyle;
+import com.google.gwt.dom.client.Style.Float;
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -57,32 +70,52 @@ public class ArticlePage implements Page {
 	private Sidebar sidebar = new Sidebar();
 	private TagSection tagSection;
 	private FormField tagField;
+	private String title;
 
-	public ArticlePage(VerticalPanel page) {
-		int articleId = Url.getIntegerParameter("articleId");
+	public ArticlePage(VerticalPanel p) {
+		final int articleId = Url.getIntegerParameter("articleId");
 
 		if (!Application.isAuthenticated() && articleId < 0) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
 		}
 
-		this.page = page;
+		this.page = p;
 
-		if (articleId > 0) {
-			articleService.getById(articleId, new Callback<Article>() {
-				@Override
-				protected void doOnSuccess(Article result) {
-					if (result == null) {
-						new ErrorPage(PageError.PAGE_NOT_FOUND);
-						return;
-					}
-					article = result;
-					initializePage();
+		articleService.getById(articleId, new Callback<Article>() {
+			@Override
+			protected void doOnSuccess(Article result) {
+				if (articleId > 0 && result == null) {
+					new ErrorPage(PageError.PAGE_NOT_FOUND);
+					return;
 				}
-			});
-		} else {
-			initializePage();
-		}
+
+				if (result != null) {
+					article = result;
+				}
+
+				title = article.isSaved() ? article.getTitle() : "New Resource";
+
+				CookieCrumb cc = new CookieCrumb();
+				cc.add(new Hyperlink("Articles By Type", PageUrl.tagGroup("ARTICLE")));
+				cc.add(new Hyperlink("Articles", PageUrl.articleList()));
+				if (Url.getBooleanParameter("details")) {
+					cc.add(new Hyperlink(article.getTitle(), PageUrl.article(article.getId())));
+					cc.add("Edit details");
+				} else {
+					cc.add(article.getTitle());
+				}
+				page.add(cc);
+
+				if (article.isSaved() && !Url.getBooleanParameter("details")) {
+					createViewPage();
+				} else {
+					createDetailsPage();
+				}
+
+				Application.getLayout().setPage(title, page);
+			}
+		});
 	}
 
 	private boolean allowEdit() {
@@ -90,6 +123,18 @@ public class ArticlePage implements Page {
 			return Application.isSystemAdministrator();
 		}
 		return Application.administratorOf(article);
+	}
+
+	private void createDetailsPage() {
+		sidebar.add(MiniModule.ADS);
+
+		if (noTitle) {
+			createTextPage();
+		} else if (!Application.administratorOf(article)) {
+			createReadOnlyPage();
+		} else {
+			createReadWritePage();
+		}
 	}
 
 	private void createFieldTable() {
@@ -252,16 +297,75 @@ public class ArticlePage implements Page {
 		Application.getLayout().setPage(article.getTitle(), sidebar, page);
 	}
 
-	private void initializePage() {
-		sidebar.add(MiniModule.ADS);
+	private void createViewPage() {
+		PaddedPanel pp = new PaddedPanel(10);
+		pp.setWidth("100%");
+		pp.getElement().getStyle().setMargin(10, Unit.PX);
 
-		if (noTitle) {
-			createTextPage();
-		} else if (!Application.administratorOf(article)) {
-			createReadOnlyPage();
-		} else {
-			createReadWritePage();
+		VerticalPanel vp = new VerticalPanel();
+
+		Label titleLabel = new Label(article.getTitle());
+		titleLabel.addStyleName("hugeText");
+
+		vp.add(titleLabel);
+
+		pp.add(vp);
+
+		if (allowEdit()) {
+			Hyperlink edit = new Hyperlink("Edit details", PageUrl.article(article.getId()) + "&details=true");
+			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
+			edit.getElement().getStyle().setMarginRight(5, Unit.PX);
+			pp.add(edit);
+			pp.setCellVerticalAlignment(edit, HasVerticalAlignment.ALIGN_MIDDLE);
+			pp.setCellHorizontalAlignment(edit, HasHorizontalAlignment.ALIGN_RIGHT);
 		}
+
+		VerticalPanel ovp = new VerticalPanel();
+		ovp.addStyleName("sectionContent");
+
+		ovp.add(pp);
+
+		if (!Common.isNullOrBlank(article.getArticle())) {
+			Image image = null;
+			if (article.getImageId() != null) {
+				image = new Image(ClientUtils.createDocumentUrl(article.getImageId(), article.getImageExtension()));
+			} else {
+				image = new Image(MainImageBundle.INSTANCE.defaultLarge());
+			}
+
+			image.getElement().getStyle().setFloat(Float.LEFT);
+			image.getElement().getStyle().setMarginRight(15, Unit.PX);
+			image.getElement().getStyle().setMarginTop(15, Unit.PX);
+
+			String html = image + article.getArticle();
+
+			HTML desc = new HTML(html);
+
+			desc.setWidth("750px");
+			desc.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
+			desc.getElement().getStyle().setMarginLeft(15, Unit.PX);
+			desc.getElement().getStyle().setMarginRight(15, Unit.PX);
+			desc.getElement().getStyle().setMarginBottom(15, Unit.PX);
+			desc.getElement().getStyle().setPadding(10, Unit.PX);
+			desc.getElement().getStyle().setBackgroundColor("#ffffff");
+			desc.getElement().getStyle().setBorderColor("#cccccc");
+			desc.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+			desc.getElement().getStyle().setBorderWidth(1, Unit.PX);
+
+			ovp.add(desc);
+		}
+
+		TagSection ts = new TagSection(TagMappingType.ARTICLE, article.getId());
+		ts.setEditingEnabled(false);
+		ts.populate();
+
+		ovp.add(ts);
+
+		PaddedPanel outerPanel = new PaddedPanel(10);
+		outerPanel.add(new AdsMiniModule());
+		outerPanel.add(ovp);
+
+		page.add(outerPanel);
 	}
 
 	private void save(final FormField field) {

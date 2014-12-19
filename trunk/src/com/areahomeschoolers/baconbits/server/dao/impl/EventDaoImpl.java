@@ -57,6 +57,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 @Repository
@@ -467,8 +468,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select r.eventId, e.title, e.startDate, e.endDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
-		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, up.email as registrantEmailAddress, \n";
-		sql += "r.addedById, e.groupId, e.owningOrgId, e.seriesId, e.requiredInSeries, py.statusId as paymentStatusId, \n";
+		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, up.email as registrantEmailAddress, u.directoryOptOut, \n";
+		sql += "r.addedById, e.groupId, e.owningOrgId, e.seriesId, e.requiredInSeries, py.statusId as paymentStatusId, pr.visibilityLevelId, \n";
 		if (includeFields) {
 			sql += "(select group_concat(concat(f.name, ' ', v.value) separator '\n') \n";
 			sql += "from eventFieldValues v \n";
@@ -479,6 +480,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		sql += "case isnull(a.markup) when true then e.markup else a.markup end as markup \n";
 		sql += "from eventRegistrationParticipants p \n";
 		sql += "join users u on u.id = p.userId \n";
+		sql += "left join userPrivacyPreferences pr on pr.userId = p.userId and preferenceType = 'EVENTS' \n";
 		sql += "join eventParticipantStatus s on s.id = p.statusId \n";
 		sql += "join eventRegistrations r on r.id = p.eventRegistrationId \n";
 		sql += "join events e on e.id = r.eventId \n";
@@ -557,13 +559,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 				p.setId(rs.getInt("id"));
 				p.setAgeGroupId(rs.getInt("ageGroupId"));
 				p.setEventRegistrationId(rs.getInt("eventRegistrationId"));
-				p.setFirstName(rs.getString("firstName"));
-				p.setLastName(rs.getString("lastName"));
 				p.setStatusId(rs.getInt("statusId"));
 				p.setStatus(rs.getString("status"));
 				p.setPrice(rs.getDouble("price"));
 				p.setMarkup(rs.getDouble("markup"));
-				p.setBirthDate(rs.getDate("birthDate"));
 				p.setAddedByFirstName(rs.getString("addedByFirstName"));
 				p.setAddedByLastName(rs.getString("addedByLastName"));
 				p.setAddedById(rs.getInt("addedById"));
@@ -578,10 +577,17 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 				p.setEventGroupId(rs.getInt("groupId"));
 				p.setEventOrganizationId(rs.getInt("owningOrgId"));
 				p.setEventSeriesId(rs.getInt("seriesId"));
-				p.setRegistrantEmailAddress(rs.getString("registrantEmailAddress"));
 				p.setRequiredInSeries(rs.getBoolean("requiredInSeries"));
 				if (includeFields) {
 					p.setFieldValues(rs.getString("fieldValues"));
+				}
+
+				if (ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)
+						|| (!rs.getBoolean("directoryOptOut") && rs.getInt("visibilityLevelId") < 3)) {
+					p.setFirstName(rs.getString("firstName"));
+					p.setLastName(rs.getString("lastName"));
+					p.setBirthDate(rs.getDate("birthDate"));
+					p.setRegistrantEmailAddress(rs.getString("registrantEmailAddress"));
 				}
 				return p;
 			}

@@ -33,7 +33,6 @@ import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.EmailDialog;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
@@ -42,6 +41,7 @@ import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.MarkupTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
@@ -55,7 +55,6 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
-import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
@@ -78,6 +77,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -997,17 +997,19 @@ public class EventPage implements Page {
 
 	private void createViewPage() {
 		PaddedPanel pp = new PaddedPanel(10);
+		pp.setWidth("100%");
 		pp.getElement().getStyle().setMarginTop(10, Unit.PX);
 		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
 
-		EditableImage image = new EditableImage(DocumentLinkType.EVENT, calendarEvent.getId());
+		// EditableImage image = new EditableImage(DocumentLinkType.EVENT, calendarEvent.getId());
+		Image image = null;
 		if (calendarEvent.getImageId() != null) {
-			image.setImage(new Image(ClientUtils.createDocumentUrl(calendarEvent.getImageId(), calendarEvent.getImageExtension())));
+			image = new Image(ClientUtils.createDocumentUrl(calendarEvent.getImageId(), calendarEvent.getImageExtension()));
 		} else {
-			image.setImage(new Image(MainImageBundle.INSTANCE.defaultLarge()));
+			image = new Image(MainImageBundle.INSTANCE.defaultLarge());
 		}
-		image.setEnabled(Application.isSystemAdministrator());
-		image.populate();
+		// image.setEnabled(Application.isSystemAdministrator());
+		// image.populate();
 		pp.add(image);
 		pp.setCellWidth(image, "1%");
 
@@ -1128,7 +1130,53 @@ public class EventPage implements Page {
 					new ParticipantEditDialog(pageData, refreshParticipants).center(rp);
 				}
 			});
+			register.addStyleName("bold");
 			ddt.add(register);
+		}
+
+		if (calendarEvent.getRequiresRegistration() && pageData.getEvent().allowRegistrations()) {
+			final ClickLabel attend = new ClickLabel("Who's attending?");
+			attend.setWordWrap(false);
+			attend.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					if (!Application.isAuthenticated()) {
+						LoginDialog.showLogin();
+						return;
+					}
+					ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
+					args.put(EventArg.STATUS_ID, 2);
+					eventService.getParticipants(args, new Callback<ArrayList<EventParticipant>>() {
+						@Override
+						protected void doOnSuccess(ArrayList<EventParticipant> result) {
+							DecoratedPopupPanel popup = new DecoratedPopupPanel(true);
+							VerticalPanel vp = new VerticalPanel();
+							MaxHeightScrollPanel sp = new MaxHeightScrollPanel(vp);
+							vp.setSpacing(8);
+							if (!result.isEmpty()) {
+								String s = result.size() > 1 ? "s" : "";
+								Label total = new Label(result.size() + " attendee" + s + ". Any not shown below have private profiles.");
+								total.getElement().getStyle().setMarginBottom(5, Unit.PX);
+								vp.add(total);
+							}
+							for (EventParticipant p : result) {
+								if (p.getFirstName() == null) {
+									continue;
+								}
+								Label name = new Label(p.getFirstName() + " " + p.getLastName());
+								vp.add(name);
+							}
+
+							if (result.isEmpty()) {
+								vp.add(new Label("No confirmed attendees yet."));
+							}
+							popup.setWidget(sp);
+							popup.showRelativeTo(attend);
+						}
+					});
+				}
+			});
+			ddt.add(attend);
 		}
 
 		pp.add(ddt);

@@ -366,7 +366,7 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		final RequiredListBox sexInput = new RequiredListBox();
 		sexInput.addItem("Female", "f");
 		sexInput.addItem("Male", "m");
-		FormField sexField = form.createFormField("Sex:", sexInput, sexDisplay);
+		FormField sexField = form.createFormField("Gender:", sexInput, sexDisplay);
 		sexField.setInitializer(new Command() {
 			@Override
 			public void execute() {
