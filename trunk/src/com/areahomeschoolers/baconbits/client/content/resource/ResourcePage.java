@@ -42,6 +42,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.BorderStyle;
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -653,6 +654,8 @@ public class ResourcePage implements Page {
 
 		if (!Common.isNullOrBlank(resource.getDescription())) {
 			HTML desc = new HTML(resource.getDescription());
+			desc.setWidth("700px");
+			desc.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
 			desc.getElement().getStyle().setMarginLeft(15, Unit.PX);
 			desc.getElement().getStyle().setMarginRight(15, Unit.PX);
 			desc.getElement().getStyle().setMarginBottom(15, Unit.PX);
@@ -664,8 +667,6 @@ public class ResourcePage implements Page {
 
 			ovp.add(desc);
 		}
-
-		ovp.setWidth("700px");
 
 		PaddedPanel outerPanel = new PaddedPanel(10);
 		outerPanel.add(new AdsMiniModule());

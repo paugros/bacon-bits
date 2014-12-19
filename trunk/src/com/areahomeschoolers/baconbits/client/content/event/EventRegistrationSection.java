@@ -8,11 +8,13 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -28,6 +30,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -38,9 +41,8 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class EventRegistrationSection extends Composite {
@@ -59,11 +61,11 @@ public class EventRegistrationSection extends Composite {
 		}
 	};
 	private Button volunteerAddButton;
-	private SimplePanel payMessage = new SimplePanel();
+	private HTML payLink = new HTML();
 
 	public EventRegistrationSection(EventPageData pd) {
 		initWidget(vp);
-		vp.setWidth("700px");
+		vp.setWidth("600px");
 		pageData = pd;
 		registration = pageData.getRegistration();
 
@@ -77,7 +79,7 @@ public class EventRegistrationSection extends Composite {
 		TitleBar tb = new TitleBar("Registered Participants", TitleBarStyle.SUBSECTION);
 
 		if (pageData.getEvent().allowRegistrations() && (pageData.getEvent().getGroupId() == null || Application.memberOf(pageData.getEvent().getGroupId()))) {
-			tb.addLink(new ClickLabel("Add participant", new ClickHandler() {
+			tb.addLink(new ClickLabel("Add another", new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					if (!Application.isAuthenticated()) {
@@ -91,47 +93,52 @@ public class EventRegistrationSection extends Composite {
 				}
 			}));
 
-			if (registration.isSaved()) {
-				final ClickLabel cancel = new ClickLabel(getCancelRegistrationLabelText());
-				cancel.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						String text = "";
-						if (registration.getCanceled()) {
-							text = "Restore registration?";
-						} else {
-							text = "Really cancel your registration for this event?";
-						}
-						ConfirmDialog.confirm(text, new ConfirmHandler() {
-							@Override
-							public void onConfirm() {
-								registration.setCanceled(!registration.getCanceled());
+			// if (registration.isSaved()) {
+			// final ClickLabel cancel = new ClickLabel(getCancelRegistrationLabelText());
+			// cancel.addClickHandler(new ClickHandler() {
+			// @Override
+			// public void onClick(ClickEvent event) {
+			// String text = "";
+			// if (registration.getCanceled()) {
+			// text = "Restore registration?";
+			// } else {
+			// text = "Really cancel your registration for this event?";
 
-								eventService.saveRegistration(registration, new Callback<EventRegistration>() {
-									@Override
-									protected void doOnSuccess(EventRegistration result) {
-										registration = result;
-										pageData.setRegistration(result);
-										if (registration.getCanceled()) {
-											registration.getVolunteerPositions().clear();
-											loadSection();
-										} else {
-											Application.reloadPage();
-										}
-									}
-								});
-							}
-						});
-					}
-				});
-				tb.addLink(cancel);
-			}
+			// }
+			// ConfirmDialog.confirm(text, new ConfirmHandler() {
+			// @Override
+			// public void onConfirm() {
+			// registration.setCanceled(!registration.getCanceled());
+			//
+			// eventService.saveRegistration(registration, new Callback<EventRegistration>() {
+			// @Override
+			// protected void doOnSuccess(EventRegistration result) {
+			// registration = result;
+			// pageData.setRegistration(result);
+			// if (registration.getCanceled()) {
+			// registration.getVolunteerPositions().clear();
+			// loadSection();
+			// } else {
+			// Application.reloadPage();
+			// }
+			// }
+			// });
+			// }
+			// });
+			// }
+			// });
+			// tb.addLink(cancel);
+			// }
 		}
 
+		tb.setWidth("530px");
 		vp.add(tb);
 
 		participantTable = new FlexTable();
-		participantTable.setWidth("400px");
+		participantTable.setCellSpacing(8);
+		participantTable.getElement().getStyle().setMarginLeft(8, Unit.PX);
+		participantTable.getElement().getStyle().setMarginBottom(10, Unit.PX);
+		participantTable.setWidth("500px");
 		populateParticipants();
 		vp.add(participantTable);
 	}
@@ -146,6 +153,7 @@ public class EventRegistrationSection extends Composite {
 		if (pageData.getEvent().allowRegistrations()) {
 			HorizontalPanel pp = new PaddedPanel();
 			final DefaultListBox lb = new DefaultListBox();
+			lb.getElement().getStyle().setMarginLeft(8, Unit.PX);
 			lb.addStyleName("RequiredListBox");
 			lb.addItem("Select position", 0);
 			final Map<Integer, EventVolunteerPosition> vMap = new HashMap<Integer, EventVolunteerPosition>();
@@ -227,6 +235,8 @@ public class EventRegistrationSection extends Composite {
 		}
 
 		positionTable = new FlexTable();
+		positionTable.getElement().getStyle().setMarginLeft(8, Unit.PX);
+		positionTable.getElement().getStyle().setMarginBottom(10, Unit.PX);
 		positionTable.setWidth("250px");
 
 		populateVolunteerPositions();
@@ -234,26 +244,20 @@ public class EventRegistrationSection extends Composite {
 		vp.add(positionTable);
 	}
 
-	private String getCancelRegistrationLabelText() {
-		return registration.getCanceled() ? "Restore" : "Cancel registration";
-	}
-
 	private void loadSection() {
 		vp.clear();
 
-		VerticalPanel summary = new VerticalPanel();
-		summary.addStyleName("mediumPadding");
-		if (!Common.isNullOrBlank(pageData.getEvent().getRegistrationInstructions())) {
-			HTML instructions = new HTML("<span class=errorText><b>NOTE: </b>" + pageData.getEvent().getRegistrationInstructions() + "</span>");
-			instructions.addStyleName("italic");
-			instructions.getElement().getStyle().setMarginLeft(8, Unit.PX);
-			summary.add(instructions);
-		}
-
-		vp.add(summary);
+		// VerticalPanel summary = new VerticalPanel();
+		// summary.addStyleName("mediumPadding");
+		// if (!Common.isNullOrBlank(pageData.getEvent().getRegistrationInstructions())) {
+		// HTML instructions = new HTML("<span class=errorText><b>NOTE: </b>" + pageData.getEvent().getRegistrationInstructions() + "</span>");
+		// instructions.addStyleName("italic");
+		// instructions.getElement().getStyle().setMarginLeft(8, Unit.PX);
+		// summary.add(instructions);
+		// vp.add(summary);
+		// }
 
 		addParticipantSection();
-		vp.add(payMessage);
 
 		addVolunteerSection();
 
@@ -334,7 +338,7 @@ public class EventRegistrationSection extends Composite {
 			String text = "";
 			if (pageData.getEvent().allowRegistrations()
 					&& (pageData.getEvent().getGroupId() == null || Application.memberOf(pageData.getEvent().getGroupId()))) {
-				text = "You haven't registered anyone yet. To register for this event, select the Add link above.";
+				text = "You haven't registered anyone yet. To register for this event, click Add participant above.";
 			} else if (!pageData.getEvent().allowRegistrations()) {
 				text = "We are not currently taking registrations for this event.";
 			} else if (pageData.getEvent().getGroupId() != null && !Application.memberOf(pageData.getEvent().getGroupId())) {
@@ -347,39 +351,32 @@ public class EventRegistrationSection extends Composite {
 			int row = participantTable.getRowCount();
 			participantTable.setText(row, 1, Formatter.formatCurrency(totalPrice));
 			participantTable.getCellFormatter().addStyleName(row, 1, "totalCell");
-		}
 
-		participantTable.getColumnFormatter().setWidth(0, "180px");
-		participantTable.getColumnFormatter().setWidth(1, "80px");
-		participantTable.getColumnFormatter().setWidth(2, "80px");
-
-		payMessage.clear();
-		if (pageData.getRegistration() != null) {
-			boolean hasPay = false;
-			for (EventParticipant p : pageData.getRegistration().getParticipants()) {
-				if (p.getAdjustedPrice() > 0 && p.getStatusId() == 1) {
-					hasPay = true;
-					break;
+			payLink.setHTML("");
+			if (pageData.getRegistration() != null) {
+				boolean hasPay = false;
+				for (EventParticipant p : pageData.getRegistration().getParticipants()) {
+					if (p.getAdjustedPrice() > 0 && p.getStatusId() == 1) {
+						hasPay = true;
+						break;
+					}
 				}
-			}
 
-			if (!pageData.getRegistration().getParticipants().isEmpty()) {
-				String text = "All done here? ";
 				if (hasPay) {
-					Hyperlink payLink = new Hyperlink("Pay now", PageUrl.payment());
-					text += payLink.toString() + " or ";
-					Hyperlink eventLink = new Hyperlink("continue registering", PageUrl.eventList());
-					text += eventLink.toString() + ".";
-				} else {
-					Hyperlink eventLink = new Hyperlink("Continue registering", PageUrl.eventList());
-					text += eventLink.toString() + ".";
+					Image cart = new Image(MainImageBundle.INSTANCE.shoppingCart());
+					cart.getElement().getStyle().setVerticalAlign(VerticalAlign.BOTTOM);
+					cart.getElement().getStyle().setMarginRight(5, Unit.PX);
+					String linkText = "<a href=\"" + Url.getBaseUrl() + "#" + PageUrl.payment() + "\">" + cart;
+					linkText += "<span style=\"vertical-align: bottom; font-weight: bold;\">Checkout</span></a>";
+					payLink.setHTML(linkText);
+					participantTable.setWidget(row, 2, payLink);
 				}
-
-				HTML blob = new HTML(text);
-				blob.addStyleName("largeText heavyPadding");
-				payMessage.setWidget(blob);
 			}
 		}
+
+		participantTable.getColumnFormatter().setWidth(0, "200px");
+		participantTable.getColumnFormatter().setWidth(1, "100px");
+		participantTable.getColumnFormatter().setWidth(2, "150px");
 	}
 
 	private void populateVolunteerPositions() {
@@ -410,13 +407,6 @@ public class EventRegistrationSection extends Composite {
 				positionTable.setWidget(i, 1, cl);
 				positionTable.getCellFormatter().setHorizontalAlignment(i, 1, HasHorizontalAlignment.ALIGN_RIGHT);
 			}
-		}
-
-		if (positionTable.getRowCount() == 0) {
-			String text = "To volunteer, select the volunteer position from the dropdown and click the Volunteer! button.";
-			Label empty = new Label(text);
-			empty.setWordWrap(false);
-			positionTable.setWidget(0, 0, empty);
 		}
 	}
 

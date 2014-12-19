@@ -7,16 +7,20 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColumn;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
@@ -26,17 +30,20 @@ import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
+import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.EmailDialog;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
-import com.areahomeschoolers.baconbits.client.widgets.GoogleMapWidget;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.MarkupTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
@@ -48,26 +55,35 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
 import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
+import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Style.BorderStyle;
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -102,6 +118,7 @@ public class EventPage implements Page {
 	private FormField markupField;
 	private TagSection tagSection;
 	private FormField tagField;
+	private String title;
 
 	public EventPage(final VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -136,18 +153,267 @@ public class EventPage implements Page {
 					}
 				});
 
-				if (calendarEvent.isSaved()) {
-					HorizontalPanel hp = new HorizontalPanel();
-					hp.setWidth("100%");
-					Label heading = new Label(calendarEvent.getTitle() + " - " + Formatter.formatDateTime(calendarEvent.getStartDate()));
-					heading.addStyleName("hugeText");
-					hp.add(heading);
-					page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH900PX));
+				title = calendarEvent.isSaved() ? calendarEvent.getTitle() : "New Event";
+
+				CookieCrumb cc = new CookieCrumb();
+				cc.add(new Hyperlink("Events By Type", PageUrl.tagGroup("EVENT")));
+				cc.add(new Hyperlink("Events", PageUrl.eventList()));
+				if (Url.getBooleanParameter("details")) {
+					cc.add(new Hyperlink(calendarEvent.getTitle(), PageUrl.event(calendarEvent.getId())));
+					cc.add("Edit details");
+				} else {
+					cc.add(calendarEvent.getTitle());
+				}
+				page.add(cc);
+
+				if (calendarEvent.isSaved() && !Url.getBooleanParameter("details")) {
+					createViewPage();
+				} else {
+					createDetailsPage();
 				}
 
-				initializePage();
+				Application.getLayout().setPage(title, page);
 			}
 		});
+	}
+
+	private void createDetailsPage() {
+		final String title = calendarEvent.isSaved() ? calendarEvent.getTitle() : "New Event";
+		createFieldTable();
+		form.initialize();
+
+		if (!calendarEvent.isSaved()) {
+			form.configureForAdd(fieldTable);
+			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1000PX));
+		} else {
+			tabPanel = new TabPage();
+			form.emancipate();
+
+			tabPanel.add("Event", false, new TabPageCommand() {
+				@Override
+				public void execute(VerticalPanel tabBody) {
+					TitleBar tb = new TitleBar("", TitleBarStyle.SECTION);
+					if (Application.administratorOf(calendarEvent)) {
+						tb.addLink(new ClickLabel("Clone", new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								ConfirmDialog.confirm("Clone this event?", new ConfirmHandler() {
+									@Override
+									public void onConfirm() {
+										calendarEvent.setCloneFromId(calendarEvent.getId());
+										calendarEvent.setId(0);
+										save(form.getFirstFormField());
+									}
+								});
+							}
+						}));
+
+						if (calendarEvent.getSeriesId() == null) {
+							tb.addLink(new ClickLabel("Create series", new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									new EventSeriesDialog(calendarEvent).center();
+								}
+							}));
+						}
+
+						tb.addLink(new ClickLabel("Email", new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								EmailDialog dialog = new EmailDialog();
+								dialog.setShowSubjectBox(true);
+								dialog.setAllowEditRecipients(true);
+								dialog.setSubject(calendarEvent.getTitle());
+								dialog.insertHtml(createEmailHtml());
+
+								dialog.center();
+							}
+						}));
+
+					}
+
+					if (pageData.getRegistration() != null) {
+						for (EventParticipant p : pageData.getRegistration().getParticipants()) {
+							if (p.getAdjustedPrice() > 0 && p.getStatusId() == 1) {
+								tb.addLink(new Hyperlink("Pay", PageUrl.payment()));
+								break;
+							}
+						}
+					}
+
+					tabBody.add(WidgetFactory.newSection(tb, fieldTable, ContentWidth.MAXWIDTH1000PX));
+
+					// we need to do this again in case we started on another tab
+					form.initialize();
+					form.emancipate();
+
+					tabPanel.selectTabNow(tabBody);
+				}
+			});
+
+			if (calendarEvent.getSeriesId() != null) {
+				tabPanel.add("Series", false, new TabPageCommand() {
+					@Override
+					public void execute(final VerticalPanel tabBody) {
+						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.SERIES_ID, calendarEvent.getSeriesId());
+						args.setStatus(Status.ALL);
+						EventTable table = new EventTable(args);
+						table.removeColumn(EventColumn.REGISTER);
+
+						table.setTitle("Event Series");
+
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1100PX));
+						table.populate(pageData.getEventsInSeries());
+						tabPanel.selectTabNow(tabBody);
+					}
+				});
+			} else {
+				tabPanel.addSkipIndex();
+			}
+
+			// if (Application.administratorOf(calendarEvent)) {
+			// tabPanel.add("Fields", false, new TabPageCommand() {
+			// @Override
+			// public void execute(VerticalPanel tabBody) {
+			// tabBody.add(new EventFieldsTab(pageData));
+			//
+			// tabPanel.selectTabNow(tabBody);
+			// }
+			// });
+			// } else {
+			// tabPanel.addSkipIndex();
+			// }
+
+			if (calendarEvent.getRequiresRegistration() && Application.administratorOf(calendarEvent)) {
+				tabPanel.add("Participants", false, new TabPageCommand() {
+					@Override
+					public void execute(final VerticalPanel tabBody) {
+						if (!Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
+							ArgMap<EventArg> volunteerArgs = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
+							eventService.getVolunteers(volunteerArgs, new Callback<ArrayList<Data>>() {
+								@Override
+								protected void doOnSuccess(ArrayList<Data> result) {
+									VerticalPanel vp = new VerticalPanel();
+									Label label = new Label("Volunteers");
+									label.addStyleName("largeText");
+
+									final FlexTable ft = new FlexTable();
+
+									for (final Data item : result) {
+										final int row = ft.getRowCount();
+
+										CheckBox cb = new CheckBox();
+										cb.setValue(item.getBoolean("fulfilled"));
+										cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+											@Override
+											public void onValueChange(ValueChangeEvent<Boolean> event) {
+												eventService.setVolunteerFulFilled(item.getId(), event.getValue(), new Callback<Void>(false) {
+													@Override
+													protected void doOnSuccess(Void result) {
+													}
+												});
+											}
+										});
+
+										// if they've already used the corresponding discount, don't allow it to be deleted
+										if (item.getBoolean("adjustmentApplied")) {
+											cb.setEnabled(false);
+										}
+										ft.setWidget(row, 0, cb);
+										Label name = new Label(item.get("firstName") + " " + item.get("lastName"));
+										name.getElement().getStyle().setMarginRight(30, Unit.PX);
+										ft.setWidget(row, 1, name);
+										Label title = new Label(item.get("jobTitle"));
+										title.getElement().getStyle().setMarginRight(20, Unit.PX);
+										ft.setWidget(row, 2, title);
+										if (Application.administratorOf(calendarEvent) && !item.getBoolean("adjustmentApplied")) {
+											ClickLabel cl = new ClickLabel("X", new ClickHandler() {
+												@Override
+												public void onClick(ClickEvent event) {
+													ConfirmDialog.confirm("Remove this volunteer?", new ConfirmHandler() {
+														@Override
+														public void onConfirm() {
+															eventService.deleteVolunteerPositionMapping(item.getId(), new Callback<Void>() {
+																@Override
+																protected void doOnSuccess(Void result) {
+																	ft.removeRow(row);
+																	if (ft.getRowCount() == 0) {
+																		ft.setText(0, 0, "None");
+																	}
+																}
+															});
+														}
+													});
+												}
+											});
+
+											ft.setWidget(row, 3, cl);
+										}
+									}
+
+									vp.add(label);
+									if (!result.isEmpty()) {
+										vp.add(ft);
+									} else {
+										Label none = new Label("None");
+										none.addStyleName("mediumPadding");
+										vp.add(none);
+									}
+									tabBody.insert(vp, 0);
+								}
+							});
+						}
+
+						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
+						args.put(EventArg.NOT_STATUS_ID, 5);
+						args.put(EventArg.INCLUDE_FIELDS);
+						final EventParticipantTable table = new EventParticipantTable(args);
+						table.disablePaging();
+
+						table.addStatusFilterBox();
+						table.getTitleBar().addExcelControl();
+						table.getTitleBar().addSearchControl();
+						table.populate();
+						table.setTitle("Participants");
+						table.addDataReturnHandler(new DataReturnHandler() {
+							@Override
+							public void onDataReturn() {
+								if (emailDialog != null) {
+									return;
+								}
+
+								table.getTitleBar().addLink(new ClickLabel("Email Registrants", new ClickHandler() {
+									@Override
+									public void onClick(ClickEvent event) {
+										emailDialog = new EmailDialog();
+										String subject = calendarEvent.getTitle() + " - " + Formatter.formatDateTime(calendarEvent.getStartDate());
+										emailDialog.setSubject(subject);
+										emailDialog.setShowSubjectBox(true);
+										for (EventParticipant p : table.getFullList()) {
+											emailDialog.addBcc(p.getRegistrantEmailAddress());
+										}
+										emailDialog.center();
+									}
+								}));
+							}
+						});
+
+						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1200PX));
+						tabPanel.selectTabNow(tabBody);
+					}
+				});
+			} else {
+				tabPanel.addSkipIndex();
+			}
+
+			if (!Application.administratorOf(calendarEvent)) {
+				form.setEnabled(false);
+			}
+
+			page.add(tabPanel);
+		}
+
+		Application.getLayout().setPage(title, page);
 	}
 
 	private String createEmailHtml() {
@@ -729,263 +995,179 @@ public class EventPage implements Page {
 		tagField.removeEditLabel();
 	}
 
-	private void initializePage() {
-		final String title = calendarEvent.isSaved() ? calendarEvent.getTitle() : "New Event";
-		createFieldTable();
-		form.initialize();
+	private void createViewPage() {
+		PaddedPanel pp = new PaddedPanel(10);
+		pp.getElement().getStyle().setMarginTop(10, Unit.PX);
+		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
 
-		if (!calendarEvent.isSaved()) {
-			form.configureForAdd(fieldTable);
-			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1000PX));
+		EditableImage image = new EditableImage(DocumentLinkType.EVENT, calendarEvent.getId());
+		if (calendarEvent.getImageId() != null) {
+			image.setImage(new Image(ClientUtils.createDocumentUrl(calendarEvent.getImageId(), calendarEvent.getImageExtension())));
 		} else {
-			tabPanel = new TabPage();
-			form.emancipate();
+			image.setImage(new Image(MainImageBundle.INSTANCE.defaultLarge()));
+		}
+		image.setEnabled(Application.isSystemAdministrator());
+		image.populate();
+		pp.add(image);
+		pp.setCellWidth(image, "1%");
 
-			tabPanel.add("Event", false, new TabPageCommand() {
+		VerticalPanel vp = new VerticalPanel();
+
+		Label titleLabel = new Label(calendarEvent.getTitle());
+		titleLabel.addStyleName("hugeText");
+
+		vp.add(titleLabel);
+
+		String time = Formatter.formatDateTime(calendarEvent.getStartDate());
+		if (!calendarEvent.getStartDate().equals(calendarEvent.getEndDate())) {
+			time += " to " + Formatter.formatDateTime(calendarEvent.getEndDate());
+		}
+		Label timeLabel = new Label(time);
+		timeLabel.getElement().getStyle().setFontSize(14, Unit.PX);
+		vp.add(timeLabel);
+
+		if (!Common.isNullOrBlank(calendarEvent.getFacilityName())) {
+			vp.add(new Label("At " + calendarEvent.getFacilityName()));
+		}
+
+		if (!Common.isNullOrBlank(calendarEvent.getAddress())) {
+			Anchor address = new Anchor(calendarEvent.getAddress(), "http://maps.google.com/maps?q=" + calendarEvent.getAddress());
+			address.setTarget("_blank");
+
+			vp.add(address);
+		}
+
+		String price = "Price: ";
+		if (calendarEvent.getPrice() == 0) {
+			price += "Free";
+		} else {
+			price += Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
+		}
+		Label priceLabel = new Label(price);
+		priceLabel.getElement().getStyle().setFontSize(16, Unit.PX);
+		priceLabel.getElement().getStyle().setMarginTop(10, Unit.PX);
+
+		vp.add(priceLabel);
+
+		String text = "";
+		if (!Common.isNullOrBlank(calendarEvent.getContactName())) {
+			text += Formatter.formatNoteText(calendarEvent.getContactName()) + "<br>";
+		}
+
+		if (!Common.isNullOrBlank(calendarEvent.getContactEmail())) {
+			text += "<a href=\"mailto:" + calendarEvent.getContactEmail() + "\">" + Formatter.formatNoteText(calendarEvent.getContactEmail()) + "</a><br>";
+		}
+
+		if (!Common.isNullOrBlank(calendarEvent.getPhone())) {
+			text += Formatter.formatNoteText(calendarEvent.getPhone()) + "<br>";
+		}
+
+		PaddedPanel lp = new PaddedPanel();
+
+		if (!Common.isNullOrBlank(calendarEvent.getWebsite())) {
+			HTML web = new HTML("<a href=\"" + calendarEvent.getWebsite() + "\" target=_blank>Web site</a>");
+			lp.add(web);
+			lp.setCellVerticalAlignment(web, HasVerticalAlignment.ALIGN_MIDDLE);
+		}
+
+		if (lp.getWidgetCount() > 0) {
+			text += lp;
+		}
+
+		if (!text.isEmpty()) {
+			HTML contactInfo = new HTML();
+			contactInfo.getElement().getStyle().setMarginTop(10, Unit.PX);
+			contactInfo.setHTML(text);
+
+			vp.add(contactInfo);
+		}
+
+		pp.add(vp);
+
+		VerticalPanel ddt = new VerticalPanel();
+		ddt.setSpacing(6);
+
+		if (Application.administratorOf(calendarEvent)) {
+			Hyperlink edit = new Hyperlink("Edit details", PageUrl.event(calendarEvent.getId()) + "&details=true");
+			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
+			ddt.add(edit);
+		}
+
+		final VerticalPanel oovp = new VerticalPanel();
+
+		if (pageData.getRegistration() != null && !pageData.getRegistration().getParticipants().isEmpty()) {
+			oovp.insert(new EventRegistrationSection(pageData), 0);
+		} else if (calendarEvent.getRequiresRegistration() && pageData.getEvent().allowRegistrations()) {
+			final ClickLabel register = new ClickLabel("Register");
+			register.addClickHandler(new ClickHandler() {
 				@Override
-				public void execute(VerticalPanel tabBody) {
-					TitleBar tb = new TitleBar(title, TitleBarStyle.SECTION);
-					if (Application.administratorOf(calendarEvent)) {
-						tb.addLink(new ClickLabel("Clone", new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								ConfirmDialog.confirm("Clone this event?", new ConfirmHandler() {
-									@Override
-									public void onConfirm() {
-										calendarEvent.setCloneFromId(calendarEvent.getId());
-										calendarEvent.setId(0);
-										save(form.getFirstFormField());
-									}
-								});
-							}
-						}));
+				public void onClick(ClickEvent event) {
+					if (!Application.isAuthenticated()) {
+						LoginDialog.showLogin();
+						return;
+					}
 
-						if (calendarEvent.getSeriesId() == null) {
-							tb.addLink(new ClickLabel("Create series", new ClickHandler() {
+					EventParticipant rp = new EventParticipant();
+					EventRegistration registration = pageData.getRegistration();
+					rp.setEventRegistrationId(registration.getId());
+					ParameterHandler<EventRegistration> refreshParticipants = new ParameterHandler<EventRegistration>() {
+						@Override
+						public void execute(EventRegistration item) {
+							pageData.setRegistration(item);
+							EventRegistrationSection ers = new EventRegistrationSection(pageData);
+							oovp.insert(ers, 0);
+
+							Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 								@Override
-								public void onClick(ClickEvent event) {
-									new EventSeriesDialog(calendarEvent).center();
-								}
-							}));
-						}
-
-						tb.addLink(new ClickLabel("Email", new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								EmailDialog dialog = new EmailDialog();
-								dialog.setShowSubjectBox(true);
-								dialog.setAllowEditRecipients(true);
-								dialog.setSubject(calendarEvent.getTitle());
-								dialog.insertHtml(createEmailHtml());
-
-								dialog.center();
-							}
-						}));
-
-					}
-
-					if (pageData.getRegistration() != null) {
-						for (EventParticipant p : pageData.getRegistration().getParticipants()) {
-							if (p.getAdjustedPrice() > 0 && p.getStatusId() == 1) {
-								tb.addLink(new Hyperlink("Pay", PageUrl.payment()));
-								break;
-							}
-						}
-					}
-
-					tabBody.add(WidgetFactory.newSection(tb, fieldTable, ContentWidth.MAXWIDTH1000PX));
-
-					// we need to do this again in case we started on another tab
-					form.initialize();
-					form.emancipate();
-
-					tabPanel.selectTabNow(tabBody);
-				}
-			});
-
-			if (calendarEvent.getRequiresRegistration() && calendarEvent.getCategoryId() != 6) {
-				tabPanel.add("Register", false, new TabPageCommand() {
-					@Override
-					public void execute(VerticalPanel tabBody) {
-						tabBody.add(new EventRegistrationSection(pageData));
-
-						tabPanel.selectTabNow(tabBody);
-					}
-				});
-			} else {
-				tabPanel.addSkipIndex();
-			}
-
-			if (calendarEvent.getSeriesId() != null) {
-				tabPanel.add("Series", false, new TabPageCommand() {
-					@Override
-					public void execute(final VerticalPanel tabBody) {
-						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.SERIES_ID, calendarEvent.getSeriesId());
-						args.setStatus(Status.ALL);
-						EventTable table = new EventTable(args);
-						table.removeColumn(EventColumn.REGISTER);
-
-						table.setTitle("Event Series");
-
-						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1100PX));
-						table.populate(pageData.getEventsInSeries());
-						tabPanel.selectTabNow(tabBody);
-					}
-				});
-			} else {
-				tabPanel.addSkipIndex();
-			}
-
-			// if (Application.administratorOf(calendarEvent)) {
-			// tabPanel.add("Fields", false, new TabPageCommand() {
-			// @Override
-			// public void execute(VerticalPanel tabBody) {
-			// tabBody.add(new EventFieldsTab(pageData));
-			//
-			// tabPanel.selectTabNow(tabBody);
-			// }
-			// });
-			// } else {
-			// tabPanel.addSkipIndex();
-			// }
-
-			if (calendarEvent.getRequiresRegistration() && Application.administratorOf(calendarEvent)) {
-				tabPanel.add("Participants", false, new TabPageCommand() {
-					@Override
-					public void execute(final VerticalPanel tabBody) {
-						if (!Common.isNullOrEmpty(pageData.getVolunteerPositions())) {
-							ArgMap<EventArg> volunteerArgs = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
-							eventService.getVolunteers(volunteerArgs, new Callback<ArrayList<Data>>() {
-								@Override
-								protected void doOnSuccess(ArrayList<Data> result) {
-									VerticalPanel vp = new VerticalPanel();
-									Label label = new Label("Volunteers");
-									label.addStyleName("largeText");
-
-									final FlexTable ft = new FlexTable();
-
-									for (final Data item : result) {
-										final int row = ft.getRowCount();
-
-										CheckBox cb = new CheckBox();
-										cb.setValue(item.getBoolean("fulfilled"));
-										cb.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-											@Override
-											public void onValueChange(ValueChangeEvent<Boolean> event) {
-												eventService.setVolunteerFulFilled(item.getId(), event.getValue(), new Callback<Void>(false) {
-													@Override
-													protected void doOnSuccess(Void result) {
-													}
-												});
-											}
-										});
-
-										// if they've already used the corresponding discount, don't allow it to be deleted
-										if (item.getBoolean("adjustmentApplied")) {
-											cb.setEnabled(false);
-										}
-										ft.setWidget(row, 0, cb);
-										Label name = new Label(item.get("firstName") + " " + item.get("lastName"));
-										name.getElement().getStyle().setMarginRight(30, Unit.PX);
-										ft.setWidget(row, 1, name);
-										Label title = new Label(item.get("jobTitle"));
-										title.getElement().getStyle().setMarginRight(20, Unit.PX);
-										ft.setWidget(row, 2, title);
-										if (Application.administratorOf(calendarEvent) && !item.getBoolean("adjustmentApplied")) {
-											ClickLabel cl = new ClickLabel("X", new ClickHandler() {
-												@Override
-												public void onClick(ClickEvent event) {
-													ConfirmDialog.confirm("Remove this volunteer?", new ConfirmHandler() {
-														@Override
-														public void onConfirm() {
-															eventService.deleteVolunteerPositionMapping(item.getId(), new Callback<Void>() {
-																@Override
-																protected void doOnSuccess(Void result) {
-																	ft.removeRow(row);
-																	if (ft.getRowCount() == 0) {
-																		ft.setText(0, 0, "None");
-																	}
-																}
-															});
-														}
-													});
-												}
-											});
-
-											ft.setWidget(row, 3, cl);
-										}
-									}
-
-									vp.add(label);
-									if (!result.isEmpty()) {
-										vp.add(ft);
-									} else {
-										Label none = new Label("None");
-										none.addStyleName("mediumPadding");
-										vp.add(none);
-									}
-									tabBody.insert(vp, 0);
+								public void execute() {
+									register.removeFromParent();
 								}
 							});
 						}
-
-						ArgMap<EventArg> args = new ArgMap<EventArg>(EventArg.EVENT_ID, calendarEvent.getId());
-						args.put(EventArg.NOT_STATUS_ID, 5);
-						args.put(EventArg.INCLUDE_FIELDS);
-						final EventParticipantTable table = new EventParticipantTable(args);
-
-						table.addStatusFilterBox();
-						table.getTitleBar().addExcelControl();
-						table.getTitleBar().addSearchControl();
-						table.populate();
-						table.setTitle("Participants");
-						table.addDataReturnHandler(new DataReturnHandler() {
-							@Override
-							public void onDataReturn() {
-								if (emailDialog != null) {
-									return;
-								}
-
-								table.getTitleBar().addLink(new ClickLabel("Email Registrants", new ClickHandler() {
-									@Override
-									public void onClick(ClickEvent event) {
-										emailDialog = new EmailDialog();
-										String subject = calendarEvent.getTitle() + " - " + Formatter.formatDateTime(calendarEvent.getStartDate());
-										emailDialog.setSubject(subject);
-										emailDialog.setShowSubjectBox(true);
-										for (EventParticipant p : table.getFullList()) {
-											emailDialog.addBcc(p.getRegistrantEmailAddress());
-										}
-										emailDialog.center();
-									}
-								}));
-							}
-						});
-
-						tabBody.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1200PX));
-						tabPanel.selectTabNow(tabBody);
-					}
-				});
-			} else {
-				tabPanel.addSkipIndex();
-			}
-
-			tabPanel.add("Map", new TabPageCommand() {
-				@Override
-				public void execute(VerticalPanel tabBody) {
-					tabBody.add(new GoogleMapWidget(calendarEvent.getAddress()));
-					tabPanel.selectTabNow(tabBody);
+					};
+					new ParticipantEditDialog(pageData, refreshParticipants).center(rp);
 				}
 			});
-
-			if (!Application.administratorOf(calendarEvent)) {
-				form.setEnabled(false);
-			}
-
-			page.add(tabPanel);
+			ddt.add(register);
 		}
 
-		Application.getLayout().setPage(title, page);
+		pp.add(ddt);
+		pp.setCellHorizontalAlignment(ddt, HasHorizontalAlignment.ALIGN_RIGHT);
+
+		VerticalPanel ovp = new VerticalPanel();
+		oovp.add(ovp);
+		ovp.addStyleName("sectionContent");
+
+		ovp.add(pp);
+
+		TagSection ts = new TagSection(TagMappingType.EVENT, calendarEvent.getId());
+		ts.setEditingEnabled(false);
+		ts.populate();
+
+		ovp.add(ts);
+
+		if (!Common.isNullOrBlank(calendarEvent.getDescription())) {
+			HTML desc = new HTML(calendarEvent.getDescription());
+			desc.setWidth("800px");
+			desc.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
+			desc.getElement().getStyle().setMarginLeft(15, Unit.PX);
+			desc.getElement().getStyle().setMarginRight(15, Unit.PX);
+			desc.getElement().getStyle().setMarginBottom(15, Unit.PX);
+			desc.getElement().getStyle().setPadding(10, Unit.PX);
+			desc.getElement().getStyle().setBackgroundColor("#ffffff");
+			desc.getElement().getStyle().setBorderColor("#cccccc");
+			desc.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+			desc.getElement().getStyle().setBorderWidth(1, Unit.PX);
+			desc.getElement().getStyle().setBorderWidth(1, Unit.PX);
+
+			ovp.add(desc);
+		}
+
+		PaddedPanel outerPanel = new PaddedPanel(10);
+		outerPanel.add(new AdsMiniModule());
+		outerPanel.add(oovp);
+
+		page.add(outerPanel);
 	}
 
 	private void populateAgeGroups() {
