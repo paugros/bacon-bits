@@ -46,6 +46,7 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -276,29 +277,20 @@ public class ArticlePage implements Page {
 	}
 
 	private void createViewPage() {
-		PaddedPanel pp = new PaddedPanel(10);
+		HorizontalPanel pp = new HorizontalPanel();
 		pp.setWidth("100%");
 		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
 
-		VerticalPanel vp = new VerticalPanel();
-
 		Label titleLabel = new Label(article.getTitle());
+		titleLabel.getElement().getStyle().setPadding(4, Unit.PX);
 		titleLabel.addStyleName("hugeText");
 
-		vp.add(titleLabel);
-
-		TagSection ts = new TagSection(TagMappingType.ARTICLE, article.getId());
-		ts.setEditingEnabled(false);
-		ts.populate();
-
-		vp.add(ts);
-
-		pp.add(vp);
+		pp.add(titleLabel);
 
 		if (allowEdit()) {
 			Hyperlink edit = new Hyperlink("Edit details", PageUrl.article(article.getId()) + "&details=true");
 			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
-			edit.getElement().getStyle().setMarginRight(5, Unit.PX);
+			edit.getElement().getStyle().setMarginRight(15, Unit.PX);
 			pp.add(edit);
 			pp.setCellHorizontalAlignment(edit, HasHorizontalAlignment.ALIGN_RIGHT);
 		}
@@ -307,6 +299,13 @@ public class ArticlePage implements Page {
 		ovp.addStyleName("sectionContent");
 
 		ovp.add(pp);
+
+		TagSection ts = new TagSection(TagMappingType.ARTICLE, article.getId());
+		ts.setEditingEnabled(false);
+		ts.populate();
+		ts.getElement().getStyle().setMarginLeft(10, Unit.PX);
+
+		ovp.add(ts);
 
 		if (!Common.isNullOrBlank(article.getArticle())) {
 			Image image = null;
