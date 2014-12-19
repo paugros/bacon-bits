@@ -4,7 +4,6 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.Sidebar;
-import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
@@ -20,8 +19,6 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
-import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
@@ -49,7 +46,6 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -126,14 +122,28 @@ public class ArticlePage implements Page {
 	}
 
 	private void createDetailsPage() {
-		sidebar.add(MiniModule.ADS);
-
 		if (noTitle) {
 			createTextPage();
-		} else if (!Application.administratorOf(article)) {
-			createReadOnlyPage();
 		} else {
-			createReadWritePage();
+			createFieldTable();
+			form.initialize();
+
+			if (!article.isSaved()) {
+				String policy = Url.getParameter("gp");
+				if (!Common.isNullOrBlank(policy)) {
+					try {
+						article.setGroupPolicy(GroupPolicy.valueOf(policy));
+					} catch (Exception e) {
+					}
+				}
+				form.configureForAdd(fieldTable);
+			} else {
+				form.emancipate();
+			}
+
+			page.add(fieldTable);
+
+			form.setEnabled(allowEdit());
 		}
 	}
 
@@ -248,38 +258,6 @@ public class ArticlePage implements Page {
 		form.getButtonPanel().insertCenterButton(cancelButton, 0);
 	}
 
-	private void createReadOnlyPage() {
-		String title = article.isSaved() ? article.getTitle() : "New Article";
-		page.add(new ArticleWidget(article));
-		Application.getLayout().setPage(title, sidebar, page);
-	}
-
-	private void createReadWritePage() {
-		String title = article.isSaved() ? article.getTitle() : "New Article";
-
-		createFieldTable();
-		form.initialize();
-
-		if (!article.isSaved()) {
-			String policy = Url.getParameter("gp");
-			if (!Common.isNullOrBlank(policy)) {
-				try {
-					article.setGroupPolicy(GroupPolicy.valueOf(policy));
-				} catch (Exception e) {
-				}
-			}
-			form.configureForAdd(fieldTable);
-		} else {
-			form.emancipate();
-		}
-
-		page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1000PX));
-
-		form.setEnabled(allowEdit());
-
-		Application.getLayout().setPage(title, page);
-	}
-
 	private void createTagSection() {
 		tagSection = new TagSection(TagMappingType.ARTICLE, article.getId());
 		tagSection.setEditingEnabled(allowEdit());
@@ -300,7 +278,7 @@ public class ArticlePage implements Page {
 	private void createViewPage() {
 		PaddedPanel pp = new PaddedPanel(10);
 		pp.setWidth("100%");
-		pp.getElement().getStyle().setMargin(10, Unit.PX);
+		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
 
 		VerticalPanel vp = new VerticalPanel();
 
@@ -309,6 +287,12 @@ public class ArticlePage implements Page {
 
 		vp.add(titleLabel);
 
+		TagSection ts = new TagSection(TagMappingType.ARTICLE, article.getId());
+		ts.setEditingEnabled(false);
+		ts.populate();
+
+		vp.add(ts);
+
 		pp.add(vp);
 
 		if (allowEdit()) {
@@ -316,7 +300,6 @@ public class ArticlePage implements Page {
 			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 			edit.getElement().getStyle().setMarginRight(5, Unit.PX);
 			pp.add(edit);
-			pp.setCellVerticalAlignment(edit, HasVerticalAlignment.ALIGN_MIDDLE);
 			pp.setCellHorizontalAlignment(edit, HasHorizontalAlignment.ALIGN_RIGHT);
 		}
 
@@ -354,12 +337,6 @@ public class ArticlePage implements Page {
 
 			ovp.add(desc);
 		}
-
-		TagSection ts = new TagSection(TagMappingType.ARTICLE, article.getId());
-		ts.setEditingEnabled(false);
-		ts.populate();
-
-		ovp.add(ts);
 
 		PaddedPanel outerPanel = new PaddedPanel(10);
 		outerPanel.add(new AdsMiniModule());
