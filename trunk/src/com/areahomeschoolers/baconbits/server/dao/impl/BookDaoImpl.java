@@ -105,7 +105,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			book.setAddedDate(rs.getTimestamp("addedDate"));
 			if (book.getImageId() == null) {
 				book.setImageId(rs.getInt("tagImageId"));
-				book.setSmallImageId(rs.getInt("smallImageId"));
+				book.setSmallImageId(rs.getInt("tagSmallImageId"));
 				book.setImageExtension(rs.getString("tagFileExtension"));
 			}
 			return book;
@@ -160,7 +160,11 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	@Override
 	public int getCount() {
 		String sql = "select count(*) from books b ";
-		sql += TagDaoImpl.createWhere(TagMappingType.BOOK);
+		Double latD = ServerContext.getCurrentLat();
+		String lat = latD == null ? null : Double.toString(latD);
+		Double lngD = ServerContext.getCurrentLng();
+		String lng = lngD == null ? null : Double.toString(lngD);
+		sql += TagDaoImpl.createWhere(TagMappingType.BOOK, Constants.DEFAULT_SEARCH_RADIUS, lat, lng);
 		return queryForInt(0, sql);
 	}
 

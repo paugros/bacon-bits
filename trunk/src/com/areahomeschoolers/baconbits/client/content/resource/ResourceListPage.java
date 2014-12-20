@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
@@ -20,14 +21,23 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class ResourceListPage implements Page {
 	private ResourceServiceAsync resourceService = (ResourceServiceAsync) ServiceCache.getService(ResourceService.class);
 	private ArgMap<ResourceArg> args = new ArgMap<ResourceArg>(Status.ACTIVE);
 	private TilePanel fp = new TilePanel();
+	private ArrayList<Resource> resources;
 
 	public ResourceListPage(final VerticalPanel page) {
 		final String title = "Resources";
@@ -51,6 +61,31 @@ public final class ResourceListPage implements Page {
 			page.add(link);
 		}
 
+		PaddedPanel searchBox = new PaddedPanel();
+		searchBox.addStyleName("boxedBlurb");
+		searchBox.setSpacing(8);
+		searchBox.add(new Label("Search:"));
+		final TextBox searchInput = new TextBox();
+		searchInput.setVisibleLength(35);
+		searchBox.add(searchInput);
+		searchInput.addBlurHandler(new BlurHandler() {
+			@Override
+			public void onBlur(BlurEvent event) {
+				search(searchInput.getText());
+			}
+		});
+
+		searchInput.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					search(searchInput.getText());
+				}
+			}
+		});
+
+		page.add(searchBox);
+
 		page.add(fp);
 		Application.getLayout().setPage(title, page);
 		populate();
@@ -60,6 +95,7 @@ public final class ResourceListPage implements Page {
 		resourceService.list(args, new Callback<ArrayList<Resource>>() {
 			@Override
 			protected void doOnSuccess(ArrayList<Resource> result) {
+				resources = result;
 				fp.clear();
 
 				for (Resource r : result) {
@@ -67,6 +103,20 @@ public final class ResourceListPage implements Page {
 				}
 			}
 		});
+	}
+
+	private void search(String text) {
+		if (text == null || text.isEmpty()) {
+			fp.showAll();
+			return;
+		}
+
+		text = text.toLowerCase();
+
+		for (Resource r : resources) {
+			String descriptionText = new HTML(r.getDescription()).getText().toLowerCase();
+			fp.setVisible(r, r.getName().toLowerCase().contains(text) || descriptionText.contains(text));
+		}
 	}
 
 }

@@ -26,20 +26,22 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class UserListPage implements Page {
@@ -47,6 +49,8 @@ public final class UserListPage implements Page {
 	private ArgMap<UserArg> args;
 	private TilePanel fp = new TilePanel();
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
+	private TextBox searchControl;
+	private ArrayList<User> users;
 
 	public UserListPage(final VerticalPanel page) {
 		fp.setWidth("100%");
@@ -84,13 +88,27 @@ public final class UserListPage implements Page {
 		populate();
 	}
 
+	private void applyTextFilter(String text) {
+		if (text == null || text.isEmpty()) {
+			fp.showAll();
+			return;
+		}
+
+		text = text.toLowerCase();
+
+		for (User u : users) {
+			String email = u.getEmail() == null ? "" : u.getEmail();
+			fp.setVisible(u, u.getFullName().toLowerCase().contains(text) || email.toLowerCase().contains(text));
+		}
+	}
+
 	private ArgMap<UserArg> getDefaultArgs() {
 		ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 		args.put(UserArg.PARENTS);
 		if (Application.hasLocation()) {
 			args.put(UserArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
 			args.put(UserArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
-			args.put(UserArg.WITHIN_MILES, Constants.defaultSearchRadius);
+			args.put(UserArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
 		}
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			args.put(UserArg.HAS_TAGS, Url.getIntListParameter("tagId"));
@@ -102,6 +120,7 @@ public final class UserListPage implements Page {
 		userService.list(args, new Callback<ArrayList<User>>() {
 			@Override
 			protected void doOnSuccess(ArrayList<User> result) {
+				users = result;
 				fp.clear();
 
 				for (User u : result) {
@@ -110,6 +129,13 @@ public final class UserListPage implements Page {
 			}
 		});
 	}
+
+	// private void resetFilter() {
+	// optionsPanel.clear();
+	// populateOptionsPanel();
+	// args = getDefaultArgs();
+	// populate();
+	// }
 
 	private void populateOptionsPanel() {
 		optionsPanel.addStyleName("boxedBlurb");
@@ -191,7 +217,7 @@ public final class UserListPage implements Page {
 		milesInput.addItem("10", 10);
 		milesInput.addItem("25", 25);
 		milesInput.addItem("50", 50);
-		milesInput.setValue(Constants.defaultSearchRadius);
+		milesInput.setValue(Constants.DEFAULT_SEARCH_RADIUS);
 		milesInput.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
@@ -235,12 +261,28 @@ public final class UserListPage implements Page {
 
 		optionsPanel.add(top);
 
-		// PaddedPanel sp = new PaddedPanel();
-		// sp.add(new Label("Search text"));
+		PaddedPanel sp = new PaddedPanel();
+		searchControl = new TextBox();
+		searchControl.addBlurHandler(new BlurHandler() {
+			@Override
+			public void onBlur(BlurEvent event) {
+				applyTextFilter(searchControl.getText());
+			}
+		});
 
-		// sp.add(searchControl);
+		searchControl.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					applyTextFilter(searchControl.getText());
+				}
+			}
+		});
+		searchControl.setVisibleLength(35);
+		sp.add(new Label("Search text"));
+		sp.add(searchControl);
 
-		// optionsPanel.add(sp);
+		optionsPanel.add(sp);
 
 		if (Application.isAuthenticated()) {
 			CheckBox cb = new CheckBox("Only show members with whom I have interests in common");
@@ -259,21 +301,13 @@ public final class UserListPage implements Page {
 			optionsPanel.add(cb);
 		}
 
-		Button resetButton = new Button("Reset", new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				resetFilter();
-			}
-		});
-
-		optionsPanel.add(resetButton);
-		optionsPanel.setCellHorizontalAlignment(resetButton, HasHorizontalAlignment.ALIGN_CENTER);
-	}
-
-	private void resetFilter() {
-		optionsPanel.clear();
-		populateOptionsPanel();
-		args = getDefaultArgs();
-		populate();
+		// Button resetButton = new Button("Reset", new ClickHandler() {
+		// @Override
+		// public void onClick(ClickEvent event) {
+		// resetFilter();
+		// }
+		// });
+		// optionsPanel.add(resetButton);
+		// optionsPanel.setCellHorizontalAlignment(resetButton, HasHorizontalAlignment.ALIGN_CENTER);
 	}
 }

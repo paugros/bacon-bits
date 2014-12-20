@@ -11,11 +11,9 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
-import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
-import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
@@ -35,7 +33,6 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.dom.client.Style.BorderStyle;
-import com.google.gwt.dom.client.Style.Float;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.WhiteSpace;
@@ -48,7 +45,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -91,16 +87,21 @@ public class ArticlePage implements Page {
 					article = result;
 				}
 
+				if (Url.getBooleanParameter("details") && !Application.administratorOf(article)) {
+					new ErrorPage(PageError.NOT_AUTHORIZED);
+					return;
+				}
+
 				title = article.isSaved() ? article.getTitle() : "New Resource";
 
 				CookieCrumb cc = new CookieCrumb();
 				cc.add(new Hyperlink("Articles By Type", PageUrl.tagGroup("ARTICLE")));
 				cc.add(new Hyperlink("Articles", PageUrl.articleList()));
 				if (Url.getBooleanParameter("details")) {
-					cc.add(new Hyperlink(article.getTitle(), PageUrl.article(article.getId())));
+					cc.add(new Hyperlink(title, PageUrl.article(article.getId())));
 					cc.add("Edit details");
 				} else {
-					cc.add(article.getTitle());
+					cc.add(title);
 				}
 				page.add(cc);
 
@@ -227,6 +228,7 @@ public class ArticlePage implements Page {
 		final HTML dataDisplay = new HTML();
 		dataDisplay.getElement().getStyle().setPadding(10, Unit.PX);
 		dataDisplay.setWidth("800px");
+		dataDisplay.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
 		FormField dataField = form.createFormField("", dataInput, dataDisplay);
 		dataField.setDtoUpdater(new Command() {
 			@Override
@@ -281,11 +283,9 @@ public class ArticlePage implements Page {
 		pp.setWidth("100%");
 		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
 
-		Label titleLabel = new Label(article.getTitle());
-		titleLabel.getElement().getStyle().setPadding(4, Unit.PX);
-		titleLabel.addStyleName("hugeText");
-
-		pp.add(titleLabel);
+		String titleText = "<div style=\"padding: 4px;\" class=hugeText>" + article.getTitle() + "</div>";
+		titleText += "<div style=\"padding: 4px;\">By " + article.getAddedByFirstName() + " " + article.getAddedByLastName() + "</div>";
+		pp.add(new HTML(titleText));
 
 		if (allowEdit()) {
 			Hyperlink edit = new Hyperlink("Edit details", PageUrl.article(article.getId()) + "&details=true");
@@ -308,18 +308,7 @@ public class ArticlePage implements Page {
 		ovp.add(ts);
 
 		if (!Common.isNullOrBlank(article.getArticle())) {
-			Image image = null;
-			if (article.getImageId() != null) {
-				image = new Image(ClientUtils.createDocumentUrl(article.getImageId(), article.getImageExtension()));
-			} else {
-				image = new Image(MainImageBundle.INSTANCE.defaultLarge());
-			}
-
-			image.getElement().getStyle().setFloat(Float.LEFT);
-			image.getElement().getStyle().setMarginRight(15, Unit.PX);
-			image.getElement().getStyle().setMarginTop(15, Unit.PX);
-
-			String html = image + article.getArticle();
+			String html = article.getArticle();
 
 			HTML desc = new HTML(html);
 

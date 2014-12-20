@@ -27,7 +27,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.KeyHolder;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
@@ -162,15 +161,6 @@ public abstract class ServerUtils {
 		sql += "+ sin( radians(" + withinLat + ") ) * sin( radians( " + tableAlias + ".lat ) ) ) ) as distance, ";
 
 		return sql;
-	}
-
-	public static String getFirstNodeContentByName(Document doc, String name) {
-		NodeList nodes = doc.getElementsByTagName(name);
-		if (nodes.getLength() == 0) {
-			return "";
-		}
-
-		return nodes.item(0).getTextContent();
 	}
 
 	public static RowMapper<Data> getGenericRowMapper() {

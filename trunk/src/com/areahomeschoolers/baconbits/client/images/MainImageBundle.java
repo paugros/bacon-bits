@@ -49,6 +49,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource defaultSmall();
 
+	ImageResource earth();
+
 	ImageResource edit();
 
 	ImageResource event();

@@ -283,7 +283,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	@Override
 	public int getCount() {
 		String sql = "select count(*) from users u ";
-		sql += TagDaoImpl.createWhere(TagMappingType.USER);
+		Double latD = ServerContext.getCurrentLat();
+		String lat = latD == null ? null : Double.toString(latD);
+		Double lngD = ServerContext.getCurrentLng();
+		String lng = lngD == null ? null : Double.toString(lngD);
+		sql += TagDaoImpl.createWhere(TagMappingType.USER, Constants.DEFAULT_SEARCH_RADIUS, lat, lng);
 
 		return queryForInt(sql);
 	}

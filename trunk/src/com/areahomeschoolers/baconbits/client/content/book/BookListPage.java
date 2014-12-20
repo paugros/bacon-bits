@@ -24,14 +24,20 @@ import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class BookListPage implements Page {
@@ -43,6 +49,8 @@ public final class BookListPage implements Page {
 	private int sellerId = Url.getIntegerParameter("sellerId");
 	private TilePanel fp = new TilePanel();
 	private VerticalPanel page;
+	private TextBox searchControl;
+	private ArrayList<Book> books;
 
 	public BookListPage(final VerticalPanel p) {
 		fp.setWidth("100%");
@@ -62,7 +70,7 @@ public final class BookListPage implements Page {
 		if (Application.hasLocation()) {
 			args.put(BookArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
 			args.put(BookArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
-			args.put(BookArg.WITHIN_MILES, Constants.defaultSearchRadius);
+			args.put(BookArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
 		}
 
 		CookieCrumb cc = new CookieCrumb();
@@ -84,13 +92,38 @@ public final class BookListPage implements Page {
 		Application.getLayout().setPage("Books", page);
 	}
 
+	private void applyTextFilter(String text) {
+		if (text == null || text.isEmpty()) {
+			fp.showAll();
+			return;
+		}
+
+		text = text.toLowerCase();
+
+		for (Book b : books) {
+			String[] tokens = { b.getTitle(), b.getDescription(), b.getAuthor(), b.getPublisher() };
+			boolean show = false;
+			for (int i = 0; i < tokens.length; i++) {
+				if (tokens[i] == null) {
+					continue;
+				}
+				if (tokens[i].toLowerCase().contains(text)) {
+					show = true;
+					break;
+				}
+			}
+			fp.setVisible(b, show);
+		}
+	}
+
 	private void populate() {
 		bookService.list(args, new Callback<ArrayList<Book>>() {
 			@Override
-			protected void doOnSuccess(ArrayList<Book> books) {
+			protected void doOnSuccess(ArrayList<Book> result) {
 				fp.clear();
 
-				for (Book b : books) {
+				books = result;
+				for (Book b : result) {
 					fp.add(new BookTile(b), b.getId());
 				}
 			}
@@ -214,8 +247,24 @@ public final class BookListPage implements Page {
 				bottom.add(milesInput);
 				bottom.add(new Label("miles of"));
 				bottom.add(locationInput);
-				// bottom.add(new Label("with text"));
-				// bottom.add(table.getTitleBar().extractSearchControl());
+				bottom.add(new Label("with text"));
+				searchControl = new TextBox();
+				searchControl.setVisibleLength(35);
+				bottom.add(searchControl);
+				searchControl.addBlurHandler(new BlurHandler() {
+					@Override
+					public void onBlur(BlurEvent event) {
+						applyTextFilter(searchControl.getText());
+					}
+				});
+				searchControl.addKeyDownHandler(new KeyDownHandler() {
+					@Override
+					public void onKeyDown(KeyDownEvent event) {
+						if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+							applyTextFilter(searchControl.getText());
+						}
+					}
+				});
 
 				for (int i = 0; i < bottom.getWidgetCount(); i++) {
 					bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);

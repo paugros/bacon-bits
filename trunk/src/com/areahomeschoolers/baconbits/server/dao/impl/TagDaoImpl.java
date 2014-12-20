@@ -38,7 +38,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 @Repository
 public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 
-	public static String createWhere(TagMappingType type) {
+	public static String createWhere(TagMappingType type, int withinMiles, String withinLat, String withinLng) {
 		String sql = "";
 		switch (type) {
 		case ARTICLE:
@@ -66,6 +66,16 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			break;
 		default:
 			break;
+		}
+
+		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+			String tableAlias = type.toString().substring(0, 1).toLowerCase();
+			if (type.equals(TagMappingType.BOOK)) {
+				tableAlias = "u";
+			}
+			sql += "and (3959 * acos( cos( radians(" + withinLat + ") ) * ";
+			sql += "cos( radians( " + tableAlias + ".lat ) ) * cos( radians( " + tableAlias + ".lng ) - radians(" + withinLng + ") ) ";
+			sql += "+ sin( radians(" + withinLat + ") ) * sin( radians( " + tableAlias + ".lat ) ) ) ) < " + withinMiles + " \n";
 		}
 
 		return sql;
@@ -152,6 +162,9 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		final TagMappingType mappingType = Common.isNullOrBlank(args.getString(TagArg.MAPPING_TYPE)) ? null : TagMappingType.valueOf(args
 				.getString(TagArg.MAPPING_TYPE));
 		int mappingId = args.getInt(TagArg.MAPPING_ID);
+		int withinMiles = args.getInt(TagArg.WITHIN_MILES);
+		String withinLat = args.getString(TagArg.WITHIN_LAT);
+		String withinLng = args.getString(TagArg.WITHIN_LNG);
 
 		// tags
 		String always = "t.id, t.name, t.addedDate, t.addedById, t.imageId, t.smallImageId, d.fileExtension \n";
@@ -207,7 +220,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			}
 
 			if (getCounts) {
-				sql += createWhere(mappingType);
+				sql += createWhere(mappingType, withinMiles, withinLat, withinLng);
 				sql += "group by " + always;
 				sql += "order by t.name";
 			} else {

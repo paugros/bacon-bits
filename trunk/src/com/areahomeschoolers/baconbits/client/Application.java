@@ -54,6 +54,7 @@ import com.areahomeschoolers.baconbits.shared.dto.HasGroupOwnership;
 import com.areahomeschoolers.baconbits.shared.dto.HistoryEntry;
 import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.PollUpdateData;
+import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -151,6 +152,18 @@ public final class Application implements ValueChangeHandler<String> {
 
 	public static boolean administratorOf(Integer groupId) {
 		return isAuthenticated() && applicationData.getCurrentUser().administratorOf(groupId);
+	}
+
+	public static boolean administratorOf(Resource resource) {
+		if (!isAuthenticated()) {
+			return false;
+		}
+
+		if (isSystemAdministrator() || resource.getAddedById() == getCurrentUserId()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public static boolean administratorOf(User u) {

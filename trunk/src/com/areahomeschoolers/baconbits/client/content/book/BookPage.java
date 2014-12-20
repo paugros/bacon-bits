@@ -57,16 +57,21 @@ public class BookPage implements Page {
 				pageData = result;
 
 				book = result.getBook();
+				if (Url.getBooleanParameter("details") && !Application.administratorOf(book)) {
+					new ErrorPage(PageError.NOT_AUTHORIZED);
+					return;
+				}
+
 				final String title = book.isSaved() ? book.getTitle() : "New Book";
 
 				CookieCrumb cc = new CookieCrumb();
 				cc.add(new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
 				cc.add(new Hyperlink("Books", PageUrl.bookList()));
 				if (Url.getBooleanParameter("details")) {
-					cc.add(new Hyperlink(book.getTitle(), PageUrl.book(book.getId())));
+					cc.add(new Hyperlink(title, PageUrl.book(book.getId())));
 					cc.add("Edit details");
 				} else {
-					cc.add(book.getTitle());
+					cc.add(title);
 				}
 				page.add(cc);
 

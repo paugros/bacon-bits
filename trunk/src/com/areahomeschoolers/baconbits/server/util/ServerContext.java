@@ -82,15 +82,25 @@ public class ServerContext implements ApplicationContextAware {
 		return cache;
 	}
 
-	public static double getCurrentLat() {
-		return (double) getSession().getAttribute("lat");
+	public static Double getCurrentLat() {
+		if (getSession().getAttribute("lat") == null) {
+			return null;
+		}
+		return (Double) getSession().getAttribute("lat");
 	}
 
-	public static double getCurrentLng() {
-		return (double) getSession().getAttribute("lng");
+	public static Double getCurrentLng() {
+		if (getSession().getAttribute("lng") == null) {
+			return null;
+		}
+
+		return (Double) getSession().getAttribute("lng");
 	}
 
 	public static String getCurrentLocation() {
+		if (getSession().getAttribute("location") == null) {
+			return null;
+		}
 		return (String) getSession().getAttribute("location");
 	}
 
