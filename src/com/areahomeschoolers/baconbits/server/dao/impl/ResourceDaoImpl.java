@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -116,7 +117,11 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 	@Override
 	public int getCount() {
-		String sql = "select count(*) from resources r " + TagDaoImpl.createWhere(TagMappingType.RESOURCE);
+		Double latD = ServerContext.getCurrentLat();
+		String lat = latD == null ? null : Double.toString(latD);
+		Double lngD = ServerContext.getCurrentLng();
+		String lng = lngD == null ? null : Double.toString(lngD);
+		String sql = "select count(*) from resources r " + TagDaoImpl.createWhere(TagMappingType.RESOURCE, Constants.DEFAULT_SEARCH_RADIUS, lat, lng);
 
 		return queryForInt(0, sql);
 	}

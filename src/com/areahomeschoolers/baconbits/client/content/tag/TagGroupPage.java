@@ -18,16 +18,32 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class TagGroupPage implements Page {
@@ -35,9 +51,11 @@ public final class TagGroupPage implements Page {
 	private TagServiceAsync tagService = (TagServiceAsync) ServiceCache.getService(TagService.class);
 	private TilePanel fp = new TilePanel();
 	private TagMappingType type = null;
+	private ArrayList<Tag> tags;
+	private VerticalPanel page;
 
-	public TagGroupPage(final VerticalPanel page) {
-
+	public TagGroupPage(final VerticalPanel p) {
+		page = p;
 		try {
 			type = TagMappingType.valueOf(Url.getParameter("type"));
 		} catch (Exception e) {
@@ -54,45 +72,13 @@ public final class TagGroupPage implements Page {
 		args.put(TagArg.MAPPING_TYPE, type.toString());
 		args.put(TagArg.GET_COUNTS);
 
-		tagService.list(args, new Callback<ArrayList<Tag>>() {
-			@Override
-			protected void doOnSuccess(ArrayList<Tag> result) {
-				for (Tag tag : result) {
-					TileConfig uc = new TileConfig().setText(tag.getName()).setCount(tag.getCount());
-					if (tag.getImageId() != null) {
-						uc.setImage(new Image(ClientUtils.createDocumentUrl(tag.getImageId(), tag.getImageExtension())));
-					} else {
-						uc.setImage(new Image(MainImageBundle.INSTANCE.citrusGirl()));
-					}
-					String url = null;
-					String extras = "&tagId=" + tag.getId() + "&tn=" + URL.encode(tag.getName());
-					switch (type) {
-					case ARTICLE:
-						url = PageUrl.articleList() + extras;
-						break;
-					case BOOK:
-						url = PageUrl.bookList() + extras;
-						break;
-					case EVENT:
-						url = PageUrl.eventList() + extras;
-						break;
-					case RESOURCE:
-						url = PageUrl.resourceList() + extras;
-						break;
-					case USER:
-						url = PageUrl.userList() + extras;
-						break;
-					default:
-						break;
-					}
-					uc.setUrl(url);
-					uc.setColor(type.getColor());
-					Tile tile = new Tile(uc);
+		if (Application.hasLocation() && !type.equals(TagMappingType.ARTICLE)) {
+			args.put(TagArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
+			args.put(TagArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
+			args.put(TagArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
+		}
 
-					fp.add(tile);
-				}
-			}
-		});
+		populate();
 
 		CookieCrumb cc = new CookieCrumb();
 		String typeText = type.equals(TagMappingType.USER) ? "Interests" : "Type";
@@ -133,8 +119,164 @@ public final class TagGroupPage implements Page {
 			}
 		}
 
+		createSearchBox();
+
 		page.add(fp);
 
 		Application.getLayout().setPage(title, page);
 	}
+
+	private void createSearchBox() {
+		VerticalPanel vvp = new VerticalPanel();
+		vvp.setSpacing(4);
+		PaddedPanel searchBox = new PaddedPanel();
+		vvp.addStyleName("boxedBlurb");
+		searchBox.setSpacing(4);
+		searchBox.add(new Label("Search:"));
+		final TextBox searchInput = new TextBox();
+		searchInput.setVisibleLength(35);
+		searchBox.add(searchInput);
+		searchInput.addBlurHandler(new BlurHandler() {
+			@Override
+			public void onBlur(BlurEvent event) {
+				search(searchInput.getText());
+			}
+		});
+
+		searchInput.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					search(searchInput.getText());
+				}
+			}
+		});
+
+		vvp.add(searchBox);
+
+		// within miles
+		if (!type.equals(TagMappingType.ARTICLE)) {
+			final GeocoderTextBox locationInput = new GeocoderTextBox();
+			if (Application.hasLocation()) {
+				locationInput.setText(Application.getCurrentLocation());
+			}
+
+			final DefaultListBox milesInput = new DefaultListBox();
+			milesInput.addItem("5", 5);
+			milesInput.addItem("10", 10);
+			milesInput.addItem("25", 25);
+			milesInput.addItem("50", 50);
+			milesInput.setValue(25);
+			milesInput.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					args.put(TagArg.WITHIN_MILES, milesInput.getIntValue());
+					if (!locationInput.getText().isEmpty()) {
+						populate();
+					}
+				}
+			});
+
+			locationInput.setClearCommand(new Command() {
+				@Override
+				public void execute() {
+					args.remove(EventArg.WITHIN_LAT);
+					args.remove(EventArg.WITHIN_LNG);
+					populate();
+				}
+			});
+
+			locationInput.setChangeCommand(new Command() {
+				@Override
+				public void execute() {
+					args.put(TagArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
+					args.put(TagArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
+					args.put(TagArg.WITHIN_MILES, milesInput.getIntValue());
+					populate();
+				}
+			});
+
+			PaddedPanel bottom = new PaddedPanel();
+			bottom.setSpacing(4);
+
+			bottom.add(new Label("within"));
+			bottom.add(milesInput);
+			bottom.add(new Label("miles of"));
+			bottom.add(locationInput);
+
+			for (int i = 0; i < bottom.getWidgetCount(); i++) {
+				bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+			}
+			vvp.add(bottom);
+		}
+
+		page.add(vvp);
+	}
+
+	private void populate() {
+		tagService.list(args, new Callback<ArrayList<Tag>>() {
+			@Override
+			protected void doOnSuccess(ArrayList<Tag> result) {
+				tags = result;
+				int totalCount = 0;
+				for (Tag tag : result) {
+					totalCount += tag.getCount();
+				}
+				String url = null;
+				switch (type) {
+				case ARTICLE:
+					url = PageUrl.articleList();
+					break;
+				case BOOK:
+					url = PageUrl.bookList();
+					break;
+				case EVENT:
+					url = PageUrl.eventList();
+					break;
+				case RESOURCE:
+					url = PageUrl.resourceList();
+					break;
+				case USER:
+					url = PageUrl.userList();
+					break;
+				default:
+					break;
+				}
+
+				TileConfig ac = new TileConfig().setText("All " + type.getName()).setCount(totalCount).setUrl(url);
+				ac.setImage(new Image(MainImageBundle.INSTANCE.earth())).setColor("#ffffff");
+				Tile all = new Tile(ac);
+				fp.add(all);
+
+				for (Tag tag : result) {
+					TileConfig uc = new TileConfig().setText(tag.getName()).setCount(tag.getCount());
+					if (tag.getImageId() != null) {
+						uc.setImage(new Image(ClientUtils.createDocumentUrl(tag.getImageId(), tag.getImageExtension())));
+					} else {
+						uc.setImage(new Image(MainImageBundle.INSTANCE.citrusGirl()));
+					}
+					String extras = "&tagId=" + tag.getId() + "&tn=" + URL.encode(tag.getName());
+					uc.setUrl(url + extras);
+					uc.setColor(type.getColor());
+					Tile tile = new Tile(uc);
+
+					fp.add(tile, tag.getId());
+				}
+			}
+		});
+	}
+
+	private void search(String text) {
+		if (text == null || text.isEmpty()) {
+			fp.showAll();
+			return;
+		}
+
+		text = text.toLowerCase();
+
+		for (Tag tag : tags) {
+			fp.setVisible(tag, tag.getName().toLowerCase().contains(text));
+		}
+	}
+
 }

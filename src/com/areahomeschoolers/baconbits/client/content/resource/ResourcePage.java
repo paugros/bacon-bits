@@ -106,16 +106,21 @@ public class ResourcePage implements Page {
 
 				resource = result.getResource();
 
+				if (Url.getBooleanParameter("details") && !Application.administratorOf(resource)) {
+					new ErrorPage(PageError.NOT_AUTHORIZED);
+					return;
+				}
+
 				title = resource.isSaved() ? resource.getName() : "New Resource";
 
 				CookieCrumb cc = new CookieCrumb();
 				cc.add(new Hyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE")));
 				cc.add(new Hyperlink("Resources", PageUrl.resourceList()));
 				if (Url.getBooleanParameter("details")) {
-					cc.add(new Hyperlink(resource.getName(), PageUrl.resource(resource.getId())));
+					cc.add(new Hyperlink(title, PageUrl.resource(resource.getId())));
 					cc.add("Edit details");
 				} else {
-					cc.add(resource.getName());
+					cc.add(title);
 				}
 				page.add(cc);
 
@@ -518,6 +523,7 @@ public class ResourcePage implements Page {
 		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
 		descriptionDisplay.getElement().getStyle().setPadding(10, Unit.PX);
 		descriptionDisplay.setWidth("800px");
+		descriptionDisplay.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
 		descriptionField.setRequired(true);
 		descriptionField.setInitializer(new Command() {
 			@Override

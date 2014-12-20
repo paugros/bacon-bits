@@ -1,8 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
@@ -29,23 +27,29 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class EventListPage implements Page {
 	private MonthPicker monthBox;
 	private DefaultListBox ageBox;
-	private DefaultListBox categoryBox;
 	private static final String NEWLY_ADDED_TOKEN = "newlyAdded";
 	private boolean showCommunity = Url.getBooleanParameter("showCommunity");
 	private boolean newlyAdded = Url.getBooleanParameter(NEWLY_ADDED_TOKEN);
@@ -53,7 +57,7 @@ public final class EventListPage implements Page {
 	private TilePanel fp = new TilePanel();
 	private ArgMap<EventArg> args = new ArgMap<EventArg>(Status.ACTIVE);
 	private ArrayList<Event> events;
-	private boolean runOnce;
+	private TextBox searchControl;
 
 	public EventListPage(final VerticalPanel page) {
 		if (showCommunity) {
@@ -69,7 +73,7 @@ public final class EventListPage implements Page {
 		if (Application.hasLocation()) {
 			args.put(EventArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
 			args.put(EventArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
-			args.put(EventArg.WITHIN_MILES, Constants.defaultSearchRadius);
+			args.put(EventArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
 		}
 
 		final String title = showCommunity ? "Community Events" : "Events";
@@ -100,14 +104,6 @@ public final class EventListPage implements Page {
 			vpp.setSpacing(8);
 			vpp.add(pp);
 			vp.add(vpp);
-			categoryBox = new DefaultListBox();
-			categoryBox.addItem("all", 0);
-			categoryBox.addChangeHandler(new ChangeHandler() {
-				@Override
-				public void onChange(ChangeEvent event) {
-					applyTableFilter();
-				}
-			});
 
 			ageBox = new DefaultListBox();
 			ageBox.addItem("all ages", 0);
@@ -133,7 +129,6 @@ public final class EventListPage implements Page {
 			});
 
 			pp.add(new Label("Show "));
-			pp.add(categoryBox);
 			pp.add(new Label(" events for "));
 			pp.add(ageBox);
 
@@ -198,12 +193,28 @@ public final class EventListPage implements Page {
 			}
 			vpp.add(bottom);
 
-			// PaddedPanel searchPanel = new PaddedPanel(15);
-			// searchPanel.add(new Label("with text"));
-			// TextBox searchControl = table.getTitleBar().extractSearchControl();
-			// searchControl.setVisibleLength(50);
-			// searchPanel.add(searchControl);
-			// vpp.add(searchPanel);
+			PaddedPanel searchPanel = new PaddedPanel(15);
+			searchPanel.add(new Label("with text"));
+			searchControl = new TextBox();
+			searchControl.setVisibleLength(50);
+			searchPanel.add(searchControl);
+			vpp.add(searchPanel);
+
+			searchControl.addBlurHandler(new BlurHandler() {
+				@Override
+				public void onBlur(BlurEvent event) {
+					applyTableFilter();
+				}
+			});
+
+			searchControl.addKeyDownHandler(new KeyDownHandler() {
+				@Override
+				public void onKeyDown(KeyDownEvent event) {
+					if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+						applyTableFilter();
+					}
+				}
+			});
 
 			CheckBox cb = new CheckBox("Only show recently added events");
 			cb.setValue(newlyAdded, false);
@@ -240,9 +251,9 @@ public final class EventListPage implements Page {
 		// first
 		int month = monthBox.getMonth();
 		int age = ageBox.getIntValue();
-		int categoryId = categoryBox.getIntValue();
+		String text = searchControl.getValue().toLowerCase();
 
-		if (month == 0 && age == 0 && categoryId == 0) {
+		if (month == 0 && age == 0 && text.isEmpty()) {
 			fp.showAll();
 			return;
 		}
@@ -250,13 +261,14 @@ public final class EventListPage implements Page {
 		for (Event e : events) {
 			boolean monthMatch = false;
 			boolean ageMatch = false;
-			boolean categoryMatch = false;
+			boolean textMatch = false;
 
 			// month
 			monthMatch = month == 0 || (ClientDateUtils.getMonth(e.getStartDate()) == month);
 
-			// category
-			categoryMatch = categoryId == 0 || (categoryId == e.getCategoryId());
+			// text
+			String eventDescription = new HTML(e.getDescription()).getText().toLowerCase();
+			textMatch = text.isEmpty() || e.getTitle().toLowerCase().contains(text) || eventDescription.contains(text);
 
 			// age
 			String rangeText = e.getAgeRanges();
@@ -279,11 +291,7 @@ public final class EventListPage implements Page {
 				}
 			}
 
-			if (monthMatch && ageMatch && categoryMatch) {
-				fp.show(e);
-			} else {
-				fp.hide(e);
-			}
+			fp.setVisible(e, monthMatch && ageMatch && textMatch);
 		}
 
 	}
@@ -297,21 +305,6 @@ public final class EventListPage implements Page {
 
 				for (Event e : result) {
 					fp.add(new EventTile(e), e.getId());
-				}
-
-				if (runOnce) {
-					return;
-				}
-
-				runOnce = true;
-				// add in categories
-				Map<Integer, String> categories = new HashMap<Integer, String>();
-				for (Event item : result) {
-					categories.put(item.getCategoryId(), item.getCategory());
-				}
-
-				for (int id : categories.keySet()) {
-					categoryBox.addItem(categories.get(id), id);
 				}
 			}
 		});

@@ -33,6 +33,7 @@ import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.server.util.SpringWrapper;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
@@ -356,7 +357,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		pd.setArticleCount(ad.getCount());
 
 		String sql = "select count(*) from events e ";
-		sql += TagDaoImpl.createWhere(TagMappingType.EVENT);
+		Double latD = ServerContext.getCurrentLat();
+		String lat = latD == null ? null : Double.toString(latD);
+		Double lngD = ServerContext.getCurrentLng();
+		String lng = lngD == null ? null : Double.toString(lngD);
+		sql += TagDaoImpl.createWhere(TagMappingType.EVENT, Constants.DEFAULT_SEARCH_RADIUS, lat, lng);
 		pd.setEventCount(queryForInt(sql));
 
 		return pd;
@@ -772,7 +777,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		}
 
 		if (!Common.isNullOrBlank(distanceCols)) {
-			sql += "having distance < " + withinMiles + " ";
+			sql += "having (distance < " + withinMiles + " or e.address = null or e.address = '') ";
 		}
 
 		sql += "order by e.directoryPriority desc, e.startDate ";

@@ -45,6 +45,14 @@ public class TilePanel extends Composite {
 		}
 	}
 
+	public void setVisible(EntityDto<?> dto, boolean visible) {
+		if (visible) {
+			show(dto);
+		} else {
+			hide(dto);
+		}
+	}
+
 	public void show(EntityDto<?> dto) {
 		if (widgetMap.get(dto.getId()) != null) {
 			widgetMap.get(dto.getId()).getElement().getStyle().setDisplay(Display.INLINE_BLOCK);

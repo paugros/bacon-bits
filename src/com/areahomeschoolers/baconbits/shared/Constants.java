@@ -39,7 +39,7 @@ public abstract class Constants {
 	// 5.9% and 99 cents total
 	public static final double EVENT_PERCENT_MARKUP = 5.9;
 	public static final double EVENT_DOLLARS_MARKUP = 0.99;
-	public static final int defaultSearchRadius = 25;
+	public static final int DEFAULT_SEARCH_RADIUS = 25;
 
 	public static final int MAX_DATA_ROWS = 2000;
 
