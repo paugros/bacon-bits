@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -55,6 +56,12 @@ public final class ResourceListPage implements Page {
 			args.put(ResourceArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
 
+		if (Application.hasLocation()) {
+			args.put(ResourceArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
+			args.put(ResourceArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
+			args.put(ResourceArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
+		}
+
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new Hyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
@@ -68,6 +75,7 @@ public final class ResourceListPage implements Page {
 			AddLink link = new AddLink("Add Resource", PageUrl.resource(0));
 			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
 			page.add(link);
+			page.setCellWidth(link, "1%");
 		}
 
 		createSearchBox();

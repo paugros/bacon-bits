@@ -59,6 +59,7 @@ public final class ArticleListPage implements Page {
 			AddLink link = new AddLink("Add Article", PageUrl.article(0));
 			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
 			page.add(link);
+			page.setCellWidth(link, "1%");
 		}
 
 		PaddedPanel searchBox = new PaddedPanel();

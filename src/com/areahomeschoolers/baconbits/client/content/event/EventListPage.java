@@ -91,6 +91,7 @@ public final class EventListPage implements Page {
 			AddLink link = new AddLink("Add Event", PageUrl.event(0));
 			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
 			page.add(link);
+			page.setCellWidth(link, "1%");
 		}
 
 		if (!showCommunity) {
