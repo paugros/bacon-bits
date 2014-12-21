@@ -718,13 +718,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		int withinMiles = args.getInt(EventArg.WITHIN_MILES);
 		String withinLat = args.getString(EventArg.WITHIN_LAT);
 		String withinLng = args.getString(EventArg.WITHIN_LNG);
-		String distanceCols = "";
 
-		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
-			distanceCols = ServerUtils.getDistanceSql("e", withinMiles, withinLat, withinLng);
-		}
-
-		String sql = createSqlBase(distanceCols);
+		String sql = createSqlBase();
 
 		if (args.getStatus() != Status.ALL) {
 			if (args.getStatus() == Status.ACTIVE) {
@@ -776,8 +771,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "and (e.addedDate >= date_add(now(), interval -2 week) and (e.seriesId = e.id or e.seriesId is null)) \n";
 		}
 
-		if (!Common.isNullOrBlank(distanceCols)) {
-			sql += "having (distance < " + withinMiles + " or e.address = null or e.address = '') ";
+		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+			sql += "and (" + ServerUtils.getDistanceSql("e", withinLat, withinLng);
+			sql += " < " + withinMiles + " or e.address is null or e.address = '') \n";
 		}
 
 		sql += "order by e.directoryPriority desc, e.startDate ";
@@ -1089,16 +1085,9 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	}
 
 	private String createSqlBase() {
-		return createSqlBase("");
-	}
-
-	private String createSqlBase(String specialCols) {
 		int userId = ServerContext.getCurrentUserId();
 		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.visibilityLevel, \n";
 		sql += "gg.markupPercent as groupMarkupPercent, gg.markupDollars as groupMarkupDollars, gg.markupOverride as groupMarkupOverride, \n";
-		if (!Common.isNullOrBlank(specialCols)) {
-			sql += specialCols;
-		}
 		sql += "(select group_concat(price + markup) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
 		if (ServerContext.isAuthenticated()) {

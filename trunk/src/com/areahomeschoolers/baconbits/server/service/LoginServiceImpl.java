@@ -58,7 +58,7 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		ServerContext.setCurrentOrg();
 
 		User user = ServerContext.getCurrentUser();
-		initLocation(user);
+		initLocation();
 
 		ApplicationData ap = new ApplicationData();
 		ap.setCurrentOrg(ServerContext.getCurrentOrg());
@@ -165,16 +165,7 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		return userDao.sendPasswordResetEmail(username);
 	}
 
-	private void initLocation(User user) {
-		// System.out.println("Initializing location data...");
-		if (user != null && user.getZip() != null) {
-			// System.out.println("Using user location...");
-			ServerContext.setCurrentLocation(user.getZip());
-			ServerContext.setCurrentLat(user.getLat());
-			ServerContext.setCurrentLng(user.getLng());
-			return;
-		}
-
+	private void initLocation() {
 		// default location
 		String location = ServerContext.getCurrentLocation();
 

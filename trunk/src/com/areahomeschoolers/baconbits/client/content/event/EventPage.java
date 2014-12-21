@@ -519,7 +519,7 @@ public class EventPage implements Page {
 		final HTML websiteDisplay = new HTML();
 		final TextBox websiteInput = new TextBox();
 		websiteInput.setMaxLength(512);
-		FormField websiteField = form.createFormField("Website:", websiteInput, websiteDisplay);
+		FormField websiteField = form.createFormField("Web site:", websiteInput, websiteDisplay);
 		websiteField.setInitializer(new Command() {
 			@Override
 			public void execute() {
@@ -541,7 +541,7 @@ public class EventPage implements Page {
 
 		final Label phoneDisplay = new Label();
 		final PhoneTextBox phoneInput = new PhoneTextBox(true);
-		FormField phoneField = form.createFormField("Phone:", phoneInput, phoneDisplay);
+		FormField phoneField = form.createFormField("Contact phone:", phoneInput, phoneDisplay);
 		phoneField.setInitializer(new Command() {
 			@Override
 			public void execute() {

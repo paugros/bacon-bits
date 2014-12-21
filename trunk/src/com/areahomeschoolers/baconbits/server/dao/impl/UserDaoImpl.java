@@ -517,7 +517,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int withinMiles = args.getInt(UserArg.WITHIN_MILES);
 		String withinLat = args.getString(UserArg.WITHIN_LAT);
 		String withinLng = args.getString(UserArg.WITHIN_LNG);
-		String distanceCols = "";
 		String groupCols = "";
 		int minAge = 0;
 		int maxAge = 0;
@@ -527,15 +526,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			maxAge = ages.get(1);
 		}
 
-		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
-			distanceCols = ServerUtils.getDistanceSql("u", withinMiles, withinLat, withinLng);
-		}
-
 		if (groupId > 0) {
 			groupCols += "ugm.userApproved, ugm.groupApproved, ";
 		}
 
-		String sql = createSqlBase(distanceCols + groupCols);
+		String sql = createSqlBase(groupCols);
 
 		if (groupId > 0) {
 			sql += "join userGroupMembers ugm on ugm.userId = u.id and ugm.groupId = ? \n";
@@ -561,6 +556,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 		if (hasEmail) {
 			sql += "and u.email is not null and u.email != '' \n";
+		}
+
+		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+			sql += "and " + ServerUtils.getDistanceSql("u", withinLat, withinLng) + " < " + withinMiles + " ";
 		}
 
 		// start directory logic //
@@ -640,10 +639,6 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			} else if (activeNumber > 0) {
 				sql += "and date_add(now(), interval -5 minute) < u.lastActivityDate ";
 			}
-		}
-
-		if (!Common.isNullOrBlank(distanceCols)) {
-			sql += "having distance < " + withinMiles + " ";
 		}
 
 		if (activeNumber > 0) {
@@ -1029,6 +1024,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		} catch (UsernameNotFoundException e) {
 			return false;
 		}
+	}
+
+	@Override
+	public void setCurrentLocation(String location, double lat, double lng) {
+		ServerContext.setCurrentLocation(location);
+		ServerContext.setCurrentLat(lat);
+		ServerContext.setCurrentLng(lng);
 	}
 
 	@Override

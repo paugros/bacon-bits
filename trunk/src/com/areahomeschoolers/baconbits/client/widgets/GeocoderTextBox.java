@@ -1,5 +1,12 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.rpc.Callback;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
+import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
+
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style.FontStyle;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -25,6 +32,7 @@ public class GeocoderTextBox extends Composite {
 	private Command clearCommand;
 	private Command changeCommand;
 	private static final String defaultSearchText = "Address, city, or zip";
+	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
 	public GeocoderTextBox() {
 		input.setVisibleLength(30);
@@ -83,6 +91,18 @@ public class GeocoderTextBox extends Composite {
 
 									lat = location.getGeometry().getLocation().lat();
 									lng = location.getGeometry().getLocation().lng();
+
+									ApplicationData ad = Application.getApplicationData();
+									input.setText(location.getFormattedAddress());
+									ad.setCurrentLocation(location.getFormattedAddress());
+									ad.setCurrentLat(lat);
+									ad.setCurrentLng(lng);
+
+									userService.setCurrentLocation(location.getFormattedAddress(), lat, lng, new Callback<Void>(false) {
+										@Override
+										protected void doOnSuccess(Void result) {
+										}
+									});
 
 									changeCommand.execute();
 								}

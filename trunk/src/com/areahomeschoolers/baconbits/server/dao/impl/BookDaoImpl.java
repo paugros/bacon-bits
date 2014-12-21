@@ -274,13 +274,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		int withinMiles = args.getInt(BookArg.WITHIN_MILES);
 		String withinLat = args.getString(BookArg.WITHIN_LAT);
 		String withinLng = args.getString(BookArg.WITHIN_LNG);
-		String distanceCols = "";
 
-		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
-			distanceCols = ServerUtils.getDistanceSql("u", withinMiles, withinLat, withinLng);
-		}
-
-		String sql = createSqlBase(distanceCols);
+		String sql = createSqlBase();
 
 		if (userId > 0) {
 			sql += "and b.userId = ? ";
@@ -298,6 +293,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 				sqlArgs.add(Double.parseDouble(range[0]));
 				sqlArgs.add(Double.parseDouble(range[1]));
 			}
+		}
+
+		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+			sql += "and " + ServerUtils.getDistanceSql("u", withinLat, withinLng) + " < " + withinMiles + " ";
 		}
 
 		if (ids != null && !ids.isEmpty()) {
@@ -332,10 +331,6 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 		if (newNumber > 0) {
 			sql += "and date_add(now(), interval -2 week) < b.addedDate and statusId = 1 ";
-		}
-
-		if (!Common.isNullOrBlank(distanceCols)) {
-			sql += "having distance < " + withinMiles + " ";
 		}
 
 		if (ids != null && !ids.isEmpty()) {
@@ -495,14 +490,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	private String createSqlBase() {
-		return createSqlBase("");
-	}
-
-	private String createSqlBase(String specialCols) {
-		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, case when bsc.id is null then 0 else 1 end as inMyShoppingCart, d.fileExtension, ";
-		if (!Common.isNullOrBlank(specialCols)) {
-			sql += specialCols;
-		}
+		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, case when bsc.id is null then 0 else 1 end as inMyShoppingCart, d.fileExtension, \n";
 		sql += "t.imageId as tagImageId, t.smallImageId as tagSmallImageId, dd.fileExtension as tagFileExtension, \n";
 		sql += "u.firstName, u.lastName, u.email, concat(u.city, ', ', u.state) as shippingFrom, bo.bookCondition \n";
 		sql += "from books b \n";

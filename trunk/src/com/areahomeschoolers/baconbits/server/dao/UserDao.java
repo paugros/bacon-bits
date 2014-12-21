@@ -66,6 +66,8 @@ public interface UserDao {
 
 	public boolean sendPasswordResetEmail(String username);
 
+	public void setCurrentLocation(String location, double lat, double lng);
+
 	public User setPasswordFromDigest(int id, String digest);
 
 	@PreAuthorize("hasRole('ORGANIZATION_ADMINISTRATORS')")

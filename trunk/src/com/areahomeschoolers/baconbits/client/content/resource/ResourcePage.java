@@ -254,10 +254,10 @@ public class ResourcePage implements Page {
 
 		final Anchor urlDisplay = new Anchor();
 		urlDisplay.setTarget("_blank");
-		final RequiredTextBox urlInput = new RequiredTextBox();
+		final TextBox urlInput = new TextBox();
 		urlInput.setMaxLength(500);
 		urlInput.setVisibleLength(50);
-		FormField urlField = form.createFormField("Web address:", urlInput, urlDisplay);
+		FormField urlField = form.createFormField("Web site:", urlInput, urlDisplay);
 		urlField.setInitializer(new Command() {
 			@Override
 			public void execute() {

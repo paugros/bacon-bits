@@ -198,10 +198,15 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		Date beforeDate = args.getDate(ArticleArg.BEFORE_DATE);
 		Date afterDate = args.getDate(ArticleArg.AFTER_DATE);
 		int articleId = args.getInt(ArticleArg.ARTICLE_ID);
+		boolean onlyTagged = args.getBoolean(ArticleArg.ONLY_TAGGED);
 
 		String sql = createSqlBase();
 
 		sql += "and a.owningOrgId = " + ServerContext.getCurrentOrgId() + " \n";
+
+		if (onlyTagged) {
+			sql += "and a.firstTagId is not null \n";
+		}
 
 		if (orgId > 0) {
 			sql += "and a.owningOrgId = ? ";

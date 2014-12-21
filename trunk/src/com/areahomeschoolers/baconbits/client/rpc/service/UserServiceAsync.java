@@ -58,4 +58,6 @@ public interface UserServiceAsync {
 	public void validatePassword(String password, AsyncCallback<ServerResponseData<String>> callback);
 
 	void getNavigationHistory(int userId, AsyncCallback<ArrayList<HistoryEntry>> callback);
+
+	void setCurrentLocation(String location, double lat, double lng, AsyncCallback<Void> callback);
 }

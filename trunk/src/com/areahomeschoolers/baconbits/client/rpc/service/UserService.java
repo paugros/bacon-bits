@@ -56,6 +56,8 @@ public interface UserService extends RemoteService {
 
 	public void sendEmail(Email email);
 
+	public void setCurrentLocation(String location, double lat, double lng);
+
 	public void switchToUser(int userId);
 
 	public void updateMenuOrdinals(ArrayList<MainMenuItem> items);

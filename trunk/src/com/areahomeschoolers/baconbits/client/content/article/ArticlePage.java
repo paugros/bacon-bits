@@ -284,7 +284,9 @@ public class ArticlePage implements Page {
 		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
 
 		String titleText = "<div style=\"padding: 4px;\" class=hugeText>" + article.getTitle() + "</div>";
-		titleText += "<div style=\"padding: 4px;\">By " + article.getAddedByFirstName() + " " + article.getAddedByLastName() + "</div>";
+		if (article.getNewsItem()) {
+			titleText += "<div style=\"padding: 4px;\">By " + article.getAddedByFirstName() + " " + article.getAddedByLastName() + "</div>";
+		}
 		pp.add(new HTML(titleText));
 
 		if (allowEdit()) {

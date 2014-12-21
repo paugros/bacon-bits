@@ -166,6 +166,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		String nameLike = args.getString(ResourceArg.NAME_LIKE);
 		boolean random = args.getBoolean(ResourceArg.RANDOM);
 		boolean ad = args.getBoolean(ResourceArg.AD);
+		int withinMiles = args.getInt(ResourceArg.WITHIN_MILES);
+		String withinLat = args.getString(ResourceArg.WITHIN_LAT);
+		String withinLng = args.getString(ResourceArg.WITHIN_LNG);
 
 		String sql = createSqlBase();
 		sql += "where 1 = 1 ";
@@ -195,6 +198,11 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		if (id > 0) {
 			sql += "and r.id = ? ";
 			sqlArgs.add(id);
+		}
+
+		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+			sql += "and (" + ServerUtils.getDistanceSql("r", withinLat, withinLng);
+			sql += " < " + withinMiles + " or r.address is null or r.address = '') \n";
 		}
 
 		if (random) {
