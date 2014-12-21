@@ -74,6 +74,7 @@ public final class UserListPage implements Page {
 			AddLink link = new AddLink("Add User", PageUrl.user(0));
 			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
 			page.add(link);
+			page.setCellWidth(link, "1%");
 		}
 
 		page.add(optionsPanel);

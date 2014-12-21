@@ -116,6 +116,7 @@ public final class TagGroupPage implements Page {
 				AddLink link = new AddLink("Add " + name, url);
 				link.getElement().getStyle().setMarginLeft(10, Unit.PX);
 				page.add(link);
+				page.setCellWidth(link, "1%");
 			}
 		}
 
