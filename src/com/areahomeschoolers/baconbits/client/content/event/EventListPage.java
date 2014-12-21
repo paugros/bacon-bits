@@ -197,7 +197,7 @@ public final class EventListPage implements Page {
 			PaddedPanel searchPanel = new PaddedPanel(15);
 			searchPanel.add(new Label("with text"));
 			searchControl = new TextBox();
-			searchControl.setVisibleLength(50);
+			searchControl.setVisibleLength(45);
 			searchPanel.add(searchControl);
 			vpp.add(searchPanel);
 
