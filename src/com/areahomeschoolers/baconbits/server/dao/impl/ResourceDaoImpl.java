@@ -201,8 +201,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		}
 
 		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
-			sql += "and (" + ServerUtils.getDistanceSql("r", withinLat, withinLng);
-			sql += " < " + withinMiles + " or r.address is null or r.address = '') \n";
+			sql += "and ((" + ServerUtils.getDistanceSql("r", withinLat, withinLng);
+			sql += " < " + withinMiles + ") or r.address is null or r.address = '') \n";
 		}
 
 		if (random) {
