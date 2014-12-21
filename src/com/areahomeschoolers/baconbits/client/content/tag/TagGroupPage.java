@@ -218,10 +218,6 @@ public final class TagGroupPage implements Page {
 			@Override
 			protected void doOnSuccess(ArrayList<Tag> result) {
 				tags = result;
-				int totalCount = 0;
-				for (Tag tag : result) {
-					totalCount += tag.getCount();
-				}
 				String url = null;
 				switch (type) {
 				case ARTICLE:
@@ -243,7 +239,7 @@ public final class TagGroupPage implements Page {
 					break;
 				}
 
-				TileConfig ac = new TileConfig().setText("All " + type.getName()).setCount(totalCount).setUrl(url);
+				TileConfig ac = new TileConfig().setText("All " + type.getName()).setUrl(url).setCenterText(true);
 				ac.setImage(new Image(MainImageBundle.INSTANCE.earth())).setColor("#ffffff");
 				Tile all = new Tile(ac);
 				fp.add(all);

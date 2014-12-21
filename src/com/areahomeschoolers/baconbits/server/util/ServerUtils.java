@@ -155,10 +155,10 @@ public abstract class ServerUtils {
 		return boolVal;
 	}
 
-	public static String getDistanceSql(String tableAlias, int withinMiles, String withinLat, String withinLng) {
+	public static String getDistanceSql(String tableAlias, String withinLat, String withinLng) {
 		String sql = "(3959 * acos( cos( radians(" + withinLat + ") ) * ";
 		sql += "cos( radians( " + tableAlias + ".lat ) ) * cos( radians( " + tableAlias + ".lng ) - radians(" + withinLng + ") ) ";
-		sql += "+ sin( radians(" + withinLat + ") ) * sin( radians( " + tableAlias + ".lat ) ) ) ) as distance, ";
+		sql += "+ sin( radians(" + withinLat + ") ) * sin( radians( " + tableAlias + ".lat ) ) ) )";
 
 		return sql;
 	}

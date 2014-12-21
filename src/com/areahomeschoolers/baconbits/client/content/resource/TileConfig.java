@@ -12,6 +12,7 @@ public class TileConfig {
 	private String color;
 	private TagMappingType tagType;
 	private Image image;
+	private boolean centerText;
 
 	public TileConfig() {
 	}
@@ -38,6 +39,15 @@ public class TileConfig {
 
 	public String getUrl() {
 		return url;
+	}
+
+	public boolean getCenterText() {
+		return centerText;
+	}
+
+	public TileConfig setCenterText(boolean centerText) {
+		this.centerText = centerText;
+		return this;
 	}
 
 	public TileConfig setColor(String color) {

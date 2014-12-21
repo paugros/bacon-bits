@@ -12,9 +12,12 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -23,11 +26,15 @@ import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -38,9 +45,11 @@ public final class ResourceListPage implements Page {
 	private ArgMap<ResourceArg> args = new ArgMap<ResourceArg>(Status.ACTIVE);
 	private TilePanel fp = new TilePanel();
 	private ArrayList<Resource> resources;
+	private VerticalPanel page;
 
-	public ResourceListPage(final VerticalPanel page) {
+	public ResourceListPage(final VerticalPanel p) {
 		final String title = "Resources";
+		page = p;
 
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			args.put(ResourceArg.HAS_TAGS, Url.getIntListParameter("tagId"));
@@ -61,9 +70,19 @@ public final class ResourceListPage implements Page {
 			page.add(link);
 		}
 
+		createSearchBox();
+
+		page.add(fp);
+		Application.getLayout().setPage(title, page);
+		populate();
+	}
+
+	private void createSearchBox() {
+		VerticalPanel vvp = new VerticalPanel();
+		vvp.setSpacing(4);
 		PaddedPanel searchBox = new PaddedPanel();
-		searchBox.addStyleName("boxedBlurb");
-		searchBox.setSpacing(8);
+		vvp.addStyleName("boxedBlurb");
+		searchBox.setSpacing(4);
 		searchBox.add(new Label("Search:"));
 		final TextBox searchInput = new TextBox();
 		searchInput.setVisibleLength(35);
@@ -84,11 +103,62 @@ public final class ResourceListPage implements Page {
 			}
 		});
 
-		page.add(searchBox);
+		vvp.add(searchBox);
 
-		page.add(fp);
-		Application.getLayout().setPage(title, page);
-		populate();
+		final GeocoderTextBox locationInput = new GeocoderTextBox();
+		if (Application.hasLocation()) {
+			locationInput.setText(Application.getCurrentLocation());
+		}
+
+		final DefaultListBox milesInput = new DefaultListBox();
+		milesInput.addItem("5", 5);
+		milesInput.addItem("10", 10);
+		milesInput.addItem("25", 25);
+		milesInput.addItem("50", 50);
+		milesInput.setValue(25);
+		milesInput.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				args.put(ResourceArg.WITHIN_MILES, milesInput.getIntValue());
+				if (!locationInput.getText().isEmpty()) {
+					populate();
+				}
+			}
+		});
+
+		locationInput.setClearCommand(new Command() {
+			@Override
+			public void execute() {
+				args.remove(EventArg.WITHIN_LAT);
+				args.remove(EventArg.WITHIN_LNG);
+				populate();
+			}
+		});
+
+		locationInput.setChangeCommand(new Command() {
+			@Override
+			public void execute() {
+				args.put(ResourceArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
+				args.put(ResourceArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
+				args.put(ResourceArg.WITHIN_MILES, milesInput.getIntValue());
+				populate();
+			}
+		});
+
+		PaddedPanel bottom = new PaddedPanel();
+		bottom.setSpacing(4);
+
+		bottom.add(new Label("within"));
+		bottom.add(milesInput);
+		bottom.add(new Label("miles of"));
+		bottom.add(locationInput);
+
+		for (int i = 0; i < bottom.getWidgetCount(); i++) {
+			bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+		}
+		vvp.add(bottom);
+
+		page.add(vvp);
 	}
 
 	private void populate() {

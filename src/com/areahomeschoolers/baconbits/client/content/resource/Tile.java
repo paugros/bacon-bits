@@ -65,6 +65,9 @@ public class Tile extends Composite {
 
 		String htmlText = "<a href=\"" + url + "\" class=\"" + textSize + "\" style=\"color: black;\">" + config.getText() + "</a>";
 		HTML link = new HTML(htmlText);
+		if (config.getCenterText()) {
+			link.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		}
 
 		link.setWordWrap(false);
 		link.setWidth(width + "px");

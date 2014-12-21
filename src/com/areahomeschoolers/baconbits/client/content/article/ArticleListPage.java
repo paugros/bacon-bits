@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.dom.client.Style.Unit;
@@ -34,11 +35,12 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class ArticleListPage implements Page {
 	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
-	private ArgMap<ArticleArg> args = new ArgMap<ArticleArg>();
+	private ArgMap<ArticleArg> args = new ArgMap<ArticleArg>(Status.ACTIVE);
 	private TilePanel fp = new TilePanel();
 	private ArrayList<Article> articles;
 
 	public ArticleListPage(final VerticalPanel page) {
+		args.put(ArticleArg.ONLY_TAGGED);
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			args.put(ArticleArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
