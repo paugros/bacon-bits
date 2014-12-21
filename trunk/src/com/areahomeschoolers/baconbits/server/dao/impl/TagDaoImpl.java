@@ -73,9 +73,13 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			if (type.equals(TagMappingType.BOOK)) {
 				tableAlias = "u";
 			}
-			sql += "and (3959 * acos( cos( radians(" + withinLat + ") ) * ";
-			sql += "cos( radians( " + tableAlias + ".lat ) ) * cos( radians( " + tableAlias + ".lng ) - radians(" + withinLng + ") ) ";
-			sql += "+ sin( radians(" + withinLat + ") ) * sin( radians( " + tableAlias + ".lat ) ) ) ) < " + withinMiles + " \n";
+
+			String within = ServerUtils.getDistanceSql(tableAlias, withinLat, withinLng) + " < " + withinMiles + " ";
+			if (EnumSet.of(TagMappingType.RESOURCE, TagMappingType.EVENT).contains(type)) {
+				sql += "and ((" + within + ") or " + tableAlias + ".address is null or " + tableAlias + ".address = '') ";
+			} else {
+				sql += "and " + within + "\n";
+			}
 		}
 
 		return sql;
