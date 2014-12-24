@@ -106,8 +106,6 @@ public class HomePage implements Page {
 		Application.getLayout().setPage("Home", page);
 		// end slider test ground
 
-		centerPanel.setSpacing(10);
-		centerPanel.setWidth("100%");
 		page.add(centerPanel);
 
 		eventService.getHomePageData(new Callback<HomePageData>() {
@@ -116,7 +114,7 @@ public class HomePage implements Page {
 				pageData = result;
 
 				Grid g = new Grid(3, 3);
-				g.setCellSpacing(10);
+				g.setCellSpacing(45);
 
 				TileConfig rc = new TileConfig().setTagType(TagMappingType.RESOURCE).setCount(pageData.getResourceCount());
 				rc.setImage(new Image(MainImageBundle.INSTANCE.resourceTile()));
