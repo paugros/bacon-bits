@@ -49,7 +49,7 @@ public class ImageSwitcher extends Composite {
 		h3 += "with our <a href=\"" + Url.getBaseUrl() + "#" + PageUrl.article(147) + "\">book management system and tools</a>.";
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherBooks()), h3));
 
-		String h4 = "<div class=largeText><a href=\"" + Url.getBaseUrl() + "#" + PageUrl.article(147) + "\">Businesses</a></div>";
+		String h4 = "<div class=largeText>Businesses</div>";
 		h4 += "Reach homeschoolers directly with our advertising services. We offer <a href=\"" + Url.getBaseUrl() + "#" + PageUrl.article(101) + "\">";
 		h4 += "affordable packages</a>, and can coordinate field trips and events at your location, providing online event registration and payment if you need it.";
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherVendors()), h4));

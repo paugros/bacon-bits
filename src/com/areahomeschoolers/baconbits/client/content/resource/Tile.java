@@ -33,9 +33,9 @@ public class Tile extends Composite {
 		}, ClickEvent.getType());
 
 		vp.addStyleName("tile");
-		vp.setHeight("267px");
-		vp.setWidth("238px");
-		vp.setSpacing(12);
+		vp.setHeight("245px");
+		vp.setWidth("202px");
+		// vp.setSpacing(12);
 		// vp.getElement().getStyle().setBackgroundColor(config.getColor());
 
 		SimplePanel sp = new SimplePanel();
@@ -47,6 +47,7 @@ public class Tile extends Composite {
 		vp.setCellHorizontalAlignment(sp, HasHorizontalAlignment.ALIGN_CENTER);
 
 		HorizontalPanel hp = new HorizontalPanel();
+		hp.setSpacing(12);
 		hp.setWidth("100%");
 
 		String url = config.getUrl();
@@ -54,16 +55,15 @@ public class Tile extends Composite {
 			url = Url.getBaseUrl() + "#" + url;
 		}
 
-		String textSize = null;
 		int countLength = 0;
 		if (config.getCount() != null) {
 			countLength = Integer.toString(config.getCount()).length();
 		}
-		int width = 205;
-		textSize = "largeText";
+		int width = 165;
 		width -= countLength * 10;
+		int fontSize = 14;
 
-		String htmlText = "<a href=\"" + url + "\" class=\"" + textSize + "\" style=\"color: black;\">" + config.getText() + "</a>";
+		String htmlText = "<a href=\"" + url + "\" style=\"color: black; font-size: " + fontSize + "px;\">" + config.getText() + "</a>";
 		HTML link = new HTML(htmlText);
 		if (config.getCenterText()) {
 			link.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
@@ -76,7 +76,7 @@ public class Tile extends Composite {
 
 		if (config.getCount() != null) {
 			Label countDisplay = new Label(Integer.toString(config.getCount()));
-			countDisplay.addStyleName(textSize);
+			countDisplay.getElement().getStyle().setFontSize(fontSize, Unit.PX);
 			hp.add(countDisplay);
 			hp.setCellHorizontalAlignment(countDisplay, HasHorizontalAlignment.ALIGN_RIGHT);
 		}
