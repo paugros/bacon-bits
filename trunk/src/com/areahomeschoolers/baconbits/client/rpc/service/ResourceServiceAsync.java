@@ -19,4 +19,6 @@ public interface ResourceServiceAsync {
 	void clickResource(int adId, AsyncCallback<Void> callback);
 
 	void getPageData(int resourceId, AsyncCallback<ResourcePageData> callback);
+
+	void incrementImpressions(ArrayList<Integer> ids, AsyncCallback<Void> callback);
 }

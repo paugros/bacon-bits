@@ -40,6 +40,8 @@ public class AdsMiniModule extends Composite {
 	}
 
 	private void populate() {
+		final ArrayList<Integer> ids = new ArrayList<>();
+
 		resourceService.list(args, new Callback<ArrayList<Resource>>(false) {
 			@Override
 			protected void doOnSuccess(ArrayList<Resource> result) {
@@ -49,9 +51,17 @@ public class AdsMiniModule extends Composite {
 					tile.getElement().getStyle().setMarginBottom(10, Unit.PX);
 
 					vp.add(tile);
+					ids.add(ad.getId());
 				}
+
+				resourceService.incrementImpressions(ids, new Callback<Void>(false) {
+					@Override
+					protected void doOnSuccess(Void result) {
+					}
+				});
 			}
 		});
+
 	}
 
 }

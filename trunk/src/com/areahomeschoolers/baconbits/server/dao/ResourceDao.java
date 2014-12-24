@@ -18,6 +18,8 @@ public interface ResourceDao {
 
 	public ResourcePageData getPageData(int resourceId);
 
+	public void incrementImpressions(ArrayList<Integer> ids);
+
 	public ArrayList<Resource> list(ArgMap<ResourceArg> args);
 
 	@PreAuthorize("hasRole('SITE_MEMBERS')")

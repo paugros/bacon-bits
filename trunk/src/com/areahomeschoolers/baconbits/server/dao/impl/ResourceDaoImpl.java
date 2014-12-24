@@ -70,6 +70,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			resource.setContactName(rs.getString("contactName"));
 			resource.setFacilityName(rs.getString("facilityName"));
 			resource.setFacebookUrl(rs.getString("facebookUrl"));
+			resource.setImpressions(rs.getInt("impressions"));
 
 			if (resource.getImageId() == null) {
 				resource.setImageExtension(rs.getString("tagFileExtension"));
@@ -155,6 +156,14 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		String search = "%" + token + "%";
 		data.setSuggestions(query(sql, ServerUtils.getSuggestionMapper(), search));
 		return data;
+	}
+
+	@Override
+	public void incrementImpressions(ArrayList<Integer> ids) {
+		String sql = "update resources set impressions = case when impressions is null then 1 else impressions + 1 end ";
+		sql += "where id in(" + Common.join(ids, ", ") + ")";
+
+		update(sql);
 	}
 
 	@Override

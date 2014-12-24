@@ -53,6 +53,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Payment;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
+import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
@@ -352,6 +353,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		args.setStatus(Status.ACTIVE);
 		args.put(ResourceArg.RANDOM);
 		pd.setAds(rd.list(args));
+
+		ArrayList<Integer> ids = new ArrayList<>();
+		for (Resource ad : pd.getAds()) {
+			ids.add(ad.getId());
+		}
+		rd.incrementImpressions(ids);
 
 		ArticleDao ad = ServerContext.getDaoImpl("article");
 		pd.setArticleCount(ad.getCount());

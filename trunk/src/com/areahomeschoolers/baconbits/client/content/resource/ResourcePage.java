@@ -454,6 +454,8 @@ public class ResourcePage implements Page {
 				clicks = resource.getClickCount() + " (last " + Formatter.formatDateTime(resource.getLastClickDate()) + ")";
 			}
 			ft.addField("Clicks:", clicks);
+
+			ft.addField("Impressions:", Integer.toString(resource.getImpressions()));
 		}
 
 		if (Application.isSystemAdministrator()) {
