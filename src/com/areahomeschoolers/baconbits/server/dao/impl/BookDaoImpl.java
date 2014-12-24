@@ -160,11 +160,11 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	@Override
 	public int getCount() {
 		String sql = "select count(*) from books b ";
-		Double latD = ServerContext.getCurrentLat();
-		String lat = latD == null ? null : Double.toString(latD);
-		Double lngD = ServerContext.getCurrentLng();
-		String lng = lngD == null ? null : Double.toString(lngD);
-		sql += TagDaoImpl.createWhere(TagMappingType.BOOK, Constants.DEFAULT_SEARCH_RADIUS, lat, lng);
+		// Double latD = ServerContext.getCurrentLat();
+		// String lat = latD == null ? null : Double.toString(latD);
+		// Double lngD = ServerContext.getCurrentLng();
+		// String lng = lngD == null ? null : Double.toString(lngD);
+		sql += TagDaoImpl.createWhere(TagMappingType.BOOK, 0, null, null);
 		return queryForInt(0, sql);
 	}
 

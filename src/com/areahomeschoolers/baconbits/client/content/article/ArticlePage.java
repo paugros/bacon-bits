@@ -264,7 +264,6 @@ public class ArticlePage implements Page {
 	private void createTagSection() {
 		tagSection = new TagSection(TagMappingType.ARTICLE, article.getId());
 		tagSection.setEditingEnabled(allowEdit());
-		tagSection.setRequired(true);
 		tagSection.populate();
 
 		tagField = form.createFormField("Tags:", tagSection);
@@ -326,6 +325,13 @@ public class ArticlePage implements Page {
 			desc.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
 			ovp.add(desc);
+		}
+
+		if (article.hasDocuments()) {
+			DocumentSection ds = new DocumentSection(article, false);
+			ds.init();
+			ds.getElement().getStyle().setPadding(8, Unit.PX);
+			ovp.add(ds);
 		}
 
 		PaddedPanel outerPanel = new PaddedPanel(10);

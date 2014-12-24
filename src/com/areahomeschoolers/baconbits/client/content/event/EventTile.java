@@ -7,7 +7,6 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
@@ -35,7 +34,7 @@ public class EventTile extends Composite {
 		HorizontalPanel hp = new PaddedPanel(10);
 		hp.setWidth("300px");
 		hp.addStyleName("itemTile");
-		hp.getElement().getStyle().setBackgroundColor(TagMappingType.EVENT.getColor());
+		// hp.getElement().getStyle().setBackgroundColor(TagMappingType.EVENT.getColor());
 
 		Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
 		if (item.getSmallImageId() != null) {

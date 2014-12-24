@@ -1,10 +1,17 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import com.areahomeschoolers.baconbits.client.util.AnimationUtils;
+import com.areahomeschoolers.baconbits.client.util.AnimationUtils.AnimationCurveType;
+
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.UIObject;
 
 public class Fader {
+	public static void fadeObjectIn(UIObject target) {
+		fadeObjectIn(target, null);
+	}
+
 	public static void fadeObjectIn(UIObject target, Command onCompleteCommand) {
 		Fader f = new Fader(target);
 		f.fadeIn(onCompleteCommand);
@@ -19,18 +26,16 @@ public class Fader {
 		f.fadeOut(onCompleteCommand);
 	}
 
-	public static void fadeOjbectIn(UIObject target) {
-		fadeObjectIn(target, null);
-	}
-
 	private UIObject object;
 	private Timer fadeOutTimer;
 	private Timer fadeInTimer;
 	private double fadeStep = 0.05;
-	private int fadeDelay = 15;
+	private int fadeDelay = 10;
 	private double currentOpacity = 1.0;
+	private double maxOpacity = 1.0;
 	private int commandDelay;
 	private Command onCompleteCommand;
+	private boolean toggleVisibility = true;
 
 	public Fader(UIObject target) {
 		object = target;
@@ -38,14 +43,13 @@ public class Fader {
 		fadeOutTimer = new Timer() {
 			@Override
 			public void run() {
-				if (object == null) {
-					throw new RuntimeException("The object provided is null.");
-				}
 				currentOpacity -= fadeStep;
 				if (currentOpacity < 0) {
 					currentOpacity = 0;
 				}
-				object.getElement().getStyle().setOpacity(currentOpacity);
+
+				double curvedOpacity = AnimationUtils.getAnimatedPosition(AnimationCurveType.EASEOUT_SIN, 0, maxOpacity, currentOpacity, 1);
+				object.getElement().getStyle().setOpacity(curvedOpacity);
 
 				if (currentOpacity == 0) {
 					cancel();
@@ -59,13 +63,14 @@ public class Fader {
 			@Override
 			public void run() {
 				currentOpacity += fadeStep;
-				if (currentOpacity > 1) {
-					currentOpacity = 1;
+				if (currentOpacity > maxOpacity) {
+					currentOpacity = maxOpacity;
 				}
 
-				object.getElement().getStyle().setOpacity(currentOpacity);
+				double curvedOpacity = AnimationUtils.getAnimatedPosition(AnimationCurveType.EASEOUT_CUBIC, 0, maxOpacity, currentOpacity, 1);
+				object.getElement().getStyle().setOpacity(curvedOpacity);
 
-				if (currentOpacity == 1) {
+				if (currentOpacity == maxOpacity) {
 					cancel();
 					executeCommand();
 				}
@@ -81,6 +86,11 @@ public class Fader {
 		this.onCompleteCommand = onCompleteCommand;
 		currentOpacity = 0;
 		object.getElement().getStyle().setOpacity(currentOpacity);
+
+		if (toggleVisibility) {
+			object.setVisible(true);
+		}
+
 		fadeInTimer.scheduleRepeating(fadeDelay);
 	}
 
@@ -90,12 +100,28 @@ public class Fader {
 
 	public void fadeOut(Command onCompleteCommand) {
 		this.onCompleteCommand = onCompleteCommand;
-		currentOpacity = 1;
+		currentOpacity = maxOpacity;
 		fadeOutTimer.scheduleRepeating(fadeDelay);
 	}
 
 	public void setCommandDelay(int commandDelay) {
 		this.commandDelay = commandDelay;
+	}
+
+	public void setFadeDelay(int delay) {
+		fadeDelay = delay;
+	}
+
+	public void setFadeStep(double fadeStep) {
+		this.fadeStep = fadeStep;
+	}
+
+	public void setMaxOpacity(double maxOpacity) {
+		this.maxOpacity = maxOpacity;
+	}
+
+	public void setToggleVisibility(boolean set) {
+		toggleVisibility = set;
 	}
 
 	private void executeCommand() {
@@ -119,8 +145,10 @@ public class Fader {
 
 	private void resetOpacity() {
 		if (currentOpacity == 0) {
-			object.setVisible(false);
-			object.getElement().getStyle().setOpacity(1.0);
+			if (toggleVisibility) {
+				object.setVisible(false);
+				object.getElement().getStyle().setOpacity(maxOpacity);
+			}
 		}
 	}
 }

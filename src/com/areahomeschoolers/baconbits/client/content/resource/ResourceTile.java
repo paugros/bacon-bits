@@ -6,7 +6,6 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -36,7 +35,7 @@ public class ResourceTile extends Composite {
 		if (item.getShowInAds()) {
 			hp.getElement().getStyle().setOpacity(1);
 		}
-		hp.getElement().getStyle().setBackgroundColor(TagMappingType.RESOURCE.getColor());
+		// hp.getElement().getStyle().setBackgroundColor(TagMappingType.RESOURCE.getColor());
 
 		Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
 		if (item.getSmallImageId() != null) {

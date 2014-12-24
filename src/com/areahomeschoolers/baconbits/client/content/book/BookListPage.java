@@ -16,7 +16,6 @@ import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -67,11 +66,11 @@ public final class BookListPage implements Page {
 			args.put(BookArg.USER_ID, sellerId);
 		}
 
-		if (Application.hasLocation()) {
-			args.put(BookArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
-			args.put(BookArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
-			args.put(BookArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
-		}
+		// if (Application.hasLocation()) {
+		// args.put(BookArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
+		// args.put(BookArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
+		// args.put(BookArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
+		// }
 
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK")));

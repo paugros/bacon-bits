@@ -356,16 +356,18 @@ public class TagSection extends Composite implements HasValidator {
 	}
 
 	private boolean addTag(Tag tag) {
-		int max = 4;
-		if (mappingType.equals(TagMappingType.USER)) {
-			max = 50;
-		}
+		if (!Application.isSystemAdministrator()) {
+			int max = 4;
+			if (mappingType.equals(TagMappingType.USER)) {
+				max = 50;
+			}
 
-		if (tags.size() >= max) {
-			String thing = mappingType.equals(TagMappingType.USER) ? "interests" : "tags";
-			String message = "Sorry, no more than " + max + " " + thing + ".";
-			AlertDialog.alert(message);
-			return false;
+			if (tags.size() >= max) {
+				String thing = mappingType.equals(TagMappingType.USER) ? "interests" : "tags";
+				String message = "Sorry, no more than " + max + " " + thing + ".";
+				AlertDialog.alert(message);
+				return false;
+			}
 		}
 
 		if (tag.getEntityId() == 0 && tag.isSaved()) {
@@ -386,7 +388,8 @@ public class TagSection extends Composite implements HasValidator {
 	private void addTagToPanel(Tag tag) {
 		TagWidget tw = new TagWidget(tag);
 		fp.add(tw);
-		Fader.fadeOjbectIn(tw);
+		Fader fader = new Fader(tw);
+		fader.fadeIn();
 		tags.add(tag);
 		tagMap.put(tag, tw);
 	}
