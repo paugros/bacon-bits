@@ -429,7 +429,7 @@ public class ResourcePage implements Page {
 			final TextBox adDescriptionInput = new TextBox();
 			final Label adDescriptionDisplay = new Label();
 			adDescriptionInput.setMaxLength(50);
-			adDescriptionInput.setWidth("215px");
+			adDescriptionInput.setWidth("186px");
 			adDescriptionInput.getElement().getStyle().setFontSize(13, Unit.PX);
 			FormField adDescriptionField = form.createFormField("Ad description:", adDescriptionInput, adDescriptionDisplay);
 			adDescriptionField.setInitializer(new Command() {

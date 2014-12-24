@@ -49,14 +49,15 @@ public class AdTile extends Composite {
 		}, ClickEvent.getType());
 
 		vp.addStyleName("tile");
-		vp.setHeight("267px");
-		vp.setWidth("238px");
+		vp.setHeight("245px");
+		vp.setWidth("202px");
+		// vp.setHeight("267px");
+		// vp.setWidth("238px");
 		// vp.getElement().getStyle().setBackgroundColor(TagMappingType.RESOURCE.getColor());
 
 		SimplePanel sp = new SimplePanel();
 		sp.getElement().getStyle().setHeight(200, Unit.PX);
 		sp.getElement().getStyle().setWidth(200, Unit.PX);
-		sp.getElement().getStyle().setMarginTop(12, Unit.PX);
 		Image image = new Image(ClientUtils.createDocumentUrl(ad.getImageId(), ad.getImageExtension()));
 
 		sp.setWidget(image);
@@ -64,12 +65,12 @@ public class AdTile extends Composite {
 		vp.setCellHorizontalAlignment(sp, HasHorizontalAlignment.ALIGN_CENTER);
 
 		VerticalPanel vvp = new VerticalPanel();
-		vvp.getElement().getStyle().setMarginLeft(12, Unit.PX);
+		vvp.getElement().getStyle().setMarginLeft(8, Unit.PX);
 		vvp.setWidth("100%");
 
 		String url = ad.getUrl();
 
-		int width = 215;
+		int width = 186;
 		String htmlText = "<a href=\"" + url + "\" style=\"text-size: 14px; font-weight: bold;\">" + ad.getName() + "</a>";
 		HTML link = new HTML(htmlText);
 
@@ -80,16 +81,16 @@ public class AdTile extends Composite {
 
 		if (!Common.isNullOrBlank(ad.getAdDescription())) {
 			Label description = new Label(ad.getAdDescription());
-			description.getElement().getStyle().setFontSize(13, Unit.PX);
+			description.getElement().getStyle().setFontSize(12, Unit.PX);
 			description.setWordWrap(false);
 			description.setWidth(width + "px");
 			description.getElement().getStyle().setOverflow(Overflow.HIDDEN);
 			vvp.add(description);
 		} else {
-			link.getElement().getStyle().setMarginBottom(13, Unit.PX);
+			link.getElement().getStyle().setMarginBottom(12, Unit.PX);
 		}
 
-		vvp.getElement().getStyle().setMarginBottom(10, Unit.PX);
+		vvp.getElement().getStyle().setMarginBottom(3, Unit.PX);
 		vp.add(vvp);
 		vp.setCellVerticalAlignment(vvp, HasVerticalAlignment.ALIGN_MIDDLE);
 
