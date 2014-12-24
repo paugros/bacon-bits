@@ -43,6 +43,11 @@ public class ResourceServiceImpl extends GwtController implements ResourceServic
 	}
 
 	@Override
+	public void incrementImpressions(ArrayList<Integer> ids) {
+		dao.incrementImpressions(ids);
+	}
+
+	@Override
 	public ArrayList<Resource> list(ArgMap<ResourceArg> args) {
 		return dao.list(args);
 	}

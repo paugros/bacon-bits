@@ -37,6 +37,7 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	private boolean showInAds;
 	private boolean directoryPriority;
+	private int impressions;
 
 	// address
 	private String address;
@@ -95,6 +96,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		return clickCount;
 	}
 
+	public String getContactEmail() {
+		return contactEmail;
+	}
+
 	public String getContactName() {
 		return contactName;
 	}
@@ -105,10 +110,6 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public boolean getDirectoryPriority() {
 		return directoryPriority;
-	}
-
-	public String getContactEmail() {
-		return contactEmail;
 	}
 
 	public Date getEndDate() {
@@ -132,6 +133,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 			return null;
 		}
 		return imageId;
+	}
+
+	public int getImpressions() {
+		return impressions;
 	}
 
 	public Date getLastClickDate() {
@@ -237,6 +242,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		this.clickCount = clickCount;
 	}
 
+	public void setContactEmail(String email) {
+		this.contactEmail = email;
+	}
+
 	public void setContactName(String contactName) {
 		this.contactName = contactName;
 	}
@@ -247,10 +256,6 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setDirectoryPriority(boolean directoryPriority) {
 		this.directoryPriority = directoryPriority;
-	}
-
-	public void setContactEmail(String email) {
-		this.contactEmail = email;
 	}
 
 	public void setEndDate(Date endDate) {
@@ -271,6 +276,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setImageId(Integer imageId) {
 		this.imageId = imageId;
+	}
+
+	public void setImpressions(int impressions) {
+		this.impressions = impressions;
 	}
 
 	public void setLastClickDate(Date lastClickDate) {

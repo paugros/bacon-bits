@@ -18,8 +18,9 @@ public interface ResourceService extends RemoteService {
 
 	public ResourcePageData getPageData(int resourceId);
 
+	public void incrementImpressions(ArrayList<Integer> ids);
+
 	public ArrayList<Resource> list(ArgMap<ResourceArg> args);
 
 	public Resource save(Resource resource);
-
 }
