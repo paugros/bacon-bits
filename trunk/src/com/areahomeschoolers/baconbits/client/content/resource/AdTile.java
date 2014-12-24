@@ -7,7 +7,6 @@ import com.areahomeschoolers.baconbits.client.rpc.service.ResourceServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
@@ -52,7 +51,7 @@ public class AdTile extends Composite {
 		vp.addStyleName("tile");
 		vp.setHeight("267px");
 		vp.setWidth("238px");
-		vp.getElement().getStyle().setBackgroundColor(TagMappingType.RESOURCE.getColor());
+		// vp.getElement().getStyle().setBackgroundColor(TagMappingType.RESOURCE.getColor());
 
 		SimplePanel sp = new SimplePanel();
 		sp.getElement().getStyle().setHeight(200, Unit.PX);

@@ -18,6 +18,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.ImageSwitcher;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -30,6 +31,7 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ScriptElement;
+import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
@@ -96,6 +98,14 @@ public class HomePage implements Page {
 			});
 		}
 
+		page.getElement().getStyle().setZIndex(0);
+		page.getElement().getStyle().setPosition(Position.RELATIVE);
+		// begin slider test ground
+		ImageSwitcher s = new ImageSwitcher();
+		page.add(s);
+		Application.getLayout().setPage("Home", page);
+		// end slider test ground
+
 		centerPanel.setSpacing(10);
 		centerPanel.setWidth("100%");
 		page.add(centerPanel);
@@ -141,7 +151,6 @@ public class HomePage implements Page {
 				centerPanel.add(g);
 				// centerPanel.setCellHorizontalAlignment(g, HasHorizontalAlignment.ALIGN_CENTER);
 
-				Application.getLayout().setPage("Home", page);
 			}
 		});
 

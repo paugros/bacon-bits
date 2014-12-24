@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.tag;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
@@ -72,7 +73,7 @@ public final class TagGroupPage implements Page {
 		args.put(TagArg.MAPPING_TYPE, type.toString());
 		args.put(TagArg.GET_COUNTS);
 
-		if (Application.hasLocation() && !type.equals(TagMappingType.ARTICLE)) {
+		if (Application.hasLocation() && !EnumSet.of(TagMappingType.ARTICLE, TagMappingType.BOOK).contains(type)) {
 			args.put(TagArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
 			args.put(TagArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
 			args.put(TagArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
@@ -133,7 +134,7 @@ public final class TagGroupPage implements Page {
 		PaddedPanel searchBox = new PaddedPanel();
 		vvp.addStyleName("boxedBlurb");
 		searchBox.setSpacing(4);
-		searchBox.add(new Label("Search:"));
+		searchBox.add(new Label("Tag name search:"));
 		final TextBox searchInput = new TextBox();
 		searchInput.setVisibleLength(35);
 		searchBox.add(searchInput);

@@ -7,7 +7,6 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -34,7 +33,7 @@ public class BookTile extends Composite {
 		hp.setWidth((textWidth + 80) + "px");
 		hp.setHeight("117px");
 		hp.addStyleName("itemTile");
-		hp.getElement().getStyle().setBackgroundColor(TagMappingType.BOOK.getColor());
+		// hp.getElement().getStyle().setBackgroundColor(TagMappingType.BOOK.getColor());
 
 		Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
 		if (item.getSmallImageId() != null) {

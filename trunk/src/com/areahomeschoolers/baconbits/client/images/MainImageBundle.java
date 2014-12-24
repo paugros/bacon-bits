@@ -121,6 +121,16 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource swap();
 
+	ImageResource switcherBooks();
+
+	ImageResource switcherConnect();
+
+	ImageResource switcherEvents();
+
+	ImageResource switcherMoms();
+
+	ImageResource switcherVendors();
+
 	ImageResource user();
 
 	ImageResource userTile();

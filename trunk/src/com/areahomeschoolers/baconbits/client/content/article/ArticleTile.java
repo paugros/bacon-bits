@@ -5,7 +5,6 @@ import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -32,7 +31,7 @@ public class ArticleTile extends Composite {
 		hp.setWidth((textWidth + 80) + "px");
 		hp.setHeight("100px");
 		hp.addStyleName("itemTile");
-		hp.getElement().getStyle().setBackgroundColor(TagMappingType.ARTICLE.getColor());
+		// hp.getElement().getStyle().setBackgroundColor(TagMappingType.ARTICLE.getColor());
 
 		Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
 		if (item.getSmallImageId() != null) {

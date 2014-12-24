@@ -248,6 +248,24 @@ img {
 	max-width: 1500px;
 }
 
+.imageSwitcherBottom {
+	margin: 15px;
+	margin-left: 18px;
+	vertical-align: middle;
+	color: #ffffff;
+	height: 75px;
+	overflow: hidden;
+}
+
+.imageSwitcherBottom a {
+	color: #ffffff;
+	text-decoration: underline;
+}
+
+.imageSwitcherBottom a:hover {
+	color: #4aaa48;
+}
+
 .DndVerticalPanel {
 	
 }
@@ -339,7 +357,8 @@ img {
 }
 
 .tile {
-	border: 1px solid #cccccc;
+	border: 1px solid #b4b4b4;
+	background-color: #f9f9f9;
 	opacity: 0.8;
 }
 
@@ -349,6 +368,8 @@ img {
 }
 
 .itemTile {
+	border: 1px solid #b4b4b4;
+	background-color: #f9f9f9;
 	opacity: 0.8;
 	margin: 5px;
 	padding: 10px;	
