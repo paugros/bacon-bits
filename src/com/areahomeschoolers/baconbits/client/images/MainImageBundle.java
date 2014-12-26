@@ -61,6 +61,8 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource faceBook();
 
+	ImageResource facebookLarge();
+
 	@Source("file/excel.png")
 	ImageResource fileIconExcel();
 

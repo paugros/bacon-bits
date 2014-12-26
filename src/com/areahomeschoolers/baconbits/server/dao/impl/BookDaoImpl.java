@@ -164,7 +164,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		// String lat = latD == null ? null : Double.toString(latD);
 		// Double lngD = ServerContext.getCurrentLng();
 		// String lng = lngD == null ? null : Double.toString(lngD);
-		sql += TagDaoImpl.createWhere(TagMappingType.BOOK, 0, null, null);
+		sql += TagDaoImpl.createWhere(TagMappingType.BOOK, 0, null, null, null);
 		return queryForInt(0, sql);
 	}
 
@@ -274,6 +274,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		int withinMiles = args.getInt(BookArg.WITHIN_MILES);
 		String withinLat = args.getString(BookArg.WITHIN_LAT);
 		String withinLng = args.getString(BookArg.WITHIN_LNG);
+		String state = args.getString(BookArg.STATE);
 
 		String sql = createSqlBase();
 
@@ -284,6 +285,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 		if (inMyCart) {
 			sql += "and bsc.id is not null ";
+		}
+
+		if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
+			sql += "and u.state = '" + state + "' \n";
 		}
 
 		if (priceBetween != null) {

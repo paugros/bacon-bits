@@ -368,7 +368,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		String lat = latD == null ? null : Double.toString(latD);
 		Double lngD = ServerContext.getCurrentLng();
 		String lng = lngD == null ? null : Double.toString(lngD);
-		sql += TagDaoImpl.createWhere(TagMappingType.EVENT, Constants.DEFAULT_SEARCH_RADIUS, lat, lng);
+		sql += TagDaoImpl.createWhere(TagMappingType.EVENT, Constants.DEFAULT_SEARCH_RADIUS, lat, lng, null);
 		pd.setEventCount(queryForInt(sql));
 
 		return pd;
@@ -725,6 +725,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		int withinMiles = args.getInt(EventArg.WITHIN_MILES);
 		String withinLat = args.getString(EventArg.WITHIN_LAT);
 		String withinLng = args.getString(EventArg.WITHIN_LNG);
+		String state = args.getString(EventArg.STATE);
 
 		String sql = createSqlBase();
 
@@ -738,6 +739,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 		if (!args.getBoolean(EventArg.SHOW_INACTIVE)) {
 			sql += "and e.active = 1 \n";
+		}
+
+		if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
+			sql += "and e.state = '" + state + "' \n";
 		}
 
 		if (!Common.isNullOrEmpty(tagIds)) {

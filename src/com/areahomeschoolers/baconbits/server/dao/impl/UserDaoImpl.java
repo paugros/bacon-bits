@@ -287,7 +287,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String lat = latD == null ? null : Double.toString(latD);
 		Double lngD = ServerContext.getCurrentLng();
 		String lng = lngD == null ? null : Double.toString(lngD);
-		sql += TagDaoImpl.createWhere(TagMappingType.USER, Constants.DEFAULT_SEARCH_RADIUS, lat, lng);
+		sql += TagDaoImpl.createWhere(TagMappingType.USER, Constants.DEFAULT_SEARCH_RADIUS, lat, lng, null);
 
 		return queryForInt(sql);
 	}
@@ -517,6 +517,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int withinMiles = args.getInt(UserArg.WITHIN_MILES);
 		String withinLat = args.getString(UserArg.WITHIN_LAT);
 		String withinLng = args.getString(UserArg.WITHIN_LNG);
+		String state = args.getString(UserArg.STATE);
 		String groupCols = "";
 		int minAge = 0;
 		int maxAge = 0;
@@ -552,6 +553,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "and u.id in(select tm.userId from tagUserMapping tm ";
 			sql += "join tags t on t.id = tm.tagId ";
 			sql += "where t.id in(" + Common.join(tagIds, ", ") + ")) ";
+		}
+
+		if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
+			sql += "and u.state = '" + state + "' \n";
 		}
 
 		if (hasEmail) {

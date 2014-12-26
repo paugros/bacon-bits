@@ -618,7 +618,7 @@ public class EventPage implements Page {
 				calendarEvent.setRequiresRegistration(registerInput.getIntValue() == 1);
 			}
 		});
-		fieldTable.addField(registerField);
+		// fieldTable.addField(registerField);
 
 		if (!calendarEvent.isSaved() || calendarEvent.getRequiresRegistration()) {
 			final Label priceDisplay = new Label();

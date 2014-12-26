@@ -157,7 +157,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	@Override
 	public int getCount() {
 		String sql = "select count(*) from articles a ";
-		sql += TagDaoImpl.createWhere(TagMappingType.ARTICLE, 0, null, null);
+		sql += TagDaoImpl.createWhere(TagMappingType.ARTICLE, 0, null, null, null);
 
 		return queryForInt(0, sql);
 	}

@@ -40,7 +40,7 @@ public class LinksMiniModule extends Composite {
 			hp.add(linkLabel);
 
 			Image icon = new Image(MainImageBundle.INSTANCE.faceBook());
-			String fbText = "<a href=\"" + Application.getCurrentOrg().getFacebookUrl() + "\">" + icon + "</a>";
+			String fbText = "<a href=\"" + Application.getCurrentOrg().getFacebookUrl() + "\" target=_blank>" + icon + "</a>";
 			HTML fbLink = new HTML(fbText);
 			hp.add(fbLink);
 			hp.setCellHorizontalAlignment(fbLink, HasHorizontalAlignment.ALIGN_RIGHT);

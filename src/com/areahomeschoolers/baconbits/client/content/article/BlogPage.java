@@ -18,6 +18,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -34,8 +35,10 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -222,8 +225,9 @@ public class BlogPage implements Page {
 		}));
 
 		// Add post
+		PaddedPanel pp = new PaddedPanel(3);
+		pp.setWidth("100%");
 		if (Application.administratorOfCurrentOrg() || Application.memberOf(33)) {
-			PaddedPanel pp = new PaddedPanel(3);
 			Image edit = new Image(MainImageBundle.INSTANCE.plus());
 			edit.addStyleName("pointer");
 			ClickHandler cl = new ClickHandler() {
@@ -239,11 +243,19 @@ public class BlogPage implements Page {
 			edit.addClickHandler(cl);
 			ClickLabel label = new ClickLabel("Add post");
 			label.addClickHandler(cl);
+			label.setWordWrap(false);
 			pp.add(edit);
+			pp.setCellWidth(edit, "1%");
 			pp.add(label);
-
-			page.add(pp);
+			pp.setCellWidth(label, "1%");
 		}
+
+		page.setWidth("auto");
+		Anchor signUp = new Anchor("Sign Up For Updates", Constants.CONSTANT_CONTACT_URL);
+		signUp.setTarget("_blank");
+		pp.add(signUp);
+		pp.setCellHorizontalAlignment(signUp, HasHorizontalAlignment.ALIGN_RIGHT);
+		page.add(pp);
 
 		page.add(blogPanel);
 
