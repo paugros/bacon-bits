@@ -173,6 +173,7 @@ public class TagSection extends Composite implements HasValidator {
 				hp.add(x);
 			}
 			hp.setCellVerticalAlignment(x, HasVerticalAlignment.ALIGN_MIDDLE);
+
 			initWidget(hp);
 		}
 	}
@@ -276,7 +277,6 @@ public class TagSection extends Composite implements HasValidator {
 		hp.add(link);
 
 		vp.add(hp);
-		vp.add(fp);
 
 		validator = new Validator(suggestBox.getTextBox(), new ValidatorCommand() {
 			@Override
@@ -287,6 +287,14 @@ public class TagSection extends Composite implements HasValidator {
 			}
 		});
 
+		String helpText = "We'll put an image on your item based on the first tag you add so make sure the first tag best describes what your item is. ";
+		helpText += "You can add up to 3 additional informative tags.";
+		Label help = new Label(helpText);
+		help.getElement().getStyle().setColor("#555555");
+		help.getElement().getStyle().setWidth(500, Unit.PX);
+		vp.add(help);
+
+		vp.add(fp);
 		initWidget(vp);
 	}
 

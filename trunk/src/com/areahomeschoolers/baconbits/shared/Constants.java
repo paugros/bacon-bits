@@ -44,5 +44,9 @@ public abstract class Constants {
 	public static final int MAX_DATA_ROWS = 2000;
 
 	public static final String GCS_PREFIX = "http://storage.googleapis.com/baconbits-production/documents/";
+	public static final String CONSTANT_CONTACT_URL = "http://visitor.r20.constantcontact.com/d.jsp?llr=46z5vasab&p=oi&m=1118862010303&sit=jit4hqejb&f=5aab0409-0315-469a-9cda-834a978dab48";
 
+	public final static String[] STATE_NAMES = { "AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA",
+			"MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NJ", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN",
+			"TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY" };
 }

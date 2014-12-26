@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.tag.FriendlyTextWidget;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
@@ -25,6 +26,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -98,7 +100,6 @@ public final class EventListPage implements Page {
 			VerticalPanel vp = new VerticalPanel();
 			vp.setWidth("100%");
 			HorizontalPanel hp = new HorizontalPanel();
-			hp.setWidth("100%");
 
 			PaddedPanel pp = new PaddedPanel(10);
 			VerticalPanel vpp = new VerticalPanel();
@@ -184,10 +185,25 @@ public final class EventListPage implements Page {
 				}
 			});
 
+			final DefaultListBox stateInput = new DefaultListBox();
+			stateInput.addItem("");
+			for (int i = 0; i < Constants.STATE_NAMES.length; i++) {
+				stateInput.addItem(Constants.STATE_NAMES[i]);
+			}
+			stateInput.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					args.put(EventArg.STATE, stateInput.getValue());
+					populate();
+				}
+			});
+
 			bottom.add(new Label("within"));
 			bottom.add(milesInput);
 			bottom.add(new Label("miles of"));
 			bottom.add(locationInput);
+			bottom.add(new Label("in"));
+			bottom.add(stateInput);
 
 			for (int i = 0; i < bottom.getWidgetCount(); i++) {
 				bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
@@ -238,6 +254,10 @@ public final class EventListPage implements Page {
 			vpp.addStyleName("boxedBlurb");
 
 			hp.add(vp);
+
+			FriendlyTextWidget fw = new FriendlyTextWidget(TagMappingType.EVENT);
+			fw.getElement().getStyle().setMarginLeft(10, Unit.PX);
+			hp.add(fw);
 
 			page.add(hp);
 		}

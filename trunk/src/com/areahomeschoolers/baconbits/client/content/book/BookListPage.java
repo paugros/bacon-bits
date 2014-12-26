@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.tag.FriendlyTextWidget;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
@@ -16,11 +17,13 @@ import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -44,7 +47,6 @@ public final class BookListPage implements Page {
 	private ArgMap<BookArg> args = new ArgMap<BookArg>(BookArg.STATUS_ID, 1);
 	private VerticalPanel optionsPanel = new VerticalPanel();
 	private PaddedPanel top = new PaddedPanel(15);
-	private PaddedPanel bottom = new PaddedPanel(15);
 	private int sellerId = Url.getIntegerParameter("sellerId");
 	private TilePanel fp = new TilePanel();
 	private VerticalPanel page;
@@ -81,7 +83,11 @@ public final class BookListPage implements Page {
 		}
 		page.add(cc);
 
-		page.add(optionsPanel);
+		PaddedPanel pp = new PaddedPanel(10);
+		pp.add(optionsPanel);
+		pp.add(new FriendlyTextWidget(TagMappingType.BOOK));
+
+		page.add(pp);
 		populateOptionsPanel();
 
 		page.add(fp);
@@ -242,14 +248,37 @@ public final class BookListPage implements Page {
 					}
 				});
 
+				final DefaultListBox stateInput = new DefaultListBox();
+				stateInput.addItem("");
+				for (int i = 0; i < Constants.STATE_NAMES.length; i++) {
+					stateInput.addItem(Constants.STATE_NAMES[i]);
+				}
+				stateInput.addChangeHandler(new ChangeHandler() {
+					@Override
+					public void onChange(ChangeEvent event) {
+						args.put(BookArg.STATE, stateInput.getValue());
+						populate();
+					}
+				});
+
+				PaddedPanel bottom = new PaddedPanel(15);
+
 				bottom.add(new Label("within"));
 				bottom.add(milesInput);
 				bottom.add(new Label("miles of"));
 				bottom.add(locationInput);
-				bottom.add(new Label("with text"));
+				bottom.add(new Label("in"));
+				bottom.add(stateInput);
+
+				for (int i = 0; i < bottom.getWidgetCount(); i++) {
+					bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+				}
+
+				PaddedPanel extraBottom = new PaddedPanel(15);
+				extraBottom.add(new Label("with text"));
 				searchControl = new TextBox();
 				searchControl.setVisibleLength(35);
-				bottom.add(searchControl);
+				extraBottom.add(searchControl);
 				searchControl.addBlurHandler(new BlurHandler() {
 					@Override
 					public void onBlur(BlurEvent event) {
@@ -265,12 +294,10 @@ public final class BookListPage implements Page {
 					}
 				});
 
-				for (int i = 0; i < bottom.getWidgetCount(); i++) {
-					bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
-				}
-
 				optionsPanel.add(top);
 				optionsPanel.add(bottom);
+				optionsPanel.add(extraBottom);
+
 			}
 		});
 	}

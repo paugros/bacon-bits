@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.tag.FriendlyTextWidget;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
@@ -23,6 +24,7 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.dom.client.Style.Unit;
@@ -77,7 +79,11 @@ public final class UserListPage implements Page {
 			page.setCellWidth(link, "1%");
 		}
 
-		page.add(optionsPanel);
+		PaddedPanel pp = new PaddedPanel(10);
+		pp.add(optionsPanel);
+		pp.add(new FriendlyTextWidget(TagMappingType.USER));
+
+		page.add(pp);
 
 		populateOptionsPanel();
 
@@ -207,6 +213,9 @@ public final class UserListPage implements Page {
 			}
 		});
 
+		optionsPanel.add(top);
+
+		PaddedPanel middle = new PaddedPanel(10);
 		// within miles
 		final GeocoderTextBox locationInput = new GeocoderTextBox();
 		if (Application.hasLocation()) {
@@ -248,19 +257,34 @@ public final class UserListPage implements Page {
 			}
 		});
 
+		final DefaultListBox stateInput = new DefaultListBox();
+		stateInput.addItem("");
+		for (int i = 0; i < Constants.STATE_NAMES.length; i++) {
+			stateInput.addItem(Constants.STATE_NAMES[i]);
+		}
+		stateInput.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				args.put(UserArg.STATE, stateInput.getValue());
+				populate();
+			}
+		});
+
 		top.add(memberInput);
 		top.add(new Label("of"));
 		top.add(ageInput);
-		top.add(new Label("within"));
-		top.add(milesInput);
-		top.add(new Label("miles of"));
-		top.add(locationInput);
+		middle.add(new Label("within"));
+		middle.add(milesInput);
+		middle.add(new Label("miles of"));
+		middle.add(locationInput);
+		middle.add(new Label("in"));
+		middle.add(stateInput);
 
-		for (int i = 0; i < top.getWidgetCount(); i++) {
-			top.setCellVerticalAlignment(top.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+		for (int i = 0; i < middle.getWidgetCount(); i++) {
+			middle.setCellVerticalAlignment(middle.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
 		}
 
-		optionsPanel.add(top);
+		optionsPanel.add(middle);
 
 		PaddedPanel sp = new PaddedPanel();
 		searchControl = new TextBox();

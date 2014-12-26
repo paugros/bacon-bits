@@ -38,7 +38,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 @Repository
 public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 
-	public static String createWhere(TagMappingType type, int withinMiles, String withinLat, String withinLng) {
+	public static String createWhere(TagMappingType type, int withinMiles, String withinLat, String withinLng, String state) {
 		String sql = "";
 		switch (type) {
 		case ARTICLE:
@@ -68,17 +68,23 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			break;
 		}
 
-		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+		if (!type.equals(TagMappingType.ARTICLE)) {
 			String tableAlias = type.toString().substring(0, 1).toLowerCase();
 			if (type.equals(TagMappingType.BOOK)) {
 				tableAlias = "u";
 			}
 
-			String within = ServerUtils.getDistanceSql(tableAlias, withinLat, withinLng) + " < " + withinMiles + " ";
-			if (EnumSet.of(TagMappingType.RESOURCE, TagMappingType.EVENT).contains(type)) {
-				sql += "and ((" + within + ") or " + tableAlias + ".address is null or " + tableAlias + ".address = '') ";
-			} else {
-				sql += "and " + within + "\n";
+			if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
+				sql += "and " + tableAlias + ".state = '" + state + "' \n";
+			}
+
+			if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+				String within = ServerUtils.getDistanceSql(tableAlias, withinLat, withinLng) + " < " + withinMiles + " ";
+				if (EnumSet.of(TagMappingType.RESOURCE, TagMappingType.EVENT).contains(type)) {
+					sql += "and ((" + within + ") or " + tableAlias + ".address is null or " + tableAlias + ".address = '') ";
+				} else {
+					sql += "and " + within + "\n";
+				}
 			}
 		}
 
@@ -169,6 +175,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		int withinMiles = args.getInt(TagArg.WITHIN_MILES);
 		String withinLat = args.getString(TagArg.WITHIN_LAT);
 		String withinLng = args.getString(TagArg.WITHIN_LNG);
+		String state = args.getString(TagArg.STATE);
 
 		// tags
 		String always = "t.id, t.name, t.addedDate, t.addedById, t.imageId, t.smallImageId, d.fileExtension \n";
@@ -224,7 +231,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			}
 
 			if (getCounts) {
-				sql += createWhere(mappingType, withinMiles, withinLat, withinLng);
+				sql += createWhere(mappingType, withinMiles, withinLat, withinLng, state);
 				sql += "group by " + always;
 				sql += "order by t.name";
 			} else {

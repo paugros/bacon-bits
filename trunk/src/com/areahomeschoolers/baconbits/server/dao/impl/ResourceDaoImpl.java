@@ -122,7 +122,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		String lat = latD == null ? null : Double.toString(latD);
 		Double lngD = ServerContext.getCurrentLng();
 		String lng = lngD == null ? null : Double.toString(lngD);
-		String sql = "select count(*) from resources r " + TagDaoImpl.createWhere(TagMappingType.RESOURCE, Constants.DEFAULT_SEARCH_RADIUS, lat, lng);
+		String sql = "select count(*) from resources r " + TagDaoImpl.createWhere(TagMappingType.RESOURCE, Constants.DEFAULT_SEARCH_RADIUS, lat, lng, null);
 
 		return queryForInt(0, sql);
 	}
@@ -178,6 +178,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		int withinMiles = args.getInt(ResourceArg.WITHIN_MILES);
 		String withinLat = args.getString(ResourceArg.WITHIN_LAT);
 		String withinLng = args.getString(ResourceArg.WITHIN_LNG);
+		String state = args.getString(ResourceArg.STATE);
 
 		String sql = createSqlBase();
 		sql += "where 1 = 1 ";
@@ -207,6 +208,10 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		if (id > 0) {
 			sql += "and r.id = ? ";
 			sqlArgs.add(id);
+		}
+
+		if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
+			sql += "and r.state = '" + state + "' \n";
 		}
 
 		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {

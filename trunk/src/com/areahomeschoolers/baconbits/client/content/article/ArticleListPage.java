@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.tag.FriendlyTextWidget;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
@@ -19,6 +20,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -85,7 +87,11 @@ public final class ArticleListPage implements Page {
 			}
 		});
 
-		page.add(searchBox);
+		PaddedPanel pp = new PaddedPanel(10);
+		pp.add(searchBox);
+		pp.add(new FriendlyTextWidget(TagMappingType.ARTICLE));
+
+		page.add(pp);
 
 		page.add(fp);
 		Application.getLayout().setPage(title, page);

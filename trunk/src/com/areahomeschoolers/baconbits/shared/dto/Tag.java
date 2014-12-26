@@ -19,6 +19,32 @@ public class Tag extends EntityDto<Tag> {
 			return color;
 		}
 
+		public String getHelpText() {
+			String h = "";
+
+			switch (this) {
+			case ARTICLE:
+				h += "Read helpful information about homeschooling topics.";
+				break;
+			case BOOK:
+				h += "Find used books for sale. <a href=\"mailto:info@citrusgroups.com\">Contact us</a> if you're interested in selling your used items.";
+				break;
+			case EVENT:
+				h += "Find local and virtual events, classes, and workshops. You can also add your own events, or add community events to share with other homeschoolers.";
+				break;
+			case RESOURCE:
+				h += "Browse local, statewide, and national resources such as: field trips, tutors, blogs, books, or other homeschooling-friendly services. ";
+				h += "Share your own great resources by adding them to our directory!";
+				break;
+			case USER:
+				h += "Find local homeschoolers near you!";
+				break;
+			default:
+				break;
+			}
+			return h;
+		}
+
 		public String getName() {
 			if (TagMappingType.this.equals(USER)) {
 				return "Homeschoolers";

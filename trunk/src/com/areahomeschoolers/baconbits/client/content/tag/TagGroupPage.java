@@ -87,38 +87,36 @@ public final class TagGroupPage implements Page {
 
 		page.add(cc);
 
-		if (Application.isAuthenticated()) {
-			String url = null;
-			switch (type) {
-			case ARTICLE:
-				if (Application.memberOf(33)) {
-					url = PageUrl.article(0);
-				}
-				break;
-			case BOOK:
-				break;
-			case EVENT:
-				url = PageUrl.event(0);
-				break;
-			case RESOURCE:
-				url = PageUrl.resource(0);
-				break;
-			case USER:
-				if (Application.isSystemAdministrator()) {
-					url = PageUrl.user(0);
-				}
-				break;
-			default:
-				break;
+		String url = null;
+		switch (type) {
+		case ARTICLE:
+			if (Application.memberOf(33)) {
+				url = PageUrl.article(0);
 			}
+			break;
+		case BOOK:
+			break;
+		case EVENT:
+			url = PageUrl.event(0);
+			break;
+		case RESOURCE:
+			url = PageUrl.resource(0);
+			break;
+		case USER:
+			if (Application.isSystemAdministrator()) {
+				url = PageUrl.user(0);
+			}
+			break;
+		default:
+			break;
+		}
 
-			if (url != null) {
-				String name = Common.ucWords(type.getName()).substring(0, type.getName().length() - 1);
-				AddLink link = new AddLink("Add " + name, url);
-				link.getElement().getStyle().setMarginLeft(10, Unit.PX);
-				page.add(link);
-				page.setCellWidth(link, "1%");
-			}
+		if (url != null) {
+			String name = Common.ucWords(type.getName()).substring(0, type.getName().length() - 1);
+			AddLink link = new AddLink("Add " + name, url);
+			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
+			page.add(link);
+			page.setCellWidth(link, "1%");
 		}
 
 		createSearchBox();
@@ -198,6 +196,19 @@ public final class TagGroupPage implements Page {
 				}
 			});
 
+			final DefaultListBox stateInput = new DefaultListBox();
+			stateInput.addItem("");
+			for (int i = 0; i < Constants.STATE_NAMES.length; i++) {
+				stateInput.addItem(Constants.STATE_NAMES[i]);
+			}
+			stateInput.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					args.put(TagArg.STATE, stateInput.getValue());
+					populate();
+				}
+			});
+
 			PaddedPanel bottom = new PaddedPanel();
 			bottom.setSpacing(4);
 
@@ -205,6 +216,8 @@ public final class TagGroupPage implements Page {
 			bottom.add(milesInput);
 			bottom.add(new Label("miles of"));
 			bottom.add(locationInput);
+			bottom.add(new Label("in"));
+			bottom.add(stateInput);
 
 			for (int i = 0; i < bottom.getWidgetCount(); i++) {
 				bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
@@ -212,7 +225,11 @@ public final class TagGroupPage implements Page {
 			vvp.add(bottom);
 		}
 
-		page.add(vvp);
+		PaddedPanel opp = new PaddedPanel(10);
+		opp.add(vvp);
+		opp.add(new FriendlyTextWidget(type));
+
+		page.add(opp);
 	}
 
 	private void populate() {
@@ -240,6 +257,8 @@ public final class TagGroupPage implements Page {
 				default:
 					break;
 				}
+
+				fp.clear();
 
 				TileConfig ac = new TileConfig().setText("All " + type.getName()).setUrl(url).setCenterText(true);
 				ac.setImage(new Image(MainImageBundle.INSTANCE.earth())).setColor("#ffffff");
