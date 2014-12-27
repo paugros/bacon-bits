@@ -42,7 +42,6 @@ public class ImageSwitcher extends Composite {
 	};
 
 	public ImageSwitcher() {
-		// sp.setHeight("365px");
 		fp.setWidth("800px");
 		fp.getElement().getStyle().setPosition(Position.RELATIVE);
 		fp.getElement().getStyle().setTop(0, Unit.PX);
@@ -151,6 +150,12 @@ public class ImageSwitcher extends Composite {
 	}
 
 	private void loadPanel(int nextIndex) {
+		if (nextIndex == currentIndex) {
+			timer.cancel();
+			timer.scheduleRepeating(switchDelay);
+			return;
+		}
+
 		final int lastIndex = currentIndex;
 		final Widget outPanel = panels.get(currentIndex);
 		final Widget inPanel = panels.get(nextIndex);
