@@ -271,11 +271,15 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		boolean inMyCart = args.getBoolean(BookArg.IN_MY_CART);
 		int newNumber = args.getInt(BookArg.NEW_NUMBER);
 		List<Integer> ids = args.getIntList(BookArg.IDS);
-		int withinMiles = args.getInt(BookArg.WITHIN_MILES);
-		String withinLat = args.getString(BookArg.WITHIN_LAT);
-		String withinLng = args.getString(BookArg.WITHIN_LNG);
-		String state = args.getString(BookArg.STATE);
-
+		boolean locationFilter = args.getBoolean(BookArg.LOCATION_FILTER);
+		int withinMiles = ServerContext.getCurrentRadius();
+		String withinLat = Double.toString(ServerContext.getCurrentLat());
+		String withinLng = Double.toString(ServerContext.getCurrentLng());
+		String loc = ServerContext.getCurrentLocation();
+		String state = null;
+		if (ServerContext.getCurrentLocation() != null && loc.length() == 2 && ServerContext.getCurrentLat() == 0) {
+			state = loc;
+		}
 		String sql = createSqlBase();
 
 		if (userId > 0) {
@@ -287,7 +291,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			sql += "and bsc.id is not null ";
 		}
 
-		if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
+		if (locationFilter && !Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
 			sql += "and u.state = '" + state + "' \n";
 		}
 
@@ -300,7 +304,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			}
 		}
 
-		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+		if (locationFilter && withinMiles > 0) {
 			sql += "and " + ServerUtils.getDistanceSql("u", withinLat, withinLng) + " < " + withinMiles + " ";
 		}
 

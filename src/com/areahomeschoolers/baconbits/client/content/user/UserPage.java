@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTabl
 import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTable.ParticipantColumn;
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerTable;
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerTable.VolunteerColumn;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
@@ -41,6 +42,7 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.CalendarPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FixedWidthLabel;
@@ -51,6 +53,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SelectionPolicy;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
@@ -74,6 +77,7 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Style.VerticalAlign;
+import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -82,10 +86,12 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -93,7 +99,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 public class UserPage implements Page {
 	public static boolean canEditUser(User user) {
@@ -138,6 +143,7 @@ public class UserPage implements Page {
 	private BookEditDialog bookDialog;
 	private TagSection tagSection;
 	private FormField tagField;
+	private String title;
 
 	public UserPage(final VerticalPanel page) {
 		if (!Application.isAuthenticated()) {
@@ -165,15 +171,37 @@ public class UserPage implements Page {
 
 				user = result.getUser();
 
-				if (user.isSaved()) {
-					HorizontalPanel hp = new HorizontalPanel();
-					hp.setWidth("100%");
-					hp.add(createBreadCrumb());
-					page.add(WidgetFactory.wrapForWidth(hp, ContentWidth.MAXWIDTH900PX));
+				if (Url.getBooleanParameter("details") && !canEditUser(user)) {
+					new ErrorPage(PageError.NOT_AUTHORIZED);
+					return;
 				}
 
-				initializePage();
+				title = user.isSaved() ? user.getFullName() : "New User";
+
+				CookieCrumb cc = new CookieCrumb();
+				cc.add(new Hyperlink("Homeschoolers By Interest", PageUrl.tagGroup("USER")));
+				cc.add(new Hyperlink("Homeschoolers", PageUrl.userList()));
+				if (user.getParentId() != null && user.getParentId() > 0) {
+					Hyperlink parent = new Hyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId()));
+					cc.add(parent);
+				}
+				if (Url.getBooleanParameter("details")) {
+					cc.add(new Hyperlink(title, PageUrl.user(user.getId())));
+					cc.add("Edit details");
+				} else {
+					cc.add(title);
+				}
+				page.add(cc);
+
+				if (user.isSaved() && !Url.getBooleanParameter("details")) {
+					createViewPage();
+				} else {
+					createDetailsPage();
+				}
+
+				Application.getLayout().setPage(title, page);
 			}
+
 		});
 	}
 
@@ -183,35 +211,7 @@ public class UserPage implements Page {
 		});
 	}-*/;
 
-	private Widget createBreadCrumb() {
-		PaddedPanel pp = new PaddedPanel();
-		Label heading = new Label(user.getFullName());
-		pp.addStyleName("hugeText");
-
-		if (user.getParentId() != null && user.getParentId() > 0) {
-			Hyperlink parent = new Hyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId()));
-			pp.add(parent);
-			pp.add(new Label(">>"));
-		}
-		pp.add(heading);
-		return pp;
-	}
-
-	private void createFieldTable() {
-		fieldTable = new UserFieldTable(form, user);
-		fieldTable.setWidth("100%");
-	}
-
-	private void createTagSection() {
-		tagSection = new TagSection(TagMappingType.USER, user.getId());
-		tagSection.setEditingEnabled(canEditUser(user));
-		tagSection.populate(pageData.getInterests());
-
-		tagField = form.createFormField("Interests:", tagSection);
-		tagField.removeEditLabel();
-	}
-
-	private void initializePage() {
+	private void createDetailsPage() {
 		final String title = user.isSaved() ? user.getFullName() : "New User";
 		createFieldTable();
 		form.initialize();
@@ -243,7 +243,7 @@ public class UserPage implements Page {
 					hp.add(fieldTable);
 					hp.setCellWidth(image, "220px");
 
-					tabBody.add(WidgetFactory.newSection("Basic Information", hp, ContentWidth.MAXWIDTH1100PX));
+					tabBody.add(WidgetFactory.newSection("", hp, ContentWidth.MAXWIDTH1100PX));
 					// interests
 					// if (!pageData.getInterests().isEmpty() || canEditUser(user)) {
 					// VerticalPanel tp = new VerticalPanel();
@@ -684,7 +684,105 @@ public class UserPage implements Page {
 			page.add(tabPanel);
 		}
 
-		Application.getLayout().setPage(title, page);
+	}
+
+	private void createFieldTable() {
+		fieldTable = new UserFieldTable(form, user);
+		fieldTable.setWidth("100%");
+	}
+
+	private void createTagSection() {
+		tagSection = new TagSection(TagMappingType.USER, user.getId());
+		tagSection.setEditingEnabled(canEditUser(user));
+		tagSection.populate(pageData.getInterests());
+
+		tagField = form.createFormField("Interests:", tagSection);
+		tagField.removeEditLabel();
+	}
+
+	private void createViewPage() {
+		PaddedPanel pp = new PaddedPanel(10);
+		pp.setWidth("100%");
+		pp.getElement().getStyle().setMarginTop(10, Unit.PX);
+		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
+
+		EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, user.getId());
+		if (user.getImageId() != null) {
+			image.setImage(new Image(ClientUtils.createDocumentUrl(user.getImageId(), user.getImageExtension())));
+		} else {
+			image.setImage(new Image(MainImageBundle.INSTANCE.defaultLarge()));
+		}
+		image.setEnabled(Application.isSystemAdministrator());
+		image.populate();
+		pp.add(image);
+		pp.setCellWidth(image, "1%");
+
+		VerticalPanel vp = new VerticalPanel();
+		vp.setSpacing(3);
+
+		Label titleLabel = new Label(user.getFullName());
+		titleLabel.addStyleName("hugeText");
+
+		vp.add(titleLabel);
+
+		if (!Common.isNullOrBlank(user.getEmail())) {
+			vp.add(new HTML("<a href=\"mailto:" + user.getEmail() + "\">" + Formatter.formatNoteText(user.getEmail()) + "</a>"));
+		}
+
+		if (!Common.isNullOrBlank(user.getAddress())) {
+			Anchor address = new Anchor(user.getAddress(), "http://maps.google.com/maps?q=" + user.getAddress());
+			address.setTarget("_blank");
+			vp.add(address);
+		}
+
+		if (!Common.isNullOrBlank(user.getHomePhone())) {
+			vp.add(new Label(user.getHomePhone()));
+		}
+
+		if (!Common.isNullOrBlank(user.getMobilePhone())) {
+			vp.add(new Label(user.getMobilePhone() + " (mobile)"));
+		}
+
+		if (!user.isChild() && user.isSaved() && Application.getUserActivity().get(user.getId()) != null) {
+			UserStatusIndicator st = new UserStatusIndicator();
+			st.setShowWeeksAndMonths(true);
+			st.setUserId(user.getId());
+			vp.add(st);
+		}
+
+		if (!Common.isNullOrBlank(user.getFacebookUrl())) {
+			Image fb = new Image(MainImageBundle.INSTANCE.faceBook());
+			fb.getElement().getStyle().setMarginTop(5, Unit.PX);
+			String fbLink = "<a href=\"" + user.getFacebookUrl() + "\" target=_blank>" + fb + "</a>";
+			vp.add(new HTML(fbLink));
+		}
+
+		pp.add(vp);
+
+		if (canEditUser(user)) {
+			Hyperlink edit = new Hyperlink("Edit details", PageUrl.user(user.getId()) + "&details=true");
+			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
+			edit.getElement().getStyle().setMarginRight(5, Unit.PX);
+			pp.add(edit);
+			pp.setCellHorizontalAlignment(edit, HasHorizontalAlignment.ALIGN_RIGHT);
+		}
+
+		VerticalPanel ovp = new VerticalPanel();
+		ovp.addStyleName("sectionContent");
+
+		ovp.add(pp);
+
+		TagSection ts = new TagSection(TagMappingType.USER, user.getId());
+		ts.setEditingEnabled(false);
+		ts.populate();
+
+		ovp.add(ts);
+
+		PaddedPanel outerPanel = new PaddedPanel(10);
+		outerPanel.add(new AdsMiniModule());
+		outerPanel.add(ovp);
+
+		page.add(outerPanel);
 	}
 
 	private PrivacyPreferenceWidget makePrivacyWidget(PrivacyPreferenceType privacyType) {

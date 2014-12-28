@@ -16,12 +16,11 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.MonthPicker;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -62,6 +61,9 @@ public final class EventListPage implements Page {
 	private TextBox searchControl;
 
 	public EventListPage(final VerticalPanel page) {
+		if (Application.hasLocation()) {
+			args.put(EventArg.LOCATION_FILTER, true);
+		}
 		if (showCommunity) {
 			args.put(EventArg.ONLY_COMMUNITY);
 		}
@@ -71,11 +73,8 @@ public final class EventListPage implements Page {
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			args.put(EventArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
-
 		if (Application.hasLocation()) {
-			args.put(EventArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
-			args.put(EventArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
-			args.put(EventArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
+			args.put(EventArg.LOCATION_FILTER, true);
 		}
 
 		final String title = showCommunity ? "Community Events" : "Events";
@@ -145,32 +144,15 @@ public final class EventListPage implements Page {
 			PaddedPanel bottom = new PaddedPanel(15);
 
 			// within miles
-			final GeocoderTextBox locationInput = new GeocoderTextBox();
+			final LocationFilterInput locationInput = new LocationFilterInput();
 			if (Application.hasLocation()) {
 				locationInput.setText(Application.getCurrentLocation());
 			}
 
-			final DefaultListBox milesInput = new DefaultListBox();
-			milesInput.addItem("5", 5);
-			milesInput.addItem("10", 10);
-			milesInput.addItem("25", 25);
-			milesInput.addItem("50", 50);
-			milesInput.setValue(25);
-			milesInput.addChangeHandler(new ChangeHandler() {
-				@Override
-				public void onChange(ChangeEvent event) {
-					args.put(EventArg.WITHIN_MILES, milesInput.getIntValue());
-					if (!locationInput.getText().isEmpty()) {
-						populate();
-					}
-				}
-			});
-
 			locationInput.setClearCommand(new Command() {
 				@Override
 				public void execute() {
-					args.remove(EventArg.WITHIN_LAT);
-					args.remove(EventArg.WITHIN_LNG);
+					args.remove(EventArg.LOCATION_FILTER);
 					populate();
 				}
 			});
@@ -178,32 +160,12 @@ public final class EventListPage implements Page {
 			locationInput.setChangeCommand(new Command() {
 				@Override
 				public void execute() {
-					args.put(EventArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
-					args.put(EventArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
-					args.put(EventArg.WITHIN_MILES, milesInput.getIntValue());
+					args.put(EventArg.LOCATION_FILTER, true);
 					populate();
 				}
 			});
 
-			final DefaultListBox stateInput = new DefaultListBox();
-			stateInput.addItem("");
-			for (int i = 0; i < Constants.STATE_NAMES.length; i++) {
-				stateInput.addItem(Constants.STATE_NAMES[i]);
-			}
-			stateInput.addChangeHandler(new ChangeHandler() {
-				@Override
-				public void onChange(ChangeEvent event) {
-					args.put(EventArg.STATE, stateInput.getValue());
-					populate();
-				}
-			});
-
-			bottom.add(new Label("within"));
-			bottom.add(milesInput);
-			bottom.add(new Label("miles of"));
 			bottom.add(locationInput);
-			bottom.add(new Label("in"));
-			bottom.add(stateInput);
 
 			for (int i = 0; i < bottom.getWidgetCount(); i++) {
 				bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);

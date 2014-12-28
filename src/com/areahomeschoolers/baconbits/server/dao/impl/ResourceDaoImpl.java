@@ -175,10 +175,16 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		String nameLike = args.getString(ResourceArg.NAME_LIKE);
 		boolean random = args.getBoolean(ResourceArg.RANDOM);
 		boolean ad = args.getBoolean(ResourceArg.AD);
-		int withinMiles = args.getInt(ResourceArg.WITHIN_MILES);
-		String withinLat = args.getString(ResourceArg.WITHIN_LAT);
-		String withinLng = args.getString(ResourceArg.WITHIN_LNG);
-		String state = args.getString(ResourceArg.STATE);
+
+		boolean locationFilter = args.getBoolean(ResourceArg.LOCATION_FILTER);
+		int withinMiles = ServerContext.getCurrentRadius();
+		String withinLat = Double.toString(ServerContext.getCurrentLat());
+		String withinLng = Double.toString(ServerContext.getCurrentLng());
+		String loc = ServerContext.getCurrentLocation();
+		String state = null;
+		if (ServerContext.getCurrentLocation() != null && loc.length() == 2 && ServerContext.getCurrentLat() == 0) {
+			state = loc;
+		}
 
 		String sql = createSqlBase();
 		sql += "where 1 = 1 ";
@@ -210,11 +216,11 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			sqlArgs.add(id);
 		}
 
-		if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
+		if (locationFilter && !Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
 			sql += "and r.state = '" + state + "' \n";
 		}
 
-		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+		if (locationFilter && withinMiles > 0) {
 			sql += "and ((" + ServerUtils.getDistanceSql("r", withinLat, withinLng);
 			sql += " < " + withinMiles + ") or r.address is null or r.address = '') \n";
 		}

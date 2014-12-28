@@ -19,6 +19,7 @@ public class ApplicationData implements IsSerializable {
 	private String currentLocation;
 	private double currentLat;
 	private double currentLng;
+	private int currentRadius;
 
 	public ApplicationData() {
 
@@ -42,6 +43,10 @@ public class ApplicationData implements IsSerializable {
 
 	public UserGroup getCurrentOrg() {
 		return currentOrg;
+	}
+
+	public int getCurrentRadius() {
+		return currentRadius;
 	}
 
 	public User getCurrentUser() {
@@ -90,6 +95,10 @@ public class ApplicationData implements IsSerializable {
 
 	public void setCurrentOrg(UserGroup currentOrg) {
 		this.currentOrg = currentOrg;
+	}
+
+	public void setCurrentRadius(int currentRadius) {
+		this.currentRadius = currentRadius;
 	}
 
 	public void setCurrentUser(User currentUser) {

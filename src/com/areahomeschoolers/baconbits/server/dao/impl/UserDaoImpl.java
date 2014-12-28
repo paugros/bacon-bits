@@ -514,10 +514,15 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String sex = args.getString(UserArg.SEX);
 		List<Integer> ages = args.getIntList(UserArg.AGES);
 		String addressSearch = args.getString(UserArg.ADDRESS_SEARCH);
-		int withinMiles = args.getInt(UserArg.WITHIN_MILES);
-		String withinLat = args.getString(UserArg.WITHIN_LAT);
-		String withinLng = args.getString(UserArg.WITHIN_LNG);
-		String state = args.getString(UserArg.STATE);
+		boolean locationFilter = args.getBoolean(UserArg.LOCATION_FILTER);
+		int withinMiles = ServerContext.getCurrentRadius();
+		String withinLat = Double.toString(ServerContext.getCurrentLat());
+		String withinLng = Double.toString(ServerContext.getCurrentLng());
+		String loc = ServerContext.getCurrentLocation();
+		String state = null;
+		if (ServerContext.getCurrentLocation() != null && loc.length() == 2 && ServerContext.getCurrentLat() == 0) {
+			state = loc;
+		}
 		String groupCols = "";
 		int minAge = 0;
 		int maxAge = 0;
@@ -555,7 +560,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "where t.id in(" + Common.join(tagIds, ", ") + ")) ";
 		}
 
-		if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
+		if (locationFilter && !Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
 			sql += "and u.state = '" + state + "' \n";
 		}
 
@@ -563,7 +568,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "and u.email is not null and u.email != '' \n";
 		}
 
-		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+		if (locationFilter && withinMiles > 0) {
 			sql += "and " + ServerUtils.getDistanceSql("u", withinLat, withinLng) + " < " + withinMiles + " ";
 		}
 
@@ -1032,10 +1037,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
-	public void setCurrentLocation(String location, double lat, double lng) {
+	public void setCurrentLocation(String location, double lat, double lng, int radius) {
 		ServerContext.setCurrentLocation(location);
 		ServerContext.setCurrentLat(lat);
 		ServerContext.setCurrentLng(lng);
+		ServerContext.setCurrentRadius(radius);
 	}
 
 	@Override
