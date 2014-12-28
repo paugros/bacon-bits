@@ -172,10 +172,20 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		final TagMappingType mappingType = Common.isNullOrBlank(args.getString(TagArg.MAPPING_TYPE)) ? null : TagMappingType.valueOf(args
 				.getString(TagArg.MAPPING_TYPE));
 		int mappingId = args.getInt(TagArg.MAPPING_ID);
-		int withinMiles = args.getInt(TagArg.WITHIN_MILES);
-		String withinLat = args.getString(TagArg.WITHIN_LAT);
-		String withinLng = args.getString(TagArg.WITHIN_LNG);
-		String state = args.getString(TagArg.STATE);
+
+		boolean locationFilter = args.getBoolean(TagArg.LOCATION_FILTER);
+		int withinMiles = ServerContext.getCurrentRadius();
+		String withinLat = Double.toString(ServerContext.getCurrentLat());
+		String withinLng = Double.toString(ServerContext.getCurrentLng());
+		String loc = ServerContext.getCurrentLocation();
+		String state = null;
+		if (ServerContext.getCurrentLocation() != null && loc.length() == 2 && ServerContext.getCurrentLat() == 0) {
+			state = loc;
+		}
+		if (!locationFilter) {
+			state = null;
+			withinMiles = 0;
+		}
 
 		// tags
 		String always = "t.id, t.name, t.addedDate, t.addedById, t.imageId, t.smallImageId, d.fileExtension \n";

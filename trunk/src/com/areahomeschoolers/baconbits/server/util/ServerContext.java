@@ -84,14 +84,14 @@ public class ServerContext implements ApplicationContextAware {
 
 	public static Double getCurrentLat() {
 		if (getSession().getAttribute("lat") == null) {
-			return null;
+			return 0.0;
 		}
 		return (Double) getSession().getAttribute("lat");
 	}
 
 	public static Double getCurrentLng() {
 		if (getSession().getAttribute("lng") == null) {
-			return null;
+			return 0.0;
 		}
 
 		return (Double) getSession().getAttribute("lng");
@@ -126,6 +126,13 @@ public class ServerContext implements ApplicationContextAware {
 		}
 
 		return orgId;
+	}
+
+	public static int getCurrentRadius() {
+		if (getSession().getAttribute("radius") == null) {
+			return 0;
+		}
+		return (int) getSession().getAttribute("radius");
 	}
 
 	public static User getCurrentUser() {
@@ -268,6 +275,10 @@ public class ServerContext implements ApplicationContextAware {
 
 	public static void setCurrentOrg(UserGroup org) {
 		getSession().setAttribute("orgId", org.getId());
+	}
+
+	public static void setCurrentRadius(int radius) {
+		getSession().setAttribute("radius", radius);
 	}
 
 	/**

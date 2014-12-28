@@ -19,13 +19,10 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.Constants;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
@@ -34,8 +31,6 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -74,9 +69,7 @@ public final class TagGroupPage implements Page {
 		args.put(TagArg.GET_COUNTS);
 
 		if (Application.hasLocation() && !EnumSet.of(TagMappingType.ARTICLE, TagMappingType.BOOK).contains(type)) {
-			args.put(TagArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
-			args.put(TagArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
-			args.put(TagArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
+			args.put(TagArg.LOCATION_FILTER);
 		}
 
 		populate();
@@ -156,32 +149,15 @@ public final class TagGroupPage implements Page {
 
 		// within miles
 		if (!type.equals(TagMappingType.ARTICLE)) {
-			final GeocoderTextBox locationInput = new GeocoderTextBox();
+			final LocationFilterInput locationInput = new LocationFilterInput();
 			if (Application.hasLocation()) {
 				locationInput.setText(Application.getCurrentLocation());
 			}
 
-			final DefaultListBox milesInput = new DefaultListBox();
-			milesInput.addItem("5", 5);
-			milesInput.addItem("10", 10);
-			milesInput.addItem("25", 25);
-			milesInput.addItem("50", 50);
-			milesInput.setValue(25);
-			milesInput.addChangeHandler(new ChangeHandler() {
-				@Override
-				public void onChange(ChangeEvent event) {
-					args.put(TagArg.WITHIN_MILES, milesInput.getIntValue());
-					if (!locationInput.getText().isEmpty()) {
-						populate();
-					}
-				}
-			});
-
 			locationInput.setClearCommand(new Command() {
 				@Override
 				public void execute() {
-					args.remove(EventArg.WITHIN_LAT);
-					args.remove(EventArg.WITHIN_LNG);
+					args.remove(TagArg.LOCATION_FILTER);
 					populate();
 				}
 			});
@@ -189,22 +165,7 @@ public final class TagGroupPage implements Page {
 			locationInput.setChangeCommand(new Command() {
 				@Override
 				public void execute() {
-					args.put(TagArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
-					args.put(TagArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
-					args.put(TagArg.WITHIN_MILES, milesInput.getIntValue());
-					populate();
-				}
-			});
-
-			final DefaultListBox stateInput = new DefaultListBox();
-			stateInput.addItem("");
-			for (int i = 0; i < Constants.STATE_NAMES.length; i++) {
-				stateInput.addItem(Constants.STATE_NAMES[i]);
-			}
-			stateInput.addChangeHandler(new ChangeHandler() {
-				@Override
-				public void onChange(ChangeEvent event) {
-					args.put(TagArg.STATE, stateInput.getValue());
+					args.put(TagArg.LOCATION_FILTER, true);
 					populate();
 				}
 			});
@@ -212,12 +173,7 @@ public final class TagGroupPage implements Page {
 			PaddedPanel bottom = new PaddedPanel();
 			bottom.setSpacing(4);
 
-			bottom.add(new Label("within"));
-			bottom.add(milesInput);
-			bottom.add(new Label("miles of"));
 			bottom.add(locationInput);
-			bottom.add(new Label("in"));
-			bottom.add(stateInput);
 
 			for (int i = 0; i < bottom.getWidgetCount(); i++) {
 				bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);

@@ -722,10 +722,16 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		int seriesId = args.getInt(EventArg.SERIES_ID);
 		boolean newlyAdded = args.getBoolean(EventArg.NEWLY_ADDED);
 		int registeredByOrAddedForId = args.getInt(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID);
-		int withinMiles = args.getInt(EventArg.WITHIN_MILES);
-		String withinLat = args.getString(EventArg.WITHIN_LAT);
-		String withinLng = args.getString(EventArg.WITHIN_LNG);
-		String state = args.getString(EventArg.STATE);
+
+		boolean locationFilter = args.getBoolean(EventArg.LOCATION_FILTER);
+		int withinMiles = ServerContext.getCurrentRadius();
+		String withinLat = Double.toString(ServerContext.getCurrentLat());
+		String withinLng = Double.toString(ServerContext.getCurrentLng());
+		String loc = ServerContext.getCurrentLocation();
+		String state = null;
+		if (ServerContext.getCurrentLocation() != null && loc.length() == 2 && ServerContext.getCurrentLat() == 0) {
+			state = loc;
+		}
 
 		String sql = createSqlBase();
 
@@ -741,7 +747,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "and e.active = 1 \n";
 		}
 
-		if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
+		if (locationFilter && !Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
 			sql += "and e.state = '" + state + "' \n";
 		}
 
@@ -783,7 +789,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "and (e.addedDate >= date_add(now(), interval -2 week) and (e.seriesId = e.id or e.seriesId is null)) \n";
 		}
 
-		if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
+		if (locationFilter && withinMiles > 0) {
 			sql += "and ((" + ServerUtils.getDistanceSql("e", withinLat, withinLng);
 			sql += " < " + withinMiles + ") or e.address is null or e.address = '') \n";
 		}

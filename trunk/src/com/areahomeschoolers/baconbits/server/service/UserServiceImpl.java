@@ -149,8 +149,8 @@ public class UserServiceImpl extends GwtController implements UserService {
 	}
 
 	@Override
-	public void setCurrentLocation(String location, double lat, double lng) {
-		dao.setCurrentLocation(location, lat, lng);
+	public void setCurrentLocation(String location, double lat, double lng, int radius) {
+		dao.setCurrentLocation(location, lat, lng, radius);
 	}
 
 	@Override

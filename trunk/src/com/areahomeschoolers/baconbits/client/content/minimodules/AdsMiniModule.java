@@ -8,7 +8,6 @@ import com.areahomeschoolers.baconbits.client.content.resource.AdTile;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceServiceAsync;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -28,9 +27,7 @@ public class AdsMiniModule extends Composite {
 		args.put(ResourceArg.LIMIT, 3);
 		args.put(ResourceArg.AD);
 		if (Application.hasLocation()) {
-			args.put(ResourceArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
-			args.put(ResourceArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
-			args.put(ResourceArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
+			args.put(ResourceArg.LOCATION_FILTER, true);
 		}
 
 		populate();

@@ -27,6 +27,8 @@ public interface UserServiceAsync {
 
 	public void getMenuItems(ArgMap<UserArg> args, AsyncCallback<ArrayList<MainMenuItem>> callback);
 
+	public void getNavigationHistory(int userId, AsyncCallback<ArrayList<HistoryEntry>> callback);
+
 	public void getPageData(int userId, AsyncCallback<UserPageData> callback);
 
 	public void getPollData(PollUpdateData pollData, AsyncCallback<PollResponseData> callback);
@@ -49,6 +51,8 @@ public interface UserServiceAsync {
 
 	public void sendEmail(Email email, AsyncCallback<Void> callback);
 
+	public void setCurrentLocation(String location, double lat, double lng, int radius, AsyncCallback<Void> callback);
+
 	public void switchToUser(int userId, AsyncCallback<Void> callback);
 
 	public void updateMenuOrdinals(ArrayList<MainMenuItem> items, AsyncCallback<Void> callback);
@@ -56,8 +60,4 @@ public interface UserServiceAsync {
 	public void updateUserGroupRelation(User u, UserGroup g, boolean add, AsyncCallback<Void> callback);
 
 	public void validatePassword(String password, AsyncCallback<ServerResponseData<String>> callback);
-
-	void getNavigationHistory(int userId, AsyncCallback<ArrayList<HistoryEntry>> callback);
-
-	void setCurrentLocation(String location, double lat, double lng, AsyncCallback<Void> callback);
 }

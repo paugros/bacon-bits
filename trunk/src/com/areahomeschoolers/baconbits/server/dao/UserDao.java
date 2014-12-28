@@ -66,7 +66,7 @@ public interface UserDao {
 
 	public boolean sendPasswordResetEmail(String username);
 
-	public void setCurrentLocation(String location, double lat, double lng);
+	public void setCurrentLocation(String location, double lat, double lng, int radius);
 
 	public User setPasswordFromDigest(int id, String digest);
 

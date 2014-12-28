@@ -16,11 +16,10 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -110,13 +109,11 @@ public final class UserListPage implements Page {
 	}
 
 	private ArgMap<UserArg> getDefaultArgs() {
+		if (Application.hasLocation()) {
+			args.put(UserArg.LOCATION_FILTER, true);
+		}
 		ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
 		args.put(UserArg.PARENTS);
-		if (Application.hasLocation()) {
-			args.put(UserArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
-			args.put(UserArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
-			args.put(UserArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
-		}
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			args.put(UserArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
@@ -217,32 +214,15 @@ public final class UserListPage implements Page {
 
 		PaddedPanel middle = new PaddedPanel(10);
 		// within miles
-		final GeocoderTextBox locationInput = new GeocoderTextBox();
+		final LocationFilterInput locationInput = new LocationFilterInput();
 		if (Application.hasLocation()) {
 			locationInput.setText(Application.getCurrentLocation());
 		}
 
-		final DefaultListBox milesInput = new DefaultListBox();
-		milesInput.addItem("5", 5);
-		milesInput.addItem("10", 10);
-		milesInput.addItem("25", 25);
-		milesInput.addItem("50", 50);
-		milesInput.setValue(Constants.DEFAULT_SEARCH_RADIUS);
-		milesInput.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				args.put(UserArg.WITHIN_MILES, milesInput.getIntValue());
-				if (!locationInput.getText().isEmpty()) {
-					populate();
-				}
-			}
-		});
-
 		locationInput.setClearCommand(new Command() {
 			@Override
 			public void execute() {
-				args.remove(UserArg.WITHIN_LAT);
-				args.remove(UserArg.WITHIN_LNG);
+				args.remove(UserArg.LOCATION_FILTER);
 				populate();
 			}
 		});
@@ -250,22 +230,7 @@ public final class UserListPage implements Page {
 		locationInput.setChangeCommand(new Command() {
 			@Override
 			public void execute() {
-				args.put(UserArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
-				args.put(UserArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
-				args.put(UserArg.WITHIN_MILES, milesInput.getIntValue());
-				populate();
-			}
-		});
-
-		final DefaultListBox stateInput = new DefaultListBox();
-		stateInput.addItem("");
-		for (int i = 0; i < Constants.STATE_NAMES.length; i++) {
-			stateInput.addItem(Constants.STATE_NAMES[i]);
-		}
-		stateInput.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				args.put(UserArg.STATE, stateInput.getValue());
+				args.put(UserArg.LOCATION_FILTER, true);
 				populate();
 			}
 		});
@@ -273,12 +238,7 @@ public final class UserListPage implements Page {
 		top.add(memberInput);
 		top.add(new Label("of"));
 		top.add(ageInput);
-		middle.add(new Label("within"));
-		middle.add(milesInput);
-		middle.add(new Label("miles of"));
 		middle.add(locationInput);
-		middle.add(new Label("in"));
-		middle.add(stateInput);
 
 		for (int i = 0; i < middle.getWidgetCount(); i++) {
 			middle.setCellVerticalAlignment(middle.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);

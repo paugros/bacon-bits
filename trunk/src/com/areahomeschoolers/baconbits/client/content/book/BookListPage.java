@@ -13,11 +13,10 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.GeocoderTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -56,6 +55,9 @@ public final class BookListPage implements Page {
 	public BookListPage(final VerticalPanel p) {
 		fp.setWidth("100%");
 		page = p;
+		if (Application.hasLocation()) {
+			args.put(BookArg.LOCATION_FILTER, true);
+		}
 		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			args.put(BookArg.ONLINE_ONLY);
 		}
@@ -67,12 +69,6 @@ public final class BookListPage implements Page {
 		if (sellerId > 0) {
 			args.put(BookArg.USER_ID, sellerId);
 		}
-
-		// if (Application.hasLocation()) {
-		// args.put(BookArg.WITHIN_LAT, Double.toString(Application.getCurrentLat()));
-		// args.put(BookArg.WITHIN_LNG, Double.toString(Application.getCurrentLng()));
-		// args.put(BookArg.WITHIN_MILES, Constants.DEFAULT_SEARCH_RADIUS);
-		// }
 
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
@@ -207,33 +203,15 @@ public final class BookListPage implements Page {
 					top.setCellVerticalAlignment(top.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
 				}
 
-				final GeocoderTextBox locationInput = new GeocoderTextBox();
+				final LocationFilterInput locationInput = new LocationFilterInput();
 				if (Application.hasLocation()) {
 					locationInput.setText(Application.getCurrentLocation());
 				}
 
-				// within miles
-				final DefaultListBox milesInput = new DefaultListBox();
-				milesInput.addItem("5", 5);
-				milesInput.addItem("10", 10);
-				milesInput.addItem("25", 25);
-				milesInput.addItem("50", 50);
-				milesInput.setValue(25);
-				milesInput.addChangeHandler(new ChangeHandler() {
-					@Override
-					public void onChange(ChangeEvent event) {
-						args.put(BookArg.WITHIN_MILES, milesInput.getIntValue());
-						if (!locationInput.getText().isEmpty()) {
-							populate();
-						}
-					}
-				});
-
 				locationInput.setClearCommand(new Command() {
 					@Override
 					public void execute() {
-						args.remove(BookArg.WITHIN_LAT);
-						args.remove(BookArg.WITHIN_LNG);
+						args.remove(BookArg.LOCATION_FILTER);
 						populate();
 					}
 				});
@@ -241,34 +219,14 @@ public final class BookListPage implements Page {
 				locationInput.setChangeCommand(new Command() {
 					@Override
 					public void execute() {
-						args.put(BookArg.WITHIN_LAT, Double.toString(locationInput.getLat()));
-						args.put(BookArg.WITHIN_LNG, Double.toString(locationInput.getLng()));
-						args.put(BookArg.WITHIN_MILES, milesInput.getIntValue());
-						populate();
-					}
-				});
-
-				final DefaultListBox stateInput = new DefaultListBox();
-				stateInput.addItem("");
-				for (int i = 0; i < Constants.STATE_NAMES.length; i++) {
-					stateInput.addItem(Constants.STATE_NAMES[i]);
-				}
-				stateInput.addChangeHandler(new ChangeHandler() {
-					@Override
-					public void onChange(ChangeEvent event) {
-						args.put(BookArg.STATE, stateInput.getValue());
+						args.put(BookArg.LOCATION_FILTER, true);
 						populate();
 					}
 				});
 
 				PaddedPanel bottom = new PaddedPanel(15);
 
-				bottom.add(new Label("within"));
-				bottom.add(milesInput);
-				bottom.add(new Label("miles of"));
 				bottom.add(locationInput);
-				bottom.add(new Label("in"));
-				bottom.add(stateInput);
 
 				for (int i = 0; i < bottom.getWidgetCount(); i++) {
 					bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
