@@ -128,6 +128,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setSmallImageId(rs.getInt("smallImageId"));
 			event.setImageExtension(rs.getString("fileExtension"));
 			event.setDirectoryPriority(rs.getBoolean("directoryPriority"));
+			event.setTags(rs.getString("tags"));
 			return event;
 		}
 	}
@@ -748,7 +749,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		}
 
 		if (locationFilter && !Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
-			sql += "and e.state = '" + state + "' \n";
+			sql += "and (e.state = '" + state + "' or (e.address is null or e.address = '')) \n";
 		}
 
 		if (!Common.isNullOrEmpty(tagIds)) {
@@ -794,7 +795,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += " < " + withinMiles + ") or e.address is null or e.address = '') \n";
 		}
 
-		sql += "order by e.directoryPriority desc, e.startDate ";
+		sql += "order by e.startDate ";
 		if (upcoming > 0) {
 			sql += "limit ? ";
 			sqlArgs.add(upcoming);
@@ -1116,6 +1117,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		}
 		sql += "(select count(id) from documentEventMapping where eventId = e.id) as documentCount, \n";
 		sql += "(e.addedDate >= date_add(now(), interval -2 week) and (e.seriesId = e.id or e.seriesId is null)) as newlyAdded, \n";
+		sql += "(select group_concat(t.name separator ', ') ";
+		sql += "from tags t join tagEventMapping tm on tm.tagId = t.id where tm.eventId = e.id) as tags, \n";
 		sql += "t.imageId, t.smallImageId, d.fileExtension, \n";
 		sql += "(e.endDate < now()) as finished, isActive(e.registrationStartDate, e.registrationEndDate) as registrationOpen \n";
 		sql += "from events e \n";

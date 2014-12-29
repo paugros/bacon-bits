@@ -6,11 +6,10 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 
 import com.google.gwt.dom.client.Style.Overflow;
-import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.dom.client.Style.WhiteSpace;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
@@ -20,6 +19,8 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class EventTile extends Composite {
 
@@ -33,8 +34,6 @@ public class EventTile extends Composite {
 
 		HorizontalPanel hp = new PaddedPanel(10);
 		hp.setWidth("300px");
-		hp.addStyleName("itemTile");
-		// hp.getElement().getStyle().setBackgroundColor(TagMappingType.EVENT.getColor());
 
 		Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
 		if (item.getSmallImageId() != null) {
@@ -42,24 +41,52 @@ public class EventTile extends Composite {
 		}
 		HTML image = new HTML(i.toString());
 		hp.add(image);
-		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_MIDDLE);
+		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_TOP);
 
 		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.event(item.getId()));
 		link.addStyleName("bold");
-		String text = link.toString() + "<br>";
+
+		String text = "<div style=\"overflow: hidden; height: 110px; width: 190px;\">";
+		text += "<div style=\"white-space: nowrap;\">" + link + "<br>";
+		if (!Common.isNullOrBlank(item.getAddress())) {
+			String a = "<div style=\"font-style: italic;\">";
+			if (!Common.isNullOrBlank(item.getCity())) {
+				a += item.getCity();
+				if (!Common.isNullOrBlank(item.getState())) {
+					a += ", ";
+				}
+			}
+			if (!Common.isNullOrBlank(item.getState())) {
+				a += item.getState();
+			}
+			text += a + "</div>";
+		}
+		if (!Common.isNullOrBlank(item.getFacilityName())) {
+			text += "<div style=\"font-style: italic;\">" + item.getFacilityName() + "</div>";
+		}
 		text += Formatter.formatDateTime(item.getStartDate()) + "<br>";
-		text += new HTML(item.getDescription().replaceAll("<br>", " ")).getText() + "<br>";
+		text += "</div>";
+
+		String desc = new HTML(item.getDescription().replaceAll("<br>", " ")).getText();
+
+		text += "<div class=smallText>" + desc + "</div></div>";
 
 		HTML h = new HTML(text);
-		h.setHeight("85px");
-		h.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
-		h.getElement().getStyle().setOverflow(Overflow.HIDDEN);
-		h.getElement().getStyle().setWidth(190, Unit.PX);
 
 		hp.add(h);
 		hp.setCellHorizontalAlignment(h, HasHorizontalAlignment.ALIGN_LEFT);
 
-		initWidget(hp);
+		VerticalPanel vp = new VerticalPanel();
+		vp.addStyleName("itemTile");
+		vp.add(hp);
+		String tags = item.getTags() == null ? "No tags" : item.getTags();
+		Label t = new Label(tags);
+		t.setWidth("280px");
+		t.setWordWrap(false);
+		t.getElement().getStyle().setOverflow(Overflow.HIDDEN);
+		vp.add(t);
+
+		initWidget(vp);
 	}
 
 }

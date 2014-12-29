@@ -61,7 +61,6 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			resource.setLat(rs.getDouble("lat"));
 			resource.setLng(rs.getDouble("lng"));
 			resource.setShowInAds(rs.getBoolean("showInAds"));
-			resource.setTagCount(rs.getInt("tagCount"));
 			resource.setAddressScope(rs.getString("addressScope"));
 			resource.setContactEmail(rs.getString("contactEmail"));
 			resource.setImageExtension(rs.getString("fileExtension"));
@@ -71,6 +70,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			resource.setFacilityName(rs.getString("facilityName"));
 			resource.setFacebookUrl(rs.getString("facebookUrl"));
 			resource.setImpressions(rs.getInt("impressions"));
+			resource.setTags(rs.getString("tags"));
 
 			if (resource.getImageId() == null) {
 				resource.setImageExtension(rs.getString("tagFileExtension"));
@@ -99,7 +99,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	public String createSqlBase() {
 		String sql = "select r.*, u.firstName, u.lastName, s.scope as addressScope, d.fileExtension, ";
 		sql += "t.imageId as tagImageId, t.smallImageId as tagSmallImageId, dd.fileExtension as tagFileExtension, \n";
-		sql += "(select count(id) from tagResourceMapping where resourceId = r.id) as tagCount \n";
+		sql += "(select group_concat(t.name separator ', ') ";
+		sql += "from tags t join tagResourceMapping tm on tm.tagId = t.id where tm.resourceId = r.id) as tags \n";
 		sql += "from resources r \n";
 		sql += "join users u on u.id = r.addedById \n";
 		sql += "left join tags t on t.id = r.firstTagId \n";
@@ -217,7 +218,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		}
 
 		if (locationFilter && !Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
-			sql += "and r.state = '" + state + "' \n";
+			sql += "and (r.state = '" + state + "' or (r.address is null or r.address = '')) \n";
 		}
 
 		if (locationFilter && withinMiles > 0) {

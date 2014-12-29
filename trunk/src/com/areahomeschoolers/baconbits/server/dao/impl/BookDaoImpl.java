@@ -103,6 +103,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			book.setInMyShoppingCart(rs.getBoolean("inMyShoppingCart"));
 			book.setShippingFrom(rs.getString("shippingFrom"));
 			book.setAddedDate(rs.getTimestamp("addedDate"));
+			book.setTags(rs.getString("tags"));
 			if (book.getImageId() == null) {
 				book.setImageId(rs.getInt("tagImageId"));
 				book.setSmallImageId(rs.getInt("tagSmallImageId"));
@@ -501,6 +502,8 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	private String createSqlBase() {
 		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, case when bsc.id is null then 0 else 1 end as inMyShoppingCart, d.fileExtension, \n";
 		sql += "t.imageId as tagImageId, t.smallImageId as tagSmallImageId, dd.fileExtension as tagFileExtension, \n";
+		sql += "(select group_concat(t.name separator ', ') ";
+		sql += "from tags t join tagBookMapping tm on tm.tagId = t.id where tm.bookId = b.id) as tags, \n";
 		sql += "u.firstName, u.lastName, u.email, concat(u.city, ', ', u.state) as shippingFrom, bo.bookCondition \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
