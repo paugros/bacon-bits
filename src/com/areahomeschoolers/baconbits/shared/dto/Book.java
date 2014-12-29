@@ -34,6 +34,7 @@ public final class Book extends EntityDto<Book> {
 	private String imageExtension;
 
 	// auxillary
+	private String tags;
 	private String amazonNewPrice, amazonUsedPrice;
 	private String shippingFrom;
 	private String amazonUrl;
@@ -184,6 +185,10 @@ public final class Book extends EntityDto<Book> {
 		return subTitle;
 	}
 
+	public String getTags() {
+		return tags;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -326,6 +331,10 @@ public final class Book extends EntityDto<Book> {
 
 	public void setSubTitle(String subTitle) {
 		this.subTitle = subTitle;
+	}
+
+	public void setTags(String tags) {
+		this.tags = tags;
 	}
 
 	public void setTitle(String title) {

@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
@@ -16,6 +17,8 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class ResourceTile extends Composite {
 
@@ -28,14 +31,10 @@ public class ResourceTile extends Composite {
 		}, ClickEvent.getType());
 
 		HorizontalPanel hp = new HorizontalPanel();
-		int textWidth = 200;
-		hp.setWidth((textWidth + 80) + "px");
-		hp.setHeight("115px");
-		hp.addStyleName("itemTile");
+		hp.setWidth("300px");
 		if (item.getShowInAds()) {
 			hp.getElement().getStyle().setOpacity(1);
 		}
-		// hp.getElement().getStyle().setBackgroundColor(TagMappingType.RESOURCE.getColor());
 
 		Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
 		if (item.getSmallImageId() != null) {
@@ -47,14 +46,13 @@ public class ResourceTile extends Composite {
 		}
 		HTML image = new HTML(imageText);
 		hp.add(image);
-		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_MIDDLE);
+		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_TOP);
 
 		Hyperlink link = new Hyperlink(item.getName(), PageUrl.resource(item.getId()));
 		link.addStyleName("bold");
-		// title/link
-		String text = "<div style=\"overflow: hidden; width: " + textWidth + "px; white-space: nowrap;\">" + link.toString() + "<br>";
 
-		// address
+		String text = "<div style=\"overflow: hidden; height: 110px; width: 190px;\">";
+		text += "<div style=\"white-space: nowrap;\">" + link + "<br>";
 		if (!Common.isNullOrBlank(item.getAddress())) {
 			String a = "<div style=\"font-style: italic;\">";
 			if (!Common.isNullOrBlank(item.getCity())) {
@@ -69,22 +67,32 @@ public class ResourceTile extends Composite {
 			text += a + "</div>";
 		}
 
+		if (!Common.isNullOrBlank(item.getFacilityName())) {
+			text += "<div style=\"font-style: italic;\">" + item.getFacilityName() + "</div>";
+		}
+
 		text += "</div>";
 
 		// description
 		String desc = new HTML(item.getDescription().replaceAll("<br>", " ")).getText();
-		int height = 60;
-		if (Common.isNullOrBlank(item.getAddress())) {
-			height += 15;
-		}
-		text += "<div class=smallText style=\"overflow: hidden; max-height: " + height + "px; width: " + textWidth + "px;\">" + desc + "</div>";
+		text += "<div class=smallText>" + desc + "</div></div>";
 
 		HTML h = new HTML(text);
 
 		hp.add(h);
 		hp.setCellHorizontalAlignment(h, HasHorizontalAlignment.ALIGN_LEFT);
 
-		initWidget(hp);
+		VerticalPanel vp = new VerticalPanel();
+		vp.addStyleName("itemTile");
+		vp.add(hp);
+		String tags = item.getTags() == null ? "No tags" : item.getTags();
+		Label t = new Label(tags);
+		t.setWidth("280px");
+		t.setWordWrap(false);
+		t.getElement().getStyle().setOverflow(Overflow.HIDDEN);
+		vp.add(t);
+
+		initWidget(vp);
 	}
 
 }

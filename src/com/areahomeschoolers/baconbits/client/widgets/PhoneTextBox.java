@@ -22,8 +22,8 @@ public class PhoneTextBox extends TextBox implements HasValidator {
 
 	private final RegExp internationalRegExp = RegExp.compile("^(?:[0-9] ?){6,14}[0-9]$");
 	private final RegExp internationalCheck = RegExp.compile("^011.*");
-	private final char[] PHONE_FILLERS = { '(', ')', '-', ' ' };
-	private final char[] NUMBERS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
+	private final char[] PHONE_FILLERS = { '(', ')', '-', ' ', '.' };
+	private final char[] NUMBERS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 	private final String domesticRegEx = "[(][0-9]{3}[)] [0-9]{3}-[0-9]{4}( x\\d+)?";
 	private final boolean supportExtensions;
 	private final String DEFAULT_TEXT = "ex: (555) 555-5555 x55";
@@ -60,7 +60,9 @@ public class PhoneTextBox extends TextBox implements HasValidator {
 			addFocusHandler(new FocusHandler() {
 				@Override
 				public void onFocus(FocusEvent event) {
-					setText("");
+					if (getText().isEmpty()) {
+						setText("");
+					}
 					getElement().getStyle().setColor("#000000");
 					getElement().getStyle().setFontStyle(FontStyle.NORMAL);
 				}
@@ -68,7 +70,7 @@ public class PhoneTextBox extends TextBox implements HasValidator {
 			addBlurHandler(new BlurHandler() {
 				@Override
 				public void onBlur(BlurEvent event) {
-					if (getText().equals("")) {
+					if (getText().isEmpty()) {
 						reset();
 					}
 				}
@@ -77,7 +79,9 @@ public class PhoneTextBox extends TextBox implements HasValidator {
 			addAttachHandler(new Handler() {
 				@Override
 				public void onAttachOrDetach(AttachEvent event) {
-					reset();
+					if (getText().isEmpty()) {
+						reset();
+					}
 				}
 			});
 		} else {

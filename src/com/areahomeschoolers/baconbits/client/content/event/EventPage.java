@@ -1076,17 +1076,14 @@ public class EventPage implements Page {
 			vp.add(address);
 		}
 
-		String price = "Price: ";
-		if (calendarEvent.getPrice() == 0) {
-			price += "Free";
-		} else {
-			price += Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
-		}
-		Label priceLabel = new Label(price);
-		priceLabel.getElement().getStyle().setFontSize(16, Unit.PX);
-		priceLabel.getElement().getStyle().setMarginTop(10, Unit.PX);
+		if (calendarEvent.getPrice() > 0) {
+			String price = "Price: " + Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
+			Label priceLabel = new Label(price);
+			priceLabel.getElement().getStyle().setFontSize(16, Unit.PX);
+			priceLabel.getElement().getStyle().setMarginTop(10, Unit.PX);
 
-		vp.add(priceLabel);
+			vp.add(priceLabel);
+		}
 
 		String text = "";
 		if (!Common.isNullOrBlank(calendarEvent.getContactName())) {

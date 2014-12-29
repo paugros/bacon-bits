@@ -50,8 +50,8 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 	private boolean addressChanged;
 
 	// auxiliary
-	private int tagCount;
 	private String addressScope;
+	private String tags;
 
 	public Resource() {
 
@@ -186,8 +186,8 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		return street;
 	}
 
-	public int getTagCount() {
-		return tagCount;
+	public String getTags() {
+		return tags;
 	}
 
 	public String getUrl() {
@@ -197,10 +197,6 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 	@Override
 	public String getZip() {
 		return zip;
-	}
-
-	public boolean hasTags() {
-		return tagCount > 0;
 	}
 
 	public void setAddedById(int addedById) {
@@ -326,8 +322,8 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		this.street = street;
 	}
 
-	public void setTagCount(int tagCount) {
-		this.tagCount = tagCount;
+	public void setTags(String tags) {
+		this.tags = tags;
 	}
 
 	public void setUrl(String url) {

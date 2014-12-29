@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
@@ -17,6 +18,8 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class BookTile extends Composite {
 
@@ -31,9 +34,6 @@ public class BookTile extends Composite {
 		HorizontalPanel hp = new HorizontalPanel();
 		int textWidth = 200;
 		hp.setWidth((textWidth + 80) + "px");
-		hp.setHeight("117px");
-		hp.addStyleName("itemTile");
-		// hp.getElement().getStyle().setBackgroundColor(TagMappingType.BOOK.getColor());
 
 		Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
 		if (item.getSmallImageId() != null) {
@@ -42,13 +42,14 @@ public class BookTile extends Composite {
 
 		HTML image = new HTML("<div style=\"width: 80px; margin-right: 10px; text-align: center;\">" + i.toString() + "</div>");
 		hp.add(image);
-		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_MIDDLE);
+		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_TOP);
 
 		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.book(item.getId()));
 		link.addStyleName("bold");
 		// title/link
-		String text = "<div style=\"overflow: hidden; max-height: 38px; width: " + textWidth + "px;\">" + link.toString() + "</div>";
-		text += "<div style=\"overflow: hidden; width: " + textWidth + "px; white-space: nowrap;\">";
+		String text = "<div style=\"overflow: hidden; height: 100px; width: 190px;\">";
+		text += "<div style=\"overflow: hidden; max-height: 38px; width: " + textWidth + "px;\">" + link.toString() + "</div>";
+		text += "<div style=\"white-space: nowrap;\">";
 
 		// price/condition
 		text += "<span style=\"font-size: 16px; font-weight: bold;\">" + Formatter.formatCurrency(item.getPrice()) + "</span> / ";
@@ -68,13 +69,23 @@ public class BookTile extends Composite {
 
 			text += publish + "<br>";
 		}
-		text += "</div>";
+		text += "</div></div>";
 
 		HTML h = new HTML(text);
 
 		hp.add(h);
 		hp.setCellHorizontalAlignment(h, HasHorizontalAlignment.ALIGN_LEFT);
 
-		initWidget(hp);
+		VerticalPanel vp = new VerticalPanel();
+		vp.addStyleName("itemTile");
+		vp.add(hp);
+		String tags = item.getTags() == null ? "No tags" : item.getTags();
+		Label t = new Label(tags);
+		t.setWidth("280px");
+		t.setWordWrap(false);
+		t.getElement().getStyle().setOverflow(Overflow.HIDDEN);
+		vp.add(t);
+
+		initWidget(vp);
 	}
 }

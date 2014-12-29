@@ -58,6 +58,7 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private String facilityName;
 
 	// auxilliary
+	private String tags;
 	private Integer imageId;
 	private Integer smallImageId;
 	private String imageExtension;
@@ -375,6 +376,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 		return street;
 	}
 
+	public String getTags() {
+		return tags;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -651,6 +656,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	@Override
 	public void setStreet(String street) {
 		this.street = street;
+	}
+
+	public void setTags(String tags) {
+		this.tags = tags;
 	}
 
 	public void setTitle(String title) {

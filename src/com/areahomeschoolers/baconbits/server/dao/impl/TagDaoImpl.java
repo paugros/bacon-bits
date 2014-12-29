@@ -75,7 +75,11 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			}
 
 			if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
-				sql += "and " + tableAlias + ".state = '" + state + "' \n";
+				sql += "and (" + tableAlias + ".state = '" + state + "'";
+				if (EnumSet.of(TagMappingType.RESOURCE, TagMappingType.EVENT).contains(type)) {
+					sql += "or (" + tableAlias + ".address is null or " + tableAlias + ".address = '')";
+				}
+				sql += ") \n";
 			}
 
 			if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
