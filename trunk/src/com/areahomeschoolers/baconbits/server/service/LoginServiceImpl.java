@@ -29,6 +29,7 @@ import com.areahomeschoolers.baconbits.server.spring.GwtController;
 import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -196,6 +197,7 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 			logger.log(Level.WARNING, e.getMessage());
 		}
 
+		ServerContext.setCurrentRadius(Constants.DEFAULT_SEARCH_RADIUS);
 		ServerContext.setCurrentLocation(location);
 
 	}
