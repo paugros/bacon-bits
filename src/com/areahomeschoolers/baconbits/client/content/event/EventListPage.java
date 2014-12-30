@@ -73,9 +73,6 @@ public final class EventListPage implements Page {
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			args.put(EventArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
-		if (Application.hasLocation()) {
-			args.put(EventArg.LOCATION_FILTER, true);
-		}
 
 		final String title = showCommunity ? "Community Events" : "Events";
 

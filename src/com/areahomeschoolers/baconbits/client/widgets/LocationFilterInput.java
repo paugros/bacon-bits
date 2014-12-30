@@ -88,6 +88,7 @@ public class LocationFilterInput extends Composite {
 				}
 
 				if (locationInput.getText().isEmpty()) {
+					updateLocation(null, 0, 0, 0);
 					reset();
 
 					if (lastLocationText == null) {
@@ -210,6 +211,7 @@ public class LocationFilterInput extends Composite {
 			locationInput.setText("");
 			locationInput.setEnabled(false);
 			milesInput.setEnabled(false);
+			lastLocationText = "";
 		} else {
 			milesInput.setEnabled(true);
 			locationInput.setEnabled(true);
