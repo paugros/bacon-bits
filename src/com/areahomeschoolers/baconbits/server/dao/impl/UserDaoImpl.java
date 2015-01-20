@@ -1021,7 +1021,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			String sn = ServerContext.getCurrentOrg().getGroupName();
 			mailer.setSubject(sn + " Password Assistance");
 			String body = "To initiate the password reset process for your " + username + " " + sn + " account, click the link below: \n\n";
-			body += ServerContext.getBaseUrlWithCodeServer() + "#rr=" + u.getPasswordDigest() + "&uu=" + u.getId() + "\n\n";
+			body += ServerContext.getBaseUrlWithCodeServer() + "rr=" + u.getPasswordDigest() + "&uu=" + u.getId() + "\n\n";
 			body += "If clicking the link above doesn't work, please copy and paste the URL in a new browser window instead.\n\n";
 			body += "If you've received this mail in error, it's likely that another user entered your email address by mistake while trying to reset a password. ";
 			body += "If you didn't initiate the request, you don't need to take any further action and can safely disregard this email.\n\n";
@@ -1127,7 +1127,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 					body += "group, within the " + g.getOrganizationName() + " ";
 				}
 				body += "homeschool organization, a member of <a href=\"" + Constants.CG_URL + "\">Citrus Groups</a> homeschool network.<br><br>";
-				body += "<a href=\"" + ServerContext.getBaseUrlWithCodeServer() + "#" + PageUrl.user(u.getId()) + "&tab=2\">";
+				body += "<a href=\"" + ServerContext.getBaseUrlWithCodeServer() + PageUrl.user(u.getId()) + "&tab=2\">";
 				body += "Click here</a> to view the invitation on the group membership tab of your profile, ";
 				body += "then click \"Approve\" if you wish to accept.<br><br>";
 				body += "Regards,<br>" + ServerContext.getCurrentUser().getFullName() + "<br>";
@@ -1146,7 +1146,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 					body += "group, within the " + g.getOrganizationName() + " ";
 				}
 				body += "homeschool organization.<br><br>";
-				body += "<a href=\"" + ServerContext.getBaseUrlWithCodeServer() + "#" + PageUrl.userGroup(g.getId()) + "&tab=1\">";
+				body += "<a href=\"" + ServerContext.getBaseUrlWithCodeServer() + PageUrl.userGroup(g.getId()) + "&tab=1\">";
 				body += "Click here</a> to view the request on the members tab of the group page, ";
 				body += "then click \"Approve\" if you wish to accept.";
 

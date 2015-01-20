@@ -33,7 +33,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -58,7 +58,7 @@ public final class ResourceListPage implements Page {
 		}
 
 		CookieCrumb cc = new CookieCrumb();
-		cc.add(new Hyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE")));
+		cc.add(new DefaultHyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			cc.add(URL.decode(Url.getParameter("tn")));
 		} else {

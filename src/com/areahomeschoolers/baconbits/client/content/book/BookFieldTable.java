@@ -276,7 +276,7 @@ public class BookFieldTable extends FieldTable {
 
 		final Label conditionDisplay = new Label();
 		final DefaultListBox conditionInput = new DefaultListBox();
-		Anchor conditionLink = new Anchor("Condition:", Url.getBaseUrl() + "#" + PageUrl.article(64));
+		Anchor conditionLink = new Anchor("Condition:", Url.getBaseUrl() + PageUrl.article(64));
 		conditionLink.setTarget("_blank");
 		for (Data item : pageData.getConditions()) {
 			conditionInput.addItem(item.get("bookCondition"), item.getId());

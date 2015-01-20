@@ -93,7 +93,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -179,14 +179,14 @@ public class UserPage implements Page {
 				title = user.isSaved() ? user.getFullName() : "New User";
 
 				CookieCrumb cc = new CookieCrumb();
-				cc.add(new Hyperlink("Homeschoolers By Interest", PageUrl.tagGroup("USER")));
-				cc.add(new Hyperlink("Homeschoolers", PageUrl.userList()));
+				cc.add(new DefaultHyperlink("Homeschoolers By Interest", PageUrl.tagGroup("USER")));
+				cc.add(new DefaultHyperlink("Homeschoolers", PageUrl.userList()));
 				if (user.getParentId() != null && user.getParentId() > 0) {
-					Hyperlink parent = new Hyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId()));
+					DefaultHyperlink parent = new DefaultHyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId()));
 					cc.add(parent);
 				}
 				if (Url.getBooleanParameter("details")) {
-					cc.add(new Hyperlink(title, PageUrl.user(user.getId())));
+					cc.add(new DefaultHyperlink(title, PageUrl.user(user.getId())));
 					cc.add("Edit details");
 				} else {
 					cc.add(title);
@@ -440,7 +440,7 @@ public class UserPage implements Page {
 				tabPanel.add("Books", new TabPageCommand() {
 					@Override
 					public void execute(VerticalPanel tabBody) {
-						Hyperlink link = new Hyperlink("Click here", PageUrl.article(65));
+						DefaultHyperlink link = new DefaultHyperlink("Click here", PageUrl.article(65));
 						String html = "<b>Need help?</b> " + link.toString() + " for book seller instructions, or ";
 						html += "<a href=\"mailto:" + Constants.SUPPORT_EMAIL + "?subject=Adding books\">contact us</a> with questions.";
 						HTML info = new HTML(html);
@@ -760,7 +760,7 @@ public class UserPage implements Page {
 		pp.add(vp);
 
 		if (canEditUser(user)) {
-			Hyperlink edit = new Hyperlink("Edit details", PageUrl.user(user.getId()) + "&details=true");
+			DefaultHyperlink edit = new DefaultHyperlink("Edit details", PageUrl.user(user.getId()) + "&details=true");
 			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 			edit.getElement().getStyle().setMarginRight(5, Unit.PX);
 			pp.add(edit);

@@ -18,7 +18,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -96,7 +96,7 @@ public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, 
 				addWidgetColumn(col, new WidgetCellCreator<Resource>() {
 					@Override
 					protected Widget createWidget(Resource item) {
-						return new Hyperlink(item.getName(), PageUrl.resource(item.getId()));
+						return new DefaultHyperlink(item.getName(), PageUrl.resource(item.getId()));
 					}
 				});
 				break;

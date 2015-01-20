@@ -14,7 +14,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Event;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -60,7 +60,7 @@ public class EventMiniModule extends Composite {
 
 		for (Event e : events) {
 			VerticalPanel ep = new VerticalPanel();
-			Hyperlink link = new Hyperlink(e.getTitle(), PageUrl.event(e.getId()));
+			DefaultHyperlink link = new DefaultHyperlink(e.getTitle(), PageUrl.event(e.getId()));
 			link.addStyleName("mediumText");
 
 			ep.add(link);
@@ -93,7 +93,7 @@ public class EventMiniModule extends Composite {
 			lvp.add(new Label("None right now."));
 		} else {
 			String url = PageUrl.eventList() + extraParams;
-			lvp.add(new Hyperlink("See more events...", url));
+			lvp.add(new DefaultHyperlink("See more events...", url));
 		}
 
 		vp.add(lvp);

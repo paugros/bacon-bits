@@ -84,7 +84,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -164,10 +164,10 @@ public class EventPage implements Page {
 				title = calendarEvent.isSaved() ? calendarEvent.getTitle() : "New Event";
 
 				CookieCrumb cc = new CookieCrumb();
-				cc.add(new Hyperlink("Events By Type", PageUrl.tagGroup("EVENT")));
-				cc.add(new Hyperlink("Events", PageUrl.eventList()));
+				cc.add(new DefaultHyperlink("Events By Type", PageUrl.tagGroup("EVENT")));
+				cc.add(new DefaultHyperlink("Events", PageUrl.eventList()));
 				if (Url.getBooleanParameter("details")) {
-					cc.add(new Hyperlink(title, PageUrl.event(calendarEvent.getId())));
+					cc.add(new DefaultHyperlink(title, PageUrl.event(calendarEvent.getId())));
 					cc.add("Edit details");
 				} else {
 					cc.add(title);
@@ -243,7 +243,7 @@ public class EventPage implements Page {
 					if (pageData.getRegistration() != null) {
 						for (EventParticipant p : pageData.getRegistration().getParticipants()) {
 							if (p.getAdjustedPrice() > 0 && p.getStatusId() == 1) {
-								tb.addLink(new Hyperlink("Pay", PageUrl.payment()));
+								tb.addLink(new DefaultHyperlink("Pay", PageUrl.payment()));
 								break;
 							}
 						}
@@ -1124,7 +1124,7 @@ public class EventPage implements Page {
 		ddt.setSpacing(6);
 
 		if (Application.administratorOf(calendarEvent)) {
-			Hyperlink edit = new Hyperlink("Edit details", PageUrl.event(calendarEvent.getId()) + "&details=true");
+			DefaultHyperlink edit = new DefaultHyperlink("Edit details", PageUrl.event(calendarEvent.getId()) + "&details=true");
 			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 			ddt.add(edit);
 		}

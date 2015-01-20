@@ -38,7 +38,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -239,7 +239,7 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 					addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
 						@Override
 						protected Widget createWidget(Book item) {
-							return new Hyperlink(item.getUserFirstName() + " " + item.getUserLastName(), PageUrl.user(item.getUserId()));
+							return new DefaultHyperlink(item.getUserFirstName() + " " + item.getUserLastName(), PageUrl.user(item.getUserId()));
 						}
 					});
 				}
@@ -297,7 +297,7 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 							});
 						}
 
-						return new Hyperlink(item.getTitle(), PageUrl.book(item.getId()));
+						return new DefaultHyperlink(item.getTitle(), PageUrl.book(item.getId()));
 					}
 				});
 				break;

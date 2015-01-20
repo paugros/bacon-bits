@@ -19,6 +19,7 @@ public abstract class Constants {
 
 	public static final String DOCUMENT_URL_PREFIX = "/baconbits/service/file?id=";
 
+	public static final String URL_SEPARATOR = "#!";
 	public static final int CG_ORG_ID = 21;
 	public static final String CG_PAYPAL_EMAIL = "payments@citrusgroups.com";
 	public static final String BOOK_GROUP_OPTION_CACHE_KEY = "bookSellerGroupOption_";
@@ -32,15 +33,14 @@ public abstract class Constants {
 	public static final int BOOK_TC_ARTICLE_ID = 103;
 	public static final String CG_DOMAIN = "myhomeschoolgroups.com";
 	public static final String CG_URL = "http://www." + CG_DOMAIN;
-	public static final String TOS_URL = CG_URL + "/#page=Article&articleId=73";
-	public static final String PRIVACY_POLICY_URL = CG_URL + "/#page=Article&articleId=72";
+	public static final String TOS_URL = CG_URL + "/" + URL_SEPARATOR + "page=Article&articleId=73";
+	public static final String PRIVACY_POLICY_URL = CG_URL + "/" + URL_SEPARATOR + "page=Article&articleId=72";
 	public static final String PRODUCTION_VERSION = "production";
 	// 2.9% and 30 to PayPal, then 3% and 69 cents to us
 	// 5.9% and 99 cents total
 	public static final double EVENT_PERCENT_MARKUP = 5.9;
 	public static final double EVENT_DOLLARS_MARKUP = 0.99;
 	public static final int DEFAULT_SEARCH_RADIUS = 25;
-
 	public static final int MAX_DATA_ROWS = 2000;
 
 	public static final String GCS_PREFIX = "http://storage.googleapis.com/baconbits-production/documents/";

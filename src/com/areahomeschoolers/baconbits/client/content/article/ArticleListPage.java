@@ -30,7 +30,7 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -49,7 +49,7 @@ public final class ArticleListPage implements Page {
 		final String title = "Articles";
 
 		CookieCrumb cc = new CookieCrumb();
-		cc.add(new Hyperlink("Articles By Type", PageUrl.tagGroup("ARTICLE")));
+		cc.add(new DefaultHyperlink("Articles By Type", PageUrl.tagGroup("ARTICLE")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			cc.add(URL.decode(Url.getParameter("tn")));
 		} else {

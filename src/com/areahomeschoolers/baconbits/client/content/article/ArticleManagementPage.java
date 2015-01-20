@@ -14,7 +14,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class ArticleManagementPage implements Page {
@@ -32,7 +32,7 @@ public final class ArticleManagementPage implements Page {
 		final ArticleTable table = new ArticleTable(args);
 		table.setTitle(title);
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
-			table.getTitleBar().addLink(new Hyperlink("Add", PageUrl.article(0)));
+			table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.article(0)));
 		}
 
 		table.getTitleBar().addExcelControl();

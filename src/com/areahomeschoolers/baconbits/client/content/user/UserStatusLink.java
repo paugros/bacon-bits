@@ -5,12 +5,12 @@ import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 
 public class UserStatusLink extends Composite {
 	private HorizontalPanel panel = new HorizontalPanel();
 	private UserStatusIndicator statusIndicator = new UserStatusIndicator();
-	private Hyperlink userLink = new Hyperlink();
+	private DefaultHyperlink userLink = new DefaultHyperlink();
 
 	public UserStatusLink() {
 		initWidget(panel);

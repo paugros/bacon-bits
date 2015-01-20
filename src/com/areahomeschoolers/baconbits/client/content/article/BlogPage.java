@@ -41,7 +41,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -285,7 +285,7 @@ public class BlogPage implements Page {
 			item = new Article();
 		}
 
-		Hyperlink back = new Hyperlink("<< Blog", PageUrl.blog(0));
+		DefaultHyperlink back = new DefaultHyperlink("<< Blog", PageUrl.blog(0));
 		blogPanel.add(back);
 
 		blogPanel.add(new BlogItemWidget(item));

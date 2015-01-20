@@ -28,7 +28,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -59,7 +59,7 @@ public class RegistrationManagementPage implements Page {
 						addCompositeWidgetColumn("Event", new WidgetCellCreator<Data>() {
 							@Override
 							protected Widget createWidget(Data item) {
-								return new Hyperlink(item.get("title"), PageUrl.event(item.getId()));
+								return new DefaultHyperlink(item.get("title"), PageUrl.event(item.getId()));
 							}
 						}, new ValueGetter<String, Data>() {
 							@Override

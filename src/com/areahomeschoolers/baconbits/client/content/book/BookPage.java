@@ -26,7 +26,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -65,10 +65,10 @@ public class BookPage implements Page {
 				final String title = book.isSaved() ? book.getTitle() : "New Book";
 
 				CookieCrumb cc = new CookieCrumb();
-				cc.add(new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
-				cc.add(new Hyperlink("Books", PageUrl.bookList()));
+				cc.add(new DefaultHyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
+				cc.add(new DefaultHyperlink("Books", PageUrl.bookList()));
 				if (Url.getBooleanParameter("details")) {
-					cc.add(new Hyperlink(title, PageUrl.book(book.getId())));
+					cc.add(new DefaultHyperlink(title, PageUrl.book(book.getId())));
 					cc.add("Edit details");
 				} else {
 					cc.add(title);

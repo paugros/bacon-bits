@@ -12,7 +12,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 
 public class RequestMembershipLink extends Composite {
 	private ClickLabel label;
@@ -30,7 +30,7 @@ public class RequestMembershipLink extends Composite {
 						userService.updateUserGroupRelation(Application.getCurrentUser(), userGroup, true, new Callback<Void>() {
 							@Override
 							protected void doOnSuccess(Void result) {
-								Hyperlink link = new Hyperlink("group membership tab", PageUrl.user(Application.getCurrentUserId()) + "&tab=2");
+								DefaultHyperlink link = new DefaultHyperlink("group membership tab", PageUrl.user(Application.getCurrentUserId()) + "&tab=2");
 								String msg = "Message sent! You can view the status of your reqeust on your " + link + ".";
 								AlertDialog.alert(msg);
 							}

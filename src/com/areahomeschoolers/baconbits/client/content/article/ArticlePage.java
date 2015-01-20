@@ -44,7 +44,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -95,10 +95,10 @@ public class ArticlePage implements Page {
 				title = article.isSaved() ? article.getTitle() : "New Resource";
 
 				CookieCrumb cc = new CookieCrumb();
-				cc.add(new Hyperlink("Articles By Type", PageUrl.tagGroup("ARTICLE")));
-				cc.add(new Hyperlink("Articles", PageUrl.articleList()));
+				cc.add(new DefaultHyperlink("Articles By Type", PageUrl.tagGroup("ARTICLE")));
+				cc.add(new DefaultHyperlink("Articles", PageUrl.articleList()));
 				if (Url.getBooleanParameter("details")) {
-					cc.add(new Hyperlink(title, PageUrl.article(article.getId())));
+					cc.add(new DefaultHyperlink(title, PageUrl.article(article.getId())));
 					cc.add("Edit details");
 				} else {
 					cc.add(title);
@@ -289,7 +289,7 @@ public class ArticlePage implements Page {
 		pp.add(new HTML(titleText));
 
 		if (allowEdit()) {
-			Hyperlink edit = new Hyperlink("Edit details", PageUrl.article(article.getId()) + "&details=true");
+			DefaultHyperlink edit = new DefaultHyperlink("Edit details", PageUrl.article(article.getId()) + "&details=true");
 			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 			edit.getElement().getStyle().setMarginRight(15, Unit.PX);
 			pp.add(edit);

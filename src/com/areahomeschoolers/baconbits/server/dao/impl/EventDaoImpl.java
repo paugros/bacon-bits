@@ -1027,7 +1027,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 				String body = "Registrant: " + u.getFullName() + "\n";
 				body += "Event: " + e.getTitle() + "\n";
 				body += "Date: " + e.getStartDate() + " to " + e.getEndDate() + "\n";
-				body += "Link: " + ServerContext.getBaseUrl() + "#" + PageUrl.event(e.getId()) + "\n";
+				body += "Link: " + ServerContext.getBaseUrl() + PageUrl.event(e.getId()) + "\n";
 				mailer.setSubject(subject);
 				mailer.setBody(body);
 				mailer.send();
@@ -1278,7 +1278,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		body += "Due to a cancellation, " + notify.get("participantName") + " has been moved off the waiting list for the following event.\n\n";
 		body += "Event: " + notify.get("title") + "\n";
 		body += "Date: " + notify.get("startDate") + " to " + notify.get("endDate") + "\n";
-		body += "Link: " + ServerContext.getBaseUrl() + "#" + PageUrl.event(notify.getInt("eventId")) + "\n\n";
+		body += "Link: " + ServerContext.getBaseUrl() + PageUrl.event(notify.getInt("eventId")) + "\n\n";
 		body += "Click the link above to view more event details and registration status.\n\n";
 		body += "Thank you.";
 		mailer.setSubject(subject);
@@ -1365,7 +1365,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 					String body = "Registrant: " + participant.getFirstName() + " " + participant.getLastName() + "\n";
 					body += "Event: " + participant.getEventTitle() + "\n";
 					body += "Date: " + participant.getEventStartDate() + " to " + participant.getEventEndDate() + "\n";
-					body += "Link: " + ServerContext.getBaseUrl() + "#" + PageUrl.event(participant.getEventId()) + "\n";
+					body += "Link: " + ServerContext.getBaseUrl() + PageUrl.event(participant.getEventId()) + "\n";
 					mailer.setSubject(subject);
 					mailer.setBody(body);
 					mailer.send();
@@ -1402,7 +1402,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 			if (existing != null) {
 				String m = "This participant is already registered for an event that conflicts with this one: ";
-				m += "<a href=\"" + ServerContext.getBaseUrl() + "#" + PageUrl.event(existing.getInt("id")) + "\">" + existing.get("title") + "</a>";
+				m += "<a href=\"" + ServerContext.getBaseUrl() + PageUrl.event(existing.getInt("id")) + "\">" + existing.get("title") + "</a>";
 				if (validateOverlaps) {
 					data.addError(m);
 				} else {

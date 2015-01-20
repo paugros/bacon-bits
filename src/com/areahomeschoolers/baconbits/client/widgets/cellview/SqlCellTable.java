@@ -9,7 +9,7 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -242,7 +242,7 @@ public abstract class SqlCellTable extends GenericCellTable {
 								break;
 							}
 						}
-						return new Hyperlink(linkText, url);
+						return new DefaultHyperlink(linkText, url);
 					}
 				}, new ValueGetter<String, Data>() {
 					@Override

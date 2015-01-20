@@ -52,7 +52,7 @@ public class Tile extends Composite {
 
 		String url = config.getUrl();
 		if (url.startsWith("page=")) {
-			url = Url.getBaseUrl() + "#" + url;
+			url = Url.getBaseUrl() + url;
 		}
 
 		int countLength = 0;

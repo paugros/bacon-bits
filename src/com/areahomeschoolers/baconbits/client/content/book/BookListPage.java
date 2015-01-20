@@ -36,7 +36,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -71,7 +71,7 @@ public final class BookListPage implements Page {
 		}
 
 		CookieCrumb cc = new CookieCrumb();
-		cc.add(new Hyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
+		cc.add(new DefaultHyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			cc.add(URL.decode(Url.getParameter("tn")));
 		} else {
@@ -137,12 +137,12 @@ public final class BookListPage implements Page {
 		Label label = new Label("Show");
 		top.add(label);
 
-		Hyperlink conditionLink = new Hyperlink("Click here", PageUrl.article(64));
+		DefaultHyperlink conditionLink = new DefaultHyperlink("Click here", PageUrl.article(64));
 		String text = conditionLink + " for a description of book conditions.";
 		page.add(new HTML(text));
 
 		if (sellerId > 0) {
-			Hyperlink all = new Hyperlink(">>> Books below are for a single seller. Click here to see all books.", PageUrl.bookList());
+			DefaultHyperlink all = new DefaultHyperlink(">>> Books below are for a single seller. Click here to see all books.", PageUrl.bookList());
 			all.addStyleName("largeText bold mediumPadding");
 			page.add(all);
 		}

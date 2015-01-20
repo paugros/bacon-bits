@@ -37,7 +37,7 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.InlineHyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultInlineHyperlink;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -160,13 +160,13 @@ public class AgendaView extends CalendarView {
 				for (Appointment appt : filteredList) {
 					// add the time range
 					String timeSpanString = DEFAULT_TIME_FORMAT.format(appt.getStart()) + " - " + DEFAULT_TIME_FORMAT.format(appt.getEnd());
-					InlineHyperlink timeSpanLink = new InlineHyperlink(timeSpanString.toLowerCase(), PageUrl.event(Integer.parseInt(appt.getId())));
+					DefaultInlineHyperlink timeSpanLink = new DefaultInlineHyperlink(timeSpanString.toLowerCase(), PageUrl.event(Integer.parseInt(appt.getId())));
 
 					appointmentGrid.setWidget(row, startingCell, timeSpanLink);
 
 					// add the title and description
 					FlowPanel titleContainer = new FlowPanel();
-					InlineHyperlink titleLink = new InlineHyperlink(appt.getTitle(), PageUrl.event(Integer.parseInt(appt.getId())));
+					DefaultInlineHyperlink titleLink = new DefaultInlineHyperlink(appt.getTitle(), PageUrl.event(Integer.parseInt(appt.getId())));
 					titleContainer.add(titleLink);
 					InlineLabel descLabel = new InlineLabel(" - " + appt.getDescription());
 					descLabel.setStyleName("descriptionLabel");

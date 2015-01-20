@@ -142,7 +142,8 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 		UserGroup g = Application.getCurrentOrg();
 		if (g.getGeneralPolicyId() != null) {
 			String txt = "I agree to the " + g.getGroupName() + " ";
-			txt += "<a href=\"#" + PageUrl.article(g.getGeneralPolicyId()) + "&noTitle=true\" target=\"_blank\">terms and conditions</a>";
+			txt += "<a href=\"" + Constants.URL_SEPARATOR + PageUrl.article(g.getGeneralPolicyId())
+					+ "&noTitle=true\" target=\"_blank\">terms and conditions</a>";
 			cb = new CheckBox(txt, true);
 			vp.add(cb);
 		}

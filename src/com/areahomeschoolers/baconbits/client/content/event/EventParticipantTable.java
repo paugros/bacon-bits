@@ -39,7 +39,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -195,7 +195,7 @@ public final class EventParticipantTable extends EntityCellTable<EventParticipan
 				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
 					protected Widget createWidget(EventParticipant item) {
-						return new Hyperlink(item.getEventTitle(), PageUrl.event(item.getEventId()));
+						return new DefaultHyperlink(item.getEventTitle(), PageUrl.event(item.getEventId()));
 					}
 				});
 				break;
@@ -267,7 +267,7 @@ public final class EventParticipantTable extends EntityCellTable<EventParticipan
 				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
 					protected Widget createWidget(EventParticipant item) {
-						Hyperlink link = new Hyperlink(item.getFirstName() + " " + item.getLastName(), PageUrl.user(item.getUserId()));
+						DefaultHyperlink link = new DefaultHyperlink(item.getFirstName() + " " + item.getLastName(), PageUrl.user(item.getUserId()));
 						return link;
 					}
 				});
@@ -276,7 +276,7 @@ public final class EventParticipantTable extends EntityCellTable<EventParticipan
 				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
 					protected Widget createWidget(EventParticipant item) {
-						Hyperlink link = new Hyperlink(item.getAddedByFirstName() + " " + item.getAddedByLastName(), PageUrl.user(item.getAddedById()));
+						DefaultHyperlink link = new DefaultHyperlink(item.getAddedByFirstName() + " " + item.getAddedByLastName(), PageUrl.user(item.getAddedById()));
 						return link;
 					}
 				});
