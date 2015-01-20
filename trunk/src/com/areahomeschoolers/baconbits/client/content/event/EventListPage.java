@@ -43,7 +43,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -77,7 +77,7 @@ public final class EventListPage implements Page {
 		final String title = showCommunity ? "Community Events" : "Events";
 
 		CookieCrumb cc = new CookieCrumb();
-		cc.add(new Hyperlink("Events By Type", PageUrl.tagGroup("EVENT")));
+		cc.add(new DefaultHyperlink("Events By Type", PageUrl.tagGroup("EVENT")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			cc.add(URL.decode(Url.getParameter("tn")));
 		} else {

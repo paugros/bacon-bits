@@ -25,7 +25,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.cellview.client.RowStyles;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupArg, UserGroupColumn> {
@@ -137,7 +137,7 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 				addCompositeWidgetColumn(col, new WidgetCellCreator<UserGroup>() {
 					@Override
 					protected Widget createWidget(final UserGroup item) {
-						return new Hyperlink(item.getGroupName(), PageUrl.userGroup(item.getId()));
+						return new DefaultHyperlink(item.getGroupName(), PageUrl.userGroup(item.getId()));
 					}
 				});
 				break;

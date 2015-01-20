@@ -368,7 +368,7 @@ public class EventRegistrationSection extends Composite {
 					Image cart = new Image(MainImageBundle.INSTANCE.shoppingCart());
 					cart.getElement().getStyle().setVerticalAlign(VerticalAlign.BOTTOM);
 					cart.getElement().getStyle().setMarginRight(5, Unit.PX);
-					String linkText = "<a href=\"" + Url.getBaseUrl() + "#" + PageUrl.payment() + "\">" + cart;
+					String linkText = "<a href=\"" + Url.getBaseUrl() + PageUrl.payment() + "\">" + cart;
 					linkText += "<span style=\"vertical-align: bottom; font-weight: bold;\">Checkout</span></a>";
 					payLink.setHTML(linkText);
 					participantTable.setWidget(row, 2, payLink);

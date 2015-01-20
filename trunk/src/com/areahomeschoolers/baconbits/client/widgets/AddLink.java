@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.Image;
 public class AddLink extends Composite {
 
 	public AddLink(String name, String url) {
-		url = Url.getBaseUrl() + "#" + url;
+		url = Url.getBaseUrl() + url;
 		if (!Application.isAuthenticated()) {
 			url = "javascript:;";
 		}

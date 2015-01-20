@@ -14,7 +14,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -61,7 +61,7 @@ public class BookMiniModule extends Composite {
 		for (Book b : books) {
 			VerticalPanel mhp = new VerticalPanel();
 
-			Hyperlink link = new Hyperlink(b.getTitle() + " - " + Formatter.formatCurrency(b.getPrice()), PageUrl.book(b.getId()));
+			DefaultHyperlink link = new DefaultHyperlink(b.getTitle() + " - " + Formatter.formatCurrency(b.getPrice()), PageUrl.book(b.getId()));
 			link.addStyleName("mediumText");
 			mhp.add(link);
 

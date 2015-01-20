@@ -42,7 +42,7 @@ public class Url {
 	 * @return String in the form of "[scheme]://[host][:protocol]/[?gwt.codesvr=[host:port]]"
 	 */
 	public static String getBaseUrl() {
-		return GWT.getHostPageBaseURL() + getGwtCodeServerAsQueryString();
+		return GWT.getHostPageBaseURL() + getGwtCodeServerAsQueryString() + "#!";
 	}
 
 	public static boolean getBooleanParameter(String token) {

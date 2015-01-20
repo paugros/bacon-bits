@@ -5,13 +5,13 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FieldDisplayLink extends Composite {
 	private FocusPanel panel = new FocusPanel();
-	private Hyperlink link = new Hyperlink();
+	private DefaultHyperlink link = new DefaultHyperlink();
 	private Anchor anchor = new Anchor();
 	private Label label = new Label();
 	private boolean enabled = true;

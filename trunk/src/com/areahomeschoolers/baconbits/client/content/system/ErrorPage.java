@@ -86,7 +86,7 @@ public final class ErrorPage {
 
 	private void pageNotFound() {
 		HorizontalPanel hp = new HorizontalPanel();
-		String url = Url.getBaseUrl().replaceAll("^https?://", "") + "#" + History.getToken();
+		String url = Url.getBaseUrl().replaceAll("^https?://", "") + History.getToken();
 
 		hp.setSpacing(5);
 		Image warning = new Image(MainImageBundle.INSTANCE.yellowWarning());

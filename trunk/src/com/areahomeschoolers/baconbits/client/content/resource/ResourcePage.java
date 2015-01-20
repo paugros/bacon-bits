@@ -59,7 +59,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -114,10 +114,10 @@ public class ResourcePage implements Page {
 				title = resource.isSaved() ? resource.getName() : "New Resource";
 
 				CookieCrumb cc = new CookieCrumb();
-				cc.add(new Hyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE")));
-				cc.add(new Hyperlink("Resources", PageUrl.resourceList()));
+				cc.add(new DefaultHyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE")));
+				cc.add(new DefaultHyperlink("Resources", PageUrl.resourceList()));
 				if (Url.getBooleanParameter("details")) {
-					cc.add(new Hyperlink(title, PageUrl.resource(resource.getId())));
+					cc.add(new DefaultHyperlink(title, PageUrl.resource(resource.getId())));
 					cc.add("Edit details");
 				} else {
 					cc.add(title);
@@ -223,7 +223,7 @@ public class ResourcePage implements Page {
 							dupePanel.add(message);
 
 							for (Resource r : result) {
-								Anchor link = new Anchor(r.getName(), Url.getBaseUrl() + "#" + PageUrl.resource(0));
+								Anchor link = new Anchor(r.getName(), Url.getBaseUrl() + PageUrl.resource(0));
 								link.setTarget("_blank");
 								dupePanel.add(link);
 							}
@@ -643,7 +643,7 @@ public class ResourcePage implements Page {
 		pp.add(vp);
 
 		if (allowEdit()) {
-			Hyperlink edit = new Hyperlink("Edit details", PageUrl.resource(resource.getId()) + "&details=true");
+			DefaultHyperlink edit = new DefaultHyperlink("Edit details", PageUrl.resource(resource.getId()) + "&details=true");
 			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 			edit.getElement().getStyle().setMarginRight(5, Unit.PX);
 			pp.add(edit);

@@ -32,7 +32,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -206,7 +206,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Event>() {
 					@Override
 					protected Widget createWidget(Event item) {
-						Hyperlink h = new Hyperlink(item.getTitle(), PageUrl.event(item.getId()));
+						DefaultHyperlink h = new DefaultHyperlink(item.getTitle(), PageUrl.event(item.getId()));
 
 						h.addStyleName("bold");
 
@@ -264,7 +264,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 							return new Label(text);
 						}
 
-						return new Hyperlink("Register", PageUrl.event(item.getId()) + "&tab=1");
+						return new DefaultHyperlink("Register", PageUrl.event(item.getId()) + "&tab=1");
 					}
 				});
 				break;

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.shared.Constants;
 
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
@@ -44,6 +45,10 @@ public class HistoryToken {
 	 * @param token
 	 */
 	public static void createMapFromToken(String token) {
+		if (token.startsWith("!")) {
+			token = token.substring(1);
+		}
+
 		tokenMap = new TreeMap<String, String>(new Comparator<String>() {
 			@Override
 			public int compare(String o1, String o2) {
@@ -167,7 +172,7 @@ public class HistoryToken {
 		}
 
 		if (newTab) {
-			Window.open(Url.getGwtCodeServerAsQueryString() + "#" + historyToken, "_blank", "");
+			Window.open(Url.getGwtCodeServerAsQueryString() + Constants.URL_SEPARATOR + historyToken, "_blank", "");
 		} else {
 			History.newItem(historyToken, issueEvent);
 		}

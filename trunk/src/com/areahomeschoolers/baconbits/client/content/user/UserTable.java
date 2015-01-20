@@ -32,7 +32,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -121,7 +121,7 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 						i.getElement().getStyle().setBorderColor("#c7c7c7");
 						i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 						i.getElement().getStyle().setBorderWidth(1, Unit.PX);
-						Hyperlink l = new Hyperlink(i.toString(), true, PageUrl.user(item.getId()));
+						DefaultHyperlink l = new DefaultHyperlink(i.toString(), true, PageUrl.user(item.getId()));
 						return l;
 					}
 				});
@@ -191,7 +191,7 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 				addWidgetColumn(col, new WidgetCellCreator<User>() {
 					@Override
 					protected Widget createWidget(User item) {
-						return new Hyperlink(item.getFullName(), PageUrl.user(item.getId()));
+						return new DefaultHyperlink(item.getFullName(), PageUrl.user(item.getId()));
 					}
 				});
 				break;

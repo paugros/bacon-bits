@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -43,7 +43,7 @@ public class EventTile extends Composite {
 		hp.add(image);
 		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_TOP);
 
-		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.event(item.getId()));
+		DefaultHyperlink link = new DefaultHyperlink(item.getTitle(), PageUrl.event(item.getId()));
 		link.addStyleName("bold");
 
 		String text = "<div style=\"overflow: hidden; height: 110px; width: 190px;\">";

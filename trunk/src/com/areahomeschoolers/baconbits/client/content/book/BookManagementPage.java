@@ -24,7 +24,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -50,7 +50,7 @@ public final class BookManagementPage implements Page {
 				addCompositeWidgetColumn("Seller", new WidgetCellCreator<Data>() {
 					@Override
 					protected Widget createWidget(Data item) {
-						return new Hyperlink(item.get("firstName") + " " + item.get("lastName"), PageUrl.user(item.getInt("userId")) + "&tab=4");
+						return new DefaultHyperlink(item.get("firstName") + " " + item.get("lastName"), PageUrl.user(item.getInt("userId")) + "&tab=4");
 					}
 				});
 

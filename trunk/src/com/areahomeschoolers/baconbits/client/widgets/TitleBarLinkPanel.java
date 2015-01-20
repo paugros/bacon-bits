@@ -3,7 +3,7 @@ package com.areahomeschoolers.baconbits.client.widgets;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TitleBarLinkPanel extends Composite {
@@ -19,7 +19,7 @@ public class TitleBarLinkPanel extends Composite {
 	}
 
 	public void add(Widget link) {
-		if (link instanceof Anchor || link instanceof Hyperlink || link instanceof ClickLabel) {
+		if (link instanceof Anchor || link instanceof DefaultHyperlink || link instanceof ClickLabel) {
 			link.addStyleName("linkPanelItem");
 		}
 		pp.add(link);

@@ -15,7 +15,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class UserGroupListPage implements Page {
@@ -32,7 +32,7 @@ public final class UserGroupListPage implements Page {
 		table.setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.ORGANIZATION, UserGroupColumn.DESCRIPTION, UserGroupColumn.START_DATE,
 				UserGroupColumn.END_DATE);
 		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
-			table.getTitleBar().addLink(new Hyperlink("Add", PageUrl.userGroup(0)));
+			table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.userGroup(0)));
 		}
 
 		table.getTitleBar().addExcelControl();

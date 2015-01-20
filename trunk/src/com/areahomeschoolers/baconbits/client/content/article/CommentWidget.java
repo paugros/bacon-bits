@@ -23,7 +23,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.InlineHyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultInlineHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -56,7 +56,7 @@ public class CommentWidget extends Composite {
 		String header = Formatter.formatDateTime(comment.getAddedDate());
 		Label headerLabel = new Label(header);
 		headerLabel.getElement().getStyle().setColor("#333333");
-		InlineHyperlink userLink = new InlineHyperlink(comment.getAddedBy(), PageUrl.user(comment.getUserId()));
+		DefaultInlineHyperlink userLink = new DefaultInlineHyperlink(comment.getAddedBy(), PageUrl.user(comment.getUserId()));
 		headerLabel.addStyleName("bold");
 		userLink.addStyleName("bold");
 		userLink.getElement().getStyle().setColor("#333333");

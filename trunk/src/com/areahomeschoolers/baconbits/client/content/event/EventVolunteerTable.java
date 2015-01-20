@@ -21,7 +21,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -117,7 +117,7 @@ public class EventVolunteerTable extends EntityCellTable<Data, EventArg, Volunte
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Data>() {
 					@Override
 					protected Widget createWidget(Data item) {
-						return new Hyperlink(item.get("title"), PageUrl.event(item.getInt("eventId")));
+						return new DefaultHyperlink(item.get("title"), PageUrl.event(item.getInt("eventId")));
 					}
 				}, new ValueGetter<String, Data>() {
 					@Override
@@ -167,7 +167,7 @@ public class EventVolunteerTable extends EntityCellTable<Data, EventArg, Volunte
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Data>() {
 					@Override
 					protected Widget createWidget(Data item) {
-						Hyperlink link = new Hyperlink(item.get("firstName") + " " + item.get("lastName"), PageUrl.user(item.getInt("addedById")));
+						DefaultHyperlink link = new DefaultHyperlink(item.get("firstName") + " " + item.get("lastName"), PageUrl.user(item.getInt("addedById")));
 						return link;
 					}
 				});

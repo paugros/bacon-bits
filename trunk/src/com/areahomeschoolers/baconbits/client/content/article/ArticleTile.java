@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 
 public class ArticleTile extends Composite {
@@ -41,7 +41,7 @@ public class ArticleTile extends Composite {
 		hp.add(image);
 		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_MIDDLE);
 
-		Hyperlink link = new Hyperlink(item.getTitle(), PageUrl.article(item.getId()));
+		DefaultHyperlink link = new DefaultHyperlink(item.getTitle(), PageUrl.article(item.getId()));
 		link.addStyleName("bold");
 		// title/link
 		String text = "<div style=\"overflow: hidden; width: " + textWidth + "px; white-space: nowrap;\">" + link.toString() + "</div>";

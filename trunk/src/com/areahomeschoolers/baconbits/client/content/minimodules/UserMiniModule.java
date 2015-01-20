@@ -17,7 +17,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -76,7 +76,7 @@ public class UserMiniModule extends Composite {
 				mhp.add(spacer);
 			}
 
-			Hyperlink link = new Hyperlink(u.getFirstName() + " " + u.getLastName(), PageUrl.user(u.getId()));
+			DefaultHyperlink link = new DefaultHyperlink(u.getFirstName() + " " + u.getLastName(), PageUrl.user(u.getId()));
 			link.addStyleName("mediumText");
 			mhp.add(link);
 

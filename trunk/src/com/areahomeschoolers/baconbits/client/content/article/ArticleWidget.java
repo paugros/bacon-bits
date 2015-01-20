@@ -9,7 +9,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -22,7 +22,7 @@ public class ArticleWidget extends Composite {
 		Widget title;
 
 		if (Application.administratorOf(article)) {
-			title = new Hyperlink(article.getTitle(), PageUrl.article(article.getId()));
+			title = new DefaultHyperlink(article.getTitle(), PageUrl.article(article.getId()));
 		} else {
 			title = new Label(article.getTitle());
 		}

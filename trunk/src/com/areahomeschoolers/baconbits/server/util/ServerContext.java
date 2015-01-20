@@ -63,17 +63,22 @@ public class ServerContext implements ApplicationContextAware {
 		if (port != 80 && port != 443) {
 			url += ":" + port;
 		}
-		url += "/";
+		url += "/" + Constants.URL_SEPARATOR;
 
 		return url;
 	}
 
 	public static String getBaseUrlWithCodeServer() {
-		String url = getBaseUrl();
+		String url = tl.get().request.getScheme() + "://" + tl.get().request.getServerName();
+		int port = tl.get().request.getServerPort();
+		if (port != 80 && port != 443) {
+			url += ":" + port;
+		}
 
 		if (!isLive()) {
 			url += "?gwt.codesvr=127.0.0.1:9997";
 		}
+		url += "/" + Constants.URL_SEPARATOR;
 
 		return url;
 	}

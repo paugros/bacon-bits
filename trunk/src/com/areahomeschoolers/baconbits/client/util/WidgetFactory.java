@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -14,7 +15,7 @@ import com.google.gwt.user.client.ui.CustomButton;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -144,9 +145,9 @@ public abstract class WidgetFactory {
 	 * 
 	 * @param link
 	 */
-	public static Widget openInNewTab(Hyperlink link, boolean newTab) {
+	public static Widget openInNewTab(DefaultHyperlink link, boolean newTab) {
 		if (newTab) {
-			return new HTML("<a href=\"#" + link.getTargetHistoryToken() + "\" target=\"_blank\">" + link.getText() + "</a>");
+			return new HTML("<a href=\"" + Constants.URL_SEPARATOR + link.getTargetHistoryToken() + "\" target=\"_blank\">" + link.getText() + "</a>");
 		}
 		return link;
 	}

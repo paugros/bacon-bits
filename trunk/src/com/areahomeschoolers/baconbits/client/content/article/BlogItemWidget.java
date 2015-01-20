@@ -36,7 +36,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -50,7 +50,7 @@ public class BlogItemWidget extends Composite {
 			vp.setWidth(NEWS_ITEM_WIDTH + 6 + "px");
 			vp.addStyleName("grayUnderline");
 
-			Hyperlink title = new Hyperlink(item.getTitle(), PageUrl.blog(item.getId()));
+			DefaultHyperlink title = new DefaultHyperlink(item.getTitle(), PageUrl.blog(item.getId()));
 			title.getElement().getStyle().setFontSize(25, Unit.PX);
 			title.getElement().getStyle().setColor("#333333");
 			vp.add(title);
@@ -97,7 +97,7 @@ public class BlogItemWidget extends Composite {
 			String name = item.getAddedByFirstName() + " " + item.getAddedByLastName();
 			userPanel.add(new Label("By "));
 			if (Application.isAuthenticated()) {
-				userPanel.add(new Hyperlink(name, PageUrl.user(item.getAddedById())));
+				userPanel.add(new DefaultHyperlink(name, PageUrl.user(item.getAddedById())));
 			} else {
 				userPanel.add(new Label(name));
 			}
@@ -109,7 +109,7 @@ public class BlogItemWidget extends Composite {
 			if (item.getCommentCount() == 1) {
 				s = "";
 			}
-			Hyperlink commentLink = new Hyperlink(item.getCommentCount() + " comment" + s, PageUrl.blog(item.getId()) + "&comment=1");
+			DefaultHyperlink commentLink = new DefaultHyperlink(item.getCommentCount() + " comment" + s, PageUrl.blog(item.getId()) + "&comment=1");
 			commentLink.addStyleName("largeText");
 			commentsPanel.add(commentLink);
 
@@ -137,7 +137,7 @@ public class BlogItemWidget extends Composite {
 			vp.add(body);
 
 			if (Application.isAuthenticated() && Url.getIntegerParameter("comment") != 1) {
-				vp.add(new Hyperlink("Add comment", PageUrl.blog(item.getId()) + "&comment=1"));
+				vp.add(new DefaultHyperlink("Add comment", PageUrl.blog(item.getId()) + "&comment=1"));
 				vp.add(new Spacer(1));
 			}
 

@@ -22,7 +22,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.InlineHyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultInlineHyperlink;
 
 /**
  * A panel used to render an <code>Appointment</code> in a <code>MonthView</code>.
@@ -59,7 +59,7 @@ public class AppointmentWidget extends FocusPanel {
 			time += "p";
 		}
 		time += "</b>";
-		InlineHyperlink link = new InlineHyperlink(time + " " + appointment.getTitle(), true, PageUrl.event(Integer.parseInt(appointment.getId())));
+		DefaultInlineHyperlink link = new DefaultInlineHyperlink(time + " " + appointment.getTitle(), true, PageUrl.event(Integer.parseInt(appointment.getId())));
 		this.setWidget(link);
 	}
 

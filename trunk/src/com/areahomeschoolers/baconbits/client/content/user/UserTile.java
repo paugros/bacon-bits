@@ -19,7 +19,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 
 public class UserTile extends Composite {
@@ -48,7 +48,7 @@ public class UserTile extends Composite {
 		hp.add(image);
 		hp.setCellVerticalAlignment(image, HasVerticalAlignment.ALIGN_MIDDLE);
 
-		Hyperlink link = new Hyperlink(item.getFullName(), PageUrl.user(item.getId()));
+		DefaultHyperlink link = new DefaultHyperlink(item.getFullName(), PageUrl.user(item.getId()));
 		link.addStyleName("largeText bold");
 		String text = link.toString() + "<br>";
 		if (item.getEmail() != null) {

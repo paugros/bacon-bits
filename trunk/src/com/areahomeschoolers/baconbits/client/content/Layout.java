@@ -54,7 +54,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -414,7 +414,7 @@ public final class Layout {
 
 		List<String> linkItems = new ArrayList<>();
 		for (Integer id : items.keySet()) {
-			Hyperlink link = new Hyperlink(items.get(id), PageUrl.article(id));
+			DefaultHyperlink link = new DefaultHyperlink(items.get(id), PageUrl.article(id));
 			linkItems.add(link.toString());
 		}
 		txt += Common.join(linkItems, "&nbsp;&nbsp;|&nbsp;&nbsp;");

@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -51,7 +51,7 @@ public class LinksMiniModule extends Composite {
 		}
 
 		if (Application.isAuthenticated()) {
-			vp.add(new Hyperlink("Member Directory", PageUrl.userList()));
+			vp.add(new DefaultHyperlink("Member Directory", PageUrl.userList()));
 		} else {
 			ClickLabel cl = new ClickLabel("Create an Account", new ClickHandler() {
 				@Override
@@ -62,19 +62,19 @@ public class LinksMiniModule extends Composite {
 			cl.addStyleName("bold");
 			vp.add(cl);
 		}
-		vp.add(new Hyperlink("Event Listing", PageUrl.eventList()));
-		vp.add(new Hyperlink("Event Calendar", PageUrl.eventCalendar()));
-		vp.add(new Hyperlink("News", PageUrl.blog(0)));
-		vp.add(new Hyperlink("Book Store", PageUrl.bookList()));
+		vp.add(new DefaultHyperlink("Event Listing", PageUrl.eventList()));
+		vp.add(new DefaultHyperlink("Event Calendar", PageUrl.eventCalendar()));
+		vp.add(new DefaultHyperlink("News", PageUrl.blog(0)));
+		vp.add(new DefaultHyperlink("Book Store", PageUrl.bookList()));
 
 		if (Application.isAuthenticated()) {
-			vp.add(new Hyperlink("My Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
+			vp.add(new DefaultHyperlink("My Events", PageUrl.user(Application.getCurrentUserId()) + "&tab=1"));
 			if (Application.getCurrentUser().memberOf(Constants.ONLINE_BOOK_SELLERS_GROUP_ID)) {
-				vp.add(new Hyperlink("My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
+				vp.add(new DefaultHyperlink("My Books", PageUrl.user(Application.getCurrentUserId()) + "&tab=4"));
 			}
-			vp.add(new Hyperlink("My Profile", PageUrl.user(Application.getCurrentUserId())));
+			vp.add(new DefaultHyperlink("My Profile", PageUrl.user(Application.getCurrentUserId())));
 			if (!Application.getCurrentUser().isChild()) {
-				vp.add(new Hyperlink("My Shopping Cart", PageUrl.payment()));
+				vp.add(new DefaultHyperlink("My Shopping Cart", PageUrl.payment()));
 			}
 		}
 

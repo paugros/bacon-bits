@@ -19,7 +19,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class ArticleTable extends EntityCellTable<Article, ArticleArg, ArticleColumn> {
@@ -105,7 +105,7 @@ public final class ArticleTable extends EntityCellTable<Article, ArticleArg, Art
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Article>() {
 					@Override
 					protected Widget createWidget(Article item) {
-						return new Hyperlink(item.getAddedByFirstName() + " " + item.getAddedByLastName(), PageUrl.user(item.getAddedById()));
+						return new DefaultHyperlink(item.getAddedByFirstName() + " " + item.getAddedByLastName(), PageUrl.user(item.getAddedById()));
 					}
 				});
 				break;
@@ -121,7 +121,7 @@ public final class ArticleTable extends EntityCellTable<Article, ArticleArg, Art
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Article>() {
 					@Override
 					protected Widget createWidget(Article item) {
-						return new Hyperlink(item.getTitle(), PageUrl.article(item.getId()));
+						return new DefaultHyperlink(item.getTitle(), PageUrl.article(item.getId()));
 					}
 				});
 				break;

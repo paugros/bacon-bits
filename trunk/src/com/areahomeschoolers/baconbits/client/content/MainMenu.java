@@ -138,7 +138,7 @@ public final class MainMenu extends MenuBar {
 	// }
 
 	private void addLinkToMenu(MenuBar mb, String name, String url) {
-		url = url.startsWith("page=") ? Url.getBaseUrl() + "#" + url : url;
+		url = url.startsWith("page=") ? Url.getBaseUrl() + url : url;
 		Anchor link = new Anchor(name, url);
 		if (url.startsWith("page=")) {
 			link.setTarget("_blank");

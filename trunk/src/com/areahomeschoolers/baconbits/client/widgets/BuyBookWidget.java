@@ -13,7 +13,7 @@ import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 
@@ -36,7 +36,7 @@ public class BuyBookWidget extends Composite {
 			Label add = new Label("Added to cart - ");
 			add.setWordWrap(false);
 			cartPanel.add(add);
-			Hyperlink link = new Hyperlink("checkout", PageUrl.payment());
+			DefaultHyperlink link = new DefaultHyperlink("checkout", PageUrl.payment());
 			cartPanel.add(link);
 			return;
 		}

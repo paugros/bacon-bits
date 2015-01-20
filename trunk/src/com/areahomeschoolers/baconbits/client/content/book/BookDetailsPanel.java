@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -53,7 +53,7 @@ public class BookDetailsPanel extends Composite {
 		pp.setCellWidth(image, "1%");
 
 		if (!"Book".equals(Url.getParameter("page"))) {
-			Hyperlink title = new Hyperlink(book.getTitle(), PageUrl.book(book.getId()));
+			DefaultHyperlink title = new DefaultHyperlink(book.getTitle(), PageUrl.book(book.getId()));
 			title.addStyleName("hugeText");
 			idt.add(title);
 		} else {
@@ -114,7 +114,7 @@ public class BookDetailsPanel extends Composite {
 		ddt.setSpacing(6);
 
 		if (Application.administratorOf(book)) {
-			Hyperlink edit = new Hyperlink("Edit details", PageUrl.book(book.getId()) + "&details=true");
+			DefaultHyperlink edit = new DefaultHyperlink("Edit details", PageUrl.book(book.getId()) + "&details=true");
 			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 			ddt.add(edit);
 		}
@@ -132,7 +132,7 @@ public class BookDetailsPanel extends Composite {
 		contact.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 		ddt.add(contact);
 
-		Hyperlink link = new Hyperlink("See all from this seller", PageUrl.bookList() + "&sellerId=" + book.getUserId());
+		DefaultHyperlink link = new DefaultHyperlink("See all from this seller", PageUrl.bookList() + "&sellerId=" + book.getUserId());
 		link.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
 		ddt.add(link);
 

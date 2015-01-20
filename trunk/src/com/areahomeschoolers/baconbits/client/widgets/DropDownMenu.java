@@ -23,9 +23,9 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.InlineHyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultInlineHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -124,7 +124,7 @@ public class DropDownMenu extends Composite {
 		return link;
 	}
 
-	public Hyperlink addItem(Hyperlink link) {
+	public DefaultHyperlink addItem(DefaultHyperlink link) {
 		link.addStyleName("item");
 		vp.add(link);
 		return link;
@@ -148,8 +148,8 @@ public class DropDownMenu extends Composite {
 		return item;
 	}
 
-	public Hyperlink addItem(String text, String url) {
-		Hyperlink link = new InlineHyperlink(text, url);
+	public DefaultHyperlink addItem(String text, String url) {
+		DefaultHyperlink link = new DefaultInlineHyperlink(text, url);
 		return addItem(link);
 	}
 
