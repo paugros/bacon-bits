@@ -371,7 +371,7 @@ public final class Layout {
 			cm.getElement().getStyle().setMarginLeft(20, Unit.PX);
 			text += cm;
 		} else {
-			text += "<a href=\"" + PageUrl.home() + "\">";
+			text += "<a href=\"" + Constants.URL_SEPARATOR + PageUrl.home() + "\">";
 			text += new Image(Constants.DOCUMENT_URL_PREFIX + documentId);
 			text += "</a>";
 		}

@@ -19,7 +19,8 @@ public abstract class Constants {
 
 	public static final String DOCUMENT_URL_PREFIX = "/baconbits/service/file?id=";
 
-	public static final String URL_SEPARATOR = "#!";
+	public static final String URL_SPECIAL_CHAR = "!";
+	public static final String URL_SEPARATOR = "#" + URL_SPECIAL_CHAR;
 	public static final int CG_ORG_ID = 21;
 	public static final String CG_PAYPAL_EMAIL = "payments@citrusgroups.com";
 	public static final String BOOK_GROUP_OPTION_CACHE_KEY = "bookSellerGroupOption_";
