@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldDisplayLink;
@@ -37,11 +38,9 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class UserFieldTable extends FieldTable {
 	private User user;
@@ -144,66 +143,61 @@ public class UserFieldTable extends FieldTable {
 			addField("Last activity:", st);
 		}
 
-		final Label sexDisplay = new Label();
-		final RequiredListBox sexInput = new RequiredListBox();
-		sexInput.addItem("Female", "f");
-		sexInput.addItem("Male", "m");
-		FormField sexField = f.createFormField("Gender:", sexInput, sexDisplay);
-		sexField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				sexDisplay.setText(user.getSexyText());
-				sexInput.setValue(user.getSex());
-			}
-		});
-		sexField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				user.setSex(sexInput.getValue());
-			}
-		});
-		addField(sexField);
-
-		final MonthYearPicker birthDateInput = new MonthYearPicker();
-		VerticalPanel ep = new VerticalPanel();
-		if (!Application.isAuthenticated() && !user.isSaved()) {
-			Label explain = new Label("To confirm you are over 13 years old");
-			explain.addStyleName("smallText");
-			ep.add(explain);
-		}
-		ep.add(birthDateInput);
-		birthDateInput.setRequired(true);
-		birthDateInput.setEarliestMonth(Application.getApplicationData().getAdultBirthYear(), 1);
-		birthDateInput.getYearPicker().getListBox().insertItem("Adult", Integer.toString(Application.getApplicationData().getAdultBirthYear() - 1), 1);
-
-		final Label birthDateDisplay = new Label();
-
-		final FormField birthDateField = form.createFormField("Birth month / year:", ep, birthDateDisplay);
-		birthDateField.setValidator(birthDateInput.getValidator());
-		birthDateField.setRequired(true);
-		birthDateField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				String text = "";
-				if (user.getBirthDate() != null) {
-					text = Formatter.formatDate(user.getBirthDate(), "MMMM");
-					if (!user.isChild()) {
-						text += " (Adult)";
-					} else {
-						text += " " + Formatter.formatDate(user.getBirthDate(), "yyyy");
-					}
+		if (Application.isAuthenticated()) {
+			final Label sexDisplay = new Label();
+			final RequiredListBox sexInput = new RequiredListBox();
+			sexInput.addItem("Female", "f");
+			sexInput.addItem("Male", "m");
+			FormField sexField = f.createFormField("Gender:", sexInput, sexDisplay);
+			sexField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					sexDisplay.setText(user.getSexyText());
+					sexInput.setValue(user.getSex());
 				}
-				birthDateDisplay.setText(text);
-				birthDateInput.setValue(user.getBirthDate());
-			}
-		});
-		birthDateField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				user.setBirthDate(birthDateInput.getValue());
-			}
-		});
-		addField(birthDateField);
+			});
+			sexField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					user.setSex(sexInput.getValue());
+				}
+			});
+			addField(sexField);
+
+			final MonthYearPicker birthDateInput = new MonthYearPicker();
+			birthDateInput.setRequired(true);
+			birthDateInput.setEarliestMonth(Application.getApplicationData().getAdultBirthYear(), 1);
+			birthDateInput.getYearPicker().getListBox().insertItem("Adult", Integer.toString(Application.getApplicationData().getAdultBirthYear() - 1), 1);
+
+			final Label birthDateDisplay = new Label();
+
+			final FormField birthDateField = form.createFormField("Birth month / year:", birthDateInput, birthDateDisplay);
+			birthDateField.setValidator(birthDateInput.getValidator());
+			birthDateField.setRequired(true);
+			birthDateField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					String text = "";
+					if (user.getBirthDate() != null) {
+						text = Formatter.formatDate(user.getBirthDate(), "MMMM");
+						if (!user.isChild()) {
+							text += " (Adult)";
+						} else {
+							text += " " + Formatter.formatDate(user.getBirthDate(), "yyyy");
+						}
+					}
+					birthDateDisplay.setText(text);
+					birthDateInput.setValue(user.getBirthDate());
+				}
+			});
+			birthDateField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					user.setBirthDate(birthDateInput.getValue());
+				}
+			});
+			addField(birthDateField);
+		}
 
 		if (!user.isChild() && Application.isSystemAdministrator()) {
 			final Label adminDisplay = new Label();
@@ -339,46 +333,6 @@ public class UserFieldTable extends FieldTable {
 			confirmField.setRequired(true);
 		}
 
-		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.HOME_PHONE)) {
-			final Label homePhoneDisplay = new Label();
-			final PhoneTextBox homePhoneInput = new PhoneTextBox();
-			FormField homePhoneField = form.createFormField("Home phone:", homePhoneInput, homePhoneDisplay);
-			homePhoneField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					homePhoneDisplay.setText(Common.getDefaultIfNull(user.getHomePhone()));
-					homePhoneInput.setText(user.getHomePhone());
-				}
-			});
-			homePhoneField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					user.setHomePhone(homePhoneInput.getText());
-				}
-			});
-			addField(homePhoneField);
-		}
-
-		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.MOBILE_PHONE)) {
-			final Label mobilePhoneDisplay = new Label();
-			final PhoneTextBox mobilePhoneInput = new PhoneTextBox();
-			FormField mobilePhoneField = form.createFormField("Mobile phone:", mobilePhoneInput, mobilePhoneDisplay);
-			mobilePhoneField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					mobilePhoneDisplay.setText(Common.getDefaultIfNull(user.getMobilePhone()));
-					mobilePhoneInput.setText(user.getMobilePhone());
-				}
-			});
-			mobilePhoneField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					user.setMobilePhone(mobilePhoneInput.getText());
-				}
-			});
-			addField(mobilePhoneField);
-		}
-
 		if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.ADDRESS)) {
 			FormField addressField = new AddressField(user).getFormField();
 			form.addField(addressField);
@@ -391,45 +345,87 @@ public class UserFieldTable extends FieldTable {
 			addField("Address:", address);
 		}
 
-		final FieldDisplayLink facebookDisplay = new FieldDisplayLink();
-		final TextBox facebookInput = new TextBox();
-		facebookInput.setMaxLength(200);
-		facebookInput.setVisibleLength(40);
-		FormField facebookField = form.createFormField("Facebook URL:", facebookInput, facebookDisplay);
-		facebookField.setValidator(new Validator(facebookInput, new ValidatorCommand() {
-			@Override
-			public void validate(Validator validator) {
-				String url = facebookInput.getText();
-				if (Common.isNullOrBlank(url)) {
-					return;
-				}
+		if (Application.isAuthenticated()) {
+			if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.HOME_PHONE)) {
+				final Label homePhoneDisplay = new Label();
+				final PhoneTextBox homePhoneInput = new PhoneTextBox();
+				FormField homePhoneField = form.createFormField("Home phone:", homePhoneInput, homePhoneDisplay);
+				homePhoneField.setInitializer(new Command() {
+					@Override
+					public void execute() {
+						homePhoneDisplay.setText(Common.getDefaultIfNull(user.getHomePhone()));
+						homePhoneInput.setText(user.getHomePhone());
+					}
+				});
+				homePhoneField.setDtoUpdater(new Command() {
+					@Override
+					public void execute() {
+						user.setHomePhone(homePhoneInput.getText());
+					}
+				});
+				addField(homePhoneField);
+			}
 
-				if (!url.matches("https?://(www.)?facebook.com/?.*")) {
-					validator.setError(true);
-				}
+			if (user.userCanSee(Application.getCurrentUser(), PrivacyPreferenceType.MOBILE_PHONE)) {
+				final Label mobilePhoneDisplay = new Label();
+				final PhoneTextBox mobilePhoneInput = new PhoneTextBox();
+				FormField mobilePhoneField = form.createFormField("Mobile phone:", mobilePhoneInput, mobilePhoneDisplay);
+				mobilePhoneField.setInitializer(new Command() {
+					@Override
+					public void execute() {
+						mobilePhoneDisplay.setText(Common.getDefaultIfNull(user.getMobilePhone()));
+						mobilePhoneInput.setText(user.getMobilePhone());
+					}
+				});
+				mobilePhoneField.setDtoUpdater(new Command() {
+					@Override
+					public void execute() {
+						user.setMobilePhone(mobilePhoneInput.getText());
+					}
+				});
+				addField(mobilePhoneField);
 			}
-		}));
-		facebookField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				facebookDisplay.setText(Common.getDefaultIfNull(user.getFacebookUrl()));
-				if (user.getFacebookUrl() != null) {
-					facebookDisplay.setHref(user.getFacebookUrl());
-					facebookDisplay.setText("Click to view");
+
+			final FieldDisplayLink facebookDisplay = new FieldDisplayLink();
+			final TextBox facebookInput = new TextBox();
+			facebookInput.setMaxLength(200);
+			facebookInput.setVisibleLength(40);
+			FormField facebookField = form.createFormField("Facebook URL:", facebookInput, facebookDisplay);
+			facebookField.setValidator(new Validator(facebookInput, new ValidatorCommand() {
+				@Override
+				public void validate(Validator validator) {
+					String url = facebookInput.getText();
+					if (Common.isNullOrBlank(url)) {
+						return;
+					}
+
+					if (!url.matches("https?://(www.)?facebook.com/?.*")) {
+						validator.setError(true);
+					}
 				}
-				facebookInput.setText(user.getFacebookUrl());
-				if (user.getFacebookUrl() == null) {
-					facebookInput.setText("https://www.facebook.com/");
+			}));
+			facebookField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					facebookDisplay.setText(Common.getDefaultIfNull(user.getFacebookUrl()));
+					if (user.getFacebookUrl() != null) {
+						facebookDisplay.setHref(user.getFacebookUrl());
+						facebookDisplay.setText("Click to view");
+					}
+					facebookInput.setText(user.getFacebookUrl());
+					if (user.getFacebookUrl() == null) {
+						facebookInput.setText("https://www.facebook.com/");
+					}
 				}
-			}
-		});
-		facebookField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				user.setFacebookUrl(facebookInput.getText());
-			}
-		});
-		addField(facebookField);
+			});
+			facebookField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					user.setFacebookUrl(facebookInput.getText());
+				}
+			});
+			addField(facebookField);
+		}
 
 		if (user.isSaved() && user.getParentId() != null && user.getParentId() > 0) {
 			addField("Parent:", new DefaultHyperlink(user.getParentFirstName() + " " + user.getParentLastName(), PageUrl.user(user.getParentId())));
