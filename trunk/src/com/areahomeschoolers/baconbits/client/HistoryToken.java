@@ -174,7 +174,7 @@ public class HistoryToken {
 		if (newTab) {
 			Window.open(Url.getGwtCodeServerAsQueryString() + Constants.URL_SEPARATOR + historyToken, "_blank", "");
 		} else {
-			History.newItem(historyToken, issueEvent);
+			History.newItem(Constants.URL_SPECIAL_CHAR + historyToken, issueEvent);
 		}
 	}
 
