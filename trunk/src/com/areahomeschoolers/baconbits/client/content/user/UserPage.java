@@ -43,6 +43,7 @@ import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.CalendarPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FixedWidthLabel;
@@ -93,7 +94,6 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -206,10 +206,10 @@ public class UserPage implements Page {
 	}
 
 	private native void createBarcode(String bookId) /*-{
-		$wnd.$('#barcode_' + bookId).barcode({
-			code : 'code39'
-		});
-	}-*/;
+														$wnd.$('#barcode_' + bookId).barcode({
+														code : 'code39'
+														});
+														}-*/;
 
 	private void createDetailsPage() {
 		final String title = user.isSaved() ? user.getFullName() : "New User";
@@ -228,7 +228,11 @@ public class UserPage implements Page {
 					HorizontalPanel hp = new HorizontalPanel();
 					hp.setWidth("100%");
 
-					ImageResource r = user.getSex().equals("m") ? MainImageBundle.INSTANCE.blankProfileMale() : MainImageBundle.INSTANCE.blankProfileFemale();
+					String sex = user.getSex();
+					if (sex == null) {
+						sex = "m";
+					}
+					ImageResource r = sex.equals("m") ? MainImageBundle.INSTANCE.blankProfileMale() : MainImageBundle.INSTANCE.blankProfileFemale();
 					EditableImage image = new EditableImage(DocumentLinkType.PROFILE, user.getId());
 					if (user.getImageId() != null) {
 						image.setImage(new Image(ClientUtils.createDocumentUrl(user.getImageId(), user.getImageExtension())));

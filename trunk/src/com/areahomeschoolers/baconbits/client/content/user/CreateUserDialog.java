@@ -1,7 +1,5 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
-import java.util.Date;
-
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
@@ -13,13 +11,11 @@ import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
-import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
-import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
@@ -34,6 +30,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -58,13 +55,6 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 		form.addFormSubmitHandler(new FormSubmitHandler() {
 			@Override
 			public void onFormSubmit(FormField formField) {
-				// verify age
-				if ((ClientDateUtils.daysBetween(new Date(), entity.getBirthDate()) / 365) < 13) {
-					AlertDialog.alert("Children under the age of 13 must have their account created by a parent or guardian.");
-					form.getSubmitButton().setEnabled(true);
-					return;
-				}
-
 				if (Url.getIntegerParameter("aagrp") > 0) {
 					entity.setAutoAddToGroupId(Url.getIntegerParameter("aagrp"));
 				}
@@ -86,7 +76,7 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 									@Override
 									protected void doOnSuccess(Boolean result) {
 										if (!Url.getBooleanParameter("bookSaleSignup")) {
-											HistoryToken.set(PageUrl.user(savedUser.getId()) + "&tab=7&gb=true", false);
+											HistoryToken.set(PageUrl.user(savedUser.getId()) + "&tab=7&gb=true&details=true", false);
 										}
 										Window.Location.reload();
 									}
@@ -154,6 +144,9 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 		final CheckBox scb = new CheckBox(txt, true);
 		vp.add(scb);
 
+		final CheckBox ucb = new CheckBox("I am 13 years old or older");
+		vp.add(ucb);
+
 		form.addFormValidatorCommand(new ValidatorCommand() {
 			@Override
 			public void validate(Validator validator) {
@@ -165,6 +158,16 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 				if (!scb.getValue()) {
 					validator.setError(true);
 					validator.setErrorMessage("You must agree to the site terms of service and privacy policy in order to use this site");
+				}
+
+				if (!ucb.getValue()) {
+					validator.setError(true);
+					validator.setErrorMessage("You must be at least 13 years old in order to use this site");
+				} else {
+					DateTimeFormat dtf = DateTimeFormat.getFormat("yyyy/MM/dd");
+					String dateStr = "1990/01/01";
+
+					entity.setBirthDate(dtf.parse(dateStr));
 				}
 
 				if (validator.hasError()) {
