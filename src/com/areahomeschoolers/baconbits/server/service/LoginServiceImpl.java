@@ -59,7 +59,10 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		ServerContext.setCurrentOrg();
 
 		User user = ServerContext.getCurrentUser();
-		initLocation();
+
+		if (!ServerContext.isPhantomJsRequest()) {
+			initLocation();
+		}
 
 		ApplicationData ap = new ApplicationData();
 		ap.setCurrentOrg(ServerContext.getCurrentOrg());
