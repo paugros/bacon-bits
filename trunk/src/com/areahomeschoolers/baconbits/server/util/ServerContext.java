@@ -235,6 +235,11 @@ public class ServerContext implements ApplicationContextAware {
 		return isLive;
 	}
 
+	public static boolean isPhantomJsRequest() {
+		String agent = tl.get().request.getHeader("User-Agent");
+		return (agent != null && agent.contains("PhantomJsCloud"));
+	}
+
 	public static boolean isSystemAdministrator() {
 		return isAuthenticated() && getCurrentUser().getSystemAdministrator();
 	}
