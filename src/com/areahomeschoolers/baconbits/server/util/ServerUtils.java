@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -260,7 +261,13 @@ public abstract class ServerUtils {
 
 	public static String getUrlContents(String urlText) throws IOException {
 		URL url = new URL(urlText);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+		HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+		huc.setConnectTimeout(15 * 1000);
+		huc.setRequestMethod("GET");
+		huc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)");
+		huc.connect();
+		InputStream input = huc.getInputStream();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 		String line;
 
 		StringBuffer buffer = new StringBuffer();
