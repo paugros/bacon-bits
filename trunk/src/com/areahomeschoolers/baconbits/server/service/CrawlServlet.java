@@ -15,7 +15,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.areahomeschoolers.baconbits.server.util.ServerContext;
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 
 public final class CrawlServlet implements Filter {
@@ -61,6 +60,11 @@ public final class CrawlServlet implements Filter {
 		String queryString = httpRequest.getQueryString();
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+		// PRODUCTION TEST: http://www.myhomeschoolgroups.com/index.html?_escaped_fragment_=page%3DEvent%26eventId%3D1138
+		// DEV TEST: http://127.0.0.1:8888/index.html?gwt.codesvr=127.0.0.1:9997&_escaped_fragment_=page%3DEvent%26eventId%3D1138
+
+		// System.out.println("Filtering query string: " + queryString);
+
 		if ((queryString != null) && (queryString.contains(ESCAPED_FRAGMENT_FORMAT1))) {
 			String url = request.getScheme() + "://" + request.getServerName();
 			int port = request.getServerPort();
@@ -69,20 +73,27 @@ public final class CrawlServlet implements Filter {
 			}
 			url += "/";
 
-			if (!ServerContext.isLive()) {
+			if (queryString.contains("gwt.codesvr")) {
 				url = "http://www.myhomeschoolgroups.com/";
+				queryString = queryString.replaceAll("gwt.codesvr=127.0.0.1:9997&", "");
 			}
 
 			url += rewriteQueryString(queryString);
 
 			url = URLEncoder.encode(url, "UTF-8");
 
+			// System.out.println("Fetching URL: " + url);
+
 			String agent = URLEncoder.encode("Mozilla/5.0+(Windows+NT+6.1)+AppleWebKit/537.36+Chrome/28.0.1468.0+Safari/537.36+PhantomJsCloud/1.1", "UTF-8");
 			String jsUrl = "http://api.phantomjscloud.com/single/browser/v1/997774cd49a439c431a67f9cf08d2b3025f3d5a6/?requestType=text&targetUrl=" + url;
 			jsUrl += "&loadImages=false&outputAsJson=false&timeout=30000&abortOnJavascriptErrors=false&delayTime=1000&isDebug=false&postDomLoadedTimeout=10000";
 			jsUrl += "&userAgent=" + agent + "&viewportSize=" + URLEncoder.encode("{+height:1280,+width:720+}", "UTF-8") + "&geolocation=us";
 
+			// System.out.println("JS URL: " + jsUrl);
+
 			String data = ServerUtils.getUrlContents(jsUrl);
+
+			// System.out.println(data);
 
 			final PrintWriter out = httpResponse.getWriter();
 			out.println(data);
