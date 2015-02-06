@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
@@ -19,7 +20,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 
 public class UserTile extends Composite {
@@ -37,6 +37,10 @@ public class UserTile extends Composite {
 		hp.addStyleName("itemTile");
 		// hp.getElement().getStyle().setBackgroundColor(TagMappingType.USER.getColor());
 
+		String sex = item.getSex();
+		if (sex == null) {
+			sex = "m";
+		}
 		Image i = new Image(item.getSex().equals("m") ? MainImageBundle.INSTANCE.blankProfileMaleSmall() : MainImageBundle.INSTANCE.blankProfileFemaleSmall());
 		if (item.getSmallImageId() != null) {
 			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
