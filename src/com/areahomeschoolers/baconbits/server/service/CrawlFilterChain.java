@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.areahomeschoolers.baconbits.server.util.ServerUtils;
 
-public final class CrawlServlet implements Filter {
+public final class CrawlFilterChain implements Filter {
 	private static final String ESCAPED_FRAGMENT_FORMAT1 = "_escaped_fragment_=";
 	private static final int ESCAPED_FRAGMENT_LENGTH1 = ESCAPED_FRAGMENT_FORMAT1.length();
 	private static final String ESCAPED_FRAGMENT_FORMAT2 = "&" + ESCAPED_FRAGMENT_FORMAT1;
@@ -60,12 +60,10 @@ public final class CrawlServlet implements Filter {
 		String queryString = httpRequest.getQueryString();
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-		// System.out.println(queryString);
+//		System.out.println(httpRequest.getRequestURL());
 
 		// PRODUCTION TEST: http://www.myhomeschoolgroups.com/index.html?_escaped_fragment_=page%3DEvent%26eventId%3D1138
 		// DEV TEST: http://127.0.0.1:8888/index.html?gwt.codesvr=127.0.0.1:9997&_escaped_fragment_=page%3DEvent%26eventId%3D1138
-
-		// System.out.println("Filtering query string: " + queryString);
 
 		if ((queryString != null) && (queryString.contains(ESCAPED_FRAGMENT_FORMAT1))) {
 			String url = request.getScheme() + "://" + request.getServerName();
