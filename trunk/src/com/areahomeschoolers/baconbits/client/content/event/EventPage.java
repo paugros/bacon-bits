@@ -32,6 +32,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeRangeBox;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EmailDialog;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
@@ -84,7 +85,6 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -279,18 +279,18 @@ public class EventPage implements Page {
 				tabPanel.addSkipIndex();
 			}
 
-			// if (Application.administratorOf(calendarEvent)) {
-			// tabPanel.add("Fields", false, new TabPageCommand() {
-			// @Override
-			// public void execute(VerticalPanel tabBody) {
-			// tabBody.add(new EventFieldsTab(pageData));
-			//
-			// tabPanel.selectTabNow(tabBody);
-			// }
-			// });
-			// } else {
-			// tabPanel.addSkipIndex();
-			// }
+			if (Application.administratorOf(calendarEvent)) {
+				tabPanel.add("Fields", false, new TabPageCommand() {
+					@Override
+					public void execute(VerticalPanel tabBody) {
+						tabBody.add(new EventFieldsTab(pageData));
+
+						tabPanel.selectTabNow(tabBody);
+					}
+				});
+			} else {
+				tabPanel.addSkipIndex();
+			}
 
 			if (calendarEvent.getRequiresRegistration() && Application.administratorOf(calendarEvent)) {
 				tabPanel.add("Participants", false, new TabPageCommand() {
@@ -618,7 +618,7 @@ public class EventPage implements Page {
 				calendarEvent.setRequiresRegistration(registerInput.getIntValue() == 1);
 			}
 		});
-		// fieldTable.addField(registerField);
+		fieldTable.addField(registerField);
 
 		if (!calendarEvent.isSaved() || calendarEvent.getRequiresRegistration()) {
 			final Label priceDisplay = new Label();
@@ -808,61 +808,61 @@ public class EventPage implements Page {
 		// });
 		// fieldTable.addField(categoryField);
 
-		// if (Application.isSystemAdministrator()) {
-		// MarkupField mf = new MarkupField(calendarEvent);
-		// markupField = mf.getFormField();
-		// if (!calendarEvent.isSaved()) {
-		// mf.setChangeCommand(new Command() {
-		// @Override
-		// public void execute() {
-		// markupField.updateDto();
-		// priceField.updateDto();
-		// priceField.initialize();
-		// }
-		// });
-		// }
-		//
-		// form.addField(markupField);
-		// fieldTable.addField(markupField);
-		// }
+		if (Application.isSystemAdministrator()) {
+			MarkupField mf = new MarkupField(calendarEvent);
+			markupField = mf.getFormField();
+			if (!calendarEvent.isSaved()) {
+				mf.setChangeCommand(new Command() {
+					@Override
+					public void execute() {
+						markupField.updateDto();
+						priceField.updateDto();
+						priceField.initialize();
+					}
+				});
+			}
 
-		// if (calendarEvent.getRequiresRegistration()) {
-		// if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
-		// ageTable.setWidth("150px");
-		//
-		// populateAgeGroups();
-		//
-		// fieldTable.addField("Pricing:", ageTable);
-		// }
-		//
-		// if (Common.isNullOrEmpty(pageData.getAgeGroups())) {
-		// final Label priceDisplay = new Label();
-		// final MarkupTextBox priceInput = new MarkupTextBox(calendarEvent);
-		// priceField = form.createFormField("Price:", priceInput, priceDisplay);
-		// priceField.setInitializer(new Command() {
-		// @Override
-		// public void execute() {
-		// String text = Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
-		// if (calendarEvent.getPrice() == 0) {
-		// text = "Free";
-		// }
-		// priceDisplay.setText(text);
-		// priceInput.setValue(calendarEvent.getPrice());
-		//
-		// if (!Application.administratorOf(calendarEvent)) {
-		// priceField.setEnabled(false);
-		// }
-		// }
-		// });
-		// priceField.setDtoUpdater(new Command() {
-		// @Override
-		// public void execute() {
-		// calendarEvent.setPrice(priceInput.getDouble());
-		// }
-		// });
-		// fieldTable.addField(priceField);
-		// }
-		// }
+			form.addField(markupField);
+			fieldTable.addField(markupField);
+		}
+
+		if (calendarEvent.getRequiresRegistration()) {
+			if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
+				ageTable.setWidth("150px");
+
+				populateAgeGroups();
+
+				fieldTable.addField("Pricing:", ageTable);
+			}
+
+			if (Common.isNullOrEmpty(pageData.getAgeGroups())) {
+				final Label priceDisplay = new Label();
+				final MarkupTextBox priceInput = new MarkupTextBox(calendarEvent);
+				priceField = form.createFormField("Price:", priceInput, priceDisplay);
+				priceField.setInitializer(new Command() {
+					@Override
+					public void execute() {
+						String text = Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
+						if (calendarEvent.getPrice() == 0) {
+							text = "Free";
+						}
+						priceDisplay.setText(text);
+						priceInput.setValue(calendarEvent.getPrice());
+
+						if (!Application.administratorOf(calendarEvent)) {
+							priceField.setEnabled(false);
+						}
+					}
+				});
+				priceField.setDtoUpdater(new Command() {
+					@Override
+					public void execute() {
+						calendarEvent.setPrice(priceInput.getDouble());
+					}
+				});
+				fieldTable.addField(priceField);
+			}
+		}
 
 		if (calendarEvent.isSaved()) {
 			volunteerTable.setWidth("400px");

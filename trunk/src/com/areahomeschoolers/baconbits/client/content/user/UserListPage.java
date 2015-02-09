@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
@@ -40,7 +41,6 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -109,15 +109,15 @@ public final class UserListPage implements Page {
 	}
 
 	private ArgMap<UserArg> getDefaultArgs() {
+		ArgMap<UserArg> defaultArgs = new ArgMap<UserArg>(Status.ACTIVE);
 		if (Application.hasLocation()) {
-			args.put(UserArg.LOCATION_FILTER, true);
+			defaultArgs.put(UserArg.LOCATION_FILTER, true);
 		}
-		ArgMap<UserArg> args = new ArgMap<UserArg>(Status.ACTIVE);
-		args.put(UserArg.PARENTS);
+		defaultArgs.put(UserArg.PARENTS);
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			args.put(UserArg.HAS_TAGS, Url.getIntListParameter("tagId"));
+			defaultArgs.put(UserArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
-		return args;
+		return defaultArgs;
 	}
 
 	private void populate() {

@@ -7,14 +7,18 @@
 
   <display-name>BaconBits</display-name>
   
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>BaconBits.html</welcome-file>
+  </welcome-file-list>
+  
   <filter>
-     <filter-name>CrawlServlet</filter-name>
-     <filter-class>com.areahomeschoolers.baconbits.server.service.CrawlServlet</filter-class>
+     <filter-name>crawlFilterChain</filter-name>
+     <filter-class>com.areahomeschoolers.baconbits.server.service.CrawlFilterChain</filter-class>
   </filter>
 
-
   <filter-mapping>
-     <filter-name>CrawlServlet</filter-name>
+     <filter-name>crawlFilterChain</filter-name>
      <url-pattern>/*</url-pattern>
   </filter-mapping>
   
@@ -46,7 +50,6 @@
   <servlet-mapping>
     <servlet-name>dispatcher</servlet-name>
     <url-pattern>/baconbits/service/*</url-pattern>
-    <load-on-startup>1</load-on-startup>
   </servlet-mapping>
   
   <security-constraint>
@@ -58,6 +61,7 @@
   
   <security-constraint>
     <web-resource-collection>
+      <web-resource-name>Cron</web-resource-name>
       <url-pattern>/baconbits/service/cron/*</url-pattern>
     </web-resource-collection>
       <auth-constraint>
@@ -69,9 +73,4 @@
 	<session-timeout>-1</session-timeout>
   </session-config>
   
-  <!-- Default page to serve -->
-  <welcome-file-list>
-    <welcome-file>BaconBits.html</welcome-file>
-  </welcome-file-list>
-
 </web-app>
