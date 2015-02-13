@@ -24,6 +24,7 @@
 
     <include path="**.cache.*" expiration="365d" />
     <exclude path="**.gwt.rpc" />
+    <exclude path="**BaconBits.html" />
   </static-files>
 
   <!-- Configure java.util.logging -->
