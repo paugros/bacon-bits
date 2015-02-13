@@ -60,10 +60,10 @@ public final class CrawlFilterChain implements Filter {
 		String queryString = httpRequest.getQueryString();
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-//		System.out.println(httpRequest.getRequestURL());
+		// System.out.println(httpRequest.getRequestURL());
 
-		// PRODUCTION TEST: http://www.myhomeschoolgroups.com/index.html?_escaped_fragment_=page%3DEvent%26eventId%3D1138
-		// DEV TEST: http://127.0.0.1:8888/index.html?gwt.codesvr=127.0.0.1:9997&_escaped_fragment_=page%3DEvent%26eventId%3D1138
+		// PRODUCTION TEST: http://www.myhomeschoolgroups.com/?_escaped_fragment_=page%3DEvent%26eventId%3D1138
+		// DEV TEST: http://127.0.0.1:8888/?gwt.codesvr=127.0.0.1:9997&_escaped_fragment_=page%3DEvent%26eventId%3D1138
 
 		if ((queryString != null) && (queryString.contains(ESCAPED_FRAGMENT_FORMAT1))) {
 			String url = request.getScheme() + "://" + request.getServerName();
