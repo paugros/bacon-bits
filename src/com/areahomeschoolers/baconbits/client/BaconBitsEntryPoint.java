@@ -9,6 +9,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -19,6 +20,12 @@ public class BaconBitsEntryPoint implements EntryPoint {
 
 	@Override
 	public void onModuleLoad() {
+		// constant contact fuckup
+		if (Window.Location.getHref().contains("?utm_source=")) {
+			String newUrl = Window.Location.getHref().replaceAll(".utm_source=.*", "");
+			Window.Location.replace(newUrl);
+		}
+		System.out.println(Window.Location.getHref());
 		loginService.getApplicationData(new AsyncCallback<ApplicationData>() {
 			@Override
 			public void onFailure(Throwable caught) {
