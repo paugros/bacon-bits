@@ -26,7 +26,6 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.google.appengine.api.memcache.ErrorHandlers;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.appengine.api.utils.SystemProperty;
 
 /**
  * This class serves as an accessor class for thread specific data (request, response, url), session data (session, user), and the application context
@@ -38,9 +37,9 @@ public class ServerContext implements ApplicationContextAware {
 	private static ApplicationContext ctx = null;
 	// tl holds all thread-specific data
 	private static ThreadLocal<ServerContext> tl = new ThreadLocal<ServerContext>();
-	private static boolean isLiveIsSet;
-	private static boolean isLive;
 	private static MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
+
+	private static Boolean isLive = null;
 
 	static {
 		cache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
@@ -215,11 +214,23 @@ public class ServerContext implements ApplicationContextAware {
 	}
 
 	public static boolean isLive() {
-		if (isLiveIsSet) {
+		if (isLive != null) {
 			return isLive;
 		}
 
-		isLive = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production;
+		if (getRequest().getRequestURI() == null) {
+			isLive = false;
+		} else {
+			isLive = !getRequest().getRequestURI().contains("127.0.0.1");
+		}
+
+		return isLive;
+
+		// if (isLiveIsSet) {
+		// return isLive;
+		// }
+
+		// isLive = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production;
 
 		// String version = SystemProperty.applicationVersion.get();
 		// if (version == null) {
@@ -230,9 +241,9 @@ public class ServerContext implements ApplicationContextAware {
 		// isLive = false;
 		// }
 
-		isLiveIsSet = true;
+		// isLiveIsSet = true;
 
-		return isLive;
+		// return isLive;
 	}
 
 	public static boolean isPhantomJsRequest() {
