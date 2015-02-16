@@ -46,34 +46,37 @@ public class ImageSwitcher extends Composite {
 		fp.getElement().getStyle().setPosition(Position.RELATIVE);
 		fp.getElement().getStyle().setTop(0, Unit.PX);
 		fp.getElement().getStyle().setLeft(0, Unit.PX);
+		String textDiv = "<div style=\"font-size: 15px;\">";
 
 		outerPanel.add(fp);
 
 		String h1 = "<div class=largeText style=\"margin-bottom: 4px;\">";
 		h1 += "<a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagMappingType.EVENT.toString()) + "\">";
 		h1 += "Events</a> and <a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagMappingType.RESOURCE.toString()) + "\">Resources</a></div>";
-		h1 += "Find great homeschooling events and resources in your area with our extensive directory of local, statewide, and national listings.";
+		h1 += textDiv + "Find great homeschooling events and resources in your area with our extensive directory of local, ";
+		h1 += "statewide, and national listings.</div>";
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherEvents()), h1));
 
 		String h2 = "<div class=largeText style=\"margin-bottom: 4px;\">";
 		h2 += "<a href=\"" + Url.getBaseUrl() + PageUrl.userList() + "\">Find Homeschoolers</a></div>";
-		h2 += "Connect with homeschoolers near you who share your interests.";
+		h2 += textDiv + "Connect with homeschoolers near you who share your interests.</div>";
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherConnect()), h2));
 
 		String h3 = "<div class=largeText style=\"margin-bottom: 4px;\">";
 		h3 += "<a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagMappingType.BOOK.toString()) + "\">Books</a></div>";
-		h3 += "Homeschoolers can buy or sell used curriculum in our online book store. We can help your homeschool group host a book sale ";
-		h3 += "with our <a href=\"" + Url.getBaseUrl() + PageUrl.article(147) + "\">book management system and tools</a>.";
+		h3 += textDiv + "Homeschoolers can buy or sell used curriculum in our online book store. We can help your homeschool group host a book sale ";
+		h3 += "with our <a href=\"" + Url.getBaseUrl() + PageUrl.article(147) + "\">book management system and tools</a>.</div>";
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherBooks()), h3));
 
 		String h4 = "<div class=largeText style=\"margin-bottom: 4px;\">Businesses</div>";
-		h4 += "Reach homeschoolers directly with our advertising services. We offer <a href=\"" + Url.getBaseUrl() + PageUrl.article(101) + "\">";
-		h4 += "affordable packages</a>, and can coordinate field trips and events at your location, providing online event registration and payment if you need it.";
+		h4 += textDiv + "Reach homeschoolers directly with our advertising services. We offer <a href=\"" + Url.getBaseUrl() + PageUrl.article(101) + "\">";
+		h4 += "affordable packages</a>, and can coordinate field trips and events at your location, providing online event registration and payment if you need it.</div>";
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherVendors()), h4));
 
-		String h5 = "<div class=largeText style=\"margin-bottom: 4px;\">Mompreneur</div>Be your family's superhero by earning extra cash doing what you live! ";
+		String h5 = "<div class=largeText style=\"margin-bottom: 4px;\">Mompreneur</div>";
+		h5 += textDiv + "Be your family's superhero by earning extra cash doing what you live! ";
 		h5 += "Join our team and help connect homeschoolers to resources in your community. ";
-		h5 += "<a href=\"mailto:info@citrusgroups.com\">Contact us</a> for more information.";
+		h5 += "<a href=\"mailto:info@citrusgroups.com\">Contact us</a> for more information.</div>";
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherMoms()), h5));
 
 		for (int i = 0; i < panels.size(); i++) {

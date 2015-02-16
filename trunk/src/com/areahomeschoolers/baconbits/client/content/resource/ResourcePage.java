@@ -22,6 +22,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
@@ -59,7 +60,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -264,12 +264,18 @@ public class ResourcePage implements Page {
 				urlDisplay.setText(resource.getUrl());
 				urlDisplay.setHref(resource.getUrl());
 				urlInput.setText(resource.getUrl());
+				if (Common.isNullOrBlank(resource.getUrl())) {
+					urlInput.setText("http://");
+				}
 			}
 		});
 		urlField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				resource.setUrl(urlInput.getText());
+				if (urlInput.getText().equals("http://")) {
+					return;
+				}
+				resource.setUrl(urlInput.getText().trim());
 			}
 		});
 		ft.addField(urlField);
