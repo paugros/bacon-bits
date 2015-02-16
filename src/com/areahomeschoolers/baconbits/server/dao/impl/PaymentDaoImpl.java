@@ -404,19 +404,14 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		if (payPalProperties == null) {
 			Properties p = new Properties();
 			if (ServerContext.isLive()) {
-				// account email: weare.home.educators@gmail.com
-				// p.setProperty("acct1.UserName", "weare.home.educators_api1.gmail.com");
-				// p.setProperty("acct1.Password", "BZFADA4CXJSCHYW8");
-				// p.setProperty("acct1.Signature", "AFcWxV21C7fd0v3bYYYRCpSSRl31AIiJDk-qOGV.J6VfFcbztTiAOVoS");
-				// p.setProperty("acct1.AppId", "APP-4NF95723S77525228");
-				// p.setProperty("acct1.UserName", "paul.augros_api1.gmail.com");
-				// p.setProperty("acct1.Password", "366SHLHYTSFMK268");
-				// p.setProperty("acct1.Signature", "AkZ0S-OmRwy-Ntfed39a8awwiQ.kA-1t-xPweQAFDqq0jOHX5pVzJxAo");
-
 				// account email: paugros@citrusgroups.com
-				p.setProperty("acct1.UserName", "paugros_api1.citrusgroups.com");
-				p.setProperty("acct1.Password", "3ZTN3RH82WUQZB5G");
-				p.setProperty("acct1.Signature", "AFcWxV21C7fd0v3bYYYRCpSSRl31A28PGNwkQ4A5BSBkJzBWVpI3kzEI");
+				// p.setProperty("acct1.UserName", "paugros_api1.citrusgroups.com");
+				// p.setProperty("acct1.Password", "3ZTN3RH82WUQZB5G");
+				// p.setProperty("acct1.Signature", "AFcWxV21C7fd0v3bYYYRCpSSRl31A28PGNwkQ4A5BSBkJzBWVpI3kzEI");
+
+				p.setProperty("acct1.UserName", "paul.augros_api1.gmail.com");
+				p.setProperty("acct1.Password", "366SHLHYTSFMK268");
+				p.setProperty("acct1.Signature", "AkZ0S-OmRwy-Ntfed39a8awwiQ.kA-1t-xPweQAFDqq0jOHX5pVzJxAo");
 				p.setProperty("acct1.AppId", "APP-17B48118GA533502S");
 
 				p.setProperty("mode", "live");
