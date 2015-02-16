@@ -413,6 +413,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 				// p.setProperty("acct1.Password", "366SHLHYTSFMK268");
 				// p.setProperty("acct1.Signature", "AkZ0S-OmRwy-Ntfed39a8awwiQ.kA-1t-xPweQAFDqq0jOHX5pVzJxAo");
 
+				// account email: paugros@citrusgroups.com
 				p.setProperty("acct1.UserName", "paugros_api1.citrusgroups.com");
 				p.setProperty("acct1.Password", "3ZTN3RH82WUQZB5G");
 				p.setProperty("acct1.Signature", "AFcWxV21C7fd0v3bYYYRCpSSRl31A28PGNwkQ4A5BSBkJzBWVpI3kzEI");
