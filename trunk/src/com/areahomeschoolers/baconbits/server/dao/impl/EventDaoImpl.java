@@ -923,6 +923,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 				sql += "select ?, jobTitle, description, discount, positionCount ";
 				sql += "from eventVolunteerPositions where eventId = ?";
 				update(sql, event.getId(), event.getCloneFromId());
+
+				// clone tags
+				sql = "insert into tagEventMapping (eventId, tagId) ";
+				sql += "select ?, tagId ";
+				sql += "from tagEventMapping where eventId = ?";
+				update(sql, event.getId(), event.getCloneFromId());
 			}
 		}
 

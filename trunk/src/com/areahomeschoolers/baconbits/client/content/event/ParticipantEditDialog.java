@@ -25,7 +25,6 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.MonthYearPicker;
-import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -362,25 +361,25 @@ public class ParticipantEditDialog extends EntityEditDialog<EventParticipant> {
 		});
 		fieldTable.addField(birthDateField);
 
-		final Label sexDisplay = new Label();
-		final RequiredListBox sexInput = new RequiredListBox();
-		sexInput.addItem("Female", "f");
-		sexInput.addItem("Male", "m");
-		FormField sexField = form.createFormField("Gender:", sexInput, sexDisplay);
-		sexField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				sexDisplay.setText(entity.getSex() == "f" ? "Female" : "Male");
-				sexInput.setValue(entity.getSex());
-			}
-		});
-		sexField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				entity.setSex(sexInput.getValue());
-			}
-		});
-		fieldTable.addField(sexField);
+		// final Label sexDisplay = new Label();
+		// final RequiredListBox sexInput = new RequiredListBox();
+		// sexInput.addItem("Female", "f");
+		// sexInput.addItem("Male", "m");
+		// FormField sexField = form.createFormField("Gender:", sexInput, sexDisplay);
+		// sexField.setInitializer(new Command() {
+		// @Override
+		// public void execute() {
+		// sexDisplay.setText(entity.getSex() == "f" ? "Female" : "Male");
+		// sexInput.setValue(entity.getSex());
+		// }
+		// });
+		// sexField.setDtoUpdater(new Command() {
+		// @Override
+		// public void execute() {
+		// entity.setSex(sexInput.getValue());
+		// }
+		// });
+		// fieldTable.addField(sexField);
 
 		if (!Common.isNullOrEmpty(pageData.getEventsInSeries()) && !entity.isSaved()) {
 			seriesMap = new HashMap<CheckBox, Event>();
