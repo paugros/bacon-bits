@@ -26,6 +26,7 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.google.appengine.api.memcache.ErrorHandlers;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.appengine.api.utils.SystemProperty;
 
 /**
  * This class serves as an accessor class for thread specific data (request, response, url), session data (session, user), and the application context
@@ -37,6 +38,8 @@ public class ServerContext implements ApplicationContextAware {
 	private static ApplicationContext ctx = null;
 	// tl holds all thread-specific data
 	private static ThreadLocal<ServerContext> tl = new ThreadLocal<ServerContext>();
+	private static boolean isLiveIsSet;
+	private static boolean isLive;
 	private static MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
 
 	static {
@@ -212,38 +215,24 @@ public class ServerContext implements ApplicationContextAware {
 	}
 
 	public static boolean isLive() {
-		return true;
+		if (isLiveIsSet) {
+			return isLive;
+		}
 
-		// if (isLive != null) {
-		// return isLive;
-		// }
-		//
-		// if (getRequest().getRequestURI() == null) {
-		// isLive = false;
-		// } else {
-		// isLive = !getRequest().getRequestURI().contains("127.0.0.1");
-		// }
-		//
-		// return isLive;
+		isLive = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production;
 
-		// if (isLiveIsSet) {
-		// return isLive;
-		// }
+		String version = SystemProperty.applicationVersion.get();
+		if (version == null) {
+			version = Constants.PRODUCTION_VERSION;
+		}
 
-		// isLive = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production;
+		if (!version.contains(Constants.PRODUCTION_VERSION)) {
+			isLive = false;
+		}
 
-		// String version = SystemProperty.applicationVersion.get();
-		// if (version == null) {
-		// version = Constants.PRODUCTION_VERSION;
-		// }
-		//
-		// if (!version.contains(Constants.PRODUCTION_VERSION)) {
-		// isLive = false;
-		// }
+		isLiveIsSet = true;
 
-		// isLiveIsSet = true;
-
-		// return isLive;
+		return isLive;
 	}
 
 	public static boolean isPhantomJsRequest() {
