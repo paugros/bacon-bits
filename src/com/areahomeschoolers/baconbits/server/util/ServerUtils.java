@@ -262,7 +262,7 @@ public abstract class ServerUtils {
 	public static String getUrlContents(String urlText) throws IOException {
 		URL url = new URL(urlText);
 		HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-		huc.setConnectTimeout(15 * 1000);
+		huc.setConnectTimeout(60 * 1000);
 		huc.setRequestMethod("GET");
 		huc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)");
 		huc.connect();

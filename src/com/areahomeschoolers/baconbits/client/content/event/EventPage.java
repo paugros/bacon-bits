@@ -529,11 +529,17 @@ public class EventPage implements Page {
 					websiteDisplay.setHTML("<a href=\"" + calendarEvent.getWebsite() + "\" target=\"_blank\">" + calendarEvent.getWebsite() + "</a>");
 				}
 				websiteInput.setText(calendarEvent.getWebsite());
+				if (Common.isNullOrBlank(calendarEvent.getWebsite())) {
+					websiteInput.setText("http://");
+				}
 			}
 		});
 		websiteField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
+				if (websiteInput.getText().equals("http://")) {
+					return;
+				}
 				calendarEvent.setWebsite(websiteInput.getText().trim());
 			}
 		});
