@@ -5,13 +5,10 @@ import java.util.Map;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
-import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
-import com.areahomeschoolers.baconbits.shared.Common;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -86,13 +83,12 @@ public final class ErrorPage {
 
 	private void pageNotFound() {
 		HorizontalPanel hp = new HorizontalPanel();
-		String url = Url.getBaseUrl().replaceAll("^https?://", "") + History.getToken();
+		String url = Window.Location.getHref();
 
 		hp.setSpacing(5);
 		Image warning = new Image(MainImageBundle.INSTANCE.yellowWarning());
 		hp.add(warning);
-		HTML errorMessage = new HTML("The item requested - <b>" + SafeHtmlUtils.fromString(Common.getDefaultIfNull(url, "")).asString()
-				+ "</b> - does not exist.");
+		HTML errorMessage = new HTML("The item requested - <b>" + url + "</b> - does not exist.");
 
 		hp.add(errorMessage);
 		errorPanel.add(hp);
