@@ -20,6 +20,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
@@ -227,6 +228,19 @@ public class ResourcePage implements Page {
 								link.setTarget("_blank");
 								dupePanel.add(link);
 							}
+
+							String msg = "You can edit the name, or just&nbsp;";
+							ClickLabel cl = new ClickLabel("ignore this", new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									dupePanel.removeFromParent();
+								}
+							});
+
+							HorizontalPanel hp = new HorizontalPanel();
+							hp.add(new HTML(msg));
+							hp.add(cl);
+							dupePanel.add(hp);
 						}
 					});
 				}
