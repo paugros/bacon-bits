@@ -3,7 +3,6 @@ package com.areahomeschoolers.baconbits.client.content.home;
 import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.resource.AdTile;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
@@ -17,9 +16,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
-import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ImageSwitcher;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
@@ -32,12 +29,8 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.dom.client.Style.Position;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
@@ -53,28 +46,29 @@ public class HomePage implements Page {
 	public HomePage(VerticalPanel p) {
 		page = p;
 
-		if ("return".equals(Url.getParameter("ps"))) {
-			Application.refreshSecurityGroups(new Command() {
-				@Override
-				public void execute() {
-					if (signedUpForBooks()) {
-						String text = "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>My Items -> Books</b> menu option.";
-						HTML label = new HTML(text);
-						label.setWidth("300px");
-						AlertDialog dialog = new AlertDialog("Thanks!", label);
-						dialog.getButton().addClickHandler(new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								HistoryToken.set(PageUrl.home(), false);
-								Window.Location.reload();
-							}
-						});
-
-						dialog.center();
-					}
-				}
-			});
-		}
+		// if ("return".equals(Url.getParameter("ps"))) {
+		// Application.refreshSecurityGroups(new Command() {
+		// @Override
+		// public void execute() {
+		// if (signedUpForBooks()) {
+		// String text =
+		// "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>My Items -> Books</b> menu option.";
+		// HTML label = new HTML(text);
+		// label.setWidth("300px");
+		// AlertDialog dialog = new AlertDialog("Thanks!", label);
+		// dialog.getButton().addClickHandler(new ClickHandler() {
+		// @Override
+		// public void onClick(ClickEvent event) {
+		// HistoryToken.set(PageUrl.home(), false);
+		// Window.Location.reload();
+		// }
+		// });
+		//
+		// dialog.center();
+		// }
+		// }
+		// });
+		// }
 
 		if (Url.getIntegerParameter("aagrp") > 0 && Application.isAuthenticated() && !Application.memberOf(Url.getIntegerParameter("aagrp"))) {
 			final UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
@@ -181,11 +175,11 @@ public class HomePage implements Page {
 		return raffle;
 	}
 
-	private boolean signedUpForBooks() {
-		if (!Application.isAuthenticated()) {
-			return false;
-		}
-
-		return Application.getCurrentUser().memberOfAny(Constants.ONLINE_BOOK_SELLERS_GROUP_ID, Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID);
-	}
+	// private boolean signedUpForBooks() {
+	// if (!Application.isAuthenticated()) {
+	// return false;
+	// }
+	//
+	// return Application.getCurrentUser().memberOfAny(Constants.ONLINE_BOOK_SELLERS_GROUP_ID, Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID);
+	// }
 }

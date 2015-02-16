@@ -221,14 +221,14 @@ public class ServerContext implements ApplicationContextAware {
 
 		isLive = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production;
 
-		String version = SystemProperty.applicationVersion.get();
-		if (version == null) {
-			version = Constants.PRODUCTION_VERSION;
-		}
-
-		if (!version.contains(Constants.PRODUCTION_VERSION)) {
-			isLive = false;
-		}
+		// String version = SystemProperty.applicationVersion.get();
+		// if (version == null) {
+		// version = Constants.PRODUCTION_VERSION;
+		// }
+		//
+		// if (!version.contains(Constants.PRODUCTION_VERSION)) {
+		// isLive = false;
+		// }
 
 		isLiveIsSet = true;
 
