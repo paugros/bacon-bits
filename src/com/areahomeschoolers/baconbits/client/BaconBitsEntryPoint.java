@@ -25,7 +25,6 @@ public class BaconBitsEntryPoint implements EntryPoint {
 			String newUrl = Window.Location.getHref().replaceAll(".utm_source=.*", "");
 			Window.Location.replace(newUrl);
 		}
-		System.out.println(Window.Location.getHref());
 		loginService.getApplicationData(new AsyncCallback<ApplicationData>() {
 			@Override
 			public void onFailure(Throwable caught) {
