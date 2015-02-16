@@ -39,8 +39,6 @@ public class ServerContext implements ApplicationContextAware {
 	private static ThreadLocal<ServerContext> tl = new ThreadLocal<ServerContext>();
 	private static MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
 
-	private static Boolean isLive = null;
-
 	static {
 		cache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
 	}
@@ -214,17 +212,19 @@ public class ServerContext implements ApplicationContextAware {
 	}
 
 	public static boolean isLive() {
-		if (isLive != null) {
-			return isLive;
-		}
+		return true;
 
-		if (getRequest().getRequestURI() == null) {
-			isLive = false;
-		} else {
-			isLive = !getRequest().getRequestURI().contains("127.0.0.1");
-		}
-
-		return isLive;
+		// if (isLive != null) {
+		// return isLive;
+		// }
+		//
+		// if (getRequest().getRequestURI() == null) {
+		// isLive = false;
+		// } else {
+		// isLive = !getRequest().getRequestURI().contains("127.0.0.1");
+		// }
+		//
+		// return isLive;
 
 		// if (isLiveIsSet) {
 		// return isLive;
