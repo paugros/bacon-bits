@@ -15,13 +15,9 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource articleTile();
 
-	ImageResource blankProfileFemale();
+	ImageResource blankProfile();
 
-	ImageResource blankProfileFemaleSmall();
-
-	ImageResource blankProfileMale();
-
-	ImageResource blankProfileMaleSmall();
+	ImageResource blankProfileSmall();
 
 	ImageResource blogTile();
 
