@@ -34,6 +34,7 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	private Date startDate;
 	private Date endDate;
+	private int viewCount;
 
 	private boolean showInAds;
 	private boolean directoryPriority;
@@ -194,6 +195,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		return url;
 	}
 
+	public int getViewCount() {
+		return viewCount;
+	}
+
 	@Override
 	public String getZip() {
 		return zip;
@@ -328,6 +333,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public void setViewCount(int viewCount) {
+		this.viewCount = viewCount;
 	}
 
 	@Override

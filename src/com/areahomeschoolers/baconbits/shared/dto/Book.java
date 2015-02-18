@@ -32,6 +32,7 @@ public final class Book extends EntityDto<Book> {
 	private int pageCount;
 	private String googleCategories;
 	private String imageExtension;
+	private int viewCount;
 
 	// auxillary
 	private String tags;
@@ -209,6 +210,10 @@ public final class Book extends EntityDto<Book> {
 		return userLastName;
 	}
 
+	public int getViewCount() {
+		return viewCount;
+	}
+
 	public boolean isActive() {
 		return true;
 	}
@@ -355,6 +360,10 @@ public final class Book extends EntityDto<Book> {
 
 	public void setUserLastName(String userLastName) {
 		this.userLastName = userLastName;
+	}
+
+	public void setViewCount(int viewCount) {
+		this.viewCount = viewCount;
 	}
 
 }

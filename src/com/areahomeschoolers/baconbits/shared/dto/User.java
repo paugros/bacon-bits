@@ -25,6 +25,7 @@ public final class User extends EntityDto<User> implements HasAddress {
 	private String facebookUrl;
 	private String guid;
 	private boolean receiveNews;
+	private int viewCount;
 
 	// address
 	private String address;
@@ -358,6 +359,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 		return email;
 	}
 
+	public int getViewCount() {
+		return viewCount;
+	}
+
 	@Override
 	public String getZip() {
 		return zip;
@@ -595,6 +600,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public void setUserApproved(boolean userApproved) {
 		this.userApproved = userApproved;
+	}
+
+	public void setViewCount(int viewCount) {
+		this.viewCount = viewCount;
 	}
 
 	@Override

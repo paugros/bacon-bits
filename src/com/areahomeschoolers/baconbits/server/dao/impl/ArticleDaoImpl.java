@@ -61,6 +61,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			article.setImageExtension(rs.getString("fileExtension"));
 			article.setImageId(rs.getInt("imageId"));
 			article.setSmallImageId(rs.getInt("smallImageId"));
+			article.setViewCount(rs.getInt("viewCount"));
 			return article;
 		}
 	}
@@ -126,6 +127,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 
 	@Override
 	public Article getById(int articleId) {
+		update("update articles set viewCount = viewCount + 1 where id = ?", articleId);
 		String sql = createSqlBase() + "and a.id = ?";
 
 		return queryForObject(sql, new ArticleMapper(), articleId);

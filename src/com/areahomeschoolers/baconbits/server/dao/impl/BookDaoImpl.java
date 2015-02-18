@@ -104,6 +104,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			book.setShippingFrom(rs.getString("shippingFrom"));
 			book.setAddedDate(rs.getTimestamp("addedDate"));
 			book.setTags(rs.getString("tags"));
+			book.setViewCount(rs.getInt("viewCount"));
 			if (book.getImageId() == null) {
 				book.setImageId(rs.getInt("tagImageId"));
 				book.setSmallImageId(rs.getInt("tagSmallImageId"));
@@ -174,6 +175,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		BookPageData pd = new BookPageData();
 
 		if (bookId > 0) {
+			update("update books set viewCount = viewCount + 1 where id = ?", bookId);
 			pd.setBook(getById(bookId));
 
 			// tags

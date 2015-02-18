@@ -562,6 +562,10 @@ public class ResourcePage implements Page {
 		});
 		ft.addSpanningWidget(descriptionField);
 
+		if (resource.isSaved() && Application.administratorOf(resource)) {
+			ft.addField("View count:", Integer.toString(resource.getViewCount()));
+		}
+
 		if (resource.isSaved()) {
 			ft.addField(tagField);
 		}
