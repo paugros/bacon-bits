@@ -74,12 +74,14 @@ public final class EventListPage implements Page {
 			args.put(EventArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
 
-		final String title = showCommunity ? "Community Events" : "Events";
+		String title = showCommunity ? "Community Events" : "Events";
 
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new DefaultHyperlink("Events By Type", PageUrl.tagGroup("EVENT")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			cc.add(URL.decode(Url.getParameter("tn")));
+			String tag = URL.decode(Url.getParameter("tn"));
+			cc.add(tag);
+			title = tag + " " + title;
 		} else {
 			cc.add("Events");
 		}

@@ -60,12 +60,14 @@ public final class UserListPage implements Page {
 			return;
 		}
 
-		final String title = "Directory";
+		String title = "Homeschoolers";
 
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new DefaultHyperlink("Homeschoolers By Interests", PageUrl.tagGroup("USER")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			cc.add(URL.decode(Url.getParameter("tn")));
+			String tag = URL.decode(Url.getParameter("tn"));
+			cc.add(tag);
+			title = "Homeschoolers interested in " + tag;
 		} else {
 			cc.add("Homeschoolers");
 		}
