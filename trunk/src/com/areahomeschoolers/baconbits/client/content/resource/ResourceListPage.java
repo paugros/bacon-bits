@@ -13,6 +13,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
@@ -33,7 +34,6 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -46,7 +46,7 @@ public final class ResourceListPage implements Page {
 	private VerticalPanel page;
 
 	public ResourceListPage(final VerticalPanel p) {
-		final String title = "Resources";
+		String title = "Resources";
 		page = p;
 
 		if (Application.hasLocation()) {
@@ -60,7 +60,9 @@ public final class ResourceListPage implements Page {
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new DefaultHyperlink("Resources By Type", PageUrl.tagGroup("RESOURCE")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			cc.add(URL.decode(Url.getParameter("tn")));
+			String tag = URL.decode(Url.getParameter("tn"));
+			cc.add(tag);
+			title = tag + " " + title;
 		} else {
 			cc.add("Resources");
 		}

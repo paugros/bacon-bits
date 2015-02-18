@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
@@ -36,7 +37,6 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -70,10 +70,14 @@ public final class BookListPage implements Page {
 			args.put(BookArg.USER_ID, sellerId);
 		}
 
+		String title = "Books";
+
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new DefaultHyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			cc.add(URL.decode(Url.getParameter("tn")));
+			String tag = URL.decode(Url.getParameter("tn"));
+			cc.add(tag);
+			title = "Books about " + tag;
 		} else {
 			cc.add("Books");
 		}
@@ -90,7 +94,7 @@ public final class BookListPage implements Page {
 
 		populate();
 
-		Application.getLayout().setPage("Books", page);
+		Application.getLayout().setPage(title, page);
 	}
 
 	private void applyTextFilter(String text) {

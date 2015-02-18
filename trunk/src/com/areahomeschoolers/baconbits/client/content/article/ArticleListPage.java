@@ -13,6 +13,7 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -30,7 +31,6 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.HTML;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -46,12 +46,14 @@ public final class ArticleListPage implements Page {
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			args.put(ArticleArg.HAS_TAGS, Url.getIntListParameter("tagId"));
 		}
-		final String title = "Articles";
+		String title = "Articles";
 
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new DefaultHyperlink("Articles By Type", PageUrl.tagGroup("ARTICLE")));
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			cc.add(URL.decode(Url.getParameter("tn")));
+			String tag = URL.decode(Url.getParameter("tn"));
+			cc.add(tag);
+			title = "Articles about " + tag;
 		} else {
 			cc.add("Articles");
 		}
