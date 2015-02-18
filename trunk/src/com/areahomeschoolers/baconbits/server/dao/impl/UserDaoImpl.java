@@ -400,6 +400,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	public UserPageData getPageData(final int userId) {
 		UserPageData pd = new UserPageData();
 		if (userId > 0) {
+			update("update users set viewCount = viewCount + 1 where id = ?", userId);
+
 			pd.setUser(getById(userId));
 			TagDao tagDao = ServerContext.getDaoImpl("tag");
 			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.ENTITY_ID, userId);
@@ -1300,6 +1302,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		User user = new User();
 		user.setSystemAdministrator(rs.getBoolean("isSystemAdministrator"));
 		user.setId(rs.getInt("id"));
+		user.setViewCount(rs.getInt("viewCount"));
 		User cu = null;
 		if (security) {
 			cu = ServerContext.getCurrentUser();

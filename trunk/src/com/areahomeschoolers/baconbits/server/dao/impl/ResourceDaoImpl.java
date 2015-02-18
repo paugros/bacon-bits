@@ -71,7 +71,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			resource.setFacebookUrl(rs.getString("facebookUrl"));
 			resource.setImpressions(rs.getInt("impressions"));
 			resource.setTags(rs.getString("tags"));
-
+			resource.setViewCount(rs.getInt("viewCount"));
 			if (resource.getImageId() == null) {
 				resource.setImageExtension(rs.getString("tagFileExtension"));
 				resource.setImageId(rs.getInt("tagImageId"));
@@ -132,6 +132,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	public ResourcePageData getPageData(int resourceId) {
 		ResourcePageData pd = new ResourcePageData();
 		if (resourceId > 0) {
+			update("update resources set viewCount = viewCount + 1 where id = ?", resourceId);
 			pd.setResource(getById(resourceId));
 		} else {
 			pd.setResource(new Resource());

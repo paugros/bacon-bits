@@ -21,6 +21,7 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	private int visibilityLevelId;
 	private int owningOrgId;
 	private boolean newsItem;
+	private int viewCount;
 
 	// auxiliary
 	private String addedByFirstName;
@@ -97,8 +98,8 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return groupPolicy;
 	}
 
-	public int getUserImageId() {
-		return userImageId;
+	public String getImageExtension() {
+		return imageExtension;
 	}
 
 	public Integer getImageId() {
@@ -136,12 +137,16 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return tagCount;
 	}
 
-	public String getImageExtension() {
-		return imageExtension;
-	}
-
 	public String getTitle() {
 		return title;
+	}
+
+	public int getUserImageId() {
+		return userImageId;
+	}
+
+	public int getViewCount() {
+		return viewCount;
 	}
 
 	public String getVisibilityLevel() {
@@ -210,8 +215,8 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		this.groupPolicy = groupPolicy;
 	}
 
-	public void setUserImageId(int userImageId) {
-		this.userImageId = userImageId;
+	public void setImageExtension(String imageExtension) {
+		this.imageExtension = imageExtension;
 	}
 
 	public void setImageId(Integer imageId) {
@@ -243,12 +248,16 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		this.tagCount = tagCount;
 	}
 
-	public void setImageExtension(String imageExtension) {
-		this.imageExtension = imageExtension;
-	}
-
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public void setUserImageId(int userImageId) {
+		this.userImageId = userImageId;
+	}
+
+	public void setViewCount(int viewCount) {
+		this.viewCount = viewCount;
 	}
 
 	public void setVisibilityLevel(String visibilityLevel) {

@@ -994,6 +994,9 @@ public class EventPage implements Page {
 		}
 
 		if (calendarEvent.isSaved()) {
+			if (Application.administratorOf(calendarEvent)) {
+				fieldTable.addField("View count:", Integer.toString(calendarEvent.getViewCount()));
+			}
 			fieldTable.addField("Added by:", calendarEvent.getAddedByFullName());
 			fieldTable.addField("Added date:", Formatter.formatDateTime(calendarEvent.getAddedDate()));
 		}

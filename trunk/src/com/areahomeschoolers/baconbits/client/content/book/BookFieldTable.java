@@ -432,6 +432,7 @@ public class BookFieldTable extends FieldTable {
 		addField(notesField);
 
 		if (book.isSaved()) {
+			addField("View count:", Integer.toString(book.getViewCount()));
 			addField(tagField);
 		}
 	}

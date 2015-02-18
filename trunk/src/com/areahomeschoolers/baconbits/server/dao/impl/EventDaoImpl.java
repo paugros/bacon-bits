@@ -129,6 +129,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setImageExtension(rs.getString("fileExtension"));
 			event.setDirectoryPriority(rs.getBoolean("directoryPriority"));
 			event.setTags(rs.getString("tags"));
+			event.setViewCount(rs.getInt("viewCount"));
 			return event;
 		}
 	}
@@ -379,6 +380,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	public EventPageData getPageData(int eventId) {
 		final EventPageData pd = new EventPageData();
 		if (eventId > 0) {
+			update("update events set viewCount = viewCount + 1 where id = ?", eventId);
 			pd.setEvent(getById(eventId));
 
 			if (pd.getEvent() == null) {

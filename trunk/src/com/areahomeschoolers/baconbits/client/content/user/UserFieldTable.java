@@ -474,6 +474,9 @@ public class UserFieldTable extends FieldTable {
 		}
 
 		if (user.isSaved()) {
+			if (Application.administratorOf(user)) {
+				addField("View count:", Integer.toString(user.getViewCount()));
+			}
 			if (!user.isChild()) {
 				addField("Last login:", Common.getDefaultIfNull(Formatter.formatDateTime(user.getLastLoginDate())));
 			}

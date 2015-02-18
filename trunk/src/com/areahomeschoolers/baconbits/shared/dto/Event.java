@@ -45,6 +45,7 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private boolean directoryPriority;
 	private String contactName;
 	private String contactEmail;
+	private int viewCount;
 
 	// address
 	private String address;
@@ -384,6 +385,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 		return title;
 	}
 
+	public int getViewCount() {
+		return viewCount;
+	}
+
 	public String getVisibilityLevel() {
 		return visibilityLevel;
 	}
@@ -664,6 +669,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public void setViewCount(int viewCount) {
+		this.viewCount = viewCount;
 	}
 
 	public void setVisibilityLevel(String visibilityLevel) {
