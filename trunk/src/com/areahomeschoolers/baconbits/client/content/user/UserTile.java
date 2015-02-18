@@ -37,11 +37,7 @@ public class UserTile extends Composite {
 		hp.addStyleName("itemTile");
 		// hp.getElement().getStyle().setBackgroundColor(TagMappingType.USER.getColor());
 
-		String sex = item.getSex();
-		if (sex == null) {
-			sex = "m";
-		}
-		Image i = new Image(sex.equals("m") ? MainImageBundle.INSTANCE.blankProfileMaleSmall() : MainImageBundle.INSTANCE.blankProfileFemaleSmall());
+		Image i = new Image(MainImageBundle.INSTANCE.blankProfileSmall());
 		if (item.getSmallImageId() != null) {
 			i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
 		}

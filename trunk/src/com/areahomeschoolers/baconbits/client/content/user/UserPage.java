@@ -83,7 +83,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
@@ -206,10 +205,10 @@ public class UserPage implements Page {
 	}
 
 	private native void createBarcode(String bookId) /*-{
-														$wnd.$('#barcode_' + bookId).barcode({
-														code : 'code39'
-														});
-														}-*/;
+		$wnd.$('#barcode_' + bookId).barcode({
+			code : 'code39'
+		});
+	}-*/;
 
 	private void createDetailsPage() {
 		final String title = user.isSaved() ? user.getFullName() : "New User";
@@ -228,16 +227,11 @@ public class UserPage implements Page {
 					HorizontalPanel hp = new HorizontalPanel();
 					hp.setWidth("100%");
 
-					String sex = user.getSex();
-					if (sex == null) {
-						sex = "m";
-					}
-					ImageResource r = sex.equals("m") ? MainImageBundle.INSTANCE.blankProfileMale() : MainImageBundle.INSTANCE.blankProfileFemale();
 					EditableImage image = new EditableImage(DocumentLinkType.PROFILE, user.getId());
 					if (user.getImageId() != null) {
 						image.setImage(new Image(ClientUtils.createDocumentUrl(user.getImageId(), user.getImageExtension())));
 					}
-					image.setImageResource(r);
+					image.setImageResource(MainImageBundle.INSTANCE.blankProfile());
 					image.setEnabled(canEditUser(user));
 					image.populate();
 					image.addStyleName("profilePic");
@@ -710,11 +704,11 @@ public class UserPage implements Page {
 		pp.getElement().getStyle().setMarginTop(10, Unit.PX);
 		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
 
-		EditableImage image = new EditableImage(DocumentLinkType.RESOURCE, user.getId());
+		EditableImage image = new EditableImage(DocumentLinkType.PROFILE, user.getId());
 		if (user.getImageId() != null) {
 			image.setImage(new Image(ClientUtils.createDocumentUrl(user.getImageId(), user.getImageExtension())));
 		} else {
-			image.setImage(new Image(MainImageBundle.INSTANCE.defaultLarge()));
+			image.setImage(new Image(MainImageBundle.INSTANCE.blankProfile()));
 		}
 		image.setEnabled(Application.isSystemAdministrator());
 		image.populate();

@@ -314,7 +314,10 @@ public final class Application implements ValueChangeHandler<String> {
 	}
 
 	public static void setTitle(String title) {
-		Window.setTitle(title + " - " + Application.APPLICATION_NAME);
+		if (Common.isNullOrBlank(title)) {
+			title = "Citrus Groups";
+		}
+		Window.setTitle(title);
 		if (pollUpdateData != null && (!isAuthenticated() || !getCurrentUser().isSwitched())) {
 			addHistoryEntry(title, History.getToken());
 		}
