@@ -141,7 +141,7 @@ public final class BookReceiptPage implements Page {
 							populateTotalPanel();
 						}
 					});
-					table.setDisplayColumns(BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.CONDITION, BookColumn.PRICE, BookColumn.DELETE_PURCHASE);
+					table.setDisplayColumns(BookColumn.TITLE, BookColumn.CONDITION, BookColumn.PRICE, BookColumn.DELETE_PURCHASE);
 					table.setTitle("Book Receipt");
 					page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
 

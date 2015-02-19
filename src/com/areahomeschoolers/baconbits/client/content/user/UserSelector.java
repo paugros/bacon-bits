@@ -17,9 +17,7 @@ public final class UserSelector extends EntityCellSelector<User, UserArg, UserCo
 		setEntityCellTable(userTable);
 
 		userTable.removeColumn(UserColumn.STATUS);
-		userTable.removeColumn(UserColumn.COMMON_INTERESTS);
 		userTable.removeColumn(UserColumn.AGE);
-		userTable.removeColumn(UserColumn.GROUP);
 		userTable.removeColumn(UserColumn.ACTIVITY);
 	}
 
