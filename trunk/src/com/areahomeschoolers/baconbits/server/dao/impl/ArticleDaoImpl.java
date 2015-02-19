@@ -127,7 +127,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 
 	@Override
 	public Article getById(int articleId) {
-		if (!ServerContext.isSystemAdministrator()) {
+		if (!ServerContext.isSystemAdministrator() && !ServerContext.isPhantomJsRequest()) {
 			update("update articles set viewCount = viewCount + 1 where id = ?", articleId);
 		}
 
