@@ -113,7 +113,7 @@ public class UserServiceImpl extends GwtController implements UserService {
 				msg += "The password for your " + sn + " account has been reset. ";
 			}
 			msg += "Login information appears below. You will be required to establish a new password upon logging in.\n\n";
-			msg += "Site: " + ServerContext.getBaseUrl() + "\n";
+			msg += "Site: " + ServerContext.getBaseUrlWithoutSeparator() + "\n";
 			msg += "User name: " + user.getUserName() + "\n";
 			msg += "Password: " + password + "\n\n";
 			msg += "Thank you.\n\n";
