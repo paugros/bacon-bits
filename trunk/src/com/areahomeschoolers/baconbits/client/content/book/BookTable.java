@@ -35,8 +35,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
-		USER("Seller"), TITLE("Title"), GRADE_LEVEL("Grade Level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE("Price"), PRICE("Price"), ADDED_DATE(
-				"Added"), DELETE(""), DELETE_PURCHASE("");
+		USER("Seller"), TITLE("Title"), GRADE_LEVEL("Grade Level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE("Price"), PRICE("Price"), VIEWS(
+				"Views"), ADDED_DATE("Added"), DELETE(""), DELETE_PURCHASE("");
 
 		private String title;
 
@@ -88,7 +88,7 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 			}
 		});
 		setDefaultSortColumn(BookColumn.TITLE, SortDirection.SORT_ASC);
-		setDisplayColumns(BookColumn.TITLE, BookColumn.PRICE, BookColumn.GRADE_LEVEL, BookColumn.STATUS, BookColumn.CONDITION);
+		setDisplayColumns(BookColumn.TITLE, BookColumn.PRICE, BookColumn.GRADE_LEVEL, BookColumn.STATUS, BookColumn.CONDITION, BookColumn.VIEWS);
 	}
 
 	public void addStatusFilterBox() {
@@ -144,6 +144,14 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 	protected void setColumns() {
 		for (BookColumn col : getDisplayColumns()) {
 			switch (col) {
+			case VIEWS:
+				addNumberColumn(col, new ValueGetter<Number, Book>() {
+					@Override
+					public Number get(Book item) {
+						return item.getViewCount();
+					}
+				});
+				break;
 			case ADDED_DATE:
 				addDateTimeColumn(col, new ValueGetter<Date, Book>() {
 					@Override
