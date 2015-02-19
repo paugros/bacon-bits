@@ -1,4 +1,4 @@
-package com.areahomeschoolers.baconbits.client.content.resource;
+package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
@@ -9,26 +9,28 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
-import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
+import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public final class ResourceManagementPage implements Page {
-	private ArgMap<ResourceArg> args = new ArgMap<ResourceArg>();
+public final class UserManagementPage implements Page {
+	private ArgMap<UserArg> args = new ArgMap<UserArg>();
 
-	public ResourceManagementPage(final VerticalPanel page) {
+	public UserManagementPage(final VerticalPanel page) {
 		if (!Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
 		}
 
-		final String title = "Resources";
+		final String title = "Users";
 
-		final ResourceTable table = new ResourceTable(args);
+		args.setStatus(Status.ACTIVE);
+		final UserTable table = new UserTable(args);
 		table.setTitle(title);
-		table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.resource(0)));
+		table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.user(0)));
 		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
 		table.addStatusFilterBox();

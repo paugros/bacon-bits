@@ -195,9 +195,18 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
 			addLinkToMenu(menu, "Add Article", PageUrl.article(0));
 			addLinkToMenu(menu, "Add User", PageUrl.user(0));
+			menu.addSeparator();
 			addLinkToMenu(menu, "Article Management", PageUrl.articleManagement());
 			addLinkToMenu(menu, "Group Management", PageUrl.userGroupList());
-			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookManagement());
+			if (Application.isSystemAdministrator()) {
+				addLinkToMenu(menu, "Book Management", PageUrl.bookManagement());
+				addLinkToMenu(menu, "Event Management", PageUrl.eventManagement());
+				addLinkToMenu(menu, "Resource Management", PageUrl.resourceManagement());
+				addLinkToMenu(menu, "Tag Management", PageUrl.tagManagement());
+				addLinkToMenu(menu, "User Management", PageUrl.userManagement());
+				menu.addSeparator();
+			}
+			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookSellerSummary());
 		}
 
 		if (Application.administratorOf(17)) {
@@ -205,8 +214,6 @@ public final class MainMenu extends MenuBar {
 		}
 
 		if (Application.isSystemAdministrator()) {
-			addLinkToMenu(menu, "Tag Management", PageUrl.tagManagement());
-			addLinkToMenu(menu, "Resource Management", PageUrl.resourceManagement());
 			menu.addSeparator();
 
 			addCommandToMenu(menu, "Change Logo", new ScheduledCommand() {
