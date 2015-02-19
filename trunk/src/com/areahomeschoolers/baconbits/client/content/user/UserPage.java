@@ -458,7 +458,6 @@ public class UserPage implements Page {
 						}
 						if (viewingSelf()) {
 							table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
-							table.removeColumn(BookColumn.CONTACT);
 						}
 						if (bookDialog == null) {
 							bookDialog = new BookEditDialog(table);
