@@ -74,7 +74,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 			book.setId(rs.getInt("id"));
 			book.setGradeLevelId(rs.getInt("gradeLevelId"));
 			book.setGradeLevel(rs.getString("gradeLevel"));
-			book.setCategory(rs.getString("category"));
+			// book.setCategory(rs.getString("category"));
 			book.setCategoryId(rs.getInt("categoryId"));
 			book.setPrice(rs.getDouble("price"));
 			book.setStatus(rs.getString("status"));
@@ -505,7 +505,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	}
 
 	private String createSqlBase() {
-		String sql = "select b.*, bs.status, ba.gradeLevel, bc.category, case when bsc.id is null then 0 else 1 end as inMyShoppingCart, d.fileExtension, \n";
+		String sql = "select b.*, bs.status, ba.gradeLevel, case when bsc.id is null then 0 else 1 end as inMyShoppingCart, d.fileExtension, \n";
 		sql += "t.imageId as tagImageId, t.smallImageId as tagSmallImageId, dd.fileExtension as tagFileExtension, \n";
 		sql += "(select group_concat(t.name separator ', ') ";
 		sql += "from tags t join tagBookMapping tm on tm.tagId = t.id where tm.bookId = b.id) as tags, \n";
@@ -513,7 +513,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
 		sql += "join bookStatus bs on bs.id = b.statusId \n";
-		sql += "join bookCategories bc on bc.id = b.categoryId \n";
+		// sql += "join bookCategories bc on bc.id = b.categoryId \n";
 		sql += "left join documents d on d.id = b.imageId \n";
 		sql += "left join tags t on t.id = b.firstTagId \n";
 		sql += "left join documents dd on dd.id = t.imageId \n";

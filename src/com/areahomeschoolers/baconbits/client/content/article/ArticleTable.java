@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
@@ -19,12 +20,11 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class ArticleTable extends EntityCellTable<Article, ArticleArg, ArticleColumn> {
 	public enum ArticleColumn implements EntityCellTableColumn<ArticleColumn> {
-		TITLE("Title"), ADDED_DATE("Added"), ADDED_BY("Added By"), END_DATE("Inactive Date");
+		TITLE("Title"), ADDED_DATE("Added"), ADDED_BY("Added By"), END_DATE("Inactive Date"), VIEWS("Views");
 
 		private String title;
 
@@ -101,6 +101,14 @@ public final class ArticleTable extends EntityCellTable<Article, ArticleArg, Art
 	protected void setColumns() {
 		for (ArticleColumn col : getDisplayColumns()) {
 			switch (col) {
+			case VIEWS:
+				addNumberColumn(col, new ValueGetter<Number, Article>() {
+					@Override
+					public Number get(Article item) {
+						return item.getViewCount();
+					}
+				});
+				break;
 			case ADDED_BY:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<Article>() {
 					@Override

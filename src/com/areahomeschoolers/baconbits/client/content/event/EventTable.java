@@ -11,6 +11,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
@@ -32,15 +33,14 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class EventTable extends EntityCellTable<Event, EventArg, EventColumn> {
 	public enum EventColumn implements EntityCellTableColumn<EventColumn> {
-		REGISTERED(""), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), PRICE("Price"), AGES("Ages"), CATEGORY("Category"), REGISTER(
-				"Register");
+		REGISTERED(""), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), PRICE("Price"), AGES("Ages"), CATEGORY("Category"), VIEWS(
+				"Views");
 
 		private String title;
 
@@ -64,7 +64,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 	private EventTable() {
 		setDefaultSortColumn(EventColumn.START_DATE, SortDirection.SORT_ASC);
 		setDisplayColumns(EventColumn.REGISTERED, EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.PRICE, EventColumn.AGES,
-				EventColumn.REGISTER);
+				EventColumn.VIEWS);
 	}
 
 	public void addStatusFilterBox() {
@@ -108,6 +108,14 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 	protected void setColumns() {
 		for (EventColumn col : getDisplayColumns()) {
 			switch (col) {
+			case VIEWS:
+				addNumberColumn(col, new ValueGetter<Number, Event>() {
+					@Override
+					public Number get(Event item) {
+						return item.getViewCount();
+					}
+				});
+				break;
 			case REGISTERED:
 				if (Application.isAuthenticated()) {
 					addWidgetColumn(col, new WidgetCellCreator<Event>() {
@@ -251,22 +259,6 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 						return item.getStartDate();
 					}
 				}), "130px");
-				break;
-			case REGISTER:
-				addCompositeWidgetColumn(col, new WidgetCellCreator<Event>() {
-					@Override
-					protected Widget createWidget(Event item) {
-						if (!item.allowRegistrations() || !item.getRequiresRegistration()) {
-							String text = "";
-							if (item.getRegistrationStartDate().after(new Date())) {
-								text = Formatter.formatDate(item.getRegistrationStartDate());
-							}
-							return new Label(text);
-						}
-
-						return new DefaultHyperlink("Register", PageUrl.event(item.getId()) + "&tab=1");
-					}
-				});
 				break;
 			default:
 				new AssertionError();
