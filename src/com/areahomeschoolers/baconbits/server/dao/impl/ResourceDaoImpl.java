@@ -89,7 +89,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 	@Override
 	public void clickResource(int adId) {
-		if (ServerContext.isSystemAdministrator()) {
+		if (ServerContext.isSystemAdministrator() || ServerContext.isPhantomJsRequest()) {
 			return;
 		}
 
@@ -136,7 +136,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	public ResourcePageData getPageData(int resourceId) {
 		ResourcePageData pd = new ResourcePageData();
 		if (resourceId > 0) {
-			if (!ServerContext.isSystemAdministrator()) {
+			if (!ServerContext.isSystemAdministrator() && !ServerContext.isPhantomJsRequest()) {
 				update("update resources set viewCount = viewCount + 1 where id = ?", resourceId);
 			}
 			pd.setResource(getById(resourceId));
@@ -168,7 +168,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 	@Override
 	public void incrementImpressions(ArrayList<Integer> ids) {
-		if (ServerContext.isSystemAdministrator()) {
+		if (ServerContext.isSystemAdministrator() || ServerContext.isPhantomJsRequest()) {
 			return;
 		}
 

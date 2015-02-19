@@ -400,7 +400,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	public UserPageData getPageData(final int userId) {
 		UserPageData pd = new UserPageData();
 		if (userId > 0) {
-			if (!ServerContext.isSystemAdministrator()) {
+			if (!ServerContext.isSystemAdministrator() && !ServerContext.isPhantomJsRequest()) {
 				update("update users set viewCount = viewCount + 1 where id = ?", userId);
 			}
 

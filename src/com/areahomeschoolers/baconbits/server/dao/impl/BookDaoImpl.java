@@ -175,7 +175,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		BookPageData pd = new BookPageData();
 
 		if (bookId > 0) {
-			if (!ServerContext.isSystemAdministrator()) {
+			if (!ServerContext.isSystemAdministrator() && !ServerContext.isPhantomJsRequest()) {
 				update("update books set viewCount = viewCount + 1 where id = ?", bookId);
 			}
 
