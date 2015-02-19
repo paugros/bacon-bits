@@ -127,7 +127,10 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 
 	@Override
 	public Article getById(int articleId) {
-		update("update articles set viewCount = viewCount + 1 where id = ?", articleId);
+		if (!ServerContext.isSystemAdministrator()) {
+			update("update articles set viewCount = viewCount + 1 where id = ?", articleId);
+		}
+
 		String sql = createSqlBase() + "and a.id = ?";
 
 		return queryForObject(sql, new ArticleMapper(), articleId);

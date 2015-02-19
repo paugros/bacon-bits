@@ -380,7 +380,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	public EventPageData getPageData(int eventId) {
 		final EventPageData pd = new EventPageData();
 		if (eventId > 0) {
-			update("update events set viewCount = viewCount + 1 where id = ?", eventId);
+			if (!ServerContext.isSystemAdministrator()) {
+				update("update events set viewCount = viewCount + 1 where id = ?", eventId);
+			}
+
 			pd.setEvent(getById(eventId));
 
 			if (pd.getEvent() == null) {

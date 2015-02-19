@@ -89,6 +89,10 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 	@Override
 	public void clickResource(int adId) {
+		if (ServerContext.isSystemAdministrator()) {
+			return;
+		}
+
 		String sql = "update resources set clickCount = clickCount + 1, lastClickDate = now() where id = ?";
 		update(sql, adId);
 
@@ -132,7 +136,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	public ResourcePageData getPageData(int resourceId) {
 		ResourcePageData pd = new ResourcePageData();
 		if (resourceId > 0) {
-			update("update resources set viewCount = viewCount + 1 where id = ?", resourceId);
+			if (!ServerContext.isSystemAdministrator()) {
+				update("update resources set viewCount = viewCount + 1 where id = ?", resourceId);
+			}
 			pd.setResource(getById(resourceId));
 		} else {
 			pd.setResource(new Resource());
@@ -162,6 +168,10 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 	@Override
 	public void incrementImpressions(ArrayList<Integer> ids) {
+		if (ServerContext.isSystemAdministrator()) {
+			return;
+		}
+
 		String sql = "update resources set impressions = case when impressions is null then 1 else impressions + 1 end ";
 		sql += "where id in(" + Common.join(ids, ", ") + ")";
 
