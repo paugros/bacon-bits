@@ -243,10 +243,10 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		ReceiverList receiverList = new ReceiverList(receiverLst);
 
 		StringBuilder url = new StringBuilder();
-		url.append(ServerContext.getBaseUrl() + "#page=" + p.getReturnPage());
+		url.append(ServerContext.getBaseUrl() + "page=" + p.getReturnPage());
 		String returnUrl = url.toString() + "&ps=return&payKey=${payKey}";
 		String cancelUrl = url.toString() + "&ps=cancel";
-		String ipnUrl = ServerContext.getBaseUrl() + "baconbits/service/ipn";
+		String ipnUrl = ServerContext.getBaseUrlWithoutSeparator() + "baconbits/service/ipn";
 
 		PayRequest payRequest = new PayRequest(requestEnvelope, "PAY", cancelUrl, "USD", receiverList, returnUrl);
 		payRequest.setMemo(p.getMemo());
