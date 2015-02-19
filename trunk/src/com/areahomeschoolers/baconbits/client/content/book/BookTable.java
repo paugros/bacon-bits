@@ -7,19 +7,15 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
-import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
-import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
-import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
-import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.client.widgets.EmailDialog;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
@@ -27,9 +23,7 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
-import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
-import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -37,15 +31,12 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.HTML;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
-		IMAGE("Image"), USER("Seller"), TITLE("Title"), CATEGORY("Category"), GRADE_LEVEL("Grade Level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE(
-				"Price"), PRICE("Price"), ADDED_DATE("Added"), CONTACT("Contact Seller"), DELETE(""), DELETE_PURCHASE("");
+		USER("Seller"), TITLE("Title"), GRADE_LEVEL("Grade Level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE("Price"), PRICE("Price"), ADDED_DATE(
+				"Added"), DELETE(""), DELETE_PURCHASE("");
 
 		private String title;
 
@@ -77,9 +68,6 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 	}
 
 	private BookServiceAsync bookService = (BookServiceAsync) ServiceCache.getService(BookService.class);
-	private ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
-	private Article tc;
-	private boolean agreed = false;
 	private double totalPrice;
 
 	private Command onDelete;
@@ -100,15 +88,7 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 			}
 		});
 		setDefaultSortColumn(BookColumn.TITLE, SortDirection.SORT_ASC);
-		setDisplayColumns(BookColumn.IMAGE, BookColumn.TITLE, BookColumn.CATEGORY, BookColumn.PRICE, BookColumn.GRADE_LEVEL, BookColumn.STATUS,
-				BookColumn.CONDITION, BookColumn.CONTACT);
-
-		articleService.getById(66, new Callback<Article>() {
-			@Override
-			protected void doOnSuccess(Article result) {
-				tc = result;
-			}
-		});
+		setDisplayColumns(BookColumn.TITLE, BookColumn.PRICE, BookColumn.GRADE_LEVEL, BookColumn.STATUS, BookColumn.CONDITION);
 	}
 
 	public void addStatusFilterBox() {
@@ -164,39 +144,6 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 	protected void setColumns() {
 		for (BookColumn col : getDisplayColumns()) {
 			switch (col) {
-			case CONTACT:
-				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
-					@Override
-					protected Widget createWidget(final Book item) {
-						if (Application.getCurrentUserId() == item.getUserId()) {
-							return new Label("");
-						}
-
-						ClickLabel cl = new ClickLabel("Contact", new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								if (!agreed && tc != null) {
-									HTML h = new HTML(tc.getArticle());
-									h.setWidth("400px");
-									AlertDialog ad = new AlertDialog(tc.getTitle(), h);
-									ad.getButton().addClickHandler(new ClickHandler() {
-										@Override
-										public void onClick(ClickEvent event) {
-											showEmailDialog(item);
-										}
-									});
-									ad.center();
-									agreed = true;
-								} else {
-									showEmailDialog(item);
-								}
-							}
-						});
-
-						return cl;
-					}
-				});
-				break;
 			case ADDED_DATE:
 				addDateTimeColumn(col, new ValueGetter<Date, Book>() {
 					@Override
@@ -205,26 +152,6 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 					}
 				});
 
-				break;
-			case IMAGE:
-				addCompositeWidgetColumn(col, new WidgetCellCreator<Book>() {
-					@Override
-					protected Widget createWidget(final Book item) {
-						boolean editable = Application.administratorOf(item);
-						final EditableImage image = new EditableImage(DocumentLinkType.BOOK, item.getId());
-						image.setEnabled(editable);
-						image.setImageId(item.getSmallImageId());
-						image.populate();
-						image.setUploadCompleteHandler(new UploadCompleteHandler() {
-							@Override
-							public void onUploadComplete(int documentId) {
-								populate();
-							}
-						});
-
-						return image.getImage();
-					}
-				});
 				break;
 			case CONDITION:
 				addTextColumn(col, new ValueGetter<String, Book>() {
@@ -273,14 +200,6 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 					@Override
 					public String get(Book item) {
 						return item.getGradeLevel();
-					}
-				});
-				break;
-			case CATEGORY:
-				addTextColumn(col, new ValueGetter<String, Book>() {
-					@Override
-					public String get(Book item) {
-						return item.getCategory();
 					}
 				});
 				break;

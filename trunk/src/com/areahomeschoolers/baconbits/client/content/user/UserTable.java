@@ -6,11 +6,14 @@ import java.util.HashMap;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.GroupMembershipControl;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
@@ -18,7 +21,6 @@ import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableCo
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
 import com.areahomeschoolers.baconbits.shared.Common;
-import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -32,14 +34,13 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
-		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), GROUP("Group(s)"), STATUS("Status"), COMMON_INTERESTS(
-				"Same Interests"), AGE("Age"), ADMINISTRATOR("Administrator"), APPROVAL("Approval"), DELETE("Delete");
+		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), STATUS("Status"), AGE("Age"), ADMINISTRATOR(
+				"Administrator"), APPROVAL("Approval"), DELETE("Delete");
 
 		private String title;
 
@@ -117,7 +118,10 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 				addWidgetColumn(col, new WidgetCellCreator<User>() {
 					@Override
 					protected Widget createWidget(User item) {
-						Image i = new Image(Constants.DOCUMENT_URL_PREFIX + item.getSmallImageId());
+						Image i = new Image(MainImageBundle.INSTANCE.blankProfileSmall());
+						if (item.getSmallImageId() != null) {
+							i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
+						}
 						i.getElement().getStyle().setBorderColor("#c7c7c7");
 						i.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 						i.getElement().getStyle().setBorderWidth(1, Unit.PX);
@@ -159,31 +163,6 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 					@Override
 					public Integer get(User item) {
 						return item.getAge();
-					}
-				});
-				break;
-			case COMMON_INTERESTS:
-				if (Application.isAuthenticated()) {
-					addTextColumn(col, new ValueGetter<String, User>() {
-						@Override
-						public String get(User item) {
-							return item.getCommonInterestCount() > 0 ? Integer.toString(item.getCommonInterestCount()) : "None";
-						}
-					}, new ValueGetter<Integer, User>() {
-						@Override
-						public Integer get(User item) {
-							return item.getCommonInterestCount();
-						}
-					});
-				}
-				break;
-			case GROUP:
-				addWidgetColumn(col, new WidgetCellCreator<User>() {
-					@Override
-					protected Widget createWidget(User item) {
-						HTML h = new HTML(Formatter.formatNoteText(item.getGroupsText()));
-						h.addStyleName("smallText");
-						return h;
 					}
 				});
 				break;

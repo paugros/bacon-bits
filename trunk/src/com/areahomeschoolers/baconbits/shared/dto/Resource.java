@@ -2,6 +2,7 @@ package com.areahomeschoolers.baconbits.shared.dto;
 
 import java.util.Date;
 
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.HasAddress;
 
 public class Resource extends EntityDto<Resource> implements HasAddress {
@@ -202,6 +203,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 	@Override
 	public String getZip() {
 		return zip;
+	}
+
+	public boolean isActive() {
+		return Common.isActive(new Date(), endDate);
 	}
 
 	public void setAddedById(int addedById) {

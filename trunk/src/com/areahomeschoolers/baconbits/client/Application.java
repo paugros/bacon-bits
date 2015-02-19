@@ -16,8 +16,10 @@ import com.areahomeschoolers.baconbits.client.content.book.BookListPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookManagementPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookReceiptPage;
+import com.areahomeschoolers.baconbits.client.content.book.BookSellerSummaryPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventCalendarPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventListPage;
+import com.areahomeschoolers.baconbits.client.content.event.EventManagementPage;
 import com.areahomeschoolers.baconbits.client.content.event.EventPage;
 import com.areahomeschoolers.baconbits.client.content.event.PaymentPage;
 import com.areahomeschoolers.baconbits.client.content.event.RegistrationManagementPage;
@@ -32,6 +34,7 @@ import com.areahomeschoolers.baconbits.client.content.tag.TagManagementPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupListPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserListPage;
+import com.areahomeschoolers.baconbits.client.content.user.UserManagementPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserPage;
 import com.areahomeschoolers.baconbits.client.content.user.UserStatusIndicator;
 import com.areahomeschoolers.baconbits.client.event.CancelHandler;
@@ -365,8 +368,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new PaymentPage(vp);
 		} else if ("BookReceipt".equals(page)) {
 			new BookReceiptPage(vp);
-		} else if ("BookManagement".equals(page)) {
-			new BookManagementPage(vp);
+		} else if ("BookSellerSummary".equals(page)) {
+			new BookSellerSummaryPage(vp);
 		} else if ("BookList".equals(page)) {
 			new BookListPage(vp);
 		} else if ("EventCalendar".equals(page)) {
@@ -379,6 +382,12 @@ public final class Application implements ValueChangeHandler<String> {
 			new BlogPage(vp);
 		} else if ("ResourceManagement".equals(page)) {
 			new ResourceManagementPage(vp);
+		} else if ("UserManagement".equals(page)) {
+			new UserManagementPage(vp);
+		} else if ("BookManagement".equals(page)) {
+			new BookManagementPage(vp);
+		} else if ("EventManagement".equals(page)) {
+			new EventManagementPage(vp);
 		} else if ("TagManagement".equals(page)) {
 			new TagManagementPage(vp);
 		} else if ("Resource".equals(page)) {

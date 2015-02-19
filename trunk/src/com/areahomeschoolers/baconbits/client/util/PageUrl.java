@@ -41,6 +41,10 @@ public class PageUrl {
 		return "page=BookReceipt";
 	}
 
+	public static String bookSellerSummary() {
+		return "page=BookSellerSummary";
+	}
+
 	public static String event(int id) {
 		String url = "page=Event";
 		return (id == 0) ? url : url + "&eventId=" + id;
@@ -52,6 +56,10 @@ public class PageUrl {
 
 	public static String eventList() {
 		return "page=EventList";
+	}
+
+	public static String eventManagement() {
+		return "page=EventManagement";
 	}
 
 	public static String home() {
@@ -103,6 +111,10 @@ public class PageUrl {
 
 	public static String userList() {
 		return "page=UserList";
+	}
+
+	public static String userManagement() {
+		return "page=UserManagement";
 	}
 
 	private PageUrl() {
