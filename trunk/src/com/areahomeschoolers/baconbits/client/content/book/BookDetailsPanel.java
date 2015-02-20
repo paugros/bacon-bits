@@ -7,8 +7,10 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.BuyBookWidget;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
@@ -25,7 +27,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -149,7 +150,6 @@ public class BookDetailsPanel extends Composite {
 
 		if (!Common.isNullOrBlank(book.getDescription())) {
 			HTML desc = new HTML(Formatter.formatNoteText(book.getDescription()));
-			desc.setWidth("750px");
 			desc.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
 			desc.getElement().getStyle().setMargin(15, Unit.PX);
 			desc.getElement().getStyle().setPadding(10, Unit.PX);
@@ -159,6 +159,7 @@ public class BookDetailsPanel extends Composite {
 			desc.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
 			dt.add(desc);
+			dt.addStyleName(ContentWidth.MAXWIDTH800PX.toString());
 		}
 
 		initWidget(dt);

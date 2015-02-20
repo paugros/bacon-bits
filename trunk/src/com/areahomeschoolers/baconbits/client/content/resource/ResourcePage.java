@@ -20,6 +20,7 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
@@ -688,7 +689,6 @@ public class ResourcePage implements Page {
 
 		if (!Common.isNullOrBlank(resource.getDescription())) {
 			HTML desc = new HTML(resource.getDescription());
-			desc.setWidth("700px");
 			desc.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
 			desc.getElement().getStyle().setMarginLeft(15, Unit.PX);
 			desc.getElement().getStyle().setMarginRight(15, Unit.PX);
@@ -700,6 +700,7 @@ public class ResourcePage implements Page {
 			desc.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
 			ovp.add(desc);
+			ovp.addStyleName(ContentWidth.MAXWIDTH800PX.toString());
 		}
 
 		VerticalPanel outerPanel = new VerticalPanel();

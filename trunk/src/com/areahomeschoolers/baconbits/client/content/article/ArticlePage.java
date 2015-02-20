@@ -18,6 +18,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
@@ -317,7 +318,6 @@ public class ArticlePage implements Page {
 
 			HTML desc = new HTML(html);
 
-			desc.setWidth("750px");
 			desc.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
 			desc.getElement().getStyle().setMarginLeft(15, Unit.PX);
 			desc.getElement().getStyle().setMarginRight(15, Unit.PX);
@@ -329,6 +329,7 @@ public class ArticlePage implements Page {
 			desc.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
 			ovp.add(desc);
+			ovp.addStyleName(ContentWidth.MAXWIDTH800PX.toString());
 		}
 
 		if (article.hasDocuments()) {

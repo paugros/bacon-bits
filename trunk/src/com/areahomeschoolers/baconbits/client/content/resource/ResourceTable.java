@@ -8,24 +8,33 @@ import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.WidgetCellCreator;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, ResourceColumn> {
 	public enum ResourceColumn implements EntityCellTableColumn<ResourceColumn> {
-		NAME("Title"), ADDED_DATE("Added"), VIEW_COUNT("Views"), CLICK_COUNT("Clicks"), IMPRESSIONS("Impressions");
+		NAME("Title"), DESCRIPTION("Description"), ADDED_DATE("Added"), LOCATION("Location"), TAGS("Tags"), VIEW_COUNT("Views"), CLICK_COUNT("Clicks"), IMPRESSIONS(
+				"Impressions");
 
 		private String title;
 
@@ -101,6 +110,44 @@ public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, 
 	protected void setColumns() {
 		for (ResourceColumn col : getDisplayColumns()) {
 			switch (col) {
+			case TAGS:
+				addTextColumn(col, new ValueGetter<String, Resource>() {
+					@Override
+					public String get(Resource item) {
+						return item.getTags();
+					}
+				});
+				break;
+			case DESCRIPTION:
+				addCompositeWidgetColumn(col, new WidgetCellCreator<Resource>() {
+					@Override
+					protected Widget createWidget(final Resource item) {
+						final ClickLabel preview = new ClickLabel("Preview");
+						preview.addClickHandler(new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								DecoratedPopupPanel p = new DecoratedPopupPanel(true);
+								p.setModal(true);
+								int spHeight = 350;
+								MaxHeightScrollPanel sp = new MaxHeightScrollPanel(spHeight);
+								sp.alwaysUseMaxHeight(true);
+								HTML h = new HTML(item.getDescription());
+								h.setWidth("500px");
+								sp.setWidget(h);
+								p.setWidget(sp);
+								int y = event.getY();
+								if (y + spHeight + 15 > Window.getClientHeight()) {
+									y -= spHeight + 15;
+								}
+								p.setPopupPosition(event.getX(), y);
+								p.show();
+							}
+						});
+
+						return preview;
+					}
+				});
+				break;
 			case ADDED_DATE:
 				addDateColumn(col, new ValueGetter<Date, Resource>() {
 					@Override
@@ -114,6 +161,24 @@ public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, 
 					@Override
 					protected Widget createWidget(Resource item) {
 						return new DefaultHyperlink(item.getName(), PageUrl.resource(item.getId()));
+					}
+				});
+				break;
+			case LOCATION:
+				addTextColumn(col, new ValueGetter<String, Resource>() {
+					@Override
+					public String get(Resource item) {
+						String text = "";
+						if (!Common.isNullOrBlank(item.getCity())) {
+							text += item.getCity();
+							if (!Common.isNullOrBlank(item.getState())) {
+								text += ", ";
+							}
+						}
+						if (!Common.isNullOrBlank(item.getState())) {
+							text += item.getState();
+						}
+						return text;
 					}
 				});
 				break;

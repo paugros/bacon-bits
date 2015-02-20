@@ -136,7 +136,9 @@ public final class Layout {
 		menu = new MainMenu();
 		headerPanel.add(menu);
 		headerPanel.setCellVerticalAlignment(menu, HasVerticalAlignment.ALIGN_BOTTOM);
-		// headerPanel.setCellWidth(menu, "100%");
+		if (ClientUtils.isMobileBrowser()) {
+			headerPanel.setCellWidth(menu, "1%");
+		}
 
 		final PaddedPanel searchPanel = new PaddedPanel();
 		Image search = new Image(MainImageBundle.INSTANCE.searchLarge());
@@ -192,7 +194,9 @@ public final class Layout {
 
 		rightPanel.add(searchPanel);
 		headerPanel.add(rightPanel);
-		headerPanel.setCellHorizontalAlignment(rightPanel, HasHorizontalAlignment.ALIGN_RIGHT);
+		if (!ClientUtils.isMobileBrowser()) {
+			headerPanel.setCellHorizontalAlignment(rightPanel, HasHorizontalAlignment.ALIGN_RIGHT);
+		}
 		rightPanel.setCellVerticalAlignment(searchPanel, HasVerticalAlignment.ALIGN_MIDDLE);
 		headerPanel.setCellVerticalAlignment(rightPanel, HasVerticalAlignment.ALIGN_MIDDLE);
 
