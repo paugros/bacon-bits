@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.Sidebar;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
 import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule.AdDirection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
@@ -24,7 +25,6 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
-import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -338,9 +338,9 @@ public class ArticlePage implements Page {
 			ovp.add(ds);
 		}
 
-		PaddedPanel outerPanel = new PaddedPanel(10);
-		outerPanel.add(new AdsMiniModule());
+		VerticalPanel outerPanel = new VerticalPanel();
 		outerPanel.add(ovp);
+		outerPanel.add(new AdsMiniModule(AdDirection.HORIZONTAL));
 
 		page.add(outerPanel);
 	}

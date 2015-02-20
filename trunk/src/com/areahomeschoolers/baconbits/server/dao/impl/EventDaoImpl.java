@@ -840,7 +840,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		p.setStatusId(1);
 		p.setPrincipalAmount(principal);
 		p.setMarkupAmount(markup);
-		p.setReturnPage("User&tab=1&userId=" + ServerContext.getCurrentUserId());
+		p.setReturnPage("Home&pt=event");
 		p.setMemo("Payment for events");
 		p = paymentDao.save(p);
 

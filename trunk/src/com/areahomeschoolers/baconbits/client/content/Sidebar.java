@@ -7,6 +7,7 @@ import java.util.Map;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.minimodules.ActiveUsersMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule.AdDirection;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CommunityEventsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.LinksMiniModule;
@@ -80,7 +81,7 @@ public class Sidebar extends Composite {
 
 		switch (module) {
 		case ADS:
-			add(module, new AdsMiniModule());
+			add(module, new AdsMiniModule(AdDirection.VERTICAL));
 			break;
 		case COMMUNITY_EVENTS:
 			add(module, new CommunityEventsMiniModule());
