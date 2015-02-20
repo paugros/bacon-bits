@@ -181,11 +181,7 @@ public final class TagGroupPage implements Page {
 			vvp.add(bottom);
 		}
 
-		PaddedPanel opp = new PaddedPanel(10);
-		opp.add(vvp);
-		opp.add(new FriendlyTextWidget(type));
-
-		page.add(opp);
+		page.add(new SearchSection(type, vvp));
 	}
 
 	private void populate() {

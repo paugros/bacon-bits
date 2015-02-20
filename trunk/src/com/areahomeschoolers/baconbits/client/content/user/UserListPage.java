@@ -6,7 +6,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
-import com.areahomeschoolers.baconbits.client.content.tag.FriendlyTextWidget;
+import com.areahomeschoolers.baconbits.client.content.tag.SearchSection;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
@@ -80,11 +80,7 @@ public final class UserListPage implements Page {
 			page.setCellWidth(link, "1%");
 		}
 
-		PaddedPanel pp = new PaddedPanel(10);
-		pp.add(optionsPanel);
-		pp.add(new FriendlyTextWidget(TagMappingType.USER));
-
-		page.add(pp);
+		page.add(new SearchSection(TagMappingType.USER, optionsPanel));
 
 		populateOptionsPanel();
 

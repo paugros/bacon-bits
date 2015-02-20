@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.minimodules;
 
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Constants;
 
@@ -14,7 +15,10 @@ public class CitrusMiniModule extends Composite {
 		Image image = new Image(MainImageBundle.INSTANCE.littleLogo());
 		String text = "<a href=\"" + url + "\" style=\"color: #f06000; font-size: 14px; font-weight: bold;\">";
 		text += "<table><tr><td>" + image + "</td>";
-		text += "<td>Citrus<br>Groups</a></td></tr></table>";
+		if (!ClientUtils.isMobileBrowser()) {
+			text += "<td>Citrus<br>Groups</a></td>";
+		}
+		text += "</tr></table>";
 		HTML html = new HTML(text);
 		initWidget(html);
 		addStyleName("CitrusMiniModule");

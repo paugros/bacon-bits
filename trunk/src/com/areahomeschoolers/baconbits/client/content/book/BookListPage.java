@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.tag.FriendlyTextWidget;
+import com.areahomeschoolers.baconbits.client.content.tag.SearchSection;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
@@ -83,11 +83,7 @@ public final class BookListPage implements Page {
 		}
 		page.add(cc);
 
-		PaddedPanel pp = new PaddedPanel(10);
-		pp.add(optionsPanel);
-		pp.add(new FriendlyTextWidget(TagMappingType.BOOK));
-
-		page.add(pp);
+		page.add(new SearchSection(TagMappingType.BOOK, optionsPanel));
 		populateOptionsPanel();
 
 		page.add(fp);

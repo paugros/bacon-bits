@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.tag.FriendlyTextWidget;
+import com.areahomeschoolers.baconbits.client.content.tag.SearchSection;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceService;
@@ -141,11 +141,7 @@ public final class ResourceListPage implements Page {
 		}
 		vvp.add(bottom);
 
-		PaddedPanel pp = new PaddedPanel(10);
-		pp.add(vvp);
-		pp.add(new FriendlyTextWidget(TagMappingType.RESOURCE));
-
-		page.add(pp);
+		page.add(new SearchSection(TagMappingType.RESOURCE, vvp));
 	}
 
 	private void populate() {
