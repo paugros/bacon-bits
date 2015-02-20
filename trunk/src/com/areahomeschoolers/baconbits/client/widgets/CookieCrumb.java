@@ -1,10 +1,10 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 
 public class CookieCrumb extends Composite {
 	private HTML html = new HTML();
@@ -21,6 +21,9 @@ public class CookieCrumb extends Composite {
 	}
 
 	public void add(String text) {
+		if (ClientUtils.isMobileBrowser()) {
+			return;
+		}
 		String current = html.getHTML();
 		html.setHTML(current + (current.isEmpty() ? "" : SEPARATOR) + text);
 	}

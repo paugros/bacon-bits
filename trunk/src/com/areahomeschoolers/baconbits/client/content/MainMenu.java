@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client.content;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.document.FileUploadDialog;
 import com.areahomeschoolers.baconbits.client.event.UploadCompleteHandler;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
@@ -72,9 +73,11 @@ public final class MainMenu extends MenuBar {
 		addLinkToMenu(this, "Books", PageUrl.tagGroup(TagMappingType.BOOK.toString()));
 		addItem("Events", getEventsMenu());
 		addLinkToMenu(this, "Resources", PageUrl.tagGroup(TagMappingType.RESOURCE.toString()));
-		addLinkToMenu(this, "Blog", PageUrl.blog(0));
+		if (!ClientUtils.isMobileBrowser()) {
+			addLinkToMenu(this, "Blog", PageUrl.blog(0));
+		}
 
-		if (Application.isAuthenticated()) {
+		if (Application.isAuthenticated() && !ClientUtils.isMobileBrowser()) {
 			addLinkToMenu(this, "Homeschoolers", PageUrl.tagGroup(TagMappingType.USER.toString()));
 		}
 

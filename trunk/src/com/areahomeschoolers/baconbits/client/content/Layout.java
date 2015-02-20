@@ -261,7 +261,11 @@ public final class Layout {
 			rightPanel.add(dm);
 			rightPanel.setCellVerticalAlignment(dm, HasVerticalAlignment.ALIGN_MIDDLE);
 		} else {
-			final ClickLabel login = new ClickLabel("Log in / Create account");
+			String loginText = "Log in";
+			if (!ClientUtils.isMobileBrowser()) {
+				loginText += " / Create account";
+			}
+			final ClickLabel login = new ClickLabel(loginText);
 			login.getElement().getStyle().setMarginRight(15, Unit.PX);
 			login.addClickHandler(new ClickHandler() {
 				@Override
