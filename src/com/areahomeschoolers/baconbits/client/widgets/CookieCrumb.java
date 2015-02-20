@@ -21,7 +21,7 @@ public class CookieCrumb extends Composite {
 	}
 
 	public void add(String text) {
-		if (ClientUtils.isMobileBrowser()) {
+		if (!text.contains("href") && ClientUtils.isMobileBrowser()) {
 			return;
 		}
 		String current = html.getHTML();
