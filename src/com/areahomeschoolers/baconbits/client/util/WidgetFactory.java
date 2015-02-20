@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.util;
 
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar.TitleBarStyle;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
@@ -15,7 +16,6 @@ import com.google.gwt.user.client.ui.CustomButton;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public abstract class WidgetFactory {
 	public enum ContentWidth {
-		MAXWIDTH750PX, MAXWIDTH900PX, MAXWIDTH1000PX, MAXWIDTH1100PX, MAXWIDTH1200PX, MAXWIDTH1300PX, MAXWIDTH1400PX, MAXWIDTH1500PX;
+		MAXWIDTH700PX, MAXWIDTH750PX, MAXWIDTH800PX, MAXWIDTH900PX, MAXWIDTH1000PX, MAXWIDTH1100PX, MAXWIDTH1200PX, MAXWIDTH1300PX, MAXWIDTH1400PX, MAXWIDTH1500PX;
 	}
 
 	private static final String DEFAULT_PERCENTAGE_BAR_STYLE = "percentageBar-green";

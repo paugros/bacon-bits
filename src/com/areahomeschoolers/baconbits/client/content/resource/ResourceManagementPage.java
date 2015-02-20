@@ -32,7 +32,7 @@ public final class ResourceManagementPage implements Page {
 		table.getTitleBar().addSearchControl();
 		table.getTitleBar().addExcelControl();
 		table.addStatusFilterBox();
-		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1000PX));
+		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH1200PX));
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
 			public void onDataReturn() {

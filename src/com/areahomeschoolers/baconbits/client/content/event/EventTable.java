@@ -8,7 +8,6 @@ import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColu
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
-import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
@@ -39,8 +38,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class EventTable extends EntityCellTable<Event, EventArg, EventColumn> {
 	public enum EventColumn implements EntityCellTableColumn<EventColumn> {
-		REGISTERED(""), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), PRICE("Price"), AGES("Ages"), CATEGORY("Category"), VIEWS(
-				"Views");
+		REGISTERED(""), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), LOCATION("Location"), TAGS("Tags"), CATEGORY(
+				"Category"), VIEWS("Views");
 
 		private String title;
 
@@ -63,8 +62,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 
 	private EventTable() {
 		setDefaultSortColumn(EventColumn.START_DATE, SortDirection.SORT_ASC);
-		setDisplayColumns(EventColumn.REGISTERED, EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.PRICE, EventColumn.AGES,
-				EventColumn.VIEWS);
+		setDisplayColumns(EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.LOCATION, EventColumn.TAGS, EventColumn.VIEWS);
 	}
 
 	public void addStatusFilterBox() {
@@ -130,24 +128,11 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 					});
 				}
 				break;
-			case AGES:
+			case TAGS:
 				addTextColumn(col, new ValueGetter<String, Event>() {
 					@Override
 					public String get(Event item) {
-						String text = "";
-						if (!Common.isNullOrBlank(item.getAgeRanges())) {
-							String[] p = item.getAgeRanges().split(",");
-							for (int i = 0; i < p.length; i++) {
-								text += p[i].replace("-0", "+");
-								if (i < p.length - 1) {
-									text += " / ";
-								}
-							}
-
-						} else {
-							text = "All ages";
-						}
-						return text;
+						return item.getTags();
 					}
 				});
 				break;
@@ -181,30 +166,19 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 					}
 				});
 				break;
-			case PRICE:
+			case LOCATION:
 				addTextColumn(col, new ValueGetter<String, Event>() {
 					@Override
 					public String get(Event item) {
 						String text = "";
-						if (!Common.isNullOrBlank(item.getAgePrices())) {
-							String[] p = item.getAgePrices().split(",");
-							for (int i = 0; i < p.length; i++) {
-								if ("0.00".equals(p[i])) {
-									text += "Free";
-								} else {
-									text += Formatter.formatCurrency(p[i]);
-								}
-								if (i < p.length - 1) {
-									text += " / ";
-								}
+						if (!Common.isNullOrBlank(item.getCity())) {
+							text += item.getCity();
+							if (!Common.isNullOrBlank(item.getState())) {
+								text += ", ";
 							}
-
-						} else {
-							if (item.getPrice() == 0) {
-								text = "Free";
-							} else {
-								text = Formatter.formatCurrency(item.getAdjustedPrice());
-							}
+						}
+						if (!Common.isNullOrBlank(item.getState())) {
+							text += item.getState();
 						}
 						return text;
 					}
@@ -253,7 +227,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 				}), "130px");
 				break;
 			case START_DATE:
-				setColumnWidth(addDateTimeColumn(col, new ValueGetter<Date, Event>() {
+				setColumnWidth(addDateColumn(col, new ValueGetter<Date, Event>() {
 					@Override
 					public Date get(Event item) {
 						return item.getStartDate();

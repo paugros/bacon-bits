@@ -208,6 +208,11 @@ img {
 	border-right: none;
 }
 
+.MAXWIDTH800PX {
+	width: 100%;
+	max-width: 800px;
+}
+
 .MAXWIDTH900PX {
 	width: 100%;
 	max-width: 900px;
@@ -216,6 +221,11 @@ img {
 .MAXWIDTH750PX {
 	width: 100%;
 	max-width: 750px;
+}
+
+.MAXWIDTH700PX {
+	width: 100%;
+	max-width: 700px;
 }
 
 .MAXWIDTH1000PX {

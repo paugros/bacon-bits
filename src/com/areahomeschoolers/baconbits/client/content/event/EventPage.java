@@ -1238,7 +1238,6 @@ public class EventPage implements Page {
 
 		if (!Common.isNullOrBlank(calendarEvent.getDescription())) {
 			HTML desc = new HTML(calendarEvent.getDescription());
-			desc.setWidth("800px");
 			desc.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
 			desc.getElement().getStyle().setMarginLeft(15, Unit.PX);
 			desc.getElement().getStyle().setMarginRight(15, Unit.PX);
@@ -1251,6 +1250,7 @@ public class EventPage implements Page {
 			desc.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
 			ovp.add(desc);
+			ovp.addStyleName(ContentWidth.MAXWIDTH800PX.toString());
 		}
 
 		VerticalPanel outerPanel = new VerticalPanel();
