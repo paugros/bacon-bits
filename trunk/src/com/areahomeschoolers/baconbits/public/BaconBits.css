@@ -22,6 +22,12 @@ h1 {
 	font-size: small;
 }
 
+@media only screen and (max-device-width: 480px) {
+	.gwt-Label {
+		font-size: 18px;
+	}	
+}
+
 .dialogVPanel {
   margin: 5px;
 }
@@ -44,6 +50,13 @@ h1 {
 body, table td, select, span, div, label {
 	font-family: Arial Unicode MS, Arial, sans-serif;
 	font-size: small;
+}
+
+@media only screen and (max-device-width: 480px) {
+	body, table td, select, span, div, label {
+		font-family: Arial Unicode MS, Arial, sans-serif;
+		font-size: 18px;
+	}
 }
 
 body {
