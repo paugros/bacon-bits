@@ -495,7 +495,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		p.setPaymentTypeId(2);
 		p.setStatusId(1);
 		p.setPrincipalAmount(5);
-		p.setReturnPage("Home");
+		p.setReturnPage("Home&pt=book");
 		p.setMemo("Payment for book selling registration");
 		p = paymentDao.save(p);
 

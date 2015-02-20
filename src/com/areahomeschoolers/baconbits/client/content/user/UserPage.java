@@ -20,6 +20,7 @@ import com.areahomeschoolers.baconbits.client.content.event.EventParticipantTabl
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerTable;
 import com.areahomeschoolers.baconbits.client.content.event.EventVolunteerTable.VolunteerColumn;
 import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule.AdDirection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
@@ -775,9 +776,9 @@ public class UserPage implements Page {
 
 		ovp.add(ts);
 
-		PaddedPanel outerPanel = new PaddedPanel(10);
-		outerPanel.add(new AdsMiniModule());
+		VerticalPanel outerPanel = new VerticalPanel();
 		outerPanel.add(ovp);
+		outerPanel.add(new AdsMiniModule(AdDirection.HORIZONTAL));
 
 		page.add(outerPanel);
 	}

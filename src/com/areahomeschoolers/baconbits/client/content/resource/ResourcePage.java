@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule.AdDirection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
@@ -701,9 +702,9 @@ public class ResourcePage implements Page {
 			ovp.add(desc);
 		}
 
-		PaddedPanel outerPanel = new PaddedPanel(10);
-		outerPanel.add(new AdsMiniModule());
+		VerticalPanel outerPanel = new VerticalPanel();
 		outerPanel.add(ovp);
+		outerPanel.add(new AdsMiniModule(AdDirection.HORIZONTAL));
 
 		page.add(outerPanel);
 	}

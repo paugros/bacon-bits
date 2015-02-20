@@ -15,14 +15,32 @@ import com.areahomeschoolers.baconbits.shared.dto.Resource;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class AdsMiniModule extends Composite {
+	public enum AdDirection {
+		VERTICAL, HORIZONTAL
+	}
+
 	private ResourceServiceAsync resourceService = (ResourceServiceAsync) ServiceCache.getService(ResourceService.class);
 	private VerticalPanel vp = new VerticalPanel();
+	private HorizontalPanel hp = new HorizontalPanel();
 	private ArgMap<ResourceArg> args = new ArgMap<ResourceArg>(Status.ACTIVE);
+	private AdDirection direction;
 
+	@Deprecated
 	public AdsMiniModule() {
+		this(AdDirection.VERTICAL);
+	}
+
+	public AdsMiniModule(AdDirection direction) {
+		this.direction = direction;
+		vp.setSpacing(10);
+		hp.setSpacing(10);
+
+		hp.getElement().getStyle().setMarginTop(50, Unit.PX);
+
 		args.put(ResourceArg.RANDOM);
 		args.put(ResourceArg.LIMIT, 3);
 		args.put(ResourceArg.AD);
@@ -32,8 +50,7 @@ public class AdsMiniModule extends Composite {
 
 		populate();
 
-		initWidget(vp);
-
+		initWidget(direction == AdDirection.VERTICAL ? vp : hp);
 	}
 
 	private void populate() {
@@ -45,9 +62,11 @@ public class AdsMiniModule extends Composite {
 				for (Resource ad : result) {
 					AdTile tile = new AdTile(ad);
 
-					tile.getElement().getStyle().setMarginBottom(10, Unit.PX);
-
-					vp.add(tile);
+					if (direction == AdDirection.VERTICAL) {
+						vp.add(tile);
+					} else {
+						hp.add(tile);
+					}
 					ids.add(ad.getId());
 				}
 
