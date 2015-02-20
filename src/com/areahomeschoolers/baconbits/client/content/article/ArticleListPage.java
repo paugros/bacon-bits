@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.tag.FriendlyTextWidget;
+import com.areahomeschoolers.baconbits.client.content.tag.SearchSection;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
@@ -89,11 +89,7 @@ public final class ArticleListPage implements Page {
 			}
 		});
 
-		PaddedPanel pp = new PaddedPanel(10);
-		pp.add(searchBox);
-		pp.add(new FriendlyTextWidget(TagMappingType.ARTICLE));
-
-		page.add(pp);
+		page.add(new SearchSection(TagMappingType.ARTICLE, searchBox));
 
 		page.add(fp);
 		Application.getLayout().setPage(title, page);

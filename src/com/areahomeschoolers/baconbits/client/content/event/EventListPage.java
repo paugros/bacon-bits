@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.tag.FriendlyTextWidget;
+import com.areahomeschoolers.baconbits.client.content.tag.SearchSection;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
@@ -43,7 +43,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -97,7 +96,6 @@ public final class EventListPage implements Page {
 		if (!showCommunity) {
 			VerticalPanel vp = new VerticalPanel();
 			vp.setWidth("100%");
-			HorizontalPanel hp = new HorizontalPanel();
 
 			PaddedPanel pp = new PaddedPanel(10);
 			VerticalPanel vpp = new VerticalPanel();
@@ -214,13 +212,7 @@ public final class EventListPage implements Page {
 
 			vpp.addStyleName("boxedBlurb");
 
-			hp.add(vp);
-
-			FriendlyTextWidget fw = new FriendlyTextWidget(TagMappingType.EVENT);
-			fw.getElement().getStyle().setMarginLeft(10, Unit.PX);
-			hp.add(fw);
-
-			page.add(hp);
+			page.add(new SearchSection(TagMappingType.EVENT, vp));
 		}
 
 		page.add(fp);

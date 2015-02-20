@@ -425,7 +425,15 @@ img {
 .friendlyText {
 	font-size: 15px;
 	color: #555555;
-	width: 500px;
+	max-width: 500px;
+}
+
+@media only screen and (max-device-width: 480px) {
+	.friendlyText {
+		font-size: 15px;
+		color: #555555;
+		width: 100%;
+	}
 }
 
 .module {
