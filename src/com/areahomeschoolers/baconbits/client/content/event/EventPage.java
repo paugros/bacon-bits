@@ -1214,6 +1214,8 @@ public class EventPage implements Page {
 
 		final VerticalPanel oovp = new VerticalPanel();
 
+		System.out.println(pageData.getEvent().getFinished());
+		System.out.println(pageData.getEvent().getRegistrationOpen());
 		if (pageData.getRegistration() != null && !pageData.getRegistration().getParticipants().isEmpty()) {
 			oovp.insert(new EventRegistrationSection(pageData), 0);
 		} else if (calendarEvent.getRequiresRegistration() && pageData.getEvent().allowRegistrations()) {
