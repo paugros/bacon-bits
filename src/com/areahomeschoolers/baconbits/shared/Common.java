@@ -132,20 +132,19 @@ public abstract class Common {
 	}
 
 	public static double getEventMarkup(double price, Event event) {
-		double percent = Constants.EVENT_PERCENT_MARKUP;
-		double dollars = Constants.EVENT_DOLLARS_MARKUP;
-
-		if (event.getGroupMarkupOverride()) {
-			percent = event.getGroupMarkupPercent();
-			dollars = event.getGroupMarkupDollars();
-		}
-
-		if (event.getMarkupOverride()) {
-			percent = event.getMarkupPercent();
-			dollars = event.getMarkupDollars();
-		}
+		double percent = getMarkupPercent(event);
+		double dollars = getMarkupDollars(event);
 
 		return (price * (percent / 100)) + dollars;
+	}
+
+	public static double getEventPreMarkup(double price, Event event) {
+		double percent = getMarkupPercent(event);
+		double dollars = getMarkupDollars(event);
+
+		double chargeAmount = (price - dollars) / (1 + (percent / 100));
+
+		return price - chargeAmount;
 	}
 
 	/**
@@ -182,6 +181,32 @@ public abstract class Common {
 		}
 
 		return fileName.substring(fileName.lastIndexOf('.') + 1);
+	}
+
+	public static double getMarkupDollars(Event event) {
+		double dollars = Constants.EVENT_DOLLARS_MARKUP;
+		if (event.getGroupMarkupOverride()) {
+			dollars = event.getGroupMarkupDollars();
+		}
+
+		if (event.getMarkupOverride()) {
+			dollars = event.getMarkupDollars();
+		}
+
+		return dollars;
+	}
+
+	public static double getMarkupPercent(Event event) {
+		double percent = Constants.EVENT_PERCENT_MARKUP;
+		if (event.getGroupMarkupOverride()) {
+			percent = event.getGroupMarkupPercent();
+		}
+
+		if (event.getMarkupOverride()) {
+			percent = event.getMarkupPercent();
+		}
+
+		return percent;
 	}
 
 	public static String getSimpleClassName(Class<?> c) {

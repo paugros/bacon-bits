@@ -6,15 +6,13 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
-import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class ArticleManagementPage implements Page {
@@ -25,9 +23,7 @@ public final class ArticleManagementPage implements Page {
 		}
 
 		ArgMap<ArticleArg> args = new ArgMap<ArticleArg>();
-		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			args.put(ArticleArg.HAS_TAGS, Url.getIntListParameter("tagId"));
-		}
+		args.put(ArticleArg.INCLUDE_BLOG);
 		final String title = "Articles";
 		final ArticleTable table = new ArticleTable(args);
 		table.setTitle(title);

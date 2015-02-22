@@ -197,7 +197,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		int top = args.getInt(ArticleArg.MOST_RECENT);
 		String idString = args.getString(ArticleArg.IDS);
 		int orgId = args.getInt(ArticleArg.OWNING_ORG_ID);
-		boolean newsOnly = args.getBoolean(ArticleArg.BLOG_ONLY);
+		boolean blogOnly = args.getBoolean(ArticleArg.BLOG_ONLY);
+		boolean includeBlog = args.getBoolean(ArticleArg.INCLUDE_BLOG);
 		int beforeId = args.getInt(ArticleArg.BEFORE_ID);
 		String search = args.getString(ArticleArg.SEARCH);
 		Date beforeDate = args.getDate(ArticleArg.BEFORE_DATE);
@@ -218,9 +219,9 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			sqlArgs.add(orgId);
 		}
 
-		if (newsOnly) {
+		if (blogOnly) {
 			sql += "and a.newsItem = 1 ";
-		} else {
+		} else if (!includeBlog) {
 			sql += "and a.newsItem = 0 ";
 		}
 

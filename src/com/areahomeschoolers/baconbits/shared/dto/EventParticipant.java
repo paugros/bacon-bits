@@ -37,6 +37,7 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 	private boolean updateAllInSeries;
 	private String sex;
 	private String registrantEmailAddress;
+	private String payPalEmail;
 
 	// for bulk registration of a series
 	private ArrayList<Integer> seriesEventIds;
@@ -141,6 +142,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public int getPaymentStatusId() {
 		return paymentStatusId;
+	}
+
+	public String getPayPalEmail() {
+		return payPalEmail;
 	}
 
 	public double getPrice() {
@@ -281,6 +286,10 @@ public final class EventParticipant extends EntityDto<EventParticipant> {
 
 	public void setPaymentStatusId(int paymentStatusId) {
 		this.paymentStatusId = paymentStatusId;
+	}
+
+	public void setPayPalEmail(String payPalEmail) {
+		this.payPalEmail = payPalEmail;
 	}
 
 	public void setPrice(double price) {

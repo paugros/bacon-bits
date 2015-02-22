@@ -46,6 +46,7 @@ import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
@@ -121,6 +122,7 @@ public class EventPage implements Page {
 	private TagSection tagSection;
 	private FormField tagField;
 	private String title;
+	private FormField payPalField;
 
 	public EventPage(final VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -604,15 +606,17 @@ public class EventPage implements Page {
 		fieldTable.addField(tagField);
 
 		final Label registerDisplay = new Label();
-		final DefaultListBox registerInput = new DefaultListBox();
-		registerInput.addItem("No", 0);
-		registerInput.addItem("Yes", 1);
-		FormField registerField = form.createFormField("Requires registration:", registerInput, registerDisplay);
+		final RequiredListBox registerInput = new RequiredListBox();
+		registerInput.addItem("No registration is required", 0);
+		registerInput.addItem("Use this event to collect registrations and fees", 1);
+		FormField registerField = form.createFormField("Registration:", registerInput, registerDisplay);
 		registerField.setInitializer(new Command() {
 			@Override
 			public void execute() {
 				registerDisplay.setText(Common.yesNo(calendarEvent.getRequiresRegistration()));
-				registerInput.setValue(calendarEvent.getRequiresRegistration() ? 1 : 0);
+				if (calendarEvent.isSaved()) {
+					registerInput.setValue(calendarEvent.getRequiresRegistration() ? 1 : 0);
+				}
 				registerInput.fireEvent(new ChangeEvent() {
 				});
 			}
@@ -651,6 +655,60 @@ public class EventPage implements Page {
 				}
 			});
 			fieldTable.addField(priceField);
+
+			String groupEmail = Application.getCurrentOrg().getPayPalEmail();
+			String selfEmail = Application.getCurrentUser().getPayPalEmail();
+			boolean groupPay = !Common.isNullOrBlank(groupEmail) && Application.administratorOfCurrentOrg();
+			boolean selfPay = !Common.isNullOrBlank(selfEmail);
+
+			if (groupPay && selfPay && !calendarEvent.isSaved()) {
+				final Label payPalDisplay = new Label();
+				final DefaultListBox payPalInput = new DefaultListBox();
+				payPalInput.addItem(groupEmail);
+				payPalInput.addItem(selfEmail);
+				payPalField = form.createFormField("Pay to (PayPal email):", payPalInput, payPalDisplay);
+				payPalField.setInitializer(new Command() {
+					@Override
+					public void execute() {
+						payPalDisplay.setText(calendarEvent.getPayPalEmail());
+						payPalInput.setValue(calendarEvent.getPayPalEmail());
+					}
+				});
+				payPalField.setDtoUpdater(new Command() {
+					@Override
+					public void execute() {
+						calendarEvent.setPayPalEmail(payPalInput.getValue());
+					}
+				});
+				fieldTable.addField(payPalField);
+			} else {
+				final Label payPalEditDisplay = new Label();
+				final TextBox payPalEditInput = new TextBox();
+				payPalEditInput.setMaxLength(255);
+				payPalEditInput.setVisibleLength(30);
+				if (!calendarEvent.isSaved()) {
+					if (groupPay) {
+						calendarEvent.setPayPalEmail(groupEmail);
+					} else if (selfPay) {
+						calendarEvent.setPayPalEmail(selfEmail);
+					}
+				}
+				payPalField = form.createFormField("Pay to (PayPal email):", payPalEditInput, payPalEditDisplay);
+				payPalField.setInitializer(new Command() {
+					@Override
+					public void execute() {
+						payPalEditDisplay.setText(calendarEvent.getPayPalEmail());
+						payPalEditInput.setText(calendarEvent.getPayPalEmail());
+					}
+				});
+				payPalField.setDtoUpdater(new Command() {
+					@Override
+					public void execute() {
+						calendarEvent.setPayPalEmail(payPalEditInput.getText());
+					}
+				});
+				fieldTable.addField(payPalField);
+			}
 
 			final Label emailDisplay = new Label();
 			final EmailTextBox emailInput = new EmailTextBox();
@@ -693,18 +751,42 @@ public class EventPage implements Page {
 			});
 			fieldTable.addField(participantField);
 
+			if (Application.isSystemAdministrator()) {
+				MarkupField mf = new MarkupField(calendarEvent);
+				markupField = mf.getFormField();
+				if (!calendarEvent.isSaved()) {
+					mf.setChangeCommand(new Command() {
+						@Override
+						public void execute() {
+							markupField.updateDto();
+							priceField.updateDto();
+							priceField.initialize();
+						}
+					});
+				}
+
+				form.addField(markupField);
+				fieldTable.addField(markupField);
+			}
+
 			registerInput.addChangeHandler(new ChangeHandler() {
 				@Override
 				public void onChange(ChangeEvent event) {
 					boolean show = registerInput.getIntValue() == 1;
+					payPalField.setRequired(show);
 					fieldTable.setFieldVisibility(participantField, show);
 					fieldTable.setFieldVisibility(emailField, show);
 					fieldTable.setFieldVisibility(priceField, show);
+					fieldTable.setFieldVisibility(payPalField, show);
+					fieldTable.setFieldVisibility(markupField, show);
 					if (!calendarEvent.isSaved()) {
 						priceField.setInputVisibility(true);
 						emailField.setInputVisibility(true);
 						participantField.setInputVisibility(true);
+						payPalField.setInputVisibility(true);
+						markupField.setInputVisibility(true);
 					}
+
 				}
 			});
 		}
@@ -812,24 +894,6 @@ public class EventPage implements Page {
 		// }
 		// });
 		// fieldTable.addField(categoryField);
-
-		if (Application.isSystemAdministrator()) {
-			MarkupField mf = new MarkupField(calendarEvent);
-			markupField = mf.getFormField();
-			if (!calendarEvent.isSaved()) {
-				mf.setChangeCommand(new Command() {
-					@Override
-					public void execute() {
-						markupField.updateDto();
-						priceField.updateDto();
-						priceField.initialize();
-					}
-				});
-			}
-
-			form.addField(markupField);
-			fieldTable.addField(markupField);
-		}
 
 		if (calendarEvent.getRequiresRegistration()) {
 			if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
