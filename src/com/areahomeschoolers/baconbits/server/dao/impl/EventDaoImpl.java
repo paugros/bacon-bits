@@ -138,6 +138,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	@Autowired
 	public EventDaoImpl(DataSource dataSource) {
 		super(dataSource);
+		update("SET @@session.time_zone='-05:00';");
 	}
 
 	@Override
