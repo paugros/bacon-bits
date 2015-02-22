@@ -778,13 +778,17 @@ public class EventPage implements Page {
 					fieldTable.setFieldVisibility(emailField, show);
 					fieldTable.setFieldVisibility(priceField, show);
 					fieldTable.setFieldVisibility(payPalField, show);
-					fieldTable.setFieldVisibility(markupField, show);
+					if (Application.isSystemAdministrator()) {
+						fieldTable.setFieldVisibility(markupField, show);
+					}
 					if (!calendarEvent.isSaved()) {
 						priceField.setInputVisibility(true);
 						emailField.setInputVisibility(true);
 						participantField.setInputVisibility(true);
 						payPalField.setInputVisibility(true);
-						markupField.setInputVisibility(true);
+						if (Application.isSystemAdministrator()) {
+							markupField.setInputVisibility(true);
+						}
 					}
 
 				}
