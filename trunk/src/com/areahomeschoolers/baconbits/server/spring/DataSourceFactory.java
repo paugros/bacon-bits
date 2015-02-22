@@ -12,7 +12,7 @@ public class DataSourceFactory {
 
 		String db = ServerContext.isLive() ? "areahomeschoolers" : "development";
 		ds.setUrl("jdbc:google:rdbms://baconbits-sql:" + db + "/baconbits");
-		ds.setValidationQuery("select max(id) from articles");
+		ds.setValidationQuery("SET @@session.time_zone='-05:00'");
 		ds.setTestWhileIdle(true);
 		ds.setTestOnBorrow(true);
 		ds.setInitialSize(1);
