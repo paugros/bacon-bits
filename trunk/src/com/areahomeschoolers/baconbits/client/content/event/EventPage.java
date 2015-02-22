@@ -710,6 +710,13 @@ public class EventPage implements Page {
 				fieldTable.addField(payPalField);
 			}
 
+			priceInput.setChangeCommand(new Command() {
+				@Override
+				public void execute() {
+					payPalField.setRequired(priceInput.getDouble() > 0.00);
+				}
+			});
+
 			final Label emailDisplay = new Label();
 			final EmailTextBox emailInput = new EmailTextBox();
 			emailInput.setMultiEmail(true);
@@ -773,7 +780,7 @@ public class EventPage implements Page {
 				@Override
 				public void onChange(ChangeEvent event) {
 					boolean show = registerInput.getIntValue() == 1;
-					payPalField.setRequired(show);
+					payPalField.setRequired(show && priceInput.getDouble() > 0);
 					fieldTable.setFieldVisibility(participantField, show);
 					fieldTable.setFieldVisibility(emailField, show);
 					fieldTable.setFieldVisibility(priceField, show);
