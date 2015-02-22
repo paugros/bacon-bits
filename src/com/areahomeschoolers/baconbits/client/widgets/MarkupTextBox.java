@@ -9,6 +9,7 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.TextAlign;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
@@ -20,6 +21,7 @@ public class MarkupTextBox extends Composite {
 	private NumericTextBox feeInput = new NumericTextBox(2);
 	private Event event;
 	private VerticalPanel vp = new VerticalPanel();
+	private Command changeCommand;
 
 	public MarkupTextBox(Event event) {
 		vp.setSpacing(4);
@@ -87,8 +89,16 @@ public class MarkupTextBox extends Composite {
 		initWidget(vp);
 	}
 
+	public Command getChangeCommand() {
+		return changeCommand;
+	}
+
 	public Double getDouble() {
 		return preInput.getDouble();
+	}
+
+	public void setChangeCommand(Command changeCommand) {
+		this.changeCommand = changeCommand;
 	}
 
 	public void setValue(double value) {
@@ -100,6 +110,10 @@ public class MarkupTextBox extends Composite {
 		double pre = preInput.getDouble();
 		double post = postInput.getDouble();
 		double fee = post - pre;
+
+		if (changeCommand != null) {
+			changeCommand.execute();
+		}
 
 		if (pre == 0) {
 			feeInput.setValue(0.00);
