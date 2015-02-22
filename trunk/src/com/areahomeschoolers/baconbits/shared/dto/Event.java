@@ -46,6 +46,7 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private String contactName;
 	private String contactEmail;
 	private int viewCount;
+	private String payPalEmail;
 
 	// address
 	private String address;
@@ -299,6 +300,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	@Override
 	public int getOwningOrgId() {
 		return owningOrgId;
+	}
+
+	public String getPayPalEmail() {
+		return payPalEmail;
 	}
 
 	public String getPhone() {
@@ -595,6 +600,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	@Override
 	public void setOwningOrgId(int organizationId) {
 		this.owningOrgId = organizationId;
+	}
+
+	public void setPayPalEmail(String payPalEmail) {
+		this.payPalEmail = payPalEmail;
 	}
 
 	public void setPhone(String phone) {

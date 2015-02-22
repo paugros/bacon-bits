@@ -211,20 +211,32 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 
 		List<Receiver> receiverLst = new ArrayList<Receiver>();
 
-		// The organization's cut
-		Receiver orgReceiver = new Receiver(round(p.getTotalAmount(), 2, BigDecimal.ROUND_HALF_UP));
-		orgReceiver.setPaymentType("SERVICE");
+		boolean primarySet = false;
 
-		if (ServerContext.isLive()) {
-			orgReceiver.setEmail(ServerContext.getCurrentOrg().getPayPalEmail());
-		} else {
-			orgReceiver.setEmail("organization@fake.com"); // password same as email
+		// Their cut
+		for (String email : p.getReceivers().keySet()) {
+			Double amount = p.getReceivers().get(email);
+			if (!primarySet) {
+				amount = p.getTotalAmount();
+			}
+			Receiver userReceiver = new Receiver(round(amount, 2, BigDecimal.ROUND_HALF_UP));
+			userReceiver.setPaymentType("SERVICE");
+			if (!primarySet && p.getMarkupAmount() > 0 && !ServerContext.isCitrus()) {
+				// according to PayPal, the user (tenant) must be the primary receiver
+				userReceiver.setPrimary(Boolean.TRUE);
+				primarySet = true;
+			}
+
+			if (ServerContext.isLive()) {
+				userReceiver.setEmail(ServerContext.getCurrentOrg().getPayPalEmail());
+			} else {
+				userReceiver.setEmail("organization@fake.com"); // password same as email
+			}
+			receiverLst.add(userReceiver);
 		}
 
 		// Our cut
 		if (p.getMarkupAmount() > 0 && !ServerContext.isCitrus()) {
-			// according to PayPal, the organization (tenant) must be the primary receiver
-			orgReceiver.setPrimary(Boolean.TRUE);
 			Receiver siteReceiver = new Receiver(round(p.getMarkupAmount(), 2, BigDecimal.ROUND_HALF_UP));
 			siteReceiver.setPaymentType("SERVICE");
 			siteReceiver.setPrimary(Boolean.FALSE);
@@ -237,8 +249,6 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			}
 			receiverLst.add(siteReceiver);
 		}
-
-		receiverLst.add(orgReceiver);
 
 		ReceiverList receiverList = new ReceiverList(receiverLst);
 

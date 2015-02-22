@@ -71,6 +71,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setId(rs.getInt("id"));
 			event.setActive(rs.getBoolean("active"));
 			event.setAddedDate(rs.getTimestamp("addedDate"));
+			event.setPayPalEmail(rs.getString("payPalEmail"));
 			event.setAddedById(rs.getInt("addedById"));
 			event.setAdultRequired(rs.getBoolean("adultRequired"));
 			event.setCategory(rs.getString("category"));
@@ -485,7 +486,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		List<Integer> ids = args.getIntList(EventArg.PARTICIPANT_IDS);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
-		String sql = "select r.eventId, e.title, e.startDate, e.endDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, \n";
+		String sql = "select r.eventId, e.title, e.startDate, e.endDate, p.*, u.firstName, u.lastName, u.birthDate, u.parentId, s.status, e.payPalEmail, \n";
 		sql += "up.firstName as addedByFirstName, up.lastName as addedByLastName, up.email as registrantEmailAddress, u.directoryOptOut, \n";
 		sql += "r.addedById, e.groupId, e.owningOrgId, e.seriesId, e.requiredInSeries, py.statusId as paymentStatusId, pr.visibilityLevelId, \n";
 		if (includeFields) {
@@ -596,6 +597,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 				p.setEventOrganizationId(rs.getInt("owningOrgId"));
 				p.setEventSeriesId(rs.getInt("seriesId"));
 				p.setRequiredInSeries(rs.getBoolean("requiredInSeries"));
+				String email = rs.getString("payPalEmail");
+				if (Common.isNullOrBlank(email)) {
+					email = ServerContext.getCurrentOrg().getPayPalEmail();
+				}
+				p.setPayPalEmail(email);
 				if (includeFields) {
 					p.setFieldValues(rs.getString("fieldValues"));
 				}
@@ -827,32 +833,44 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		List<EventParticipant> participants = getParticipants(args);
 		double principal = 0.00;
 		double markup = 0.00;
+		Payment pmt = new Payment();
+		HashMap<String, Double> receivers = new HashMap<>();
 		for (EventParticipant p : participants) {
 			principal += p.getPrice();
 			markup += p.getMarkup();
+
+			Double current = receivers.get(p.getPayPalEmail());
+			if (current == null) {
+				current = 0.00;
+				receivers.put(p.getPayPalEmail(), current);
+			}
+
+			current += principal;
+
+			receivers.put(p.getPayPalEmail(), current);
 		}
 
 		// add a payment record
 		PaymentDao paymentDao = ServerContext.getDaoImpl("payment");
-		Payment p = new Payment();
-		p.setUserId(ServerContext.getCurrentUserId());
-		p.setPaymentTypeId(1);
-		p.setStatusId(1);
-		p.setPrincipalAmount(principal);
-		p.setMarkupAmount(markup);
-		p.setReturnPage("Home&pt=event");
-		p.setMemo("Payment for events");
-		p = paymentDao.save(p);
+		pmt.setReceivers(receivers);
+		pmt.setUserId(ServerContext.getCurrentUserId());
+		pmt.setPaymentTypeId(1);
+		pmt.setStatusId(1);
+		pmt.setPrincipalAmount(principal);
+		pmt.setMarkupAmount(markup);
+		pmt.setReturnPage("Home&pt=event");
+		pmt.setMemo("Payment for events");
+		pmt = paymentDao.save(pmt);
 
 		String sql = "update eventRegistrationParticipants set paymentId = ?";
 		// for zero or negative payments, update status now because there will be no ipn
-		if (p.getTotalAmount() <= 0) {
+		if (pmt.getTotalAmount() <= 0) {
 			sql += ", statusId = 2 ";
 		}
 		sql += " where id in(" + Common.join(participantIds, ", ") + ")";
-		update(sql, p.getId());
+		update(sql, pmt.getId());
 
-		return p.getPaypalData();
+		return pmt.getPaypalData();
 	}
 
 	@Override
@@ -871,7 +889,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, requiresRegistration = :requiresRegistration, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
 			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, directoryPriority = :directoryPriority, ";
-			sql += "contactName = :contactName, contactEmail = :contactEmail, ";
+			sql += "contactName = :contactName, contactEmail = :contactEmail, payPalEmail = :payPalEmail, ";
 			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price, phone = :phone, website = :website ";
 			sql += "where id = :id";
 			update(sql, namedParams);
@@ -893,12 +911,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
 			sql += "markupOverride, markupPercent, markupDollars, facilityName, directoryPriority, contactName, contactEmail, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, notificationEmail, owningOrgId, ";
-			sql += "address, street, city, state, zip, lat, lng, ";
+			sql += "address, street, city, state, zip, lat, lng, payPalEmail, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, :markup, ";
 			sql += ":markupOverride, :markupPercent, :markupDollars, :facilityName, :directoryPriority, :contactName, :contactEmail, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :notificationEmail, :owningOrgId, ";
-			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :payPalEmail, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
 
 			KeyHolder keys = new GeneratedKeyHolder();

@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.shared.dto;
 
 import java.util.Date;
+import java.util.HashMap;
 
 public final class Payment extends EntityDto<Payment> {
 	private static final long serialVersionUID = 1L;
@@ -20,6 +21,7 @@ public final class Payment extends EntityDto<Payment> {
 	private Date ipnDate;
 	private String rawData;
 	private int paymentTypeId;
+	private HashMap<String, Double> receivers = new HashMap<>();
 
 	// aux
 	private String paymentType;
@@ -31,6 +33,10 @@ public final class Payment extends EntityDto<Payment> {
 
 	public Payment() {
 
+	}
+
+	public void addReceiver(String email, Double amount) {
+		receivers.put(email, amount);
 	}
 
 	public Date getIpnDate() {
@@ -75,6 +81,10 @@ public final class Payment extends EntityDto<Payment> {
 
 	public String getRawData() {
 		return rawData;
+	}
+
+	public HashMap<String, Double> getReceivers() {
+		return receivers;
 	}
 
 	public String getReturnPage() {
@@ -147,6 +157,10 @@ public final class Payment extends EntityDto<Payment> {
 
 	public void setRawData(String rawData) {
 		this.rawData = rawData;
+	}
+
+	public void setReceivers(HashMap<String, Double> receivers) {
+		this.receivers = receivers;
 	}
 
 	public void setReturnPage(String returnPage) {

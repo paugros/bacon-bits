@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ImageSwitcher;
 import com.areahomeschoolers.baconbits.shared.Constants;
@@ -93,6 +94,22 @@ public class HomePage implements Page {
 			@Override
 			protected void doOnSuccess(HomePageData result) {
 				pageData = result;
+
+				if (Application.hasLocation()) {
+					String txt = "NOTE: The resource, event and homeschooler numbers below are only those ";
+					if (Application.getCurrentLocation().length() == 2) {
+						txt += "in " + Application.getCurrentLocation() + ". ";
+					} else {
+						txt += "within " + Constants.DEFAULT_SEARCH_RADIUS + " ";
+						txt += "miles of " + Application.getCurrentLocation() + ". ";
+					}
+					txt += "You can change this setting on any ";
+					txt += "<a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagMappingType.RESOURCE.toString()) + "\">search page</a>.";
+					HTML note = new HTML(txt);
+					note.addStyleName(ContentWidth.MAXWIDTH700PX.toString());
+					note.addStyleName("heavyPadding largeText");
+					centerPanel.add(note);
+				}
 
 				Grid g = new Grid(3, 3);
 				g.setCellSpacing(45);

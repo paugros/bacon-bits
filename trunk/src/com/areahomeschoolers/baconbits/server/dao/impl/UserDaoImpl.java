@@ -824,7 +824,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql = "update users set firstName = :firstName, lastName = :lastName, startDate = :startDate, endDate = :endDate, email = :email, ";
 			sql += "resetPassword = :resetPassword, homePhone = :homePhone, mobilePhone = :mobilePhone, isSystemAdministrator = :systemAdministrator, ";
 			sql += "birthDate = :birthDate, parentId = :parentId, passwordDigest = :passwordDigest, sex = :sex, showUserAgreement = :showUserAgreement, ";
-			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
+			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, payPalEmail = :payPalEmail, ";
 			sql += "directoryOptOut = :directoryOptOut, receiveNews = :receiveNews, facebookUrl = :facebookUrl, guid = :guid where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -834,11 +834,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 
 			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
 			sql += "isSystemAdministrator, resetPassword, birthDate, parentId, sex, guid, ";
-			sql += "address, street, city, state, zip, lat, lng, ";
+			sql += "address, street, city, state, zip, lat, lng, payPalEmail, ";
 			sql += "imageId, smallImageId, directoryOptOut, showUserAgreement) values ";
 			sql += "(:email, :firstName, :lastName, :passwordDigest, :startDate, :endDate, now(), :homePhone, :mobilePhone, ";
 			sql += ":systemAdministrator, :resetPassword, :birthDate, :parentId, :sex, :guid, ";
-			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :payPalEmail, ";
 			sql += ":imageId, :smallImageId, :directoryOptOut, :showUserAgreement)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
@@ -1388,6 +1388,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 		user.setStartDate(rs.getTimestamp("startDate"));
 		user.setEndDate(rs.getTimestamp("endDate"));
+		user.setPayPalEmail(rs.getString("payPalEmail"));
 		user.setResetPassword(rs.getBoolean("resetPassword"));
 		user.setAddedDate(rs.getTimestamp("addedDate"));
 		user.setLastLoginDate(rs.getTimestamp("lastLoginDate"));

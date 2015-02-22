@@ -43,6 +43,7 @@ public final class User extends EntityDto<User> implements HasAddress {
 	private String password;
 
 	private String mobilePhone;
+	private String payPalEmail;
 	private boolean active;
 	private boolean systemAdministrator;
 	private boolean resetPassword;
@@ -285,6 +286,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public String getPasswordDigest() {
 		return passwordDigest;
+	}
+
+	public String getPayPalEmail() {
+		return payPalEmail;
 	}
 
 	public PrivacyPreference getPrivacyPreference(PrivacyPreferenceType type) {
@@ -546,6 +551,10 @@ public final class User extends EntityDto<User> implements HasAddress {
 
 	public void setPasswordDigest(String passwordDigest) {
 		this.passwordDigest = passwordDigest;
+	}
+
+	public void setPayPalEmail(String payPalEmail) {
+		this.payPalEmail = payPalEmail;
 	}
 
 	public void setPrivacyPreference(PrivacyPreference pref) {
