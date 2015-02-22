@@ -331,7 +331,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		String name = tag.getName();
 
 		name = name.trim();
-		name = name.replaceAll("[^0-9A-Za-z \\&\\-]+", "");
+		name = name.replaceAll("[^0-9A-Za-z \\&\\-\\$]+", "");
 		name = name.replaceAll("\\s+", " ");
 
 		String[] words = name.split(" ");

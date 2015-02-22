@@ -205,6 +205,7 @@ public class TagSection extends Composite implements HasValidator {
 		allowedChars.add(new Character(' '));
 		allowedChars.add(new Character('-'));
 		allowedChars.add(new Character('&'));
+		allowedChars.add(new Character('$'));
 		suggestBox.getTextBox().addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
