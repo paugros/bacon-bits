@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
 import com.google.gwt.dom.client.Style.Position;
@@ -42,7 +43,7 @@ public class ImageSwitcher extends Composite {
 	};
 
 	public ImageSwitcher() {
-		fp.setWidth("800px");
+		fp.addStyleName(ContentWidth.MAXWIDTH800PX.toString());
 		fp.getElement().getStyle().setPosition(Position.RELATIVE);
 		fp.getElement().getStyle().setTop(0, Unit.PX);
 		fp.getElement().getStyle().setLeft(0, Unit.PX);
@@ -110,7 +111,7 @@ public class ImageSwitcher extends Composite {
 		bottomPanel.add(fbLink);
 		bottomPanel.setCellWidth(fbLink, "40px");
 
-		ConstantContactLink signUp = new ConstantContactLink("Sign Up For Updates");
+		MailListLink signUp = new MailListLink("Sign Up For Updates");
 		bottomPanel.add(signUp);
 		bottomPanel.add(pager);
 		bottomPanel.setCellHorizontalAlignment(pager, HasHorizontalAlignment.ALIGN_RIGHT);
@@ -126,7 +127,7 @@ public class ImageSwitcher extends Composite {
 		vp.getElement().getStyle().setBackgroundColor("#000000");
 
 		HTML bottom = new HTML(html);
-		bottom.setWidth("760px");
+		bottom.addStyleName(ContentWidth.MAXWIDTH760PX.toString());
 		bottom.addStyleName("imageSwitcherBottom");
 
 		vp.add(bottom);
