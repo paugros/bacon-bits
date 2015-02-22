@@ -228,7 +228,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			}
 
 			if (ServerContext.isLive()) {
-				userReceiver.setEmail(ServerContext.getCurrentOrg().getPayPalEmail());
+				userReceiver.setEmail(email);
 			} else {
 				userReceiver.setEmail("organization@fake.com"); // password same as email
 			}
