@@ -847,7 +847,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 				receivers.put(p.getPayPalEmail(), current);
 			}
 
-			current += principal;
+			current += p.getPrice();
 
 			receivers.put(p.getPayPalEmail(), current);
 		}
