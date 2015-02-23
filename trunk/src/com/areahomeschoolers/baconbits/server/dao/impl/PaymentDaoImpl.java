@@ -213,6 +213,12 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 
 		boolean primarySet = false;
 
+		boolean simpleCitrusPayment = false;
+
+		if (p.getReceivers().size() == 1 && p.getReceivers().containsKey(Constants.CG_PAYPAL_EMAIL)) {
+			simpleCitrusPayment = true;
+		}
+
 		// Their cut
 		for (String email : p.getReceivers().keySet()) {
 			Double amount = p.getReceivers().get(email);
@@ -221,7 +227,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			}
 			Receiver userReceiver = new Receiver(round(amount, 2, BigDecimal.ROUND_HALF_UP));
 			userReceiver.setPaymentType("SERVICE");
-			if (!primarySet && p.getMarkupAmount() > 0 && !ServerContext.isCitrus()) {
+			if (!primarySet && p.getMarkupAmount() > 0 && !simpleCitrusPayment) {
 				// according to PayPal, the user (tenant) must be the primary receiver
 				userReceiver.setPrimary(Boolean.TRUE);
 				primarySet = true;
@@ -236,7 +242,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		}
 
 		// Our cut
-		if (p.getMarkupAmount() > 0 && !ServerContext.isCitrus()) {
+		if (p.getMarkupAmount() > 0 && !simpleCitrusPayment) {
 			Receiver siteReceiver = new Receiver(round(p.getMarkupAmount(), 2, BigDecimal.ROUND_HALF_UP));
 			siteReceiver.setPaymentType("SERVICE");
 			siteReceiver.setPrimary(Boolean.FALSE);
@@ -263,7 +269,6 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		payRequest.setIpnNotificationUrl(ipnUrl);
 		ClientDetailsType cd = new ClientDetailsType();
 		cd.setIpAddress(ServerContext.getRequest().getRemoteAddr());
-		// cd.setApplicationId("weare.home.educators");
 
 		payRequest.setClientDetails(cd);
 		if (!ServerContext.isLive()) {
