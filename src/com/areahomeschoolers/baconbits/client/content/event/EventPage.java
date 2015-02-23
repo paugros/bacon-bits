@@ -43,7 +43,9 @@ import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.MarkupTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
+import com.areahomeschoolers.baconbits.client.widgets.MaxLengthTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
+import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
@@ -629,6 +631,25 @@ public class EventPage implements Page {
 		});
 		fieldTable.addField(registerField);
 
+		final Label simplePriceDisplay = new Label();
+		final NumericTextBox simplePriceInput = new NumericTextBox(2);
+		simplePriceInput.setMaxLength(50);
+		final FormField simplePriceField = form.createFormField("Price:", simplePriceInput, simplePriceDisplay);
+		simplePriceField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				simplePriceDisplay.setText(Formatter.formatCurrency(calendarEvent.getPrice()));
+				simplePriceInput.setValue(calendarEvent.getPrice());
+			}
+		});
+		simplePriceField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				calendarEvent.setPrice(simplePriceInput.getDouble());
+			}
+		});
+		fieldTable.addField(simplePriceField);
+
 		if (!calendarEvent.isSaved() || calendarEvent.getRequiresRegistration()) {
 			final Label priceDisplay = new Label();
 			final MarkupTextBox priceInput = new MarkupTextBox(calendarEvent);
@@ -710,13 +731,6 @@ public class EventPage implements Page {
 				fieldTable.addField(payPalField);
 			}
 
-			priceInput.setChangeCommand(new Command() {
-				@Override
-				public void execute() {
-					payPalField.setRequired(priceInput.getDouble() > 0.00);
-				}
-			});
-
 			final Label emailDisplay = new Label();
 			final EmailTextBox emailInput = new EmailTextBox();
 			emailInput.setMultiEmail(true);
@@ -758,6 +772,35 @@ public class EventPage implements Page {
 			});
 			fieldTable.addField(participantField);
 
+			final Label refundDisplay = new Label();
+			final MaxLengthTextArea refundInput = new MaxLengthTextArea(500);
+			refundInput.setVisibleLines(4);
+			final FormField refundField = form.createFormField("Refund policy:", refundInput, refundDisplay);
+			refundField.setRequired(calendarEvent.getRequiresRegistration() && calendarEvent.getPrice() > 0);
+			refundField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					refundDisplay.setText(calendarEvent.getRefundPolicy());
+					refundInput.setText(calendarEvent.getRefundPolicy());
+				}
+			});
+			refundField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					calendarEvent.setRefundPolicy(refundInput.getText());
+				}
+			});
+			fieldTable.addField(refundField);
+
+			priceInput.setChangeCommand(new Command() {
+				@Override
+				public void execute() {
+					boolean required = priceInput.getDouble() > 0.00;
+					payPalField.setRequired(required);
+					refundField.setRequired(required);
+				}
+			});
+
 			if (Application.isSystemAdministrator()) {
 				MarkupField mf = new MarkupField(calendarEvent);
 				markupField = mf.getFormField();
@@ -781,16 +824,21 @@ public class EventPage implements Page {
 				public void onChange(ChangeEvent event) {
 					boolean show = registerInput.getIntValue() == 1;
 					payPalField.setRequired(show && priceInput.getDouble() > 0);
+					refundField.setRequired(show && priceInput.getDouble() > 0);
+					fieldTable.setFieldVisibility(payPalField, show);
 					fieldTable.setFieldVisibility(participantField, show);
 					fieldTable.setFieldVisibility(emailField, show);
+					fieldTable.setFieldVisibility(refundField, show);
 					fieldTable.setFieldVisibility(priceField, show);
-					fieldTable.setFieldVisibility(payPalField, show);
+					fieldTable.setFieldVisibility(simplePriceField, !show);
 					if (Application.isSystemAdministrator()) {
 						fieldTable.setFieldVisibility(markupField, show);
 					}
 					if (!calendarEvent.isSaved()) {
+						simplePriceField.setInputVisibility(true);
 						priceField.setInputVisibility(true);
 						emailField.setInputVisibility(true);
+						refundField.setInputVisibility(true);
 						participantField.setInputVisibility(true);
 						payPalField.setInputVisibility(true);
 						if (Application.isSystemAdministrator()) {
@@ -905,44 +953,44 @@ public class EventPage implements Page {
 		// }
 		// });
 		// fieldTable.addField(categoryField);
-
-		if (calendarEvent.getRequiresRegistration()) {
-			if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
-				ageTable.setWidth("150px");
-
-				populateAgeGroups();
-
-				fieldTable.addField("Pricing:", ageTable);
-			}
-
-			if (Common.isNullOrEmpty(pageData.getAgeGroups())) {
-				final Label priceDisplay = new Label();
-				final MarkupTextBox priceInput = new MarkupTextBox(calendarEvent);
-				priceField = form.createFormField("Price:", priceInput, priceDisplay);
-				priceField.setInitializer(new Command() {
-					@Override
-					public void execute() {
-						String text = Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
-						if (calendarEvent.getPrice() == 0) {
-							text = "Free";
-						}
-						priceDisplay.setText(text);
-						priceInput.setValue(calendarEvent.getPrice());
-
-						if (!Application.administratorOf(calendarEvent)) {
-							priceField.setEnabled(false);
-						}
-					}
-				});
-				priceField.setDtoUpdater(new Command() {
-					@Override
-					public void execute() {
-						calendarEvent.setPrice(priceInput.getDouble());
-					}
-				});
-				fieldTable.addField(priceField);
-			}
-		}
+		//
+		// if (calendarEvent.getRequiresRegistration()) {
+		// if (calendarEvent.isSaved() && (Application.administratorOf(calendarEvent) || !Common.isNullOrEmpty(pageData.getAgeGroups()))) {
+		// ageTable.setWidth("150px");
+		//
+		// populateAgeGroups();
+		//
+		// fieldTable.addField("Pricing:", ageTable);
+		// }
+		//
+		// if (Common.isNullOrEmpty(pageData.getAgeGroups())) {
+		// final Label priceDisplay = new Label();
+		// final MarkupTextBox priceInput = new MarkupTextBox(calendarEvent);
+		// priceField = form.createFormField("Price:", priceInput, priceDisplay);
+		// priceField.setInitializer(new Command() {
+		// @Override
+		// public void execute() {
+		// String text = Formatter.formatCurrency(calendarEvent.getAdjustedPrice());
+		// if (calendarEvent.getPrice() == 0) {
+		// text = "Free";
+		// }
+		// priceDisplay.setText(text);
+		// priceInput.setValue(calendarEvent.getPrice());
+		//
+		// if (!Application.administratorOf(calendarEvent)) {
+		// priceField.setEnabled(false);
+		// }
+		// }
+		// });
+		// priceField.setDtoUpdater(new Command() {
+		// @Override
+		// public void execute() {
+		// calendarEvent.setPrice(priceInput.getDouble());
+		// }
+		// });
+		// fieldTable.addField(priceField);
+		// }
+		// }
 
 		if (calendarEvent.isSaved()) {
 			volunteerTable.setWidth("400px");
@@ -1166,6 +1214,11 @@ public class EventPage implements Page {
 			priceLabel.getElement().getStyle().setMarginTop(10, Unit.PX);
 
 			vp.add(priceLabel);
+
+			if (!Common.isNullOrBlank(calendarEvent.getRefundPolicy())) {
+				Label refundLabel = new Label("Refund policy: " + calendarEvent.getRefundPolicy());
+				vp.add(refundLabel);
+			}
 		}
 
 		String text = "";
@@ -1452,17 +1505,22 @@ public class EventPage implements Page {
 
 	private void save(final FormField field) {
 		final boolean isSaved = calendarEvent.isSaved();
+		final int clonedFromId = calendarEvent.getCloneFromId();
 
 		eventService.save(calendarEvent, new Callback<Event>() {
 			@Override
 			protected void doOnSuccess(final Event e) {
 				if (!isSaved) {
-					tagSection.saveAll(e.getId(), new Callback<Void>() {
-						@Override
-						protected void doOnSuccess(Void result) {
-							HistoryToken.set(PageUrl.event(e.getId()));
-						}
-					});
+					if (clonedFromId > 0) {
+						HistoryToken.set(PageUrl.event(e.getId()));
+					} else {
+						tagSection.saveAll(e.getId(), new Callback<Void>() {
+							@Override
+							protected void doOnSuccess(Void result) {
+								HistoryToken.set(PageUrl.event(e.getId()));
+							}
+						});
+					}
 				} else {
 					calendarEvent = e;
 					form.setDto(e);

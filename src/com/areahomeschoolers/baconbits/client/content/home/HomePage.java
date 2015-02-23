@@ -33,15 +33,20 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.dom.client.Style.Position;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -107,7 +112,8 @@ public class HomePage implements Page {
 					txt += "<a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagMappingType.RESOURCE.toString()) + "\">search page</a>.";
 					HTML note = new HTML(txt);
 					note.addStyleName(ContentWidth.MAXWIDTH700PX.toString());
-					note.addStyleName("heavyPadding largeText");
+					note.addStyleName("mediumPadding");
+					note.getElement().getStyle().setFontSize(16, Unit.PX);
 					centerPanel.add(note);
 				}
 
@@ -204,7 +210,17 @@ public class HomePage implements Page {
 				}
 			});
 		} else if ("event".equals(paymentType)) {
-			AlertDialog.alert("Thanks!", "Thank you for registering for events through us. Check in regularly for new events and resources in your area!");
+			String txt = "Thank you for registering for events through us. Check in regularly for new events and resources in your area!";
+			Label text = new Label(txt);
+			text.setWidth("350px");
+			AlertDialog ad = new AlertDialog("Thanks!", text);
+			ad.addCloseHandler(new CloseHandler<PopupPanel>() {
+				@Override
+				public void onClose(CloseEvent<PopupPanel> event) {
+					HistoryToken.set(PageUrl.home(), false);
+				}
+			});
+			ad.center();
 		}
 	}
 

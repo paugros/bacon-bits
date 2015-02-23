@@ -87,12 +87,10 @@ public class ImageSwitcher extends Composite {
 
 			if (i == 0) {
 				panel.getElement().getStyle().setPosition(Position.RELATIVE);
-				// panel.getElement().getStyle().setZIndex(1);
 				panel.getElement().getStyle().setZIndex(baseIndex + 1);
 			} else {
 				panel.getElement().getStyle().setPosition(Position.ABSOLUTE);
 				panel.getElement().getStyle().setOpacity(0);
-				// panel.getElement().getStyle().setZIndex(-1);
 				panel.getElement().getStyle().setZIndex(baseIndex - 1);
 			}
 

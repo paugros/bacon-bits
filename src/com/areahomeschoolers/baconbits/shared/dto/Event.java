@@ -47,6 +47,7 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private String contactEmail;
 	private int viewCount;
 	private String payPalEmail;
+	private String refundPolicy;
 
 	// address
 	private String address;
@@ -316,6 +317,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 
 	public Date getPublishDate() {
 		return publishDate;
+	}
+
+	public String getRefundPolicy() {
+		return refundPolicy;
 	}
 
 	public Date getRegistrationEndDate() {
@@ -616,6 +621,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 
 	public void setPublishDate(Date publishDate) {
 		this.publishDate = publishDate;
+	}
+
+	public void setRefundPolicy(String refundPolicy) {
+		this.refundPolicy = refundPolicy;
 	}
 
 	public void setRegistrationEndDate(Date registrationEndDate) {
