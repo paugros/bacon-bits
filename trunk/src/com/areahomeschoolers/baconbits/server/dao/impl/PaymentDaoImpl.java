@@ -84,6 +84,8 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		}
 	}
 
+	private static List<String> testAccounts = new ArrayList<>();
+
 	private final Logger logger = Logger.getLogger(this.getClass().toString());
 
 	private Properties payPalProperties;
@@ -91,6 +93,14 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 	@Autowired
 	public PaymentDaoImpl(DataSource dataSource) {
 		super(dataSource);
+		// passwords are same as email for most of these
+		testAccounts.add("event@fake.com");
+		testAccounts.add("testorg@fake.com");
+		testAccounts.add("orgtest@fake.com");
+		testAccounts.add("paul.augros-buyer@gmail.com");
+		testAccounts.add("someone@enduser.com");
+		testAccounts.add("organization@fake.com");
+		testAccounts.add("paul.augros-facilitator@gmail.com");
 	}
 
 	public String createSqlBase() {
@@ -211,41 +221,35 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 
 		List<Receiver> receiverLst = new ArrayList<Receiver>();
 
-		boolean primarySet = false;
-
 		boolean simpleCitrusPayment = false;
 
 		if (p.getReceivers().size() == 1 && p.getReceivers().containsKey(Constants.CG_PAYPAL_EMAIL)) {
 			simpleCitrusPayment = true;
 		}
 
+		int i = 0;
 		// Their cut
 		for (String email : p.getReceivers().keySet()) {
-			Double amount = p.getReceivers().get(email);
-			if (!primarySet) {
-				amount = p.getTotalAmount();
-			}
+			Double amount = simpleCitrusPayment ? p.getTotalAmount() : p.getReceivers().get(email);
 			Receiver userReceiver = new Receiver(round(amount, 2, BigDecimal.ROUND_HALF_UP));
 			userReceiver.setPaymentType("SERVICE");
-			if (!primarySet && p.getMarkupAmount() > 0 && !simpleCitrusPayment) {
-				// according to PayPal, the user (tenant) must be the primary receiver
-				userReceiver.setPrimary(Boolean.TRUE);
-				primarySet = true;
+			if (!simpleCitrusPayment) {
+				userReceiver.setPrimary(Boolean.FALSE);
 			}
 
 			if (ServerContext.isLive()) {
 				userReceiver.setEmail(email);
 			} else {
-				userReceiver.setEmail("organization@fake.com"); // password same as email
+				userReceiver.setEmail(testAccounts.get(i++)); // password same as email
 			}
 			receiverLst.add(userReceiver);
 		}
 
 		// Our cut
-		if (p.getMarkupAmount() > 0 && !simpleCitrusPayment) {
-			Receiver siteReceiver = new Receiver(round(p.getMarkupAmount(), 2, BigDecimal.ROUND_HALF_UP));
+		if (!simpleCitrusPayment) {
+			Receiver siteReceiver = new Receiver(round(p.getTotalAmount(), 2, BigDecimal.ROUND_HALF_UP));
 			siteReceiver.setPaymentType("SERVICE");
-			siteReceiver.setPrimary(Boolean.FALSE);
+			siteReceiver.setPrimary(Boolean.TRUE);
 
 			// site email address
 			if (ServerContext.isLive()) {
@@ -275,8 +279,8 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			payRequest.setSenderEmail("someone@enduser.com"); // password same as email
 		}
 
-		if (receiverLst.size() == 2) {
-			payRequest.setFeesPayer("SECONDARYONLY");
+		if (receiverLst.size() > 1) {
+			payRequest.setFeesPayer("PRIMARYRECEIVER");
 		} else {
 			payRequest.setFeesPayer("EACHRECEIVER");
 		}
