@@ -295,6 +295,7 @@ public final class MainMenu extends MenuBar {
 		if (Application.isAuthenticated()) {
 			menu.addSeparator();
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
+			addLinkToMenu(menu, "Event Payment / Checkout", PageUrl.payment());
 		}
 
 		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
