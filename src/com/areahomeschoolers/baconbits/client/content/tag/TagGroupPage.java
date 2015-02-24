@@ -5,6 +5,7 @@ import java.util.EnumSet;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
 import com.areahomeschoolers.baconbits.client.content.resource.TileConfig;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
@@ -25,6 +26,7 @@ import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -113,6 +115,16 @@ public final class TagGroupPage implements Page {
 		}
 
 		createSearchBox();
+
+		Data balance = Application.getApplicationData().getUnpaidBalance();
+		if (balance != null && balance.getDouble("balance") > 0) {
+			BalanceBox bb = new BalanceBox();
+			PaddedPanel pp = new PaddedPanel();
+			pp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+			pp.add(new Label("Your cart:"));
+			pp.add(bb);
+			page.add(pp);
+		}
 
 		page.add(fp);
 

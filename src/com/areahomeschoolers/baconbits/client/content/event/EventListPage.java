@@ -25,6 +25,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.EventArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 
@@ -213,6 +214,16 @@ public final class EventListPage implements Page {
 			vpp.addStyleName("boxedBlurb");
 
 			page.add(new SearchSection(TagMappingType.EVENT, vp));
+		}
+
+		Data balance = Application.getApplicationData().getUnpaidBalance();
+		if (balance != null && balance.getDouble("balance") > 0) {
+			BalanceBox bb = new BalanceBox();
+			PaddedPanel pp = new PaddedPanel();
+			pp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+			pp.add(new Label("Your cart:"));
+			pp.add(bb);
+			page.add(pp);
 		}
 
 		page.add(fp);

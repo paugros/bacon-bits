@@ -90,7 +90,7 @@ public class HomePage implements Page {
 		// begin slider test ground
 		ImageSwitcher s = new ImageSwitcher();
 		page.add(s);
-		Application.getLayout().setPage("Home", page);
+		Application.getLayout().setPage("Homeschooling Resources and Events, in Your Area", page);
 		// end slider test ground
 
 		page.add(centerPanel);

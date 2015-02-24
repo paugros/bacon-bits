@@ -23,9 +23,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultInlineHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -151,6 +149,11 @@ public class DropDownMenu extends Composite {
 	public DefaultHyperlink addItem(String text, String url) {
 		DefaultHyperlink link = new DefaultInlineHyperlink(text, url);
 		return addItem(link);
+	}
+
+	public Widget addItem(Widget widget) {
+		vp.add(widget);
+		return widget;
 	}
 
 	public void addSeparator() {

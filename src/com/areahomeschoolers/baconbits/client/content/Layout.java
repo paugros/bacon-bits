@@ -9,6 +9,7 @@ import java.util.Map;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.event.BalanceBox;
 import com.areahomeschoolers.baconbits.client.content.minimodules.CitrusMiniModule;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
@@ -258,6 +259,10 @@ public final class Layout {
 					}
 				});
 			}
+
+			BalanceBox bb = new BalanceBox();
+			dm.addItem(bb);
+
 			rightPanel.add(dm);
 			rightPanel.setCellVerticalAlignment(dm, HasVerticalAlignment.ALIGN_MIDDLE);
 		} else {
