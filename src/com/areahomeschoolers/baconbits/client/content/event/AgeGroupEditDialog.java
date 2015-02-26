@@ -56,8 +56,8 @@ public class AgeGroupEditDialog extends EntityEditDialog<EventAgeGroup> {
 		ageField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setMinimumAge((int) ageInput.getFromValue());
-				entity.setMaximumAge((int) ageInput.getToValue());
+				entity.setMinimumAge(ageInput.getFromValue());
+				entity.setMaximumAge(ageInput.getToValue());
 			}
 		});
 		ft.addField(ageField);
@@ -74,8 +74,8 @@ public class AgeGroupEditDialog extends EntityEditDialog<EventAgeGroup> {
 		participantsField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				entity.setMinimumParticipants((int) participantsInput.getFromValue());
-				entity.setMaximumParticipants((int) participantsInput.getToValue());
+				entity.setMinimumParticipants(participantsInput.getFromValue());
+				entity.setMaximumParticipants(participantsInput.getToValue());
 			}
 		});
 		ft.addField(participantsField);

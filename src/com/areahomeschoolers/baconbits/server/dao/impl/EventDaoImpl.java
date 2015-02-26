@@ -78,6 +78,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setCategoryId(rs.getInt("categoryId"));
 			event.setCost(rs.getDouble("cost"));
 			event.setPrice(rs.getDouble("price"));
+			event.setHighPrice(rs.getDouble("highPrice"));
 			event.setMarkup(rs.getDouble("markup"));
 			event.setDescription(rs.getString("description"));
 			event.setEndDate(rs.getTimestamp("endDate"));
@@ -132,6 +133,8 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setTags(rs.getString("tags"));
 			event.setViewCount(rs.getInt("viewCount"));
 			event.setRefundPolicy(rs.getString("refundPolicy"));
+			event.setMinimumAge(rs.getInt("minimumAge"));
+			event.setMaximumAge(rs.getInt("maximumAge"));
 			return event;
 		}
 	}
@@ -889,9 +892,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "markupOverride = :markupOverride, markupPercent = :markupPercent, markupDollars = :markupDollars, facilityName = :facilityName, ";
 			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, requiresRegistration = :requiresRegistration, ";
-			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, ";
+			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, highPrice = :highPrice, ";
 			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, directoryPriority = :directoryPriority, ";
 			sql += "contactName = :contactName, contactEmail = :contactEmail, payPalEmail = :payPalEmail, refundPolicy = :refundPolicy, ";
+			sql += "minimumAge = :minimumAge, maximumAge = :maximumAge, ";
 			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price, phone = :phone, website = :website ";
 			sql += "where id = :id";
 			update(sql, namedParams);
@@ -913,12 +917,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
 			sql += "markupOverride, markupPercent, markupDollars, facilityName, directoryPriority, contactName, contactEmail, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, notificationEmail, owningOrgId, ";
-			sql += "address, street, city, state, zip, lat, lng, payPalEmail, refundPolicy, ";
+			sql += "address, street, city, state, zip, lat, lng, payPalEmail, refundPolicy, highPrice, minimumAge, maximumAge, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, :markup, ";
 			sql += ":markupOverride, :markupPercent, :markupDollars, :facilityName, :directoryPriority, :contactName, :contactEmail, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :notificationEmail, :owningOrgId, ";
-			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :payPalEmail, :refundPolicy, ";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :payPalEmail, :refundPolicy, :highPrice, :minimumAge, :maximumAge, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
 
 			KeyHolder keys = new GeneratedKeyHolder();

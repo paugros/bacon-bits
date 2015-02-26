@@ -14,9 +14,11 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientDateUtils;
+import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EntityEditDialog;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
@@ -39,7 +41,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -256,12 +258,12 @@ public final class EventParticipantTable extends EntityCellTable<EventParticipan
 				}), "140px");
 				break;
 			case FIELDS:
-				// addWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
-				// @Override
-				// protected Widget createWidget(EventParticipant item) {
-				// return new HTML(Formatter.formatNoteText(item.getFieldValues()));
-				// }
-				// });
+				addWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
+					@Override
+					protected Widget createWidget(EventParticipant item) {
+						return new HTML(Formatter.formatNoteText(item.getFieldValues()));
+					}
+				});
 				break;
 			case PARTICIPANT_NAME:
 				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
@@ -276,7 +278,8 @@ public final class EventParticipantTable extends EntityCellTable<EventParticipan
 				addCompositeWidgetColumn(col, new WidgetCellCreator<EventParticipant>() {
 					@Override
 					protected Widget createWidget(EventParticipant item) {
-						DefaultHyperlink link = new DefaultHyperlink(item.getAddedByFirstName() + " " + item.getAddedByLastName(), PageUrl.user(item.getAddedById()));
+						DefaultHyperlink link = new DefaultHyperlink(item.getAddedByFirstName() + " " + item.getAddedByLastName(), PageUrl.user(item
+								.getAddedById()));
 						return link;
 					}
 				});

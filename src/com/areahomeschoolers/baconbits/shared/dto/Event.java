@@ -24,6 +24,7 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private int categoryId;
 	private double cost;
 	private double price;
+	private double highPrice;
 	private double markup;
 	private boolean adultRequired = false;
 	private boolean active = true;
@@ -48,6 +49,8 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private int viewCount;
 	private String payPalEmail;
 	private String refundPolicy;
+	private int minimumAge;
+	private int maximumAge;
 
 	// address
 	private String address;
@@ -137,6 +140,9 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	}
 
 	public double getAdjustedPrice() {
+		if (!requiresRegistration) {
+			return price;
+		}
 		return price + markup;
 	}
 
@@ -242,6 +248,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 		return groupName;
 	}
 
+	public double getHighPrice() {
+		return highPrice;
+	}
+
 	public String getImageExtension() {
 		return imageExtension;
 	}
@@ -286,8 +296,16 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 		return markupPercent;
 	}
 
+	public int getMaximumAge() {
+		return maximumAge;
+	}
+
 	public int getMaximumParticipants() {
 		return maximumParticipants;
+	}
+
+	public int getMinimumAge() {
+		return minimumAge;
 	}
 
 	public int getMinimumParticipants() {
@@ -545,6 +563,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 		this.groupName = groupName;
 	}
 
+	public void setHighPrice(double highPrice) {
+		this.highPrice = highPrice;
+	}
+
 	public void setImageExtension(String imageExtension) {
 		this.imageExtension = imageExtension;
 	}
@@ -586,8 +608,16 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 		this.markupPercent = markupPercent;
 	}
 
+	public void setMaximumAge(int maximumAge) {
+		this.maximumAge = maximumAge;
+	}
+
 	public void setMaximumParticipants(int maximumParticipants) {
 		this.maximumParticipants = maximumParticipants;
+	}
+
+	public void setMinimumAge(int minimumAge) {
+		this.minimumAge = minimumAge;
 	}
 
 	public void setMinimumParticipants(int minimumParticipants) {

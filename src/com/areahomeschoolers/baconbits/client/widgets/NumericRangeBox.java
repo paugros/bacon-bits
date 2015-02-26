@@ -10,6 +10,36 @@ import com.google.gwt.user.client.ui.Label;
 
 public class NumericRangeBox extends Composite implements HasValidator, CustomFocusWidget {
 
+	public static String getAgeRangeText(int low, int high) {
+		String txt = "";
+		if (low > 0 && high > 0) {
+			txt = low + " - " + high;
+		} else if (high > 0) {
+			txt = "Up to " + high;
+		} else if (low > 0) {
+			txt = Integer.toString(low) + " and up";
+		} else {
+			txt = "N/A";
+		}
+
+		return txt;
+	}
+
+	public static String getParticipantRangeText(int low, int high) {
+		String txt = "";
+		if (low > 0 && high > 0) {
+			txt = low + " - " + high;
+		} else if (high > 0) {
+			txt = "Up to " + high;
+		} else if (low > 0) {
+			txt = "At least " + Integer.toString(low);
+		} else {
+			txt = "N/A";
+		}
+
+		return txt;
+	}
+
 	private final PaddedPanel panel = new PaddedPanel();
 	private final FocusPanel focusPanel = new FocusPanel();
 	private final NumericTextBox fromInput;
@@ -29,19 +59,15 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 
 			if (((!allowZeroForNoLimit || toVal != 0) && fromVal > toVal) || (!allowSameVal && fromVal == toVal)) {
 				validator.setError(true);
-				validator.setErrorMessage("Left value must be less than " + (allowSameVal ? "or equal to" : "") + " right value.");
+				validator.setErrorMessage("Mininum must be less than " + (allowSameVal ? "or equal to" : "") + " maximum value.");
 				return;
 			}
 		}
 	});
 
 	public NumericRangeBox() {
-		this(0);
-	}
-
-	public NumericRangeBox(int precision) {
-		fromInput = new NumericTextBox(precision);
-		toInput = new NumericTextBox(precision);
+		fromInput = new NumericTextBox();
+		toInput = new NumericTextBox();
 
 		fromInput.setVisibleLength(4);
 		toInput.setVisibleLength(4);
@@ -64,12 +90,12 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 		return allowZeroForNoLimit;
 	}
 
-	public double getFromValue() {
-		return fromInput.getDouble();
+	public int getFromValue() {
+		return fromInput.getInteger();
 	}
 
-	public double getToValue() {
-		return toInput.getDouble();
+	public int getToValue() {
+		return toInput.getInteger();
 	}
 
 	@Override
