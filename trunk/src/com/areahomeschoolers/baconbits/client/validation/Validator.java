@@ -295,6 +295,15 @@ public class Validator {
 			setError(false);
 		}
 
+		if (!hasError && !childValidators.isEmpty()) {
+			for (Validator validator : childValidators) {
+				if (!validator.validate()) {
+					hasError = true;
+					totalErrors++;
+				}
+			}
+		}
+
 		return !hasError;
 	}
 

@@ -82,6 +82,10 @@ public class DateTimeBox extends Composite implements HasValue<Date>, HasValidat
 		return dateBox.addHandler(handler, ValueChangeEvent.getType());
 	}
 
+	public void clearDate() {
+		dateBox.getTextBox().setText("");
+	}
+
 	public void enableTimeValidation(boolean enable) {
 		timeValidationEnabled = enable;
 	}

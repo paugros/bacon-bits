@@ -32,8 +32,10 @@ import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.PriceRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
@@ -324,6 +326,45 @@ public class ResourcePage implements Page {
 		});
 		ft.addField(facilityField);
 
+		final Label ageDisplay = new Label();
+		final NumericRangeBox ageInput = new NumericRangeBox();
+		ageInput.setAllowZeroForNoLimit(true);
+		FormField ageField = form.createFormField("Age range:", ageInput, ageDisplay);
+		ageField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				ageDisplay.setText(NumericRangeBox.getAgeRangeText(resource.getMinimumAge(), resource.getMaximumAge()));
+				ageInput.setRange(resource.getMinimumAge(), resource.getMaximumAge());
+			}
+		});
+		ageField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setMinimumAge(ageInput.getFromValue());
+				resource.setMaximumAge(ageInput.getToValue());
+			}
+		});
+		ft.addField(ageField);
+
+		final Label simplePriceDisplay = new Label();
+		final PriceRangeBox simplePriceInput = new PriceRangeBox();
+		final FormField simplePriceField = form.createFormField("Pricing, if applicable:", simplePriceInput, simplePriceDisplay);
+		simplePriceField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				simplePriceDisplay.setText(PriceRangeBox.getPriceText(resource.getPrice(), resource.getHighPrice()));
+				simplePriceInput.setValues(resource.getPrice(), resource.getHighPrice());
+			}
+		});
+		simplePriceField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				resource.setPrice(simplePriceInput.getLow());
+				resource.setHighPrice(simplePriceInput.getHigh());
+			}
+		});
+		ft.addField(simplePriceField);
+
 		final Label contactDisplay = new Label();
 		final TextBox contactInput = new TextBox();
 		contactInput.setMaxLength(100);
@@ -565,6 +606,7 @@ public class ResourcePage implements Page {
 		ft.addSpanningWidget(descriptionField);
 
 		if (resource.isSaved() && Application.administratorOf(resource)) {
+			ft.addField("Added by:", new DefaultHyperlink(resource.getAddedByFullName(), PageUrl.user(resource.getAddedById())));
 			ft.addField("View count:", Integer.toString(resource.getViewCount()));
 		}
 
@@ -625,6 +667,14 @@ public class ResourcePage implements Page {
 			address.setTarget("_blank");
 
 			vp.add(address);
+		}
+
+		if (resource.getPrice() > 0) {
+			vp.add(new Label("Pricing: " + PriceRangeBox.getPriceText(resource.getPrice(), resource.getHighPrice())));
+		}
+
+		if (resource.getMinimumAge() > 0 || resource.getMaximumAge() > 0) {
+			vp.add(new Label("Ages: " + NumericRangeBox.getAgeRangeText(resource.getMinimumAge(), resource.getMaximumAge())));
 		}
 
 		String text = "";

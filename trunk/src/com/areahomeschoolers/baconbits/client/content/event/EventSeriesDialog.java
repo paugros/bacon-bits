@@ -54,6 +54,9 @@ public class EventSeriesDialog extends DefaultDialog {
 		dateTable.setWidth("300px");
 
 		final DateTimeRangeBox dateInput = new DateTimeRangeBox();
+		dateInput.setStartDate(event.getStartDate());
+		dateInput.setEndDate(event.getEndDate());
+		dateInput.clearDatesKeepTimes();
 		Button add = new Button("Add", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -77,7 +80,7 @@ public class EventSeriesDialog extends DefaultDialog {
 				dateTable.setWidget(row, 0, new Label(text));
 				dateTable.setWidget(row, 1, ex);
 
-				dateInput.clear();
+				dateInput.clearDatesKeepTimes();
 			}
 		});
 

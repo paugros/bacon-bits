@@ -312,13 +312,13 @@ public class ControlledRichTextArea extends Composite {
 				topPanel.add(ol = createPushButton(images.ol(), "Insert Ordered List"));
 				topPanel.add(ul = createPushButton(images.ul(), "Insert Unordered List"));
 				topPanel.add(insertImage = createPushButton(images.insertImage(), "Insert Image"));
-				if (Application.isAuthenticated()) {
+				if (Application.isSystemAdministrator()) {
 					topPanel.add(uploadImage = createPushButton(images.uploadImage(), "Upload Image"));
 				}
 				topPanel.add(createLink = createPushButton(images.createLink(), "Create Link"));
 				topPanel.add(removeLink = createPushButton(images.removeLink(), "Remove Link"));
 				topPanel.add(removeFormat = createPushButton(images.removeFormat(), "Remove Formatting"));
-				if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+				if (Application.isSystemAdministrator()) {
 					htmlLink = new ClickLabel("Edit HTML");
 					htmlLink.setWordWrap(false);
 					htmlLink.addClickHandler(handler);

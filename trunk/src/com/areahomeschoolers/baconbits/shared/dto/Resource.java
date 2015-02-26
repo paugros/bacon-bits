@@ -22,6 +22,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 	private String name;
 	private int addressScopeId;
 	private String adDescription;
+	private double price;
+	private double highPrice;
+	private int minimumAge;
+	private int maximumAge;
 
 	private int clickCount;
 	private Date lastClickDate;
@@ -53,10 +57,15 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	// auxiliary
 	private String addressScope;
+	private String addedByFullName;
 	private String tags;
 
 	public Resource() {
 
+	}
+
+	public String getAddedByFullName() {
+		return addedByFullName;
 	}
 
 	public int getAddedById() {
@@ -126,6 +135,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		return facilityName;
 	}
 
+	public double getHighPrice() {
+		return highPrice;
+	}
+
 	public String getImageExtension() {
 		return imageExtension;
 	}
@@ -155,12 +168,24 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		return lng;
 	}
 
+	public int getMaximumAge() {
+		return maximumAge;
+	}
+
+	public int getMinimumAge() {
+		return minimumAge;
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public String getPhone() {
 		return phone;
+	}
+
+	public double getPrice() {
+		return price;
 	}
 
 	public boolean getShowInAds() {
@@ -207,6 +232,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public boolean isActive() {
 		return Common.isActive(new Date(), endDate);
+	}
+
+	public void setAddedByFullName(String addedByFullName) {
+		this.addedByFullName = addedByFullName;
 	}
 
 	public void setAddedById(int addedById) {
@@ -276,6 +305,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		this.facilityName = facilityName;
 	}
 
+	public void setHighPrice(double highPrice) {
+		this.highPrice = highPrice;
+	}
+
 	public void setImageExtension(String imageExtension) {
 		this.imageExtension = imageExtension;
 	}
@@ -302,12 +335,24 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 		this.lng = lng;
 	}
 
+	public void setMaximumAge(int maximumAge) {
+		this.maximumAge = maximumAge;
+	}
+
+	public void setMinimumAge(int minimumAge) {
+		this.minimumAge = minimumAge;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
 	}
 
 	public void setShowInAds(boolean showInAds) {

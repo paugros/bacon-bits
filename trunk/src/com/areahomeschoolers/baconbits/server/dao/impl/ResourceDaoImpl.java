@@ -50,6 +50,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			resource.setLastClickDate(rs.getTimestamp("lastClickDate"));
 			resource.setUrl(rs.getString("url"));
 			resource.setImageId(rs.getInt("imageId"));
+			resource.setPrice(rs.getDouble("price"));
+			resource.setHighPrice(rs.getDouble("highPrice"));
 			resource.setSmallImageId(rs.getInt("smallImageId"));
 			resource.setDescription(rs.getString("description"));
 			resource.setPhone(rs.getString("phone"));
@@ -72,6 +74,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			resource.setImpressions(rs.getInt("impressions"));
 			resource.setTags(rs.getString("tags"));
 			resource.setViewCount(rs.getInt("viewCount"));
+			resource.setMinimumAge(rs.getInt("minimumAge"));
+			resource.setMaximumAge(rs.getInt("maximumAge"));
+			resource.setAddedByFullName(rs.getString("addedByFullName"));
 			if (resource.getImageId() == null) {
 				resource.setImageExtension(rs.getString("tagFileExtension"));
 				resource.setImageId(rs.getInt("tagImageId"));
@@ -101,7 +106,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 	}
 
 	public String createSqlBase() {
-		String sql = "select r.*, u.firstName, u.lastName, s.scope as addressScope, d.fileExtension, ";
+		String sql = "select r.*, u.firstName, u.lastName, s.scope as addressScope, d.fileExtension, concat(u.firstName, ' ', u.lastName) as addedByFullName, ";
 		sql += "t.imageId as tagImageId, t.smallImageId as tagSmallImageId, dd.fileExtension as tagFileExtension, \n";
 		sql += "(select group_concat(t.name separator ', ') ";
 		sql += "from tags t join tagResourceMapping tm on tm.tagId = t.id where tm.resourceId = r.id) as tags \n";
@@ -266,7 +271,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			String sql = "update resources set name = :name, startDate = :startDate, endDate = :endDate, url = :url, description = :description, showInAds = :showInAds, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone, contactEmail = :contactEmail, ";
 			sql += "addressScopeId = :addressScopeId, directoryPriority = :directoryPriority, adDescription = :adDescription,  ";
-			sql += "contactName = :contactName, facilityName = :facilityName, facebookUrl = :facebookUrl ";
+			sql += "minimumAge = :minimumAge, maximumAge = :maximumAge, ";
+			sql += "contactName = :contactName, facilityName = :facilityName, facebookUrl = :facebookUrl, price = :price, highPrice = :highPrice ";
 			sql += "where id = :id";
 			update(sql, namedParams);
 		} else {
@@ -277,10 +283,10 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 			String sql = "insert into resources (addedById, startDate, endDate, addedDate, name, url, description, adDescription, ";
 			sql += "address, street, city, state, zip, lat, lng, phone, showInAds, contactEmail, addressScopeId, directoryPriority, ";
-			sql += "contactName, facilityName, facebookUrl) ";
+			sql += "contactName, facilityName, facebookUrl, price, highPrice, minimumAge, maximumAge) ";
 			sql += "values(:addedById, :startDate, :endDate, now(), :name, :url, :description, :adDescription, ";
 			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds, :contactEmail, :addressScopeId, :directoryPriority, ";
-			sql += ":contactName, :facilityName, :facebookUrl)";
+			sql += ":contactName, :facilityName, :facebookUrl, :price, :highPrice, :minimumAge, :maximumAge)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

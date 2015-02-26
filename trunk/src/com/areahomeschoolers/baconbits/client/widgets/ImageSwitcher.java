@@ -59,8 +59,9 @@ public class ImageSwitcher extends Composite {
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherEvents()), h1));
 
 		String h2 = "<div class=largeText style=\"margin-bottom: 4px;\">";
-		h2 += "<a href=\"" + Url.getBaseUrl() + PageUrl.userList() + "\">Find Homeschoolers</a></div>";
-		h2 += textDiv + "Connect with homeschoolers near you who share your interests.</div>";
+		h2 += "<a href=\"" + Url.getBaseUrl() + PageUrl.userList() + "\">Community Connection</a></div>";
+		h2 += textDiv + "Our free service allows homeschool groups and homeschoolers to post events, make connections, and share resources. ";
+		h2 += "Set up your free homeschool account now or create your own space for your homeschool group.</div>";
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherConnect()), h2));
 
 		String h3 = "<div class=largeText style=\"margin-bottom: 4px;\">";
