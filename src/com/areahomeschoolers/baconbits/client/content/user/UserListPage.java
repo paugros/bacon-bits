@@ -1,19 +1,24 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.ViewMode;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.SearchSection;
+import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -32,6 +37,8 @@ import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -40,8 +47,10 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -52,6 +61,9 @@ public final class UserListPage implements Page {
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private TextBox searchControl;
 	private ArrayList<User> users;
+	private SimplePanel simplePanel = new SimplePanel();
+	private UserTable table = new UserTable(args);
+	private ViewMode viewMode = ViewMode.GRID;
 
 	public UserListPage(final VerticalPanel page) {
 		fp.setWidth("100%");
@@ -61,6 +73,9 @@ public final class UserListPage implements Page {
 		}
 
 		String title = "Homeschoolers";
+
+		table.setDisplayColumns(UserColumn.PICTURE, UserColumn.STATUS, UserColumn.NAME, UserColumn.EMAIL, UserColumn.INTERESTS);
+		table.addStyleName(ContentWidth.MAXWIDTH1100PX.toString());
 
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new DefaultHyperlink("Homeschoolers By Interests", PageUrl.tagGroup("USER")));
@@ -82,19 +97,24 @@ public final class UserListPage implements Page {
 
 		page.add(new SearchSection(TagMappingType.USER, optionsPanel));
 
-		populateOptionsPanel();
+		createSearchBox();
 
 		args = getDefaultArgs();
 
-		page.add(fp);
+		simplePanel.setWidget(fp);
+		page.add(simplePanel);
 		Application.getLayout().setPage(title, page);
 
 		populate();
 	}
 
-	private void applyTextFilter(String text) {
+	private void applyFilter(String text) {
 		if (text == null || text.isEmpty()) {
-			fp.showAll();
+			if (viewMode == ViewMode.GRID) {
+				fp.showAll();
+			} else {
+				table.showAllItems();
+			}
 			return;
 		}
 
@@ -102,44 +122,16 @@ public final class UserListPage implements Page {
 
 		for (User u : users) {
 			String email = u.getEmail() == null ? "" : u.getEmail();
-			fp.setVisible(u, u.getFullName().toLowerCase().contains(text) || email.toLowerCase().contains(text));
-		}
-	}
-
-	private ArgMap<UserArg> getDefaultArgs() {
-		ArgMap<UserArg> defaultArgs = new ArgMap<UserArg>(Status.ACTIVE);
-		if (Application.hasLocation()) {
-			defaultArgs.put(UserArg.LOCATION_FILTER, true);
-		}
-		defaultArgs.put(UserArg.PARENTS);
-		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			defaultArgs.put(UserArg.HAS_TAGS, Url.getIntListParameter("tagId"));
-		}
-		return defaultArgs;
-	}
-
-	private void populate() {
-		userService.list(args, new Callback<ArrayList<User>>() {
-			@Override
-			protected void doOnSuccess(ArrayList<User> result) {
-				users = result;
-				fp.clear();
-
-				for (User u : result) {
-					fp.add(new UserTile(u), u.getId());
-				}
+			boolean visible = u.getFullName().toLowerCase().contains(text) || email.toLowerCase().contains(text);
+			if (viewMode == ViewMode.GRID) {
+				fp.setVisible(u, visible);
+			} else {
+				table.setItemVisible(u, visible);
 			}
-		});
+		}
 	}
 
-	// private void resetFilter() {
-	// optionsPanel.clear();
-	// populateOptionsPanel();
-	// args = getDefaultArgs();
-	// populate();
-	// }
-
-	private void populateOptionsPanel() {
+	private void createSearchBox() {
 		optionsPanel.addStyleName("boxedBlurb");
 		optionsPanel.setSpacing(8);
 		PaddedPanel top = new PaddedPanel(10);
@@ -249,7 +241,7 @@ public final class UserListPage implements Page {
 		searchControl.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
-				applyTextFilter(searchControl.getText());
+				applyFilter(searchControl.getText());
 			}
 		});
 
@@ -257,7 +249,7 @@ public final class UserListPage implements Page {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					applyTextFilter(searchControl.getText());
+					applyFilter(searchControl.getText());
 				}
 			}
 		});
@@ -284,13 +276,75 @@ public final class UserListPage implements Page {
 			optionsPanel.add(cb);
 		}
 
-		// Button resetButton = new Button("Reset", new ClickHandler() {
-		// @Override
-		// public void onClick(ClickEvent event) {
-		// resetFilter();
-		// }
-		// });
-		// optionsPanel.add(resetButton);
-		// optionsPanel.setCellHorizontalAlignment(resetButton, HasHorizontalAlignment.ALIGN_CENTER);
+		VerticalPanel cp = new VerticalPanel();
+		final ClickLabel view = new ClickLabel("List view");
+		view.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (viewMode == ViewMode.GRID) {
+					viewMode = ViewMode.LIST;
+					view.setText("Grid view");
+
+					simplePanel.setWidget(table);
+				} else {
+					viewMode = ViewMode.GRID;
+					view.setText("List view");
+
+					simplePanel.setWidget(fp);
+				}
+
+				populate(users);
+				applyFilter(searchControl.getText());
+			}
+		});
+
+		ClickLabel reset = new ClickLabel("Reset search", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				locationInput.clearLocation();
+				Application.reloadPage();
+			}
+		});
+
+		cp.add(view);
+		cp.add(reset);
+
+		optionsPanel.add(cp);
+		optionsPanel.setCellHorizontalAlignment(cp, HasHorizontalAlignment.ALIGN_RIGHT);
+	}
+
+	private ArgMap<UserArg> getDefaultArgs() {
+		ArgMap<UserArg> defaultArgs = new ArgMap<UserArg>(Status.ACTIVE);
+		if (Application.hasLocation()) {
+			defaultArgs.put(UserArg.LOCATION_FILTER, true);
+		}
+		defaultArgs.put(UserArg.PARENTS);
+		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+			defaultArgs.put(UserArg.HAS_TAGS, Url.getIntListParameter("tagId"));
+		}
+		return defaultArgs;
+	}
+
+	private void populate() {
+		userService.list(args, new Callback<ArrayList<User>>() {
+			@Override
+			protected void doOnSuccess(ArrayList<User> result) {
+				users = result;
+
+				populate(result);
+			}
+		});
+	}
+
+	private void populate(List<User> users) {
+		if (viewMode == ViewMode.GRID) {
+			fp.clear();
+
+			for (User u : users) {
+				fp.add(new UserTile(u), u.getId());
+			}
+		} else {
+			table.populate(users);
+		}
 	}
 }

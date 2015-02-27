@@ -150,6 +150,10 @@ public class LocationFilterInput extends Composite {
 		initWidget(hp);
 	}
 
+	public void clearLocation() {
+		updateLocation(null, 0, 0, 0);
+	}
+
 	public double getLat() {
 		return lat;
 	}

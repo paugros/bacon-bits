@@ -8,12 +8,14 @@ import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColu
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.client.widgets.PriceRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -38,8 +40,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class EventTable extends EntityCellTable<Event, EventArg, EventColumn> {
 	public enum EventColumn implements EntityCellTableColumn<EventColumn> {
-		REGISTERED(""), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), LOCATION("Location"), TAGS("Tags"), CATEGORY(
-				"Category"), VIEWS("Views");
+		REGISTERED(""), IMAGE(" "), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), LOCATION("Location"), TAGS("Tags"), CATEGORY(
+				"Category"), PRICE("Price"), VIEWS("Views");
 
 		private String title;
 
@@ -106,11 +108,37 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 	protected void setColumns() {
 		for (EventColumn col : getDisplayColumns()) {
 			switch (col) {
+			case IMAGE:
+				addWidgetColumn(col, new WidgetCellCreator<Event>() {
+					@Override
+					protected Widget createWidget(Event item) {
+						Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
+						if (item.getSmallImageId() != null) {
+							i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
+						}
+						return i;
+					}
+				});
+				break;
 			case VIEWS:
 				addNumberColumn(col, new ValueGetter<Number, Event>() {
 					@Override
 					public Number get(Event item) {
 						return item.getViewCount();
+					}
+				});
+				break;
+
+			case PRICE:
+				addTextColumn(col, new ValueGetter<String, Event>() {
+					@Override
+					public String get(Event item) {
+						return PriceRangeBox.getPriceText(item.getAdjustedPrice(), item.getHighPrice());
+					}
+				}, new ValueGetter<Double, Event>() {
+					@Override
+					public Double get(Event item) {
+						return item.getPrice();
 					}
 				});
 				break;

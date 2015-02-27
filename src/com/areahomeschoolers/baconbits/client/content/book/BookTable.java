@@ -7,9 +7,11 @@ import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
@@ -31,12 +33,13 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> {
 	public enum BookColumn implements EntityCellTableColumn<BookColumn> {
-		USER("Seller"), TITLE("Title"), GRADE_LEVEL("Grade Level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE("Price"), PRICE("Price"), VIEWS(
-				"Views"), ADDED_DATE("Added"), DELETE(""), DELETE_PURCHASE("");
+		IMAGE(""), USER("Seller"), TITLE("Title"), TAGS("Tags"), GRADE_LEVEL("Grade Level"), STATUS("Status"), CONDITION("Condition"), TOTALED_PRICE("Price"), PRICE(
+				"Price"), VIEWS("Views"), ADDED_DATE("Added"), DELETE(""), DELETE_PURCHASE("");
 
 		private String title;
 
@@ -144,6 +147,26 @@ public final class BookTable extends EntityCellTable<Book, BookArg, BookColumn> 
 	protected void setColumns() {
 		for (BookColumn col : getDisplayColumns()) {
 			switch (col) {
+			case TAGS:
+				addTextColumn(col, new ValueGetter<String, Book>() {
+					@Override
+					public String get(Book item) {
+						return item.getTags();
+					}
+				});
+				break;
+			case IMAGE:
+				addWidgetColumn(col, new WidgetCellCreator<Book>() {
+					@Override
+					protected Widget createWidget(Book item) {
+						Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
+						if (item.getSmallImageId() != null) {
+							i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
+						}
+						return i;
+					}
+				});
+				break;
 			case VIEWS:
 				addNumberColumn(col, new ValueGetter<Number, Book>() {
 					@Override

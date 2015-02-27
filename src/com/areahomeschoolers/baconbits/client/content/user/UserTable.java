@@ -39,8 +39,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
-		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), STATUS("Status"), AGE("Age"), ADMINISTRATOR(
-				"Administrator"), APPROVAL("Approval"), DELETE("Delete");
+		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), STATUS("Status"), AGE("Age"), INTERESTS(
+				"Common interests"), ADMINISTRATOR("Administrator"), APPROVAL("Approval"), DELETE("Delete");
 
 		private String title;
 
@@ -114,6 +114,14 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 	protected void setColumns() {
 		for (UserColumn col : getDisplayColumns()) {
 			switch (col) {
+			case INTERESTS:
+				addNumberColumn(col, new ValueGetter<Number, User>() {
+					@Override
+					public Number get(User item) {
+						return item.getCommonInterestCount();
+					}
+				});
+				break;
 			case PICTURE:
 				addWidgetColumn(col, new WidgetCellCreator<User>() {
 					@Override

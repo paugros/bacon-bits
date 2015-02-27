@@ -29,11 +29,11 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	private String visibilityLevel;
 	private String groupName;
 	private int documentCount;
-	private int tagCount;
 	private GroupPolicy groupPolicy;
 	private int userImageId;
 	private int commentCount;
 	private Date lastCommentDate;
+	private String tags;
 
 	private Integer imageId;
 	private Integer smallImageId;
@@ -133,8 +133,8 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		return startDate;
 	}
 
-	public int getTagCount() {
-		return tagCount;
+	public String getTags() {
+		return tags;
 	}
 
 	public String getTitle() {
@@ -160,10 +160,6 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 	@Override
 	public boolean hasDocuments() {
 		return documentCount > 0;
-	}
-
-	public boolean hasTags() {
-		return tagCount > 0;
 	}
 
 	public boolean isActive() {
@@ -244,8 +240,8 @@ public final class Article extends EntityDto<Article> implements HasDocuments, H
 		this.startDate = startDate;
 	}
 
-	public void setTagCount(int tagCount) {
-		this.tagCount = tagCount;
+	public void setTags(String tags) {
+		this.tags = tags;
 	}
 
 	public void setTitle(String title) {

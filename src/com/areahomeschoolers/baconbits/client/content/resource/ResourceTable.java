@@ -5,13 +5,16 @@ import java.util.Date;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.resource.ResourceTable.ResourceColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
+import com.areahomeschoolers.baconbits.client.widgets.PriceRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.ValueGetter;
@@ -29,12 +32,13 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, ResourceColumn> {
 	public enum ResourceColumn implements EntityCellTableColumn<ResourceColumn> {
-		NAME("Title"), DESCRIPTION("Description"), ADDED_DATE("Added"), LOCATION("Location"), TAGS("Tags"), VIEW_COUNT("Views"), CLICK_COUNT("Clicks"), IMPRESSIONS(
-				"Impressions");
+		IMAGE(""), NAME("Title"), DESCRIPTION("Description"), ADDED_DATE("Added"), LOCATION("Location"), TAGS("Tags"), PRICE("Price"), VIEW_COUNT("Views"), CLICK_COUNT(
+				"Clicks"), IMPRESSIONS("Impressions");
 
 		private String title;
 
@@ -110,11 +114,36 @@ public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, 
 	protected void setColumns() {
 		for (ResourceColumn col : getDisplayColumns()) {
 			switch (col) {
+			case IMAGE:
+				addWidgetColumn(col, new WidgetCellCreator<Resource>() {
+					@Override
+					protected Widget createWidget(Resource item) {
+						Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
+						if (item.getSmallImageId() != null) {
+							i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
+						}
+						return i;
+					}
+				});
+				break;
 			case TAGS:
 				addTextColumn(col, new ValueGetter<String, Resource>() {
 					@Override
 					public String get(Resource item) {
 						return item.getTags();
+					}
+				});
+				break;
+			case PRICE:
+				addTextColumn(col, new ValueGetter<String, Resource>() {
+					@Override
+					public String get(Resource item) {
+						return PriceRangeBox.getPriceText(item.getPrice(), item.getHighPrice());
+					}
+				}, new ValueGetter<Double, Resource>() {
+					@Override
+					public Double get(Resource item) {
+						return item.getPrice();
 					}
 				});
 				break;
