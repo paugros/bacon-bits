@@ -1,9 +1,12 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.ViewMode;
+import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.tag.SearchSection;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -11,12 +14,15 @@ import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SortDirection;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.BookArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -30,14 +36,18 @@ import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -51,10 +61,19 @@ public final class BookListPage implements Page {
 	private VerticalPanel page;
 	private TextBox searchControl;
 	private ArrayList<Book> books;
+	private BookTable table = new BookTable(args);
+	private ViewMode viewMode = ViewMode.GRID;
+	private SimplePanel sp = new SimplePanel();
+	private BookPageData pd;
 
 	public BookListPage(final VerticalPanel p) {
 		fp.setWidth("100%");
 		page = p;
+
+		table.setDisplayColumns(BookColumn.IMAGE, BookColumn.TITLE, BookColumn.TAGS, BookColumn.PRICE, BookColumn.GRADE_LEVEL, BookColumn.CONDITION);
+		table.addStyleName(ContentWidth.MAXWIDTH1100PX.toString());
+		table.setDefaultSortColumn(BookColumn.TITLE, SortDirection.SORT_ASC);
+
 		if (Application.hasLocation()) {
 			args.put(BookArg.LOCATION_FILTER, true);
 		}
@@ -70,32 +89,44 @@ public final class BookListPage implements Page {
 			args.put(BookArg.USER_ID, sellerId);
 		}
 
-		String title = "Books";
+		bookService.getPageData(0, new Callback<BookPageData>() {
+			@Override
+			protected void doOnSuccess(BookPageData result) {
+				pd = result;
 
-		CookieCrumb cc = new CookieCrumb();
-		cc.add(new DefaultHyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
-		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
-			String tag = URL.decode(Url.getParameter("tn"));
-			cc.add(tag);
-			title = "Books about " + tag;
-		} else {
-			cc.add("Books");
-		}
-		page.add(cc);
+				String title = "Books";
+				CookieCrumb cc = new CookieCrumb();
+				cc.add(new DefaultHyperlink("Books By Type", PageUrl.tagGroup("BOOK")));
+				if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
+					String tag = URL.decode(Url.getParameter("tn"));
+					cc.add(tag);
+					title = "Books about " + tag;
+				} else {
+					cc.add("Books");
+				}
+				page.add(cc);
 
-		page.add(new SearchSection(TagMappingType.BOOK, optionsPanel));
-		populateOptionsPanel();
+				page.add(new SearchSection(TagMappingType.BOOK, optionsPanel));
+				createSearchBox();
 
-		page.add(fp);
+				sp.setWidget(fp);
+				page.add(sp);
 
-		populate();
+				populate();
 
-		Application.getLayout().setPage(title, page);
+				Application.getLayout().setPage(title, page);
+			}
+		});
+
 	}
 
-	private void applyTextFilter(String text) {
+	private void applyFilter(String text) {
 		if (text == null || text.isEmpty()) {
-			fp.showAll();
+			if (viewMode == ViewMode.GRID) {
+				fp.showAll();
+			} else {
+				table.showAllItems();
+			}
 			return;
 		}
 
@@ -113,25 +144,16 @@ public final class BookListPage implements Page {
 					break;
 				}
 			}
-			fp.setVisible(b, show);
+
+			if (viewMode == ViewMode.GRID) {
+				fp.setVisible(b, show);
+			} else {
+				table.setItemVisible(b, show);
+			}
 		}
 	}
 
-	private void populate() {
-		bookService.list(args, new Callback<ArrayList<Book>>() {
-			@Override
-			protected void doOnSuccess(ArrayList<Book> result) {
-				fp.clear();
-
-				books = result;
-				for (Book b : result) {
-					fp.add(new BookTile(b), b.getId());
-				}
-			}
-		});
-	}
-
-	private void populateOptionsPanel() {
+	private void createSearchBox() {
 		optionsPanel.addStyleName("boxedBlurb");
 		optionsPanel.setSpacing(8);
 		Label label = new Label("Show");
@@ -147,116 +169,168 @@ public final class BookListPage implements Page {
 			page.add(all);
 		}
 
-		bookService.getPageData(0, new Callback<BookPageData>() {
+		final DefaultListBox category = new DefaultListBox();
+		category.addChangeHandler(new ChangeHandler() {
 			@Override
-			protected void doOnSuccess(BookPageData result) {
-				final DefaultListBox category = new DefaultListBox();
-				category.addChangeHandler(new ChangeHandler() {
-					@Override
-					public void onChange(ChangeEvent event) {
-						args.put(BookArg.CATEGORY_ID, category.getIntValue());
-						populate();
-					}
-				});
-				category.addItem("all categories", 0);
-				for (Data item : result.getCategories()) {
-					category.addItem(item.get("category"), item.getId());
-				}
-
-				final DefaultListBox grade = new DefaultListBox();
-				grade.addChangeHandler(new ChangeHandler() {
-					@Override
-					public void onChange(ChangeEvent event) {
-						args.put(BookArg.GRADE_LEVEL_ID, grade.getIntValue());
-						populate();
-					}
-				});
-				grade.addItem("all grades", 0);
-				for (Data item : result.getGradeLevels()) {
-					grade.addItem(item.get("gradeLevel"), item.getId());
-				}
-
-				final DefaultListBox price = new DefaultListBox();
-				price.addChangeHandler(new ChangeHandler() {
-					@Override
-					public void onChange(ChangeEvent event) {
-						if (price.getSelectedIndex() == 0) {
-							args.remove(BookArg.PRICE_BETWEEN);
-						} else {
-							args.put(BookArg.PRICE_BETWEEN, price.getValue());
-						}
-						populate();
-					}
-				});
-				price.addItem("all prices");
-				price.addItem("< $1", "0-0.99");
-				price.addItem("$1 - $5", "1-5");
-				price.addItem("$5 - $10", "5-10");
-				price.addItem("$10 - $20", "10-20");
-				price.addItem("> $20", "20.01-1000");
-
-				top.add(category);
-				top.add(grade);
-				top.add(price);
-
-				for (int i = 0; i < top.getWidgetCount(); i++) {
-					top.setCellVerticalAlignment(top.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
-				}
-
-				final LocationFilterInput locationInput = new LocationFilterInput();
-				if (Application.hasLocation()) {
-					locationInput.setText(Application.getCurrentLocation());
-				}
-
-				locationInput.setClearCommand(new Command() {
-					@Override
-					public void execute() {
-						args.remove(BookArg.LOCATION_FILTER);
-						populate();
-					}
-				});
-
-				locationInput.setChangeCommand(new Command() {
-					@Override
-					public void execute() {
-						args.put(BookArg.LOCATION_FILTER, true);
-						populate();
-					}
-				});
-
-				PaddedPanel bottom = new PaddedPanel(15);
-
-				bottom.add(locationInput);
-
-				for (int i = 0; i < bottom.getWidgetCount(); i++) {
-					bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
-				}
-
-				PaddedPanel extraBottom = new PaddedPanel(15);
-				extraBottom.add(new Label("with text"));
-				searchControl = new TextBox();
-				searchControl.setVisibleLength(35);
-				extraBottom.add(searchControl);
-				searchControl.addBlurHandler(new BlurHandler() {
-					@Override
-					public void onBlur(BlurEvent event) {
-						applyTextFilter(searchControl.getText());
-					}
-				});
-				searchControl.addKeyDownHandler(new KeyDownHandler() {
-					@Override
-					public void onKeyDown(KeyDownEvent event) {
-						if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-							applyTextFilter(searchControl.getText());
-						}
-					}
-				});
-
-				optionsPanel.add(top);
-				optionsPanel.add(bottom);
-				optionsPanel.add(extraBottom);
-
+			public void onChange(ChangeEvent event) {
+				args.put(BookArg.CATEGORY_ID, category.getIntValue());
+				populate();
 			}
 		});
+		category.addItem("all categories", 0);
+		for (Data item : pd.getCategories()) {
+			category.addItem(item.get("category"), item.getId());
+		}
+
+		final DefaultListBox grade = new DefaultListBox();
+		grade.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				args.put(BookArg.GRADE_LEVEL_ID, grade.getIntValue());
+				populate();
+			}
+		});
+		grade.addItem("all grades", 0);
+		for (Data item : pd.getGradeLevels()) {
+			grade.addItem(item.get("gradeLevel"), item.getId());
+		}
+
+		final DefaultListBox price = new DefaultListBox();
+		price.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				if (price.getSelectedIndex() == 0) {
+					args.remove(BookArg.PRICE_BETWEEN);
+				} else {
+					args.put(BookArg.PRICE_BETWEEN, price.getValue());
+				}
+				populate();
+			}
+		});
+		price.addItem("all prices");
+		price.addItem("< $1", "0-0.99");
+		price.addItem("$1 - $5", "1-5");
+		price.addItem("$5 - $10", "5-10");
+		price.addItem("$10 - $20", "10-20");
+		price.addItem("> $20", "20.01-1000");
+
+		top.add(category);
+		top.add(grade);
+		top.add(price);
+
+		for (int i = 0; i < top.getWidgetCount(); i++) {
+			top.setCellVerticalAlignment(top.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+		}
+
+		final LocationFilterInput locationInput = new LocationFilterInput();
+		if (Application.hasLocation()) {
+			locationInput.setText(Application.getCurrentLocation());
+		}
+
+		locationInput.setClearCommand(new Command() {
+			@Override
+			public void execute() {
+				args.remove(BookArg.LOCATION_FILTER);
+				populate();
+			}
+		});
+
+		locationInput.setChangeCommand(new Command() {
+			@Override
+			public void execute() {
+				args.put(BookArg.LOCATION_FILTER, true);
+				populate();
+			}
+		});
+
+		PaddedPanel bottom = new PaddedPanel(15);
+
+		bottom.add(locationInput);
+
+		for (int i = 0; i < bottom.getWidgetCount(); i++) {
+			bottom.setCellVerticalAlignment(bottom.getWidget(i), HasVerticalAlignment.ALIGN_MIDDLE);
+		}
+
+		PaddedPanel extraBottom = new PaddedPanel(15);
+		extraBottom.add(new Label("with text"));
+		searchControl = new TextBox();
+		searchControl.setVisibleLength(35);
+		extraBottom.add(searchControl);
+		searchControl.addBlurHandler(new BlurHandler() {
+			@Override
+			public void onBlur(BlurEvent event) {
+				applyFilter(searchControl.getText());
+			}
+		});
+		searchControl.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					applyFilter(searchControl.getText());
+				}
+			}
+		});
+
+		VerticalPanel cp = new VerticalPanel();
+		final ClickLabel view = new ClickLabel("List view");
+		view.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (viewMode == ViewMode.GRID) {
+					viewMode = ViewMode.LIST;
+					view.setText("Grid view");
+
+					sp.setWidget(table);
+				} else {
+					viewMode = ViewMode.GRID;
+					view.setText("List view");
+
+					sp.setWidget(fp);
+				}
+
+				populate(books);
+				applyFilter(searchControl.getText());
+			}
+		});
+
+		ClickLabel reset = new ClickLabel("Reset search", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				locationInput.clearLocation();
+				Application.reloadPage();
+			}
+		});
+
+		cp.add(view);
+		cp.add(reset);
+
+		optionsPanel.add(top);
+		optionsPanel.add(bottom);
+		optionsPanel.add(extraBottom);
+		optionsPanel.add(cp);
+		optionsPanel.setCellHorizontalAlignment(cp, HasHorizontalAlignment.ALIGN_RIGHT);
+	}
+
+	private void populate() {
+		bookService.list(args, new Callback<ArrayList<Book>>() {
+			@Override
+			protected void doOnSuccess(ArrayList<Book> result) {
+				books = result;
+
+				populate(result);
+			}
+		});
+	}
+
+	private void populate(List<Book> books) {
+		if (viewMode == ViewMode.GRID) {
+			fp.clear();
+
+			for (Book b : books) {
+				fp.add(new BookTile(b), b.getId());
+			}
+		} else {
+			table.populate(books);
+		}
 	}
 }

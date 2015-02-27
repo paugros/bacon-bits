@@ -1,9 +1,12 @@
 package com.areahomeschoolers.baconbits.client.content.resource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.ViewMode;
+import com.areahomeschoolers.baconbits.client.content.resource.ResourceTable.ResourceColumn;
 import com.areahomeschoolers.baconbits.client.content.tag.SearchSection;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -11,12 +14,15 @@ import com.areahomeschoolers.baconbits.client.rpc.service.ResourceService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
+import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SortDirection;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -27,14 +33,18 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -44,10 +54,18 @@ public final class ResourceListPage implements Page {
 	private TilePanel fp = new TilePanel();
 	private ArrayList<Resource> resources;
 	private VerticalPanel page;
+	private ResourceTable table = new ResourceTable(args);
+	private ViewMode viewMode = ViewMode.GRID;
+	private SimplePanel sp = new SimplePanel();
 
 	public ResourceListPage(final VerticalPanel p) {
 		String title = "Resources";
 		page = p;
+
+		table.setDisplayColumns(ResourceColumn.IMAGE, ResourceColumn.NAME, ResourceColumn.DESCRIPTION, ResourceColumn.LOCATION, ResourceColumn.TAGS,
+				ResourceColumn.PRICE);
+		table.addStyleName(ContentWidth.MAXWIDTH1100PX.toString());
+		table.setDefaultSortColumn(ResourceColumn.NAME, SortDirection.SORT_ASC);
 
 		if (Application.hasLocation()) {
 			args.put(ResourceArg.LOCATION_FILTER, true);
@@ -77,9 +95,33 @@ public final class ResourceListPage implements Page {
 
 		createSearchBox();
 
-		page.add(fp);
+		sp.setWidget(fp);
+		page.add(sp);
 		Application.getLayout().setPage(title, page);
 		populate();
+	}
+
+	private void applyFilter(String text) {
+		if (text == null || text.isEmpty()) {
+			if (viewMode == ViewMode.GRID) {
+				fp.showAll();
+			} else {
+				table.showAllItems();
+			}
+			return;
+		}
+
+		text = text.toLowerCase();
+
+		for (Resource r : resources) {
+			String descriptionText = new HTML(r.getDescription()).getText().toLowerCase();
+			boolean visible = r.getName().toLowerCase().contains(text) || descriptionText.contains(text);
+			if (viewMode == ViewMode.GRID) {
+				fp.setVisible(r, visible);
+			} else {
+				table.setItemVisible(r, visible);
+			}
+		}
 	}
 
 	private void createSearchBox() {
@@ -95,7 +137,7 @@ public final class ResourceListPage implements Page {
 		searchInput.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
-				search(searchInput.getText());
+				applyFilter(searchInput.getText());
 			}
 		});
 
@@ -103,7 +145,7 @@ public final class ResourceListPage implements Page {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					search(searchInput.getText());
+					applyFilter(searchInput.getText());
 				}
 			}
 		});
@@ -141,6 +183,42 @@ public final class ResourceListPage implements Page {
 		}
 		vvp.add(bottom);
 
+		VerticalPanel cp = new VerticalPanel();
+		final ClickLabel view = new ClickLabel("List view");
+		view.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (viewMode == ViewMode.GRID) {
+					viewMode = ViewMode.LIST;
+					view.setText("Grid view");
+
+					sp.setWidget(table);
+				} else {
+					viewMode = ViewMode.GRID;
+					view.setText("List view");
+
+					sp.setWidget(fp);
+				}
+
+				populate(resources);
+				applyFilter(searchInput.getText());
+			}
+		});
+
+		ClickLabel reset = new ClickLabel("Reset search", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				locationInput.clearLocation();
+				Application.reloadPage();
+			}
+		});
+
+		cp.add(view);
+		cp.add(reset);
+
+		vvp.add(cp);
+		vvp.setCellHorizontalAlignment(cp, HasHorizontalAlignment.ALIGN_RIGHT);
+
 		page.add(new SearchSection(TagMappingType.RESOURCE, vvp));
 	}
 
@@ -149,26 +227,21 @@ public final class ResourceListPage implements Page {
 			@Override
 			protected void doOnSuccess(ArrayList<Resource> result) {
 				resources = result;
-				fp.clear();
 
-				for (Resource r : result) {
-					fp.add(new ResourceTile(r), r.getId());
-				}
+				populate(resources);
 			}
 		});
 	}
 
-	private void search(String text) {
-		if (text == null || text.isEmpty()) {
-			fp.showAll();
-			return;
-		}
+	private void populate(List<Resource> resources) {
+		if (viewMode == ViewMode.GRID) {
+			fp.clear();
 
-		text = text.toLowerCase();
-
-		for (Resource r : resources) {
-			String descriptionText = new HTML(r.getDescription()).getText().toLowerCase();
-			fp.setVisible(r, r.getName().toLowerCase().contains(text) || descriptionText.contains(text));
+			for (Resource r : resources) {
+				fp.add(new ResourceTile(r), r.getId());
+			}
+		} else {
+			table.populate(resources);
 		}
 	}
 

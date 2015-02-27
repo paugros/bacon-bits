@@ -315,11 +315,6 @@ public final class Layout {
 			bodyPanel.add(ap);
 		}
 
-		if (Application.isAuthenticated()) {
-			// BalanceBox bb = new BalanceBox();
-			// menuPanel.add(bb);
-		}
-
 		if (isMobileBrowser) {
 			mobileBodyPanel.addStyleName("bodyPanel");
 			mobileBodyPanel.setWidth("100%");

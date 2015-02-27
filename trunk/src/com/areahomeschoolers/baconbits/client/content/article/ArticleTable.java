@@ -5,8 +5,10 @@ import java.util.Date;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleTable.ArticleColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
@@ -20,11 +22,12 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class ArticleTable extends EntityCellTable<Article, ArticleArg, ArticleColumn> {
 	public enum ArticleColumn implements EntityCellTableColumn<ArticleColumn> {
-		TITLE("Title"), ADDED_DATE("Added"), ADDED_BY("Added By"), END_DATE("Inactive Date"), VIEWS("Views");
+		IMAGE(""), TITLE("Title"), TAGS("Tags"), ADDED_DATE("Added"), ADDED_BY("Added By"), END_DATE("Inactive Date"), VIEWS("Views");
 
 		private String title;
 
@@ -101,6 +104,26 @@ public final class ArticleTable extends EntityCellTable<Article, ArticleArg, Art
 	protected void setColumns() {
 		for (ArticleColumn col : getDisplayColumns()) {
 			switch (col) {
+			case IMAGE:
+				addWidgetColumn(col, new WidgetCellCreator<Article>() {
+					@Override
+					protected Widget createWidget(Article item) {
+						Image i = new Image(MainImageBundle.INSTANCE.defaultSmall());
+						if (item.getSmallImageId() != null) {
+							i = new Image(ClientUtils.createDocumentUrl(item.getSmallImageId(), item.getImageExtension()));
+						}
+						return i;
+					}
+				});
+				break;
+			case TAGS:
+				addTextColumn(col, new ValueGetter<String, Article>() {
+					@Override
+					public String get(Article item) {
+						return item.getTags();
+					}
+				});
+				break;
 			case VIEWS:
 				addNumberColumn(col, new ValueGetter<Number, Article>() {
 					@Override

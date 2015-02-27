@@ -49,7 +49,6 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			article.setArticle(rs.getString("article"));
 			article.setGroupName(rs.getString("groupName"));
 			article.setDocumentCount(rs.getInt("documentCount"));
-			article.setTagCount(rs.getInt("tagCount"));
 			article.setVisibilityLevel(rs.getString("visibilityLevel"));
 			article.setVisibilityLevelId(rs.getInt("visibilityLevelId"));
 			article.setOwningOrgId(rs.getInt("owningOrgId"));
@@ -62,6 +61,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			article.setImageId(rs.getInt("imageId"));
 			article.setSmallImageId(rs.getInt("smallImageId"));
 			article.setViewCount(rs.getInt("viewCount"));
+			article.setTags(rs.getString("tags"));
 			return article;
 		}
 	}
@@ -94,7 +94,8 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		sql += "(select count(id) from comments where articleId = a.id and endDate is null) as commentCount, \n";
 		sql += "t.imageId, t.smallImageId, d.fileExtension, \n";
 		sql += "(select addedDate from comments where articleId = a.id and endDate is null order by addedDate desc limit 1) as lastCommentDate, \n";
-		sql += "(select count(id) from tagArticleMapping where articleId = a.id) as tagCount \n";
+		sql += "(select group_concat(t.name separator ', ') ";
+		sql += "from tags t join tagArticleMapping tm on tm.tagId = t.id where tm.articleId = a.id) as tags \n";
 		sql += "from articles a \n";
 		sql += "join users u on u.id = a.addedById \n";
 		sql += "left join tags t on t.id = a.firstTagId \n";
