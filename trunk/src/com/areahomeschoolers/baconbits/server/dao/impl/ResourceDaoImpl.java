@@ -190,7 +190,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		int id = args.getInt(ResourceArg.ID);
 		int limit = args.getInt(ResourceArg.LIMIT);
 		String nameLike = args.getString(ResourceArg.NAME_LIKE);
-		boolean random = args.getBoolean(ResourceArg.RANDOM);
+		boolean leastImpressions = args.getBoolean(ResourceArg.LEAST_IMPRESSIONS);
 		boolean ad = args.getBoolean(ResourceArg.AD);
 
 		boolean locationFilter = args.getBoolean(ResourceArg.LOCATION_FILTER);
@@ -242,8 +242,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			sql += " < " + withinMiles + ") or r.address is null or r.address = '') \n";
 		}
 
-		if (random) {
-			sql += "order by rand() ";
+		if (leastImpressions) {
+			sql += "order by r.impressions / datediff(now(), r.startDate) ";
 		} else if (!Common.isNullOrBlank(nameLike)) {
 			sql += "order by levenshtein(r.name, ?) ";
 			sqlArgs.add(nameLike);

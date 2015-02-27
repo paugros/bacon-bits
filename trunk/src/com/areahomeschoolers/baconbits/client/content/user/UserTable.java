@@ -39,8 +39,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
-		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), STATUS("Status"), AGE("Age"), INTERESTS(
-				"Common interests"), ADMINISTRATOR("Administrator"), APPROVAL("Approval"), DELETE("Delete");
+		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), ADDED("Added"), STATUS("Status"), AGE("Age"), INTERESTS(
+				"Common interests"), ADMINISTRATOR("Administrator"), APPROVAL("Approval"), DELETE("Delete"), NEWS("News");
 
 		private String title;
 
@@ -114,11 +114,27 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 	protected void setColumns() {
 		for (UserColumn col : getDisplayColumns()) {
 			switch (col) {
+			case NEWS:
+				addTextColumn(col, new ValueGetter<String, User>() {
+					@Override
+					public String get(User item) {
+						return Common.yesNo(item.getReceiveNews());
+					}
+				});
+				break;
 			case INTERESTS:
 				addNumberColumn(col, new ValueGetter<Number, User>() {
 					@Override
 					public Number get(User item) {
 						return item.getCommonInterestCount();
+					}
+				});
+				break;
+			case ADDED:
+				addDateColumn(col, new ValueGetter<Date, User>() {
+					@Override
+					public Date get(User item) {
+						return item.getAddedDate();
 					}
 				});
 				break;
@@ -143,6 +159,9 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 					@Override
 					protected Widget createWidget(User user) {
 						UserStatusIndicator indicator = new UserStatusIndicator(user.getId());
+						if (Application.isSystemAdministrator()) {
+							indicator.setShowWeeksAndMonths(true);
+						}
 						userIndicators.put(user.getId(), indicator);
 						return indicator;
 					}

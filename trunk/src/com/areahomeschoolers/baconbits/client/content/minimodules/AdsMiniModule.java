@@ -29,11 +29,6 @@ public class AdsMiniModule extends Composite {
 	private ArgMap<ResourceArg> args = new ArgMap<ResourceArg>(Status.ACTIVE);
 	private AdDirection direction;
 
-	@Deprecated
-	public AdsMiniModule() {
-		this(AdDirection.VERTICAL);
-	}
-
 	public AdsMiniModule(AdDirection direction) {
 		this.direction = direction;
 		vp.setSpacing(10);
@@ -41,7 +36,7 @@ public class AdsMiniModule extends Composite {
 
 		hp.getElement().getStyle().setMarginTop(50, Unit.PX);
 
-		args.put(ResourceArg.RANDOM);
+		args.put(ResourceArg.LEAST_IMPRESSIONS);
 		args.put(ResourceArg.LIMIT, 3);
 		args.put(ResourceArg.AD);
 		if (Application.hasLocation()) {
