@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.user;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
+import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
@@ -29,6 +30,8 @@ public final class UserManagementPage implements Page {
 
 		args.setStatus(Status.ACTIVE);
 		final UserTable table = new UserTable(args);
+		table.setDisplayColumns(UserColumn.PICTURE, UserColumn.ACTIVITY, UserColumn.NAME, UserColumn.EMAIL, UserColumn.PHONE, UserColumn.STATUS,
+				UserColumn.NEWS, UserColumn.AGE);
 		table.setTitle(title);
 		table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.user(0)));
 		table.getTitleBar().addSearchControl();
