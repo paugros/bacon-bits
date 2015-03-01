@@ -26,7 +26,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -450,7 +450,7 @@ public class BookFieldTable extends FieldTable {
 	}
 
 	private void createTagSection() {
-		tagSection = new TagSection(TagMappingType.BOOK, book.getId());
+		tagSection = new TagSection(TagType.BOOK, book.getId());
 		tagSection.setEditingEnabled(Application.administratorOf(book));
 		tagSection.setRequired(true);
 		tagSection.populate(pageData.getTags());

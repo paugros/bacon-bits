@@ -30,7 +30,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 @Repository
 public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Suggestible {
@@ -77,6 +77,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			resource.setMinimumAge(rs.getInt("minimumAge"));
 			resource.setMaximumAge(rs.getInt("maximumAge"));
 			resource.setAddedByFullName(rs.getString("addedByFullName"));
+			resource.setPriceNotApplicable(rs.getBoolean("priceNotApplicable"));
 			if (resource.getImageId() == null) {
 				resource.setImageExtension(rs.getString("tagFileExtension"));
 				resource.setImageId(rs.getInt("tagImageId"));
@@ -132,7 +133,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		String lat = latD == null ? null : Double.toString(latD);
 		Double lngD = ServerContext.getCurrentLng();
 		String lng = lngD == null ? null : Double.toString(lngD);
-		String sql = "select count(*) from resources r " + TagDaoImpl.createWhere(TagMappingType.RESOURCE, Constants.DEFAULT_SEARCH_RADIUS, lat, lng, null);
+		String sql = "select count(*) from resources r " + TagDaoImpl.createWhere(TagType.RESOURCE, Constants.DEFAULT_SEARCH_RADIUS, lat, lng, null);
 
 		return queryForInt(0, sql);
 	}
@@ -148,9 +149,6 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		} else {
 			pd.setResource(new Resource());
 		}
-
-		String sql = "select * from addressScope";
-		pd.setAddressScopes(query(sql, ServerUtils.getGenericRowMapper()));
 
 		return pd;
 	}
@@ -271,7 +269,7 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			String sql = "update resources set name = :name, startDate = :startDate, endDate = :endDate, url = :url, description = :description, showInAds = :showInAds, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, phone = :phone, contactEmail = :contactEmail, ";
 			sql += "addressScopeId = :addressScopeId, directoryPriority = :directoryPriority, adDescription = :adDescription,  ";
-			sql += "minimumAge = :minimumAge, maximumAge = :maximumAge, ";
+			sql += "minimumAge = :minimumAge, maximumAge = :maximumAge, priceNotApplicable = :priceNotApplicable, ";
 			sql += "contactName = :contactName, facilityName = :facilityName, facebookUrl = :facebookUrl, price = :price, highPrice = :highPrice ";
 			sql += "where id = :id";
 			update(sql, namedParams);
@@ -283,10 +281,10 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 
 			String sql = "insert into resources (addedById, startDate, endDate, addedDate, name, url, description, adDescription, ";
 			sql += "address, street, city, state, zip, lat, lng, phone, showInAds, contactEmail, addressScopeId, directoryPriority, ";
-			sql += "contactName, facilityName, facebookUrl, price, highPrice, minimumAge, maximumAge) ";
+			sql += "contactName, facilityName, facebookUrl, price, highPrice, minimumAge, maximumAge, priceNotApplicable) ";
 			sql += "values(:addedById, :startDate, :endDate, now(), :name, :url, :description, :adDescription, ";
 			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :phone, :showInAds, :contactEmail, :addressScopeId, :directoryPriority, ";
-			sql += ":contactName, :facilityName, :facebookUrl, :price, :highPrice, :minimumAge, :maximumAge)";
+			sql += ":contactName, :facilityName, :facebookUrl, :price, :highPrice, :minimumAge, :maximumAge, :priceNotApplicable)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);

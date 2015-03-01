@@ -117,6 +117,16 @@ public interface MainImageBundle extends ClientBundle {
 
 	ImageResource sortDescending();
 
+	ImageResource starLargeBlue();
+
+	ImageResource starLargeEmpty();
+
+	ImageResource starLargeYellow();
+
+	ImageResource starSmallEmpty();
+
+	ImageResource starSmallYellow();
+
 	ImageResource swap();
 
 	ImageResource switcherBooks();

@@ -30,7 +30,7 @@ import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
@@ -267,7 +267,7 @@ public class ArticlePage implements Page {
 	}
 
 	private void createTagSection() {
-		tagSection = new TagSection(TagMappingType.ARTICLE, article.getId());
+		tagSection = new TagSection(TagType.ARTICLE, article.getId());
 		tagSection.setEditingEnabled(allowEdit());
 		tagSection.populate();
 
@@ -306,7 +306,7 @@ public class ArticlePage implements Page {
 
 		ovp.add(pp);
 
-		TagSection ts = new TagSection(TagMappingType.ARTICLE, article.getId());
+		TagSection ts = new TagSection(TagType.ARTICLE, article.getId());
 		ts.setEditingEnabled(false);
 		ts.populate();
 		ts.getElement().getStyle().setMarginLeft(10, Unit.PX);

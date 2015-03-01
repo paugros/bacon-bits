@@ -11,7 +11,7 @@ import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 
@@ -70,15 +70,15 @@ public final class MainMenu extends MenuBar {
 
 		// addDynamicItems(Application.getApplicationData().getDynamicMenuItems(), this, null, 0);
 
-		addLinkToMenu(this, "Books", PageUrl.tagGroup(TagMappingType.BOOK.toString()));
+		addLinkToMenu(this, "Books", PageUrl.tagGroup(TagType.BOOK.toString()));
 		addItem("Events", getEventsMenu());
-		addLinkToMenu(this, "Resources", PageUrl.tagGroup(TagMappingType.RESOURCE.toString()));
+		addLinkToMenu(this, "Resources", PageUrl.tagGroup(TagType.RESOURCE.toString()));
 		if (!ClientUtils.isMobileBrowser()) {
 			addLinkToMenu(this, "Blog", PageUrl.blog(0));
 		}
 
 		if (Application.isAuthenticated() && !ClientUtils.isMobileBrowser()) {
-			addLinkToMenu(this, "Homeschoolers", PageUrl.tagGroup(TagMappingType.USER.toString()));
+			addLinkToMenu(this, "Homeschoolers", PageUrl.tagGroup(TagType.USER.toString()));
 		}
 
 		if (Application.administratorOfCurrentOrg() || Application.administratorOf(17)) {

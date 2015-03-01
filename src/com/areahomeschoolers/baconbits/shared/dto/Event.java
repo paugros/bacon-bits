@@ -51,6 +51,7 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private String refundPolicy;
 	private int minimumAge;
 	private int maximumAge;
+	private boolean priceNotApplicable;
 
 	// address
 	private String address;
@@ -331,6 +332,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 
 	public double getPrice() {
 		return price;
+	}
+
+	public boolean getPriceNotApplicable() {
+		return priceNotApplicable;
 	}
 
 	public Date getPublishDate() {
@@ -647,6 +652,10 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void setPriceNotApplicable(boolean priceNotApplicable) {
+		this.priceNotApplicable = priceNotApplicable;
 	}
 
 	public void setPublishDate(Date publishDate) {

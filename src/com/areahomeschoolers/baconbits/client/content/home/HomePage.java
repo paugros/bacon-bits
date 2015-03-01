@@ -24,7 +24,7 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.gwt.core.client.Scheduler;
@@ -109,7 +109,7 @@ public class HomePage implements Page {
 						txt += "miles of " + Application.getCurrentLocation() + ". ";
 					}
 					txt += "You can change this setting on any ";
-					txt += "<a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagMappingType.RESOURCE.toString()) + "\">search page</a>.";
+					txt += "<a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagType.RESOURCE.toString()) + "\">search page</a>.";
 					HTML note = new HTML(txt);
 					note.addStyleName(ContentWidth.MAXWIDTH700PX.toString());
 					note.addStyleName("mediumPadding");
@@ -120,31 +120,31 @@ public class HomePage implements Page {
 				Grid g = new Grid(3, 3);
 				g.setCellSpacing(45);
 
-				TileConfig rc = new TileConfig().setTagType(TagMappingType.RESOURCE).setCount(pageData.getResourceCount());
+				TileConfig rc = new TileConfig().setTagType(TagType.RESOURCE).setCount(pageData.getResourceCount());
 				rc.setImage(new Image(MainImageBundle.INSTANCE.resourceTile()));
 				g.setWidget(0, 0, new Tile(rc));
 
-				TileConfig ec = new TileConfig().setTagType(TagMappingType.EVENT).setCount(pageData.getEventCount());
+				TileConfig ec = new TileConfig().setTagType(TagType.EVENT).setCount(pageData.getEventCount());
 				ec.setImage(new Image(MainImageBundle.INSTANCE.eventTile()));
 				g.setWidget(0, 1, new Tile(ec));
 
 				g.setWidget(0, 2, new AdTile(pageData.getAds().get(0)));
 
-				TileConfig uc = new TileConfig().setTagType(TagMappingType.USER).setCount(pageData.getUserCount());
+				TileConfig uc = new TileConfig().setTagType(TagType.USER).setCount(pageData.getUserCount());
 				uc.setImage(new Image(MainImageBundle.INSTANCE.userTile()));
 				g.setWidget(1, 0, new Tile(uc));
 
-				TileConfig bbc = new TileConfig().setTagType(TagMappingType.ARTICLE).setText("Blog");
+				TileConfig bbc = new TileConfig().setTagType(TagType.ARTICLE).setText("Blog");
 				bbc.setImage(new Image(MainImageBundle.INSTANCE.blogTile())).setUrl(PageUrl.blog(0));
 				g.setWidget(1, 1, new Tile(bbc));
 
 				g.setWidget(1, 2, new AdTile(pageData.getAds().get(1)));
 
-				TileConfig bc = new TileConfig().setTagType(TagMappingType.BOOK).setCount(pageData.getBookCount());
+				TileConfig bc = new TileConfig().setTagType(TagType.BOOK).setCount(pageData.getBookCount());
 				bc.setImage(new Image(MainImageBundle.INSTANCE.bookTile()));
 				g.setWidget(2, 0, new Tile(bc));
 
-				TileConfig ac = new TileConfig().setTagType(TagMappingType.ARTICLE).setCount(pageData.getArticleCount());
+				TileConfig ac = new TileConfig().setTagType(TagType.ARTICLE).setCount(pageData.getArticleCount());
 				ac.setImage(new Image(MainImageBundle.INSTANCE.articleTile()));
 				g.setWidget(2, 1, new Tile(ac));
 

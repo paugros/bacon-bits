@@ -15,7 +15,7 @@ import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Overflow;
@@ -142,7 +142,7 @@ public class BookDetailsPanel extends Composite {
 
 		dt.add(pp);
 
-		TagSection ts = new TagSection(TagMappingType.BOOK, book.getId());
+		TagSection ts = new TagSection(TagType.BOOK, book.getId());
 		ts.setEditingEnabled(false);
 		ts.populate();
 

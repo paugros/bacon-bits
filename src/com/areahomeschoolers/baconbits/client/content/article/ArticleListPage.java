@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable.SortDirection;
@@ -27,11 +28,13 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -54,6 +57,7 @@ public final class ArticleListPage implements Page {
 	private ArticleTable table = new ArticleTable(args);
 	private ViewMode viewMode = ViewMode.GRID;
 	private VerticalPanel page;
+	private TextBox searchInput;
 
 	public ArticleListPage(final VerticalPanel page) {
 		this.page = page;
@@ -87,13 +91,35 @@ public final class ArticleListPage implements Page {
 
 		createSearchBox();
 
+		DefaultListBox lb = new DefaultListBox();
+		lb.getElement().getStyle().setMarginLeft(10, Unit.PX);
+		lb.addItem("Grid view");
+		lb.addItem("List view");
+		lb.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				if (viewMode == ViewMode.GRID) {
+					viewMode = ViewMode.LIST;
+					sp.setWidget(table);
+				} else {
+					viewMode = ViewMode.GRID;
+					sp.setWidget(fp);
+				}
+				populate(articles);
+				applyFilter();
+			}
+		});
+
+		page.add(lb);
+
 		sp.setWidget(fp);
 		page.add(sp);
 		Application.getLayout().setPage(title, page);
 		populate();
 	}
 
-	private void applyFilter(String text) {
+	private void applyFilter() {
+		String text = searchInput.getText();
 		if (text == null || text.isEmpty()) {
 			if (viewMode == ViewMode.GRID) {
 				fp.showAll();
@@ -123,13 +149,13 @@ public final class ArticleListPage implements Page {
 
 		PaddedPanel search = new PaddedPanel();
 		search.add(new Label("Search:"));
-		final TextBox searchInput = new TextBox();
+		searchInput = new TextBox();
 		searchInput.setVisibleLength(35);
 		search.add(searchInput);
 		searchInput.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
-				applyFilter(searchInput.getText());
+				applyFilter();
 			}
 		});
 
@@ -137,32 +163,12 @@ public final class ArticleListPage implements Page {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					applyFilter(searchInput.getText());
+					applyFilter();
 				}
 			}
 		});
 
 		VerticalPanel cp = new VerticalPanel();
-		final ClickLabel view = new ClickLabel("List view");
-		view.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (viewMode == ViewMode.GRID) {
-					viewMode = ViewMode.LIST;
-					view.setText("Grid view");
-
-					sp.setWidget(table);
-				} else {
-					viewMode = ViewMode.GRID;
-					view.setText("List view");
-
-					sp.setWidget(fp);
-				}
-
-				populate(articles);
-				applyFilter(searchInput.getText());
-			}
-		});
 
 		ClickLabel reset = new ClickLabel("Reset search", new ClickHandler() {
 			@Override
@@ -171,14 +177,13 @@ public final class ArticleListPage implements Page {
 			}
 		});
 
-		cp.add(view);
 		cp.add(reset);
 
 		searchBox.add(search);
 		searchBox.add(cp);
 		searchBox.setCellHorizontalAlignment(cp, HasHorizontalAlignment.ALIGN_RIGHT);
 
-		page.add(new SearchSection(TagMappingType.ARTICLE, searchBox));
+		page.add(new SearchSection(TagType.ARTICLE, searchBox));
 	}
 
 	private void populate() {

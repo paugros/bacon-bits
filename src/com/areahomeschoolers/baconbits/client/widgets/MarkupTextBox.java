@@ -97,6 +97,10 @@ public class MarkupTextBox extends Composite {
 		return preInput.getDouble();
 	}
 
+	public boolean isEmpty() {
+		return preInput.getText().trim().isEmpty();
+	}
+
 	public void setChangeCommand(Command changeCommand) {
 		this.changeCommand = changeCommand;
 	}

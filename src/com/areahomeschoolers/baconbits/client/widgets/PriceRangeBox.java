@@ -12,7 +12,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class PriceRangeBox extends Composite implements HasValidator {
-	public static String getPriceText(double low, double high) {
+	public static String getPriceText(double low, double high, boolean notApplicable) {
+		if (notApplicable) {
+			return "N/A";
+		}
 		String txt = "";
 		if (low > 0 && high > 0) {
 			txt = Formatter.formatCurrency(low) + " - " + Formatter.formatCurrency(high);
@@ -21,7 +24,7 @@ public class PriceRangeBox extends Composite implements HasValidator {
 		} else if (low > 0) {
 			txt = Formatter.formatCurrency(low);
 		} else {
-			txt = "N/A";
+			txt = "Free";
 		}
 
 		return txt;
@@ -35,14 +38,18 @@ public class PriceRangeBox extends Composite implements HasValidator {
 	private Validator validator = new Validator(fp, new ValidatorCommand() {
 		@Override
 		public void validate(Validator v) {
-			Double low = lowPrice.getDouble();
-			Double high = highPrice.getDouble();
+			double low = lowPrice.getDouble();
+			double high = highPrice.getDouble();
+			if (lowPrice.isEmpty() && high > 0) {
+				v.setError(true);
+				v.setErrorMessage("Low must be set if high is set");
+			}
 			if (high > 0 && high < low) {
 				v.setError(true);
 				v.setErrorMessage("High must be more than low unless empty");
 			}
 
-			if (v.isRequired() && low == null) {
+			if (v.isRequired() && lowPrice.isEmpty()) {
 				v.setError(true);
 			}
 
@@ -90,6 +97,10 @@ public class PriceRangeBox extends Composite implements HasValidator {
 		return validator;
 	}
 
+	public boolean isEmpty() {
+		return lowPrice.getText().trim().isEmpty();
+	}
+
 	@Override
 	public boolean isRequired() {
 		return validator.isRequired();
@@ -101,9 +112,7 @@ public class PriceRangeBox extends Composite implements HasValidator {
 	}
 
 	public void setValues(double low, double high) {
-		if (low > 0) {
-			lowPrice.setValue(low);
-		}
+		lowPrice.setValue(low);
 		if (high > 0) {
 			highPrice.setValue(high);
 		}

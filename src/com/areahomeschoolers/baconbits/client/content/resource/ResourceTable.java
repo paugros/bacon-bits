@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
+import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.PriceRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTableColumn;
@@ -37,8 +38,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, ResourceColumn> {
 	public enum ResourceColumn implements EntityCellTableColumn<ResourceColumn> {
-		IMAGE(""), NAME("Title"), DESCRIPTION("Description"), ADDED_DATE("Added"), LOCATION("Location"), TAGS("Tags"), PRICE("Price"), VIEW_COUNT("Views"), CLICK_COUNT(
-				"Clicks"), IMPRESSIONS("Impressions");
+		IMAGE(""), NAME("Title"), DESCRIPTION("Description"), ADDED_DATE("Added"), LOCATION("Location"), TAGS("Tags"), PRICE("Price"), AGES("Ages"), VIEW_COUNT(
+				"Views"), CLICK_COUNT("Clicks"), IMPRESSIONS("Impressions");
 
 		private String title;
 
@@ -114,6 +115,14 @@ public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, 
 	protected void setColumns() {
 		for (ResourceColumn col : getDisplayColumns()) {
 			switch (col) {
+			case AGES:
+				addTextColumn(col, new ValueGetter<String, Resource>() {
+					@Override
+					public String get(Resource item) {
+						return NumericRangeBox.getAgeRangeText(item.getMinimumAge(), item.getMaximumAge());
+					}
+				});
+				break;
 			case IMAGE:
 				addWidgetColumn(col, new WidgetCellCreator<Resource>() {
 					@Override
@@ -138,7 +147,7 @@ public final class ResourceTable extends EntityCellTable<Resource, ResourceArg, 
 				addTextColumn(col, new ValueGetter<String, Resource>() {
 					@Override
 					public String get(Resource item) {
-						return PriceRangeBox.getPriceText(item.getPrice(), item.getHighPrice());
+						return PriceRangeBox.getPriceText(item.getPrice(), item.getHighPrice(), item.getPriceNotApplicable());
 					}
 				}, new ValueGetter<Double, Resource>() {
 					@Override

@@ -29,7 +29,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
@@ -163,7 +163,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	@Override
 	public int getCount() {
 		String sql = "select count(*) from articles a ";
-		sql += TagDaoImpl.createWhere(TagMappingType.ARTICLE, 0, null, null, null);
+		sql += TagDaoImpl.createWhere(TagType.ARTICLE, 0, null, null, null);
 
 		return queryForInt(0, sql);
 	}

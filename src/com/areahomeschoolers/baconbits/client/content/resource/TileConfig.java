@@ -1,7 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.resource;
 
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.user.client.ui.Image;
 
@@ -10,7 +10,7 @@ public class TileConfig {
 	private String url;
 	private Integer count;
 	private String color;
-	private TagMappingType tagType;
+	private TagType tagType;
 	private Image image;
 	private boolean centerText;
 
@@ -29,7 +29,7 @@ public class TileConfig {
 		return image;
 	}
 
-	public TagMappingType getTagType() {
+	public TagType getTagType() {
 		return tagType;
 	}
 
@@ -65,7 +65,7 @@ public class TileConfig {
 		return this;
 	}
 
-	public TileConfig setTagType(TagMappingType tagType) {
+	public TileConfig setTagType(TagType tagType) {
 		this.color = tagType.getColor();
 		this.text = tagType.getName();
 		this.tagType = tagType;

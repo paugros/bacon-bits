@@ -27,7 +27,7 @@ import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -61,7 +61,7 @@ public class TagSection extends Composite implements HasValidator {
 		@Override
 		public void show() {
 			if (allTags == null) {
-				ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_TYPE, mappingType.toString());
+				ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.TYPE, mappingType.toString());
 				args.put(TagArg.ENTITY_ID, entityId);
 				tagService.list(new ArgMap<TagArg>(), new Callback<ArrayList<Tag>>() {
 					@Override
@@ -89,7 +89,7 @@ public class TagSection extends Composite implements HasValidator {
 			title.addStyleName("hugeText");
 			String item = mappingType.toString().toLowerCase();
 			String txt = "Select all that apply ";
-			if (mappingType != TagMappingType.USER) {
+			if (mappingType != TagType.USER) {
 				txt += "to the " + item + " you were viewing";
 			}
 			Label sub = new Label(txt);
@@ -154,7 +154,7 @@ public class TagSection extends Composite implements HasValidator {
 			HorizontalPanel hp = new HorizontalPanel();
 			hp.addStyleName("TagWidget");
 			if (Application.getUserInterests().contains(tag)) {
-				if (tag.getMappingType() != TagMappingType.USER || tag.getEntityId() != Application.getCurrentUserId()) {
+				if (tag.getMappingType() != TagType.USER || tag.getEntityId() != Application.getCurrentUserId()) {
 					hp.addStyleDependentName("common");
 				}
 			}
@@ -184,7 +184,7 @@ public class TagSection extends Composite implements HasValidator {
 	private Button add = new Button("Add");
 	private FlowPanel fp = new FlowPanel();
 	private TagServiceAsync tagService = (TagServiceAsync) ServiceCache.getService(TagService.class);
-	private TagMappingType mappingType;
+	private TagType mappingType;
 	private int entityId;
 	private final List<Character> allowedChars = new ArrayList<Character>();
 	private boolean editingEnabled;
@@ -192,7 +192,7 @@ public class TagSection extends Composite implements HasValidator {
 	private Validator validator;
 	private Map<Tag, TagWidget> tagMap = new HashMap<>();
 
-	public TagSection(TagMappingType type, int itemId) {
+	public TagSection(TagType type, int itemId) {
 		this.mappingType = type;
 		this.entityId = itemId;
 
@@ -264,7 +264,7 @@ public class TagSection extends Composite implements HasValidator {
 		hp.setCellVerticalAlignment(add, HasVerticalAlignment.ALIGN_MIDDLE);
 
 		String item = "tags";
-		if (mappingType == TagMappingType.USER) {
+		if (mappingType == TagType.USER) {
 			item = "interests";
 		}
 		ClickLabel link = new ClickLabel("Browse " + item, new ClickHandler() {
@@ -317,7 +317,7 @@ public class TagSection extends Composite implements HasValidator {
 	public void populate() {
 		if (entityId > 0) {
 			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.ENTITY_ID, entityId);
-			args.put(TagArg.MAPPING_TYPE, mappingType.toString());
+			args.put(TagArg.TYPE, mappingType.toString());
 			tagService.list(args, new Callback<ArrayList<Tag>>() {
 				@Override
 				protected void doOnSuccess(ArrayList<Tag> result) {
@@ -369,12 +369,12 @@ public class TagSection extends Composite implements HasValidator {
 	private boolean addTag(Tag tag) {
 		if (!Application.isSystemAdministrator()) {
 			int max = 4;
-			if (mappingType.equals(TagMappingType.USER)) {
+			if (mappingType.equals(TagType.USER)) {
 				max = 50;
 			}
 
 			if (tags.size() >= max) {
-				String thing = mappingType.equals(TagMappingType.USER) ? "interests" : "tags";
+				String thing = mappingType.equals(TagType.USER) ? "interests" : "tags";
 				String message = "Sorry, no more than " + max + " " + thing + ".";
 				AlertDialog.alert(message);
 				return false;
@@ -419,7 +419,7 @@ public class TagSection extends Composite implements HasValidator {
 	}
 
 	private void removeTag(final Tag tag) {
-		if (EnumSet.of(TagMappingType.EVENT, TagMappingType.BOOK, TagMappingType.RESOURCE).contains(mappingType) && tags.size() == 1) {
+		if (EnumSet.of(TagType.EVENT, TagType.BOOK, TagType.RESOURCE).contains(mappingType) && tags.size() == 1) {
 			AlertDialog.alert("At least one tag is required.");
 			return;
 		}
