@@ -68,7 +68,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -690,7 +690,7 @@ public class UserPage implements Page {
 	}
 
 	private void createTagSection() {
-		tagSection = new TagSection(TagMappingType.USER, user.getId());
+		tagSection = new TagSection(TagType.USER, user.getId());
 		tagSection.setEditingEnabled(canEditUser(user));
 		tagSection.populate(pageData.getInterests());
 
@@ -770,7 +770,7 @@ public class UserPage implements Page {
 
 		ovp.add(pp);
 
-		TagSection ts = new TagSection(TagMappingType.USER, user.getId());
+		TagSection ts = new TagSection(TagType.USER, user.getId());
 		ts.setEditingEnabled(false);
 		ts.populate();
 

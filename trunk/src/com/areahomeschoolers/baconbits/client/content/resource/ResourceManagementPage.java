@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.resource;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.content.resource.ResourceTable.ResourceColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -27,6 +28,8 @@ public final class ResourceManagementPage implements Page {
 		final String title = "Resources";
 
 		final ResourceTable table = new ResourceTable(args);
+		table.setDisplayColumns(ResourceColumn.NAME, ResourceColumn.DESCRIPTION, ResourceColumn.ADDED_DATE, ResourceColumn.LOCATION, ResourceColumn.TAGS,
+				ResourceColumn.VIEW_COUNT, ResourceColumn.CLICK_COUNT, ResourceColumn.IMPRESSIONS);
 		table.setTitle(title);
 		table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.resource(0)));
 		table.getTitleBar().addSearchControl();

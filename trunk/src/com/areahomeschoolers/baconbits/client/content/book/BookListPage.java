@@ -29,9 +29,10 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
 import com.areahomeschoolers.baconbits.shared.dto.BookPageData;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -106,8 +107,29 @@ public final class BookListPage implements Page {
 				}
 				page.add(cc);
 
-				page.add(new SearchSection(TagMappingType.BOOK, optionsPanel));
+				page.add(new SearchSection(TagType.BOOK, optionsPanel));
 				createSearchBox();
+
+				DefaultListBox lb = new DefaultListBox();
+				lb.getElement().getStyle().setMarginLeft(10, Unit.PX);
+				lb.addItem("Grid view");
+				lb.addItem("List view");
+				lb.addChangeHandler(new ChangeHandler() {
+					@Override
+					public void onChange(ChangeEvent event) {
+						if (viewMode == ViewMode.GRID) {
+							viewMode = ViewMode.LIST;
+							sp.setWidget(table);
+						} else {
+							viewMode = ViewMode.GRID;
+							sp.setWidget(fp);
+						}
+						populate(books);
+						applyFilter();
+					}
+				});
+
+				page.add(lb);
 
 				sp.setWidget(fp);
 				page.add(sp);
@@ -120,7 +142,8 @@ public final class BookListPage implements Page {
 
 	}
 
-	private void applyFilter(String text) {
+	private void applyFilter() {
+		String text = searchControl.getText();
 		if (text == null || text.isEmpty()) {
 			if (viewMode == ViewMode.GRID) {
 				fp.showAll();
@@ -259,39 +282,19 @@ public final class BookListPage implements Page {
 		searchControl.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
-				applyFilter(searchControl.getText());
+				applyFilter();
 			}
 		});
 		searchControl.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					applyFilter(searchControl.getText());
+					applyFilter();
 				}
 			}
 		});
 
 		VerticalPanel cp = new VerticalPanel();
-		final ClickLabel view = new ClickLabel("List view");
-		view.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (viewMode == ViewMode.GRID) {
-					viewMode = ViewMode.LIST;
-					view.setText("Grid view");
-
-					sp.setWidget(table);
-				} else {
-					viewMode = ViewMode.GRID;
-					view.setText("List view");
-
-					sp.setWidget(fp);
-				}
-
-				populate(books);
-				applyFilter(searchControl.getText());
-			}
-		});
 
 		ClickLabel reset = new ClickLabel("Reset search", new ClickHandler() {
 			@Override
@@ -301,7 +304,6 @@ public final class BookListPage implements Page {
 			}
 		});
 
-		cp.add(view);
 		cp.add(reset);
 
 		optionsPanel.add(top);

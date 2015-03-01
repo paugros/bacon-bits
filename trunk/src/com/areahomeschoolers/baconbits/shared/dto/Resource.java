@@ -32,6 +32,7 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 	private Integer imageId;
 	private Integer smallImageId;
 	private String imageExtension;
+	private boolean priceNotApplicable;
 
 	private String contactName;
 	private String facilityName;
@@ -186,6 +187,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public double getPrice() {
 		return price;
+	}
+
+	public boolean getPriceNotApplicable() {
+		return priceNotApplicable;
 	}
 
 	public boolean getShowInAds() {
@@ -353,6 +358,10 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void setPriceNotApplicable(boolean priceNotApplicable) {
+		this.priceNotApplicable = priceNotApplicable;
 	}
 
 	public void setShowInAds(boolean showInAds) {

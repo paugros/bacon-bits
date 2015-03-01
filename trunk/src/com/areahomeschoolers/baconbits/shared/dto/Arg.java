@@ -50,8 +50,16 @@ public interface Arg {
 		}
 	}
 
+	public enum ReviewArg implements Arg, IsSerializable {
+		ID, USER_ID, TYPE, ENTITY_ID;
+
+		private ReviewArg() {
+
+		}
+	}
+
 	public enum TagArg implements Arg, IsSerializable {
-		ENTITY_ID, MAPPING_TYPE, MAPPING_ID, GET_COUNTS, GET_ALL_COUNTS, TAG_ID, LOCATION_FILTER;
+		ENTITY_ID, TYPE, MAPPING_ID, GET_COUNTS, GET_ALL_COUNTS, TAG_ID, LOCATION_FILTER;
 		private TagArg() {
 
 		}

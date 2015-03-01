@@ -145,6 +145,10 @@ public class NumericTextBox extends TextBox implements HasValidator {
 		return validator;
 	}
 
+	public boolean isEmpty() {
+		return getText().trim().isEmpty();
+	}
+
 	@Override
 	public boolean isRequired() {
 		return validator.isRequired();

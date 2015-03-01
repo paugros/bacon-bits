@@ -55,7 +55,7 @@ import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -287,7 +287,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String lat = latD == null ? null : Double.toString(latD);
 		Double lngD = ServerContext.getCurrentLng();
 		String lng = lngD == null ? null : Double.toString(lngD);
-		sql += TagDaoImpl.createWhere(TagMappingType.USER, Constants.DEFAULT_SEARCH_RADIUS, lat, lng, null);
+		sql += TagDaoImpl.createWhere(TagType.USER, Constants.DEFAULT_SEARCH_RADIUS, lat, lng, null);
 
 		return queryForInt(sql);
 	}
@@ -407,7 +407,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			pd.setUser(getById(userId));
 			TagDao tagDao = ServerContext.getDaoImpl("tag");
 			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.ENTITY_ID, userId);
-			args.put(TagArg.MAPPING_TYPE, TagMappingType.USER.toString());
+			args.put(TagArg.TYPE, TagType.USER.toString());
 			pd.setInterests(tagDao.list(args));
 
 			if (pd.getUser() == null) {

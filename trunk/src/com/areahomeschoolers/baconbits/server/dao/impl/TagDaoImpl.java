@@ -33,12 +33,12 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 @Repository
 public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 
-	public static String createWhere(TagMappingType type, int withinMiles, String withinLat, String withinLng, String state) {
+	public static String createWhere(TagType type, int withinMiles, String withinLat, String withinLng, String state) {
 		String sql = "";
 		switch (type) {
 		case ARTICLE:
@@ -68,15 +68,15 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			break;
 		}
 
-		if (!type.equals(TagMappingType.ARTICLE)) {
+		if (!type.equals(TagType.ARTICLE)) {
 			String tableAlias = type.toString().substring(0, 1).toLowerCase();
-			if (type.equals(TagMappingType.BOOK)) {
+			if (type.equals(TagType.BOOK)) {
 				tableAlias = "u";
 			}
 
 			if (!Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
 				sql += "and (" + tableAlias + ".state = '" + state + "'";
-				if (EnumSet.of(TagMappingType.RESOURCE, TagMappingType.EVENT).contains(type)) {
+				if (EnumSet.of(TagType.RESOURCE, TagType.EVENT).contains(type)) {
 					sql += "or (" + tableAlias + ".address is null or " + tableAlias + ".address = '')";
 				}
 				sql += ") \n";
@@ -84,7 +84,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 
 			if (withinMiles > 0 && !Common.isNullOrBlank(withinLat) && !Common.isNullOrBlank(withinLng)) {
 				String within = ServerUtils.getDistanceSql(tableAlias, withinLat, withinLng) + " < " + withinMiles + " ";
-				if (EnumSet.of(TagMappingType.RESOURCE, TagMappingType.EVENT).contains(type)) {
+				if (EnumSet.of(TagType.RESOURCE, TagType.EVENT).contains(type)) {
 					sql += "and ((" + within + ") or " + tableAlias + ".address is null or " + tableAlias + ".address = '') ";
 				} else {
 					sql += "and " + within + "\n";
@@ -119,7 +119,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		update(sql, namedParams, keys);
 
 		ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_ID, ServerUtils.getIdFromKeys(keys));
-		args.put(TagArg.MAPPING_TYPE, tag.getMappingType().toString());
+		args.put(TagArg.TYPE, tag.getMappingType().toString());
 		Tag mapped = list(args).get(0);
 		mapped.setEntityId(tag.getEntityId());
 
@@ -173,8 +173,8 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		final int tagId = args.getInt(TagArg.TAG_ID);
 		final boolean getCounts = args.getBoolean(TagArg.GET_COUNTS);
 		final boolean getAllCounts = args.getBoolean(TagArg.GET_ALL_COUNTS);
-		final TagMappingType mappingType = Common.isNullOrBlank(args.getString(TagArg.MAPPING_TYPE)) ? null : TagMappingType.valueOf(args
-				.getString(TagArg.MAPPING_TYPE));
+		final TagType mappingType = Common.isNullOrBlank(args.getString(TagArg.TYPE)) ? null : TagType.valueOf(args
+				.getString(TagArg.TYPE));
 		int mappingId = args.getInt(TagArg.MAPPING_ID);
 
 		boolean locationFilter = args.getBoolean(TagArg.LOCATION_FILTER);
@@ -209,8 +209,8 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		sql += "left join documents d on d.id = t.imageId \n";
 		if (getAllCounts) {
 			sql += "left join (select tagId, count(id) as count from (\n";
-			EnumSet<TagMappingType> types = EnumSet.allOf(TagMappingType.class);
-			Iterator<TagMappingType> i = types.iterator();
+			EnumSet<TagType> types = EnumSet.allOf(TagType.class);
+			Iterator<TagType> i = types.iterator();
 			while (i.hasNext()) {
 				String type = i.next().toString();
 				sql += "select id, tagId from tag" + Common.ucWords(type.toString()) + "Mapping \n";
@@ -296,7 +296,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		// in case the new tag is already in the selected
 		tagIds.remove(newTag.getId());
 
-		for (TagMappingType type : TagMappingType.values()) {
+		for (TagType type : TagType.values()) {
 			String item = Common.ucWords(type.toString());
 			String sql = "update ignore tag" + item + "Mapping set tagId = ? where tagId in(" + Common.join(tagIds, ", ") + ") ";
 			update(sql, newTag.getId());
@@ -369,7 +369,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 	}
 
 	private void updateFirstTags() {
-		for (TagMappingType t : TagMappingType.values()) {
+		for (TagType t : TagType.values()) {
 			String tbl = t.toString().toLowerCase();
 			String sql = "update " + tbl + "s tbl set firstTagId = ";
 			sql += "(select tagId from tag" + Common.ucWords(tbl) + "Mapping tm where " + tbl + "Id = tbl.id order by tm.id limit 1) where firstTagId is null";

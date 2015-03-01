@@ -29,7 +29,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 
 import com.google.gwt.dom.client.Style.Unit;
@@ -95,9 +95,30 @@ public final class UserListPage implements Page {
 			page.setCellWidth(link, "1%");
 		}
 
-		page.add(new SearchSection(TagMappingType.USER, optionsPanel));
+		page.add(new SearchSection(TagType.USER, optionsPanel));
 
 		createSearchBox();
+
+		DefaultListBox lb = new DefaultListBox();
+		lb.getElement().getStyle().setMarginLeft(10, Unit.PX);
+		lb.addItem("Grid view");
+		lb.addItem("List view");
+		lb.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				if (viewMode == ViewMode.GRID) {
+					viewMode = ViewMode.LIST;
+					simplePanel.setWidget(table);
+				} else {
+					viewMode = ViewMode.GRID;
+					simplePanel.setWidget(fp);
+				}
+				populate(users);
+				applyFilter();
+			}
+		});
+
+		page.add(lb);
 
 		args = getDefaultArgs();
 
@@ -108,7 +129,8 @@ public final class UserListPage implements Page {
 		populate();
 	}
 
-	private void applyFilter(String text) {
+	private void applyFilter() {
+		String text = searchControl.getText();
 		if (text == null || text.isEmpty()) {
 			if (viewMode == ViewMode.GRID) {
 				fp.showAll();
@@ -241,7 +263,7 @@ public final class UserListPage implements Page {
 		searchControl.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
-				applyFilter(searchControl.getText());
+				applyFilter();
 			}
 		});
 
@@ -249,7 +271,7 @@ public final class UserListPage implements Page {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					applyFilter(searchControl.getText());
+					applyFilter();
 				}
 			}
 		});
@@ -277,27 +299,6 @@ public final class UserListPage implements Page {
 		}
 
 		VerticalPanel cp = new VerticalPanel();
-		final ClickLabel view = new ClickLabel("List view");
-		view.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (viewMode == ViewMode.GRID) {
-					viewMode = ViewMode.LIST;
-					view.setText("Grid view");
-
-					simplePanel.setWidget(table);
-				} else {
-					viewMode = ViewMode.GRID;
-					view.setText("List view");
-
-					simplePanel.setWidget(fp);
-				}
-
-				populate(users);
-				applyFilter(searchControl.getText());
-			}
-		});
-
 		ClickLabel reset = new ClickLabel("Reset search", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -306,7 +307,6 @@ public final class UserListPage implements Page {
 			}
 		});
 
-		cp.add(view);
 		cp.add(reset);
 
 		optionsPanel.add(cp);

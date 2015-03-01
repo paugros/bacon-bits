@@ -5,13 +5,13 @@ import java.util.Date;
 import com.areahomeschoolers.baconbits.shared.Common;
 
 public class Tag extends EntityDto<Tag> {
-	public enum TagMappingType {
+	public enum TagType {
 		USER("#ffff77"), ARTICLE("#d2d6ec"), EVENT("#a2d69e"), BOOK("#ffcc6f"), RESOURCE("#a4d7f2");
 		// USER("#e4ed81"), ARTICLE("#eca575"), EVENT("#80c87d"), BOOK("#f28e76"), RESOURCE("#92ceef");
 
 		private String color;
 
-		private TagMappingType(String color) {
+		private TagType(String color) {
 			this.color = color;
 		}
 
@@ -46,7 +46,7 @@ public class Tag extends EntityDto<Tag> {
 		}
 
 		public String getName() {
-			if (TagMappingType.this.equals(USER)) {
+			if (TagType.this.equals(USER)) {
 				return "Homeschoolers";
 			}
 			return Common.ucWords(this.toString()) + "s";
@@ -65,7 +65,7 @@ public class Tag extends EntityDto<Tag> {
 	private int entityId;
 	private Date mappingAddedDate;
 	private int mappingId;
-	private TagMappingType mappingType;
+	private TagType mappingType;
 
 	// aux
 	private int count;
@@ -119,7 +119,7 @@ public class Tag extends EntityDto<Tag> {
 		return "tag" + Common.ucWords(getMappingType().toString()) + "Mapping";
 	}
 
-	public TagMappingType getMappingType() {
+	public TagType getMappingType() {
 		return mappingType;
 	}
 
@@ -167,7 +167,7 @@ public class Tag extends EntityDto<Tag> {
 		this.mappingId = mappingId;
 	}
 
-	public void setMappingType(TagMappingType t) {
+	public void setMappingType(TagType t) {
 		mappingType = t;
 	}
 

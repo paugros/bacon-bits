@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.TilePanel;
@@ -28,11 +29,13 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -57,13 +60,14 @@ public final class ResourceListPage implements Page {
 	private ResourceTable table = new ResourceTable(args);
 	private ViewMode viewMode = ViewMode.GRID;
 	private SimplePanel sp = new SimplePanel();
+	private TextBox searchInput;
 
 	public ResourceListPage(final VerticalPanel p) {
 		String title = "Resources";
 		page = p;
 
 		table.setDisplayColumns(ResourceColumn.IMAGE, ResourceColumn.NAME, ResourceColumn.DESCRIPTION, ResourceColumn.LOCATION, ResourceColumn.TAGS,
-				ResourceColumn.PRICE);
+				ResourceColumn.PRICE, ResourceColumn.AGES);
 		table.addStyleName(ContentWidth.MAXWIDTH1100PX.toString());
 		table.setDefaultSortColumn(ResourceColumn.NAME, SortDirection.SORT_ASC);
 
@@ -95,13 +99,35 @@ public final class ResourceListPage implements Page {
 
 		createSearchBox();
 
+		DefaultListBox lb = new DefaultListBox();
+		lb.getElement().getStyle().setMarginLeft(10, Unit.PX);
+		lb.addItem("Grid view");
+		lb.addItem("List view");
+		lb.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				if (viewMode == ViewMode.GRID) {
+					viewMode = ViewMode.LIST;
+					sp.setWidget(table);
+				} else {
+					viewMode = ViewMode.GRID;
+					sp.setWidget(fp);
+				}
+				populate(resources);
+				applyFilter();
+			}
+		});
+
+		page.add(lb);
+
 		sp.setWidget(fp);
 		page.add(sp);
 		Application.getLayout().setPage(title, page);
 		populate();
 	}
 
-	private void applyFilter(String text) {
+	private void applyFilter() {
+		String text = searchInput.getText();
 		if (text == null || text.isEmpty()) {
 			if (viewMode == ViewMode.GRID) {
 				fp.showAll();
@@ -131,13 +157,13 @@ public final class ResourceListPage implements Page {
 		vvp.addStyleName("boxedBlurb");
 		searchBox.setSpacing(4);
 		searchBox.add(new Label("Search:"));
-		final TextBox searchInput = new TextBox();
+		searchInput = new TextBox();
 		searchInput.setVisibleLength(35);
 		searchBox.add(searchInput);
 		searchInput.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
-				applyFilter(searchInput.getText());
+				applyFilter();
 			}
 		});
 
@@ -145,7 +171,7 @@ public final class ResourceListPage implements Page {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					applyFilter(searchInput.getText());
+					applyFilter();
 				}
 			}
 		});
@@ -184,26 +210,6 @@ public final class ResourceListPage implements Page {
 		vvp.add(bottom);
 
 		VerticalPanel cp = new VerticalPanel();
-		final ClickLabel view = new ClickLabel("List view");
-		view.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (viewMode == ViewMode.GRID) {
-					viewMode = ViewMode.LIST;
-					view.setText("Grid view");
-
-					sp.setWidget(table);
-				} else {
-					viewMode = ViewMode.GRID;
-					view.setText("List view");
-
-					sp.setWidget(fp);
-				}
-
-				populate(resources);
-				applyFilter(searchInput.getText());
-			}
-		});
 
 		ClickLabel reset = new ClickLabel("Reset search", new ClickHandler() {
 			@Override
@@ -213,13 +219,12 @@ public final class ResourceListPage implements Page {
 			}
 		});
 
-		cp.add(view);
 		cp.add(reset);
 
 		vvp.add(cp);
 		vvp.setCellHorizontalAlignment(cp, HasHorizontalAlignment.ALIGN_RIGHT);
 
-		page.add(new SearchSection(TagMappingType.RESOURCE, vvp));
+		page.add(new SearchSection(TagType.RESOURCE, vvp));
 	}
 
 	private void populate() {

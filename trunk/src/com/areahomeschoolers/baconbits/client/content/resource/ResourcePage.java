@@ -7,6 +7,7 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule.AdDirection;
+import com.areahomeschoolers.baconbits.client.content.review.ReviewSection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
@@ -45,7 +46,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Review.ReviewType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Overflow;
@@ -352,13 +354,16 @@ public class ResourcePage implements Page {
 		simplePriceField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				simplePriceDisplay.setText(PriceRangeBox.getPriceText(resource.getPrice(), resource.getHighPrice()));
-				simplePriceInput.setValues(resource.getPrice(), resource.getHighPrice());
+				simplePriceDisplay.setText(PriceRangeBox.getPriceText(resource.getPrice(), resource.getHighPrice(), resource.getPriceNotApplicable()));
+				if (!resource.getPriceNotApplicable()) {
+					simplePriceInput.setValues(resource.getPrice(), resource.getHighPrice());
+				}
 			}
 		});
 		simplePriceField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
+				resource.setPriceNotApplicable(simplePriceInput.isEmpty());
 				resource.setPrice(simplePriceInput.getLow());
 				resource.setHighPrice(simplePriceInput.getHigh());
 			}
@@ -625,7 +630,7 @@ public class ResourcePage implements Page {
 	}
 
 	private void createTagSection() {
-		tagSection = new TagSection(TagMappingType.RESOURCE, resource.getId());
+		tagSection = new TagSection(TagType.RESOURCE, resource.getId());
 		tagSection.setEditingEnabled(allowEdit());
 		tagSection.setRequired(true);
 		tagSection.populate();
@@ -670,7 +675,7 @@ public class ResourcePage implements Page {
 		}
 
 		if (resource.getPrice() > 0) {
-			vp.add(new Label("Pricing: " + PriceRangeBox.getPriceText(resource.getPrice(), resource.getHighPrice())));
+			vp.add(new Label("Pricing: " + PriceRangeBox.getPriceText(resource.getPrice(), resource.getHighPrice(), resource.getPriceNotApplicable())));
 		}
 
 		if (resource.getMinimumAge() > 0 || resource.getMaximumAge() > 0) {
@@ -731,7 +736,7 @@ public class ResourcePage implements Page {
 
 		ovp.add(pp);
 
-		TagSection ts = new TagSection(TagMappingType.RESOURCE, resource.getId());
+		TagSection ts = new TagSection(TagType.RESOURCE, resource.getId());
 		ts.setEditingEnabled(false);
 		ts.populate();
 
@@ -755,6 +760,12 @@ public class ResourcePage implements Page {
 
 		VerticalPanel outerPanel = new VerticalPanel();
 		outerPanel.add(ovp);
+
+		ReviewSection rs = new ReviewSection(ReviewType.RESOURCE, resource.getId());
+		rs.populate();
+
+		outerPanel.add(rs);
+
 		outerPanel.add(new AdsMiniModule(AdDirection.HORIZONTAL));
 
 		page.add(outerPanel);

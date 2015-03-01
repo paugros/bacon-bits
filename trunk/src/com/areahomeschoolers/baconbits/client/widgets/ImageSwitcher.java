@@ -8,7 +8,7 @@ import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Unit;
@@ -52,8 +52,8 @@ public class ImageSwitcher extends Composite {
 		outerPanel.add(fp);
 
 		String h1 = "<div class=largeText style=\"margin-bottom: 4px;\">";
-		h1 += "<a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagMappingType.EVENT.toString()) + "\">";
-		h1 += "Events</a> and <a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagMappingType.RESOURCE.toString()) + "\">Resources</a></div>";
+		h1 += "<a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagType.EVENT.toString()) + "\">";
+		h1 += "Events</a> and <a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagType.RESOURCE.toString()) + "\">Resources</a></div>";
 		h1 += textDiv + "Find great homeschooling events and resources in your area with our extensive directory of local, ";
 		h1 += "statewide, and national listings.</div>";
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherEvents()), h1));
@@ -65,7 +65,7 @@ public class ImageSwitcher extends Composite {
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherConnect()), h2));
 
 		String h3 = "<div class=largeText style=\"margin-bottom: 4px;\">";
-		h3 += "<a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagMappingType.BOOK.toString()) + "\">Books</a></div>";
+		h3 += "<a href=\"" + Url.getBaseUrl() + PageUrl.tagGroup(TagType.BOOK.toString()) + "\">Books</a></div>";
 		h3 += textDiv + "Homeschoolers can buy or sell used curriculum in our online book store. We can help your homeschool group host a book sale ";
 		h3 += "with our <a href=\"" + Url.getBaseUrl() + PageUrl.article(147) + "\">book management system and tools</a>.</div>";
 		panels.add(createPanel(new Image(MainImageBundle.INSTANCE.switcherBooks()), h3));

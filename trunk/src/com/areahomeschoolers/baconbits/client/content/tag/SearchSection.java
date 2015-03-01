@@ -1,7 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.tag;
 
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.Composite;
@@ -13,7 +13,7 @@ public class SearchSection extends Composite {
 	private HorizontalPanel hp = new HorizontalPanel();
 	private VerticalPanel vp = new VerticalPanel();
 
-	public SearchSection(TagMappingType type, Widget searchBox) {
+	public SearchSection(TagType type, Widget searchBox) {
 		FriendlyTextWidget ftw = new FriendlyTextWidget(type);
 		if (ClientUtils.isMobileBrowser()) {
 			ftw.getElement().getStyle().setMarginBottom(10, Unit.PX);

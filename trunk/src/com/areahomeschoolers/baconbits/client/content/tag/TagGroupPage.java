@@ -28,7 +28,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Tag;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -48,14 +48,14 @@ public final class TagGroupPage implements Page {
 	private ArgMap<TagArg> args = new ArgMap<TagArg>();
 	private TagServiceAsync tagService = (TagServiceAsync) ServiceCache.getService(TagService.class);
 	private TilePanel fp = new TilePanel();
-	private TagMappingType type = null;
+	private TagType type = null;
 	private ArrayList<Tag> tags;
 	private VerticalPanel page;
 
 	public TagGroupPage(final VerticalPanel p) {
 		page = p;
 		try {
-			type = TagMappingType.valueOf(Url.getParameter("type"));
+			type = TagType.valueOf(Url.getParameter("type"));
 		} catch (Exception e) {
 		}
 
@@ -67,17 +67,17 @@ public final class TagGroupPage implements Page {
 		final String title = "Categories";
 		fp.setWidth("100%");
 
-		args.put(TagArg.MAPPING_TYPE, type.toString());
+		args.put(TagArg.TYPE, type.toString());
 		args.put(TagArg.GET_COUNTS);
 
-		if (Application.hasLocation() && !EnumSet.of(TagMappingType.ARTICLE, TagMappingType.BOOK).contains(type)) {
+		if (Application.hasLocation() && !EnumSet.of(TagType.ARTICLE, TagType.BOOK).contains(type)) {
 			args.put(TagArg.LOCATION_FILTER);
 		}
 
 		populate();
 
 		CookieCrumb cc = new CookieCrumb();
-		String typeText = type.equals(TagMappingType.USER) ? "Interests" : "Type";
+		String typeText = type.equals(TagType.USER) ? "Interests" : "Type";
 		cc.add(type.getName() + " By " + typeText);
 
 		page.add(cc);
@@ -160,7 +160,7 @@ public final class TagGroupPage implements Page {
 		vvp.add(searchBox);
 
 		// within miles
-		if (!type.equals(TagMappingType.ARTICLE)) {
+		if (!type.equals(TagType.ARTICLE)) {
 			final LocationFilterInput locationInput = new LocationFilterInput();
 			if (Application.hasLocation()) {
 				locationInput.setText(Application.getCurrentLocation());

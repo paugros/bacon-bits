@@ -33,7 +33,7 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
@@ -83,7 +83,7 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 			UserDaoImpl.updateUserActivity(user.getId());
 
 			TagDao tagDao = ServerContext.getDaoImpl("tag");
-			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_TYPE, TagMappingType.USER.toString());
+			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.TYPE, TagType.USER.toString());
 			args.put(TagArg.ENTITY_ID, user.getId());
 			ap.setInterests(tagDao.list(args));
 

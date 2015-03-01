@@ -32,7 +32,7 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -87,8 +87,8 @@ public final class EventListPage implements Page {
 		String title = "Events";
 
 		table.setDisplayColumns(EventColumn.REGISTERED, EventColumn.IMAGE, EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE,
-				EventColumn.LOCATION, EventColumn.TAGS, EventColumn.PRICE);
-		table.addStyleName(ContentWidth.MAXWIDTH1200PX.toString());
+				EventColumn.LOCATION, EventColumn.TAGS, EventColumn.PRICE, EventColumn.AGES);
+		table.addStyleName(ContentWidth.MAXWIDTH1300PX.toString());
 
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new DefaultHyperlink("Events By Type", PageUrl.tagGroup("EVENT")));
@@ -117,6 +117,28 @@ public final class EventListPage implements Page {
 			cartPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 			cartPanel.add(new Label("Your cart:"));
 			cartPanel.add(bb);
+
+			DefaultListBox lb = new DefaultListBox();
+			lb.getElement().getStyle().setMarginLeft(10, Unit.PX);
+			lb.addItem("Grid view");
+			lb.addItem("List view");
+			lb.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					if (viewMode == ViewMode.GRID) {
+						viewMode = ViewMode.LIST;
+						sp.setWidget(table);
+					} else {
+						viewMode = ViewMode.GRID;
+						sp.setWidget(fp);
+					}
+					populate(events);
+					applyFilter();
+				}
+			});
+			cartPanel.add(lb);
+			cartPanel.setCellHorizontalAlignment(lb, HasHorizontalAlignment.ALIGN_RIGHT);
+
 			page.add(cartPanel);
 		}
 
@@ -306,26 +328,6 @@ public final class EventListPage implements Page {
 		ipp.add(cb);
 
 		VerticalPanel cp = new VerticalPanel();
-		final ClickLabel view = new ClickLabel("List view");
-		view.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (viewMode == ViewMode.GRID) {
-					viewMode = ViewMode.LIST;
-					view.setText("Grid view");
-
-					sp.setWidget(table);
-				} else {
-					viewMode = ViewMode.GRID;
-					view.setText("List view");
-
-					sp.setWidget(fp);
-				}
-
-				populate(events);
-				applyFilter();
-			}
-		});
 
 		ClickLabel reset = new ClickLabel("Reset search", new ClickHandler() {
 			@Override
@@ -335,7 +337,6 @@ public final class EventListPage implements Page {
 			}
 		});
 
-		cp.add(view);
 		cp.add(reset);
 
 		ipp.add(cp);
@@ -345,7 +346,7 @@ public final class EventListPage implements Page {
 
 		vpp.addStyleName("boxedBlurb");
 
-		page.add(new SearchSection(TagMappingType.EVENT, vp));
+		page.add(new SearchSection(TagType.EVENT, vp));
 	}
 
 	private void populate() {

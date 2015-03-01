@@ -65,7 +65,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.core.client.Scheduler;
@@ -656,13 +656,16 @@ public class EventPage implements Page {
 		simplePriceField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				simplePriceDisplay.setText(PriceRangeBox.getPriceText(event.getPrice(), event.getHighPrice()));
-				simplePriceInput.setValues(event.getPrice(), event.getHighPrice());
+				simplePriceDisplay.setText(PriceRangeBox.getPriceText(event.getPrice(), event.getHighPrice(), event.getPriceNotApplicable()));
+				if (!event.getPriceNotApplicable()) {
+					simplePriceInput.setValues(event.getPrice(), event.getHighPrice());
+				}
 			}
 		});
 		simplePriceField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
+				event.setPriceNotApplicable(simplePriceInput.isEmpty());
 				event.setPrice(simplePriceInput.getLow());
 				event.setHighPrice(simplePriceInput.getHigh());
 			}
@@ -677,11 +680,15 @@ public class EventPage implements Page {
 				@Override
 				public void execute() {
 					String text = Formatter.formatCurrency(event.getAdjustedPrice());
-					if (event.getPrice() == 0) {
+					if (event.getPriceNotApplicable()) {
+						text = "N/A";
+					} else if (event.getPrice() == 0) {
 						text = "Free";
 					}
 					priceDisplay.setText(text);
-					priceInput.setValue(event.getPrice());
+					if (!event.getPriceNotApplicable()) {
+						priceInput.setValue(event.getPrice());
+					}
 
 					if (!Application.administratorOf(event)) {
 						priceField.setEnabled(false);
@@ -691,6 +698,9 @@ public class EventPage implements Page {
 			priceField.setDtoUpdater(new Command() {
 				@Override
 				public void execute() {
+					if (priceInput.isEmpty()) {
+						event.setPriceNotApplicable(true);
+					}
 					event.setPrice(priceInput.getDouble());
 				}
 			});
@@ -1173,7 +1183,7 @@ public class EventPage implements Page {
 	}
 
 	private void createTagSection() {
-		tagSection = new TagSection(TagMappingType.EVENT, event.getId());
+		tagSection = new TagSection(TagType.EVENT, event.getId());
 		tagSection.setEditingEnabled(Application.administratorOf(event));
 		tagSection.setRequired(true);
 		tagSection.populate(pageData.getTags());
@@ -1231,7 +1241,7 @@ public class EventPage implements Page {
 			if (event.getRequiresRegistration()) {
 				price += Formatter.formatCurrency(event.getAdjustedPrice());
 			} else {
-				price += PriceRangeBox.getPriceText(event.getPrice(), event.getHighPrice());
+				price += PriceRangeBox.getPriceText(event.getPrice(), event.getHighPrice(), event.getPriceNotApplicable());
 			}
 			Label priceLabel = new Label(price);
 			priceLabel.getElement().getStyle().setFontSize(16, Unit.PX);
@@ -1386,7 +1396,7 @@ public class EventPage implements Page {
 
 		ovp.add(pp);
 
-		TagSection ts = new TagSection(TagMappingType.EVENT, event.getId());
+		TagSection ts = new TagSection(TagType.EVENT, event.getId());
 		ts.setEditingEnabled(false);
 		ts.populate();
 

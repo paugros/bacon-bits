@@ -56,7 +56,7 @@ import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
-import com.areahomeschoolers.baconbits.shared.dto.Tag.TagMappingType;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
@@ -135,6 +135,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setRefundPolicy(rs.getString("refundPolicy"));
 			event.setMinimumAge(rs.getInt("minimumAge"));
 			event.setMaximumAge(rs.getInt("maximumAge"));
+			event.setPriceNotApplicable(rs.getBoolean("priceNotApplicable"));
 			return event;
 		}
 	}
@@ -376,7 +377,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		String lat = latD == null ? null : Double.toString(latD);
 		Double lngD = ServerContext.getCurrentLng();
 		String lng = lngD == null ? null : Double.toString(lngD);
-		sql += TagDaoImpl.createWhere(TagMappingType.EVENT, Constants.DEFAULT_SEARCH_RADIUS, lat, lng, null);
+		sql += TagDaoImpl.createWhere(TagType.EVENT, Constants.DEFAULT_SEARCH_RADIUS, lat, lng, null);
 		pd.setEventCount(queryForInt(sql));
 
 		return pd;
@@ -398,7 +399,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			// tags
 			TagDao tagDao = ServerContext.getDaoImpl("tag");
 			ArgMap<TagArg> tagArgs = new ArgMap<TagArg>(TagArg.ENTITY_ID, pd.getEvent().getId());
-			tagArgs.put(TagArg.MAPPING_TYPE, TagMappingType.EVENT.toString());
+			tagArgs.put(TagArg.TYPE, TagType.EVENT.toString());
 			pd.setTags(tagDao.list(tagArgs));
 
 			String sql = "";
@@ -895,7 +896,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, highPrice = :highPrice, ";
 			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, directoryPriority = :directoryPriority, ";
 			sql += "contactName = :contactName, contactEmail = :contactEmail, payPalEmail = :payPalEmail, refundPolicy = :refundPolicy, ";
-			sql += "minimumAge = :minimumAge, maximumAge = :maximumAge, ";
+			sql += "minimumAge = :minimumAge, maximumAge = :maximumAge, priceNotApplicable = :priceNotApplicable, ";
 			sql += "notificationEmail = :notificationEmail, publishDate = :publishDate, active = :active, price = :price, phone = :phone, website = :website ";
 			sql += "where id = :id";
 			update(sql, namedParams);
@@ -914,13 +915,17 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setAddedById(ServerContext.getCurrentUserId());
 			event.setOwningOrgId(ServerContext.getCurrentOrgId());
 
+			if (event.getCloneFromId() > 0) {
+				event.setTitle(event.getTitle() + " (1)");
+			}
+
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
-			sql += "markupOverride, markupPercent, markupDollars, facilityName, directoryPriority, contactName, contactEmail, ";
+			sql += "markupOverride, markupPercent, markupDollars, facilityName, directoryPriority, contactName, contactEmail, priceNotApplicable, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, notificationEmail, owningOrgId, ";
 			sql += "address, street, city, state, zip, lat, lng, payPalEmail, refundPolicy, highPrice, minimumAge, maximumAge, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, :markup, ";
-			sql += ":markupOverride, :markupPercent, :markupDollars, :facilityName, :directoryPriority, :contactName, :contactEmail, ";
+			sql += ":markupOverride, :markupPercent, :markupDollars, :facilityName, :directoryPriority, :contactName, :contactEmail, :priceNotApplicable, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :notificationEmail, :owningOrgId, ";
 			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :payPalEmail, :refundPolicy, :highPrice, :minimumAge, :maximumAge, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";

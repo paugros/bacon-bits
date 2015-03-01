@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.MaxHeightScrollPanel;
+import com.areahomeschoolers.baconbits.client.widgets.NumericRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.PriceRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.cellview.EntityCellTable;
@@ -41,7 +42,7 @@ import com.google.gwt.user.client.ui.Widget;
 public final class EventTable extends EntityCellTable<Event, EventArg, EventColumn> {
 	public enum EventColumn implements EntityCellTableColumn<EventColumn> {
 		REGISTERED(""), IMAGE(" "), TITLE("Title"), DESCRIPTION("Description"), START_DATE("Date"), END_DATE("End"), LOCATION("Location"), TAGS("Tags"), CATEGORY(
-				"Category"), PRICE("Price"), VIEWS("Views");
+				"Category"), PRICE("Price"), AGES("Ages"), VIEWS("Views");
 
 		private String title;
 
@@ -108,6 +109,14 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 	protected void setColumns() {
 		for (EventColumn col : getDisplayColumns()) {
 			switch (col) {
+			case AGES:
+				addTextColumn(col, new ValueGetter<String, Event>() {
+					@Override
+					public String get(Event item) {
+						return NumericRangeBox.getAgeRangeText(item.getMinimumAge(), item.getMaximumAge());
+					}
+				});
+				break;
 			case IMAGE:
 				addWidgetColumn(col, new WidgetCellCreator<Event>() {
 					@Override
@@ -133,7 +142,7 @@ public final class EventTable extends EntityCellTable<Event, EventArg, EventColu
 				addTextColumn(col, new ValueGetter<String, Event>() {
 					@Override
 					public String get(Event item) {
-						return PriceRangeBox.getPriceText(item.getAdjustedPrice(), item.getHighPrice());
+						return PriceRangeBox.getPriceText(item.getAdjustedPrice(), item.getHighPrice(), item.getPriceNotApplicable());
 					}
 				}, new ValueGetter<Double, Event>() {
 					@Override
