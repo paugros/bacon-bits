@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.book;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.content.book.BookTable.BookColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -28,6 +29,7 @@ public final class BookManagementPage implements Page {
 
 		args.put(BookArg.STATUS_ID, 1);
 		final BookTable table = new BookTable(args);
+		table.setDisplayColumns(BookColumn.TITLE, BookColumn.USER, BookColumn.GRADE_LEVEL, BookColumn.STATUS, BookColumn.PRICE, BookColumn.VIEWS);
 		table.setTitle(title);
 		table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.book(0)));
 		table.getTitleBar().addSearchControl();

@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.article;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.content.article.ArticleTable.ArticleColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -26,6 +27,7 @@ public final class ArticleManagementPage implements Page {
 		args.put(ArticleArg.INCLUDE_BLOG);
 		final String title = "Articles";
 		final ArticleTable table = new ArticleTable(args);
+		table.setDisplayColumns(ArticleColumn.TITLE, ArticleColumn.TAGS, ArticleColumn.ADDED_DATE, ArticleColumn.ADDED_BY, ArticleColumn.VIEWS);
 		table.setTitle(title);
 		if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
 			table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.article(0)));
