@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
 import com.areahomeschoolers.baconbits.client.Application;
+import com.areahomeschoolers.baconbits.client.content.event.EventTable.EventColumn;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
@@ -28,6 +29,7 @@ public final class EventManagementPage implements Page {
 		final String title = "Events";
 		args.setStatus(Status.ACTIVE);
 		final EventTable table = new EventTable(args);
+		table.setDisplayColumns(EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE, EventColumn.LOCATION, EventColumn.TAGS, EventColumn.VIEWS);
 		table.setTitle(title);
 		table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.event(0)));
 		table.getTitleBar().addSearchControl();
