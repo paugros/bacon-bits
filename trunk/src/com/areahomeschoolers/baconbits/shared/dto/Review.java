@@ -4,7 +4,7 @@ import java.util.Date;
 
 public final class Review extends EntityDto<Review> {
 	public enum ReviewType {
-		RESOURCE, EVENT;
+		RESOURCE;
 
 		private ReviewType() {
 		}

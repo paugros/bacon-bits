@@ -51,7 +51,7 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private String refundPolicy;
 	private int minimumAge;
 	private int maximumAge;
-	private boolean priceNotApplicable;
+	private boolean priceNotApplicable = true;
 
 	// address
 	private String address;

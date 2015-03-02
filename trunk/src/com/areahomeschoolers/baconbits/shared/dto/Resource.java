@@ -32,7 +32,7 @@ public class Resource extends EntityDto<Resource> implements HasAddress {
 	private Integer imageId;
 	private Integer smallImageId;
 	private String imageExtension;
-	private boolean priceNotApplicable;
+	private boolean priceNotApplicable = true;
 
 	private String contactName;
 	private String facilityName;

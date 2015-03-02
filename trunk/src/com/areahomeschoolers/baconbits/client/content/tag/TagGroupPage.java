@@ -85,9 +85,7 @@ public final class TagGroupPage implements Page {
 		String url = null;
 		switch (type) {
 		case ARTICLE:
-			if (Application.memberOf(33)) {
-				url = PageUrl.article(0);
-			}
+			url = PageUrl.article(0);
 			break;
 		case BOOK:
 			break;

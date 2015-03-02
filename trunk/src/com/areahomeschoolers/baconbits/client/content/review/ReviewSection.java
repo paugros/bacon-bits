@@ -13,6 +13,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ReviewArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -52,14 +53,17 @@ public class ReviewSection extends Composite {
 		private DefaultListBox anonymous = new DefaultListBox();
 
 		private ReviewAddSection() {
-			anonymous.addItem(Application.getCurrentUser().getFullName(), 0);
-			anonymous.addItem("Anonymous chump", 1);
+			if (Application.isAuthenticated()) {
+				anonymous.addItem(Application.getCurrentUser().getFullName(), 0);
+			}
+			anonymous.addItem("Anonymous", 1);
 			vp.setSpacing(5);
 			vp.getElement().getStyle().setMarginTop(15, Unit.PX);
 			vp.addStyleName(ContentWidth.MAXWIDTH700PX.toString());
 			final VerticalPanel addSection = new VerticalPanel();
 			addSection.setVisible(false);
 			textArea.setCharacterWidth(100);
+			textArea.setVisibleLines(6);
 			textArea.getElement().setAttribute("placeholder", "Write your review here (optional)");
 			submit.addClickHandler(new ClickHandler() {
 				@Override
@@ -174,9 +178,8 @@ public class ReviewSection extends Composite {
 				@Override
 				protected void doOnSuccess(Review result) {
 					review = result;
-					if (!isSaved) {
-						reviews.add(0, result);
-					}
+					reviews.remove(result);
+					reviews.add(0, result);
 					hide();
 					refresh();
 					submit.setEnabled(true);
@@ -186,7 +189,9 @@ public class ReviewSection extends Composite {
 
 		private void setReview(Review review) {
 			this.review = review;
-			textArea.setText(review.getReview());
+			String r = review.getReview();
+			HTML stripper = new HTML(r.replaceAll("<br/>", "\n"));
+			textArea.setText(stripper.getText());
 			if (review.getRating() > 0) {
 				setStarsUpTo(review.getRating() - 1, MainImageBundle.INSTANCE.starLargeYellow());
 			}
@@ -262,25 +267,29 @@ public class ReviewSection extends Composite {
 		entityId = itemId;
 
 		HorizontalPanel hp = new HorizontalPanel();
-		hp.setWidth("100%");
+		hp.addStyleName(ContentWidth.MAXWIDTH700PX.toString());
 		Label heading = new Label("Reviews");
 		heading.getElement().getStyle().setMarginTop(10, Unit.PX);
 		heading.addStyleName("largeText");
 		hp.add(heading);
 
-		vp.add(hp);
-		if (Application.isAuthenticated()) {
-			addSection = new ReviewAddSection();
-			addLink = new ClickLabel("Add a review", new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					addSection.show();
+		String linkText = "Write a review";
+		addSection = new ReviewAddSection();
+		addLink = new ClickLabel(linkText, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (!Application.isAuthenticated()) {
+					LoginDialog.showLogin();
+					return;
 				}
-			});
-			hp.add(addLink);
-			hp.setCellHorizontalAlignment(addLink, HasHorizontalAlignment.ALIGN_RIGHT);
-			vp.add(addSection);
-		}
+				addSection.show();
+			}
+		});
+		hp.add(addLink);
+
+		vp.add(hp);
+		vp.add(addSection);
+		hp.setCellHorizontalAlignment(addLink, HasHorizontalAlignment.ALIGN_RIGHT);
 
 		vp.add(reviewPanel);
 
