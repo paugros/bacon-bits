@@ -410,7 +410,7 @@ public abstract class Common {
 		String clickableText = text;
 		List<String> replacedUrls = new ArrayList<String>();
 
-		String urlRegex = "\\b(https?://|www\\.|dash\\.)+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*\\b";
+		String urlRegex = "\\b(https?://|www\\.)+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*\\b";
 		RegExp regExp = RegExp.compile(urlRegex, "gi");
 
 		for (MatchResult matcher = regExp.exec(text); matcher != null; matcher = regExp.exec(text)) {

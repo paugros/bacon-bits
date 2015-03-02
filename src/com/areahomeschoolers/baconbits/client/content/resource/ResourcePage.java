@@ -336,7 +336,9 @@ public class ResourcePage implements Page {
 			@Override
 			public void execute() {
 				ageDisplay.setText(NumericRangeBox.getAgeRangeText(resource.getMinimumAge(), resource.getMaximumAge()));
-				ageInput.setRange(resource.getMinimumAge(), resource.getMaximumAge());
+				if (resource.getMinimumAge() > 0 || resource.getMaximumAge() > 0) {
+					ageInput.setRange(resource.getMinimumAge(), resource.getMaximumAge());
+				}
 			}
 		});
 		ageField.setDtoUpdater(new Command() {

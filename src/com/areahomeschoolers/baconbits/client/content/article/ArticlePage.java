@@ -118,8 +118,8 @@ public class ArticlePage implements Page {
 	}
 
 	private boolean allowEdit() {
-		if (article.getGroupId() == null) {
-			return Application.isSystemAdministrator();
+		if (!article.isSaved() && Application.isCitrus()) {
+			return true;
 		}
 		return Application.administratorOf(article);
 	}
@@ -151,7 +151,7 @@ public class ArticlePage implements Page {
 	}
 
 	private void createFieldTable() {
-		fieldTable.setWidth("100%");
+		fieldTable.addStyleName(ContentWidth.MAXWIDTH900PX.toString());
 
 		final RequiredTextBox titleInput = new RequiredTextBox();
 		final Label titleDisplay = new Label();

@@ -110,37 +110,36 @@ public final class EventListPage implements Page {
 
 		createSearchBox();
 
+		PaddedPanel cartPanel = new PaddedPanel();
 		Data balance = Application.getApplicationData().getUnpaidBalance();
 		if (balance != null && balance.getDouble("balance") > 0) {
 			BalanceBox bb = new BalanceBox();
-			PaddedPanel cartPanel = new PaddedPanel();
 			cartPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 			cartPanel.add(new Label("Your cart:"));
 			cartPanel.add(bb);
-
-			DefaultListBox lb = new DefaultListBox();
-			lb.getElement().getStyle().setMarginLeft(10, Unit.PX);
-			lb.addItem("Grid view");
-			lb.addItem("List view");
-			lb.addChangeHandler(new ChangeHandler() {
-				@Override
-				public void onChange(ChangeEvent event) {
-					if (viewMode == ViewMode.GRID) {
-						viewMode = ViewMode.LIST;
-						sp.setWidget(table);
-					} else {
-						viewMode = ViewMode.GRID;
-						sp.setWidget(fp);
-					}
-					populate(events);
-					applyFilter();
-				}
-			});
-			cartPanel.add(lb);
-			cartPanel.setCellHorizontalAlignment(lb, HasHorizontalAlignment.ALIGN_RIGHT);
-
-			page.add(cartPanel);
 		}
+
+		DefaultListBox lb = new DefaultListBox();
+		lb.getElement().getStyle().setMarginLeft(10, Unit.PX);
+		lb.addItem("Grid view");
+		lb.addItem("List view");
+		lb.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				if (viewMode == ViewMode.GRID) {
+					viewMode = ViewMode.LIST;
+					sp.setWidget(table);
+				} else {
+					viewMode = ViewMode.GRID;
+					sp.setWidget(fp);
+				}
+				populate(events);
+				applyFilter();
+			}
+		});
+		cartPanel.add(lb);
+
+		page.add(cartPanel);
 
 		sp.setWidget(fp);
 		page.add(sp);

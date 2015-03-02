@@ -136,7 +136,6 @@ public class UserFieldTable extends FieldTable {
 			addField(emailField);
 
 			final EmailTextBox payPalEmailInput = new EmailTextBox();
-			payPalEmailInput.setRequired(true);
 			payPalEmailInput.setMaxLength(255);
 			payPalEmailInput.setVisibleLength(30);
 			final Label payPalEmailDisplay = new Label();

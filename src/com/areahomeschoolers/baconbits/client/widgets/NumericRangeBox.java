@@ -75,8 +75,6 @@ public class NumericRangeBox extends Composite implements HasValidator, CustomFo
 		fromInput.getValidator().useErrorBorder(false);
 		toInput.getValidator().useErrorBorder(false);
 
-		setRequired(true);
-
 		panel.add(fromInput);
 		panel.add(new Label("to"));
 		panel.add(toInput);

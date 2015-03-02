@@ -614,7 +614,9 @@ public class EventPage implements Page {
 			@Override
 			public void execute() {
 				ageDisplay.setText(NumericRangeBox.getAgeRangeText(event.getMinimumAge(), event.getMaximumAge()));
-				ageInput.setRange(event.getMinimumAge(), event.getMaximumAge());
+				if (event.getMinimumAge() > 0 || event.getMaximumAge() > 0) {
+					ageInput.setRange(event.getMinimumAge(), event.getMaximumAge());
+				}
 			}
 		});
 		ageField.setDtoUpdater(new Command() {
@@ -628,7 +630,7 @@ public class EventPage implements Page {
 
 		final Label registerDisplay = new Label();
 		final RequiredListBox registerInput = new RequiredListBox();
-		registerInput.addItem("No registration is required", 0);
+		registerInput.addItem("No registration is required, or register on another site", 0);
 		registerInput.addItem("Use this event to collect registrations and fees", 1);
 		FormField registerField = form.createFormField("Registration:", registerInput, registerDisplay);
 		registerField.setInitializer(new Command() {
