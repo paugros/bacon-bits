@@ -11,7 +11,9 @@ import com.areahomeschoolers.baconbits.client.content.review.ReviewSection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
+import com.areahomeschoolers.baconbits.client.event.FormToggleHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -24,6 +26,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
@@ -49,6 +52,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Review.ReviewType;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
@@ -152,8 +157,10 @@ public class ResourcePage implements Page {
 
 		if (!resource.isSaved()) {
 			form.configureForAdd(ft);
+			Application.setConfirmNavigation(true);
 		} else {
 			form.emancipate();
+			Application.setConfirmNavigation(false);
 		}
 
 		HorizontalPanel pp = new HorizontalPanel();
@@ -592,7 +599,7 @@ public class ResourcePage implements Page {
 
 		final HTML descriptionDisplay = new HTML();
 		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
-		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
+		final FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
 		descriptionDisplay.getElement().getStyle().setPadding(10, Unit.PX);
 		descriptionDisplay.setWidth("800px");
 		descriptionDisplay.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
@@ -610,6 +617,21 @@ public class ResourcePage implements Page {
 				resource.setDescription(descriptionInput.getTextArea().getHTML());
 			}
 		});
+		descriptionField.addFormToggleHandler(new FormToggleHandler() {
+			@Override
+			public void onFormToggle(final boolean inputsAreVisible) {
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+					@Override
+					public void execute() {
+						if (descriptionField.getInputWidget().isVisible() == false) {
+							Application.setConfirmNavigation(false);
+						} else {
+							Application.setConfirmNavigation(true);
+						}
+					}
+				});
+			}
+		});
 		ft.addSpanningWidget(descriptionField);
 
 		if (resource.isSaved() && Application.administratorOf(resource)) {
@@ -624,7 +646,13 @@ public class ResourcePage implements Page {
 		Button cancelButton = new Button("Cancel", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				History.back();
+				ConfirmDialog.confirm("Are you sure you want to leave this page? Unsaved data will be lost.", new ConfirmHandler() {
+					@Override
+					public void onConfirm() {
+						History.back();
+						Application.setConfirmNavigation(false);
+					}
+				});
 			}
 		});
 
@@ -774,6 +802,8 @@ public class ResourcePage implements Page {
 	}
 
 	private void save(final FormField field) {
+		Application.setConfirmNavigation(false);
+
 		resourceService.save(resource, new Callback<Resource>() {
 			@Override
 			protected void doOnSuccess(final Resource r) {

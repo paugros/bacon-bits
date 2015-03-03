@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
+import com.areahomeschoolers.baconbits.client.event.FormToggleHandler;
 import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
@@ -197,7 +198,9 @@ public class EventPage implements Page {
 		if (!event.isSaved()) {
 			form.configureForAdd(fieldTable);
 			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1000PX));
+			Application.setConfirmNavigation(true);
 		} else {
+			Application.setConfirmNavigation(false);
 			tabPanel = new TabPage();
 			form.emancipate();
 
@@ -1156,7 +1159,7 @@ public class EventPage implements Page {
 
 		final HTML descriptionDisplay = new HTML();
 		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
-		FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
+		final FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
 		descriptionDisplay.getElement().getStyle().setPadding(10, Unit.PX);
 		descriptionDisplay.setWidth("800px");
 		descriptionDisplay.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
@@ -1174,6 +1177,22 @@ public class EventPage implements Page {
 				event.setDescription(descriptionInput.getTextArea().getHTML());
 			}
 		});
+		descriptionField.addFormToggleHandler(new FormToggleHandler() {
+			@Override
+			public void onFormToggle(final boolean inputsAreVisible) {
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+					@Override
+					public void execute() {
+						if (descriptionField.getInputWidget().isVisible() == false) {
+							Application.setConfirmNavigation(false);
+						} else {
+							Application.setConfirmNavigation(true);
+						}
+					}
+				});
+			}
+		});
+
 		fieldTable.addSpanningWidget(descriptionField);
 
 		if (event.isSaved()) {
@@ -1544,6 +1563,7 @@ public class EventPage implements Page {
 	}
 
 	private void save(final FormField field) {
+		Application.setConfirmNavigation(false);
 		final boolean isSaved = event.isSaved();
 		final int clonedFromId = event.getCloneFromId();
 
