@@ -7,8 +7,6 @@ import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
 import com.areahomeschoolers.baconbits.client.widgets.ServerSuggestOracle;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.dom.client.Style.FontStyle;
-import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
@@ -31,7 +29,6 @@ import com.google.gwt.user.client.ui.ValueBoxBase;
 public final class SearchBox extends Composite {
 	private final SuggestBox searchSuggestBox;
 	private HtmlSuggestion currentSuggestion;
-	private String defaultSearchText = "Search...";
 	private TextBox textBox;
 	private Command selectionHandler;
 
@@ -53,21 +50,8 @@ public final class SearchBox extends Composite {
 		textBox.setVisibleLength(20);
 		searchSuggestBox = new SuggestBox(oracle, textBox);
 		textBox.setStyleName("searchBox");
+		textBox.getElement().setAttribute("placeholder", "Search...");
 
-		textBox.addFocusHandler(new FocusHandler() {
-			@Override
-			public void onFocus(FocusEvent event) {
-				textBox.setText("");
-				textBox.getElement().getStyle().setColor("#000000");
-				textBox.getElement().getStyle().setFontStyle(FontStyle.NORMAL);
-			}
-		});
-		textBox.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				reset();
-			}
-		});
 		searchSuggestBox.setAutoSelectEnabled(false);
 
 		final ValueBoxBase<String> textBox = searchSuggestBox.getValueBox();
@@ -117,12 +101,6 @@ public final class SearchBox extends Composite {
 
 	public void addBlurHandler(BlurHandler bh) {
 		textBox.addBlurHandler(bh);
-	}
-
-	public void reset() {
-		searchSuggestBox.setText(defaultSearchText);
-		textBox.getElement().getStyle().setColor("#666666");
-		textBox.getElement().getStyle().setFontStyle(FontStyle.ITALIC);
 	}
 
 	public void setFocus(boolean focus) {
