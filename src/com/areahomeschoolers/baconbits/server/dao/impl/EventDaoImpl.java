@@ -360,7 +360,10 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		ArgMap<ResourceArg> args = new ArgMap<>(ResourceArg.AD);
 		args.put(ResourceArg.LIMIT, 3);
 		args.setStatus(Status.ACTIVE);
-		args.put(ResourceArg.LEAST_IMPRESSIONS);
+		args.put(ResourceArg.RANDOM);
+		if (ServerContext.hasLocation()) {
+			args.put(ResourceArg.LOCATION_FILTER, true);
+		}
 		pd.setAds(rd.list(args));
 
 		ArrayList<Integer> ids = new ArrayList<>();

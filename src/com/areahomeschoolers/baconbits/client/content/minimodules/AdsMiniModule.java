@@ -36,7 +36,7 @@ public class AdsMiniModule extends Composite {
 
 		hp.getElement().getStyle().setMarginTop(50, Unit.PX);
 
-		args.put(ResourceArg.LEAST_IMPRESSIONS);
+		args.put(ResourceArg.RANDOM);
 		args.put(ResourceArg.LIMIT, 3);
 		args.put(ResourceArg.AD);
 		if (Application.hasLocation()) {
