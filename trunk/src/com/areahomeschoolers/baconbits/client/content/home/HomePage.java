@@ -128,7 +128,7 @@ public class HomePage implements Page {
 				ec.setImage(new Image(MainImageBundle.INSTANCE.eventTile()));
 				g.setWidget(0, 1, new Tile(ec));
 
-				g.setWidget(0, 2, new AdTile(pageData.getAds().get(0)));
+				g.setWidget(0, 2, getAdWidget(0));
 
 				TileConfig uc = new TileConfig().setTagType(TagType.USER).setCount(pageData.getUserCount());
 				uc.setImage(new Image(MainImageBundle.INSTANCE.userTile()));
@@ -138,7 +138,7 @@ public class HomePage implements Page {
 				bbc.setImage(new Image(MainImageBundle.INSTANCE.blogTile())).setUrl(PageUrl.blog(0));
 				g.setWidget(1, 1, new Tile(bbc));
 
-				g.setWidget(1, 2, new AdTile(pageData.getAds().get(1)));
+				g.setWidget(1, 2, getAdWidget(1));
 
 				TileConfig bc = new TileConfig().setTagType(TagType.BOOK).setCount(pageData.getBookCount());
 				bc.setImage(new Image(MainImageBundle.INSTANCE.bookTile()));
@@ -148,7 +148,7 @@ public class HomePage implements Page {
 				ac.setImage(new Image(MainImageBundle.INSTANCE.articleTile()));
 				g.setWidget(2, 1, new Tile(ac));
 
-				g.setWidget(2, 2, new AdTile(pageData.getAds().get(2)));
+				g.setWidget(2, 2, getAdWidget(2));
 
 				centerPanel.add(g);
 				// centerPanel.setCellHorizontalAlignment(g, HasHorizontalAlignment.ALIGN_CENTER);
@@ -183,6 +183,14 @@ public class HomePage implements Page {
 		});
 
 		return raffle;
+	}
+
+	private Widget getAdWidget(int index) {
+		if (pageData.getAds().size() > index) {
+			return new AdTile(pageData.getAds().get(index));
+		}
+
+		return new Label();
 	}
 
 	private void handlePaymentReturn() {

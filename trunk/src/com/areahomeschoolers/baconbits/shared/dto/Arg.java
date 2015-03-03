@@ -43,7 +43,7 @@ public interface Arg {
 	}
 
 	public enum ResourceArg implements Arg, IsSerializable {
-		ID, LIMIT, LEAST_IMPRESSIONS, AD, HAS_TAGS, NAME_LIKE, LOCATION_FILTER;
+		ID, LIMIT, RANDOM, AD, HAS_TAGS, NAME_LIKE, LOCATION_FILTER;
 
 		private ResourceArg() {
 

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.areahomeschoolers.baconbits.client.rpc.service.LoginService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
+import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
@@ -206,6 +207,10 @@ public class ServerContext implements ApplicationContextAware {
 		reader.close();
 
 		return buffer.toString();
+	}
+
+	public static boolean hasLocation() {
+		return !Common.isNullOrBlank(getCurrentLocation());
 	}
 
 	public static boolean isAuthenticated() {
