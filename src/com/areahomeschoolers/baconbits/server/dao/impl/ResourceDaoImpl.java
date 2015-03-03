@@ -241,7 +241,8 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 		}
 
 		if (leastImpressions) {
-			sql += "order by r.impressions / datediff(now(), r.startDate) ";
+			// sql += "order by r.impressions / datediff(now(), r.startDate) ";
+			sql += "order by rand() ";
 		} else if (!Common.isNullOrBlank(nameLike)) {
 			sql += "order by levenshtein(r.name, ?) ";
 			sqlArgs.add(nameLike);
