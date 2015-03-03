@@ -30,8 +30,8 @@ public final class UserManagementPage implements Page {
 
 		args.setStatus(Status.ACTIVE);
 		final UserTable table = new UserTable(args);
-		table.setDisplayColumns(UserColumn.PICTURE, UserColumn.ACTIVITY, UserColumn.NAME, UserColumn.EMAIL, UserColumn.ADDED, UserColumn.STATUS,
-				UserColumn.NEWS, UserColumn.AGE);
+		table.setDisplayColumns(UserColumn.PICTURE, UserColumn.ACTIVITY, UserColumn.NAME, UserColumn.EMAIL, UserColumn.LOCATION, UserColumn.ADDED,
+				UserColumn.STATUS, UserColumn.NEWS, UserColumn.AGE);
 		table.setTitle(title);
 		table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.user(0)));
 		table.getTitleBar().addSearchControl();
