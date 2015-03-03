@@ -10,7 +10,9 @@ import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule.
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
+import com.areahomeschoolers.baconbits.client.event.FormToggleHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
@@ -19,6 +21,7 @@ import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
@@ -34,6 +37,8 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
@@ -132,6 +137,7 @@ public class ArticlePage implements Page {
 			form.initialize();
 
 			if (!article.isSaved()) {
+				Application.setConfirmNavigation(true);
 				String policy = Url.getParameter("gp");
 				if (!Common.isNullOrBlank(policy)) {
 					try {
@@ -141,6 +147,7 @@ public class ArticlePage implements Page {
 				}
 				form.configureForAdd(fieldTable);
 			} else {
+				Application.setConfirmNavigation(false);
 				form.emancipate();
 			}
 
@@ -234,7 +241,7 @@ public class ArticlePage implements Page {
 		dataDisplay.getElement().getStyle().setPadding(10, Unit.PX);
 		dataDisplay.setWidth("800px");
 		dataDisplay.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
-		FormField dataField = form.createFormField("", dataInput, dataDisplay);
+		final FormField dataField = form.createFormField("", dataInput, dataDisplay);
 		dataField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
@@ -248,6 +255,22 @@ public class ArticlePage implements Page {
 				dataDisplay.setHTML(article.getArticle());
 			}
 		});
+		dataField.addFormToggleHandler(new FormToggleHandler() {
+			@Override
+			public void onFormToggle(final boolean inputsAreVisible) {
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+					@Override
+					public void execute() {
+						if (dataField.getInputWidget().isVisible() == false) {
+							Application.setConfirmNavigation(false);
+						} else {
+							Application.setConfirmNavigation(true);
+						}
+					}
+				});
+			}
+		});
+
 		fieldTable.addSpanningWidget(dataField);
 
 		if (article.isSaved() && (article.hasDocuments() || Application.administratorOf(article))) {
@@ -259,7 +282,13 @@ public class ArticlePage implements Page {
 		Button cancelButton = new Button("Cancel", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				History.back();
+				ConfirmDialog.confirm("Are you sure you want to leave this page? Unsaved data will be lost.", new ConfirmHandler() {
+					@Override
+					public void onConfirm() {
+						History.back();
+						Application.setConfirmNavigation(false);
+					}
+				});
 			}
 		});
 
@@ -347,6 +376,8 @@ public class ArticlePage implements Page {
 	}
 
 	private void save(final FormField field) {
+		Application.setConfirmNavigation(false);
+
 		articleService.save(article, new Callback<Article>() {
 			@Override
 			protected void doOnSuccess(final Article a) {
