@@ -74,7 +74,7 @@ public final class UserListPage implements Page {
 
 		String title = "Homeschoolers";
 
-		table.setDisplayColumns(UserColumn.PICTURE, UserColumn.STATUS, UserColumn.NAME, UserColumn.EMAIL, UserColumn.INTERESTS);
+		table.setDisplayColumns(UserColumn.PICTURE, UserColumn.STATUS, UserColumn.NAME, UserColumn.LOCATION, UserColumn.EMAIL, UserColumn.INTERESTS);
 		table.addStyleName(ContentWidth.MAXWIDTH1100PX.toString());
 
 		CookieCrumb cc = new CookieCrumb();

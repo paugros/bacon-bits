@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.server.dao.impl;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -61,6 +64,9 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 import com.areahomeschoolers.baconbits.shared.dto.UserPageData;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import edu.vt.middleware.password.CharacterCharacteristicsRule;
 import edu.vt.middleware.password.CharacterRule;
@@ -832,6 +838,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				user.setStartDate(new Date());
 			}
 
+			// when adding your own user, look up and record location if not specified
+			if (!ServerContext.isAuthenticated()) {
+				addLocationInfo(user);
+			}
+
 			sql = "insert into users (email, firstName, lastName, passwordDigest, startDate, endDate, addedDate, homePhone, mobilePhone, ";
 			sql += "isSystemAdministrator, resetPassword, birthDate, parentId, sex, guid, ";
 			sql += "address, street, city, state, zip, lat, lng, payPalEmail, ";
@@ -1257,6 +1268,54 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			return validator.getMessages(result);
 		}
 		return new ArrayList<String>();
+	}
+
+	private void addLocationInfo(User u) {
+		try {
+			String stringData = ServerUtils.getUrlContents("http://ip-api.com/json/" + ServerContext.getRequest().getRemoteAddr());
+			JsonObject locationData = new JsonParser().parse(stringData).getAsJsonObject();
+			String status = ServerUtils.getStringFromJsonObject(locationData, "status");
+			if (status != null && status.equals("success")) {
+				String lat = ServerUtils.getStringFromJsonObject(locationData, "lat");
+				String lng = ServerUtils.getStringFromJsonObject(locationData, "lon");
+				u.setCity(ServerUtils.getStringFromJsonObject(locationData, "city"));
+				if (Common.isDouble(lat)) {
+					u.setLat(Double.parseDouble(lat));
+				}
+				if (Common.isDouble(lng)) {
+					u.setLng(Double.parseDouble(lng));
+				}
+				u.setState(ServerUtils.getStringFromJsonObject(locationData, "region"));
+				u.setZip(ServerUtils.getStringFromJsonObject(locationData, "zip"));
+
+				String address = "";
+				int partCount = 0;
+				if (!Common.isNullOrBlank(u.getCity())) {
+					address = u.getCity();
+					partCount++;
+				}
+
+				if (!Common.isNullOrBlank(u.getState())) {
+					if (partCount > 0) {
+						address += ", ";
+					}
+					address += u.getState();
+					partCount++;
+				}
+
+				if (!Common.isNullOrBlank(u.getZip())) {
+					if (partCount > 0) {
+						address += " ";
+					}
+					address += u.getZip();
+				}
+
+				u.setAddress(address);
+			}
+		} catch (IOException e) {
+			Logger logger = Logger.getLogger(this.getClass().toString());
+			logger.log(Level.WARNING, e.getMessage());
+		}
 	}
 
 	private void addToOrganization(int userId, UserGroup g) {

@@ -39,8 +39,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> {
 	public enum UserColumn implements EntityCellTableColumn<UserColumn> {
-		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), PHONE("Phone"), ADDED("Added"), STATUS("Status"), AGE("Age"), INTERESTS(
-				"Common interests"), ADMINISTRATOR("Administrator"), APPROVAL("Approval"), DELETE("Delete"), NEWS("News");
+		PICTURE(""), ACTIVITY("Last active"), NAME("Name"), EMAIL("Email"), SEX("Sex"), LOCATION("Location"), PHONE("Phone"), ADDED("Added"), STATUS("Status"), AGE(
+				"Age"), INTERESTS("Common interests"), ADMINISTRATOR("Administrator"), APPROVAL("Approval"), DELETE("Delete"), NEWS("News");
 
 		private String title;
 
@@ -114,6 +114,24 @@ public final class UserTable extends EntityCellTable<User, UserArg, UserColumn> 
 	protected void setColumns() {
 		for (UserColumn col : getDisplayColumns()) {
 			switch (col) {
+			case LOCATION:
+				addTextColumn(col, new ValueGetter<String, User>() {
+					@Override
+					public String get(User item) {
+						String text = "";
+						if (!Common.isNullOrBlank(item.getCity())) {
+							text += item.getCity();
+							if (!Common.isNullOrBlank(item.getState())) {
+								text += ", ";
+							}
+						}
+						if (!Common.isNullOrBlank(item.getState())) {
+							text += item.getState();
+						}
+						return text;
+					}
+				});
+				break;
 			case NEWS:
 				addTextColumn(col, new ValueGetter<String, User>() {
 					@Override
