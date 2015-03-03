@@ -112,13 +112,13 @@ public class NumericTextBox extends TextBox implements HasValidator {
 		return 0;
 	}
 
-	public Integer getInteger() {
+	public int getInteger() {
 		String value = getText();
 		if (Common.isInteger(value)) {
 			return Integer.parseInt(value);
 		}
 
-		return null;
+		return 0;
 	}
 
 	public double getMaximumValue() {
