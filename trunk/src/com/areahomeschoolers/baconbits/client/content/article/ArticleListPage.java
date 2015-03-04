@@ -82,12 +82,10 @@ public final class ArticleListPage implements Page {
 		}
 		page.add(cc);
 
-		if (Application.memberOf(33)) {
-			AddLink link = new AddLink("Add Article", PageUrl.article(0));
-			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
-			page.add(link);
-			page.setCellWidth(link, "1%");
-		}
+		AddLink link = new AddLink("Add Article", PageUrl.article(0));
+		link.getElement().getStyle().setMarginLeft(10, Unit.PX);
+		page.add(link);
+		page.setCellWidth(link, "1%");
 
 		createSearchBox();
 

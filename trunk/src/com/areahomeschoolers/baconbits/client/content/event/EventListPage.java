@@ -101,12 +101,10 @@ public final class EventListPage implements Page {
 		}
 		page.add(cc);
 
-		if (Application.isAuthenticated()) {
-			AddLink link = new AddLink("Add Event", PageUrl.event(0));
-			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
-			page.add(link);
-			page.setCellWidth(link, "1%");
-		}
+		AddLink link = new AddLink("Add Event", PageUrl.event(0));
+		link.getElement().getStyle().setMarginLeft(10, Unit.PX);
+		page.add(link);
+		page.setCellWidth(link, "1%");
 
 		createSearchBox();
 

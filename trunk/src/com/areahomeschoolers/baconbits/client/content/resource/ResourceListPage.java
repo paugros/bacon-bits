@@ -90,12 +90,10 @@ public final class ResourceListPage implements Page {
 		}
 		page.add(cc);
 
-		if (Application.isAuthenticated()) {
-			AddLink link = new AddLink("Add Resource", PageUrl.resource(0));
-			link.getElement().getStyle().setMarginLeft(10, Unit.PX);
-			page.add(link);
-			page.setCellWidth(link, "1%");
-		}
+		AddLink link = new AddLink("Add Resource", PageUrl.resource(0));
+		link.getElement().getStyle().setMarginLeft(10, Unit.PX);
+		page.add(link);
+		page.setCellWidth(link, "1%");
 
 		createSearchBox();
 
