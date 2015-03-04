@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.AddLink;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.LocationFilterInput;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
@@ -33,11 +34,14 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -158,8 +162,8 @@ public final class TagGroupPage implements Page {
 		vvp.add(searchBox);
 
 		// within miles
+		final LocationFilterInput locationInput = new LocationFilterInput();
 		if (!type.equals(TagType.ARTICLE)) {
-			final LocationFilterInput locationInput = new LocationFilterInput();
 			if (Application.hasLocation()) {
 				locationInput.setText(Application.getCurrentLocation());
 			}
@@ -190,6 +194,18 @@ public final class TagGroupPage implements Page {
 			}
 			vvp.add(bottom);
 		}
+
+		ClickLabel reset = new ClickLabel("Reset search", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (!type.equals(TagType.ARTICLE)) {
+					locationInput.clearLocation();
+				}
+				Application.reloadPage();
+			}
+		});
+		vvp.add(reset);
+		vvp.setCellHorizontalAlignment(reset, HasHorizontalAlignment.ALIGN_RIGHT);
 
 		page.add(new SearchSection(type, vvp));
 	}

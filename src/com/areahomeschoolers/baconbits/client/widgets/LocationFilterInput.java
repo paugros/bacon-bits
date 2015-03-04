@@ -10,13 +10,10 @@ import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.dom.client.Style.FontStyle;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -32,12 +29,11 @@ import com.google.maps.gwt.client.GeocoderStatus;
 
 public class LocationFilterInput extends Composite {
 	private TextBox locationInput = new TextBox();
-	private String lastLocationText;
+	private String lastLocationText = "";
 	private double lat;
 	private double lng;
 	private Command clearCommand;
 	private Command changeCommand;
-	private static final String defaultSearchText = "Address, city, or zip";
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private HorizontalPanel hp = new PaddedPanel();
 	private DefaultListBox stateInput = new DefaultListBox();
@@ -57,17 +53,7 @@ public class LocationFilterInput extends Composite {
 		});
 
 		locationInput.setVisibleLength(30);
-
-		locationInput.addFocusHandler(new FocusHandler() {
-			@Override
-			public void onFocus(FocusEvent event) {
-				if (!locationInput.getText().equals(defaultSearchText)) {
-					return;
-				}
-				locationInput.setText("");
-				setNormalStyle();
-			}
-		});
+		locationInput.getElement().setAttribute("placeholder", "Address, city, or zip");
 
 		reset();
 
@@ -83,22 +69,16 @@ public class LocationFilterInput extends Composite {
 		locationInput.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
-				if (lastLocationText != null && lastLocationText.equals(locationInput.getText())) {
+				if (lastLocationText.equals(locationInput.getText())) {
 					return;
 				}
 
 				if (locationInput.getText().isEmpty()) {
-					updateLocation(null, 0, 0, 0);
+					updateLocation("", 0, 0, 0);
 					reset();
-
-					if (lastLocationText == null) {
-						return;
-					}
 
 					clearCommand.execute();
 				}
-
-				lastLocationText = locationInput.getText();
 
 				GoogleMapWidget.runMapsCommand(new Command() {
 					@Override
@@ -151,7 +131,7 @@ public class LocationFilterInput extends Composite {
 	}
 
 	public void clearLocation() {
-		updateLocation(null, 0, 0, 0);
+		updateLocation("", 0, 0, 0);
 	}
 
 	public double getLat() {
@@ -190,7 +170,6 @@ public class LocationFilterInput extends Composite {
 	}
 
 	public void setText(String text) {
-		setNormalStyle();
 		locationInput.setText(text);
 		lastLocationText = text;
 	}
@@ -199,20 +178,12 @@ public class LocationFilterInput extends Composite {
 		if (!locationInput.getText().isEmpty()) {
 			return;
 		}
-		locationInput.setText(defaultSearchText);
-		locationInput.getElement().getStyle().setColor("#666666");
-		locationInput.getElement().getStyle().setFontStyle(FontStyle.ITALIC);
-	}
-
-	private void setNormalStyle() {
-		locationInput.getElement().getStyle().setColor("#000000");
-		locationInput.getElement().getStyle().setFontStyle(FontStyle.NORMAL);
+		locationInput.setText("");
 	}
 
 	private void updateEnabled() {
 		String loc = Application.getCurrentLocation();
 		if (!Common.isNullOrBlank(loc) && Application.getCurrentLat() == 0 && loc.length() == 2) {
-			locationInput.setText("");
 			locationInput.setEnabled(false);
 			milesInput.setEnabled(false);
 			lastLocationText = "";
@@ -226,6 +197,7 @@ public class LocationFilterInput extends Composite {
 
 	private void updateLocation(String location, double lat, double lng, int radius) {
 		ApplicationData ad = Application.getApplicationData();
+		lastLocationText = location;
 		locationInput.setText(location);
 		ad.setCurrentLocation(location);
 		ad.setCurrentLat(lat);

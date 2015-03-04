@@ -181,6 +181,7 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 		location = "";
 		try {
 			// System.out.println("Looking up location...");
+			// String stringData = ServerUtils.getUrlContents("http://ip-api.com/json/216.204.1.1");
 			String stringData = ServerUtils.getUrlContents("http://ip-api.com/json/" + ServerContext.getRequest().getRemoteAddr());
 			JsonObject locationData = new JsonParser().parse(stringData).getAsJsonObject();
 			String status = ServerUtils.getStringFromJsonObject(locationData, "status");
