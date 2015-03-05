@@ -6,18 +6,18 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class ResourcePageData implements IsSerializable {
 	private Resource resource;
-	private ArrayList<Data> addressScopes;
+	private ArrayList<Data> owners;
 
-	public ArrayList<Data> getAddressScopes() {
-		return addressScopes;
+	public ArrayList<Data> getOwners() {
+		return owners;
 	}
 
 	public Resource getResource() {
 		return resource;
 	}
 
-	public void setAddressScopes(ArrayList<Data> addressScopes) {
-		this.addressScopes = addressScopes;
+	public void setOwners(ArrayList<Data> owners) {
+		this.owners = owners;
 	}
 
 	public void setResource(Resource resource) {

@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.resource;
 
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ResourceServiceAsync;
@@ -58,7 +59,10 @@ public class AdTile extends Composite {
 		SimplePanel sp = new SimplePanel();
 		sp.getElement().getStyle().setHeight(200, Unit.PX);
 		sp.getElement().getStyle().setWidth(200, Unit.PX);
-		Image image = new Image(ClientUtils.createDocumentUrl(ad.getImageId(), ad.getImageExtension()));
+		Image image = new Image(MainImageBundle.INSTANCE.defaultLarge());
+		if (ad.getImageId() != null) {
+			image = new Image(ClientUtils.createDocumentUrl(ad.getImageId(), ad.getImageExtension()));
+		}
 
 		sp.setWidget(image);
 		vp.add(sp);

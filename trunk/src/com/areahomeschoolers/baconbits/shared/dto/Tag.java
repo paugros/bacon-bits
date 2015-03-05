@@ -6,7 +6,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 
 public class Tag extends EntityDto<Tag> {
 	public enum TagType {
-		USER("#ffff77"), ARTICLE("#d2d6ec"), EVENT("#a2d69e"), BOOK("#ffcc6f"), RESOURCE("#a4d7f2");
+		USER("#ffff77"), ARTICLE("#d2d6ec"), EVENT("#a2d69e"), BOOK("#ffcc6f"), RESOURCE("#bae0f5");
 		// USER("#e4ed81"), ARTICLE("#eca575"), EVENT("#80c87d"), BOOK("#f28e76"), RESOURCE("#92ceef");
 
 		private String color;
@@ -47,7 +47,7 @@ public class Tag extends EntityDto<Tag> {
 
 		public String getName() {
 			if (TagType.this.equals(USER)) {
-				return "Homeschoolers";
+				return "Community";
 			}
 			return Common.ucWords(this.toString()) + "s";
 		}

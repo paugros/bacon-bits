@@ -78,7 +78,7 @@ public final class MainMenu extends MenuBar {
 		}
 
 		if (Application.isAuthenticated() && !ClientUtils.isMobileBrowser()) {
-			addLinkToMenu(this, "Homeschoolers", PageUrl.tagGroup(TagType.USER.toString()));
+			addLinkToMenu(this, "Community", PageUrl.tagGroup(TagType.USER.toString()));
 		}
 
 		if (Application.administratorOfCurrentOrg() || Application.administratorOf(17)) {

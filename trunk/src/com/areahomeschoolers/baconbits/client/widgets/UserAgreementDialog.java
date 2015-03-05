@@ -83,7 +83,7 @@ public class UserAgreementDialog extends DefaultDialog {
 				userService.save(u, new Callback<ServerResponseData<User>>() {
 					@Override
 					protected void doOnSuccess(ServerResponseData<User> result) {
-						HistoryToken.set(PageUrl.user(Application.getCurrentUserId()) + "&tab=7&gb=true");
+						HistoryToken.set(PageUrl.user(Application.getCurrentUserId()) + "&tab=7&gb=true&details=true");
 					}
 				});
 

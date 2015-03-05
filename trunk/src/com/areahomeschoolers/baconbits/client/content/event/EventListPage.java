@@ -171,7 +171,17 @@ public final class EventListPage implements Page {
 
 			// text
 			String eventDescription = new HTML(e.getDescription()).getText().toLowerCase();
-			textMatch = text.isEmpty() || e.getTitle().toLowerCase().contains(text) || eventDescription.contains(text);
+			if (text.isEmpty()) {
+				textMatch = true;
+			} else if (e.getTitle().toLowerCase().contains(text)) {
+				textMatch = true;
+			} else if (eventDescription.contains(text)) {
+				textMatch = true;
+			} else if (e.getAddress() != null && e.getAddress().contains(text)) {
+				textMatch = true;
+			} else if (e.getTags().contains(text)) {
+				textMatch = true;
+			}
 
 			// age
 			String rangeText = e.getAgeRanges();

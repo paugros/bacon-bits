@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.HistoryEntry;
 import com.areahomeschoolers.baconbits.shared.dto.MainMenuItem;
@@ -46,6 +47,8 @@ public interface UserDao {
 
 	public User getUserByUsername(String username);
 
+	public ArrayList<Data> linkResource(User user, int resourceId);
+
 	public ArrayList<User> list(ArgMap<UserArg> args);
 
 	public ArrayList<UserGroup> listGroups(ArgMap<UserGroupArg> args);
@@ -69,6 +72,8 @@ public interface UserDao {
 	public void setCurrentLocation(String location, double lat, double lng, int radius);
 
 	public User setPasswordFromDigest(int id, String digest);
+
+	public void unLinkResource(User user, int resourceId);
 
 	@PreAuthorize("hasRole('ORGANIZATION_ADMINISTRATORS')")
 	public void updateMenuOrdinals(ArrayList<MainMenuItem> items);

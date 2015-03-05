@@ -160,7 +160,7 @@ public final class Layout {
 		searchPanel.addDomHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				final SearchBox searchBox = new SearchBox();
+				final HeaderSearchBox searchBox = new HeaderSearchBox();
 
 				rightPanel.insert(searchBox, rightPanel.getWidgetIndex(searchPanel));
 				searchPanel.removeFromParent();

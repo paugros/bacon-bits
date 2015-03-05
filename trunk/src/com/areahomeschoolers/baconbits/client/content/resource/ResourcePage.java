@@ -46,6 +46,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ResourcePageData;
@@ -92,7 +93,7 @@ public class ResourcePage implements Page {
 	private VerticalPanel page;
 	private FieldTable ft = new FieldTable();
 	private Resource resource = new Resource();
-	// private ResourcePageData pd;
+	private ResourcePageData pd;
 	private ResourceServiceAsync resourceService = (ResourceServiceAsync) ServiceCache.getService(ResourceService.class);
 	private TagSection tagSection;
 	private FormField tagField;
@@ -111,6 +112,7 @@ public class ResourcePage implements Page {
 		resourceService.getPageData(resourceId, new Callback<ResourcePageData>() {
 			@Override
 			protected void doOnSuccess(ResourcePageData result) {
+				pd = result;
 				if (result == null) {
 					new ErrorPage(PageError.PAGE_NOT_FOUND);
 					return;
@@ -118,7 +120,7 @@ public class ResourcePage implements Page {
 
 				resource = result.getResource();
 
-				if (Url.getBooleanParameter("details") && !Application.administratorOf(resource)) {
+				if (Url.getBooleanParameter("details") && !allowEdit()) {
 					new ErrorPage(PageError.NOT_AUTHORIZED);
 					return;
 				}
@@ -148,7 +150,21 @@ public class ResourcePage implements Page {
 	}
 
 	private boolean allowEdit() {
-		return Application.isAuthenticated();
+		if (!resource.isSaved()) {
+			return true;
+		}
+
+		if (Application.administratorOf(resource)) {
+			return true;
+		}
+
+		for (Data d : pd.getOwners()) {
+			if (d.getId() == Application.getCurrentUserId()) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private void createDetailsPage() {
@@ -526,13 +542,13 @@ public class ResourcePage implements Page {
 		}
 
 		if (resource.isSaved() && resource.getShowInAds()) {
-			String clicks = "None";
+			ft.addField("Views:", Integer.toString(resource.getViewCount()));
+			ft.addField("Impressions:", Integer.toString(resource.getImpressions()));
+			String clicks = "0";
 			if (resource.getClickCount() > 0) {
 				clicks = resource.getClickCount() + " (last " + Formatter.formatDateTime(resource.getLastClickDate()) + ")";
 			}
 			ft.addField("Clicks:", clicks);
-
-			ft.addField("Impressions:", Integer.toString(resource.getImpressions()));
 		}
 
 		if (Application.isSystemAdministrator()) {
@@ -573,30 +589,6 @@ public class ResourcePage implements Page {
 			ft.addField(endDateField);
 		}
 
-		// if (Application.isSystemAdministrator()) {
-		// final Label scopeDisplay = new Label();
-		// final DefaultListBox scopeInput = new DefaultListBox();
-		// scopeInput.addItem("N/A", 0);
-		// for (Data d : pd.getAddressScopes()) {
-		// scopeInput.addItem(d.get("scope"), d.getId());
-		// }
-		// FormField scopeField = form.createFormField("Address scope:", scopeInput, scopeDisplay);
-		// scopeField.setInitializer(new Command() {
-		// @Override
-		// public void execute() {
-		// scopeDisplay.setText(Common.getDefaultIfNull(resource.getAddressScope(), "N/A"));
-		// scopeInput.setValue(resource.getAddressScopeId());
-		// }
-		// });
-		// scopeField.setDtoUpdater(new Command() {
-		// @Override
-		// public void execute() {
-		// resource.setAddressScopeId(scopeInput.getIntValue());
-		// }
-		// });
-		// ft.addField(scopeField);
-		// }
-
 		final HTML descriptionDisplay = new HTML();
 		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
 		final FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
@@ -634,9 +626,8 @@ public class ResourcePage implements Page {
 		});
 		ft.addSpanningWidget(descriptionField);
 
-		if (resource.isSaved() && Application.administratorOf(resource)) {
+		if (resource.isSaved()) {
 			ft.addField("Added by:", new DefaultHyperlink(resource.getAddedByFullName(), PageUrl.user(resource.getAddedById())));
-			ft.addField("View count:", Integer.toString(resource.getViewCount()));
 		}
 
 		if (resource.isSaved()) {
@@ -749,6 +740,18 @@ public class ResourcePage implements Page {
 			contactInfo.setHTML(text);
 
 			vp.add(contactInfo);
+		}
+
+		if (resource.getShowInAds() && allowEdit()) {
+			String stats = "<table style=\"color: #666666; margin-top: 25px\" width=150>";
+			stats += "<tr><td>Views</td><td>" + Integer.toString(resource.getViewCount()) + "</td></tr>";
+			stats += "<tr><td>Impressions</td><td>" + Integer.toString(resource.getImpressions()) + "</td></tr>";
+			String clicks = "0";
+			if (resource.getClickCount() > 0) {
+				clicks = resource.getClickCount() + " (last " + Formatter.formatDateTime(resource.getLastClickDate()) + ")";
+			}
+			stats += "<tr><td>Clicks</td><td>" + clicks + "</td></tr></table>";
+			vp.add(new HTML(stats));
 		}
 
 		pp.add(vp);

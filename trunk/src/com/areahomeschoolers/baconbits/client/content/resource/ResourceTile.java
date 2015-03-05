@@ -4,8 +4,10 @@ import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -15,7 +17,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -83,6 +84,10 @@ public class ResourceTile extends Composite {
 		hp.setCellHorizontalAlignment(h, HasHorizontalAlignment.ALIGN_LEFT);
 
 		VerticalPanel vp = new VerticalPanel();
+		if (item.getShowInAds()) {
+			vp.getElement().getStyle().setBackgroundColor(TagType.RESOURCE.getColor());
+			vp.getElement().getStyle().setOpacity(1.0);
+		}
 		vp.addStyleName("itemTile");
 		vp.add(hp);
 		String tags = item.getTags() == null ? "No tags" : item.getTags();

@@ -241,6 +241,9 @@ public class ReviewSection extends Composite {
 					name += " (" + r.getAddedByFullName() + ")";
 				}
 			}
+			if (r.getAddedByOwner()) {
+				name += " (Verified Owner)";
+			}
 			Label heading = new Label("By " + name + " on " + Formatter.formatDate(r.getAddedDate(), "MMMM d, yyyy"));
 
 			vp.add(heading);

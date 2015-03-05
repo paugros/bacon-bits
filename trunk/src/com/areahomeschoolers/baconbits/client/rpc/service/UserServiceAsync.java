@@ -6,6 +6,7 @@ import java.util.HashMap;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.HistoryEntry;
@@ -60,4 +61,8 @@ public interface UserServiceAsync {
 	public void updateUserGroupRelation(User u, UserGroup g, boolean add, AsyncCallback<Void> callback);
 
 	public void validatePassword(String password, AsyncCallback<ServerResponseData<String>> callback);
+
+	void linkResource(User user, int resourceId, AsyncCallback<ArrayList<Data>> callback);
+
+	void unLinkResource(User user, int resourceId, AsyncCallback<Void> callback);
 }

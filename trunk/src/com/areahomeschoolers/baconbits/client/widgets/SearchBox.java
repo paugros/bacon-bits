@@ -1,10 +1,12 @@
-package com.areahomeschoolers.baconbits.client.content;
+package com.areahomeschoolers.baconbits.client.widgets;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
-import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
-import com.areahomeschoolers.baconbits.client.widgets.ServerSuggestOracle;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
+import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -16,7 +18,6 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -29,24 +30,22 @@ import com.google.gwt.user.client.ui.ValueBoxBase;
 public final class SearchBox extends Composite {
 	private final SuggestBox searchSuggestBox;
 	private HtmlSuggestion currentSuggestion;
-	private TextBox textBox;
-	private Command selectionHandler;
+	private TextBox textBox = new TextBox();
+	private ParameterHandler<HtmlSuggestion> selectionHandler;
 
-	public SearchBox() {
+	public SearchBox(ParameterHandler<HtmlSuggestion> onSelection, EnumSet<TagType> types) {
+		selectionHandler = onSelection;
 		HorizontalPanel hPanel = new HorizontalPanel();
 		initWidget(hPanel);
 		hPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		hPanel.setSpacing(4);
 
-		List<String> types = new ArrayList<String>();
-		types.add("User");
-		types.add("Event");
-		types.add("Article");
-		types.add("Book");
-		types.add("Resource");
-		final ServerSuggestOracle oracle = new ServerSuggestOracle(types);
+		List<String> stringTypes = new ArrayList<>();
+		for (TagType type : types) {
+			stringTypes.add(Common.ucWords(type.toString()));
+		}
+		final ServerSuggestOracle oracle = new ServerSuggestOracle(stringTypes);
 
-		textBox = new TextBox();
 		textBox.setVisibleLength(20);
 		searchSuggestBox = new SuggestBox(oracle, textBox);
 		textBox.setStyleName("searchBox");
@@ -54,8 +53,8 @@ public final class SearchBox extends Composite {
 
 		searchSuggestBox.setAutoSelectEnabled(false);
 
-		final ValueBoxBase<String> textBox = searchSuggestBox.getValueBox();
-		textBox.addFocusHandler(new FocusHandler() {
+		final ValueBoxBase<String> valueBox = searchSuggestBox.getValueBox();
+		valueBox.addFocusHandler(new FocusHandler() {
 			@Override
 			public void onFocus(FocusEvent event) {
 				currentSuggestion = null;
@@ -64,14 +63,14 @@ public final class SearchBox extends Composite {
 		searchSuggestBox.addSelectionHandler(new SelectionHandler<Suggestion>() {
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {
-				textBox.setFocus(true);
+				valueBox.setFocus(true);
 				HtmlSuggestion suggestion = (HtmlSuggestion) event.getSelectedItem();
 				currentSuggestion = suggestion;
-				loadEntityViewPage(suggestion);
+				selectionHandler.execute(suggestion);
 			}
 		});
 
-		textBox.addKeyDownHandler(new KeyDownHandler() {
+		valueBox.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				switch (event.getNativeKeyCode()) {
@@ -80,7 +79,7 @@ public final class SearchBox extends Composite {
 						@Override
 						public void execute() {
 							if (currentSuggestion != null) {
-								loadEntityViewPage(currentSuggestion);
+								selectionHandler.execute(currentSuggestion);
 							}
 						}
 					});
@@ -107,8 +106,8 @@ public final class SearchBox extends Composite {
 		textBox.setFocus(focus);
 	}
 
-	public void setSelectionHandler(Command selectionHandler) {
-		this.selectionHandler = selectionHandler;
+	public void setSelectionHandler(ParameterHandler<HtmlSuggestion> handler) {
+		selectionHandler = handler;
 	}
 
 	private void hideSuggestions() {
@@ -116,13 +115,4 @@ public final class SearchBox extends Composite {
 		display.hideSuggestions();
 	}
 
-	private void loadEntityViewPage(HtmlSuggestion suggestion) {
-		if (selectionHandler != null) {
-			selectionHandler.execute();
-		}
-		String entityType = suggestion.getEntityType();
-
-		String url = "page=" + entityType + "&" + entityType.substring(0, 1).toLowerCase() + entityType.substring(1) + "Id=" + suggestion.getEntityId();
-		History.newItem(url);
-	}
 }
