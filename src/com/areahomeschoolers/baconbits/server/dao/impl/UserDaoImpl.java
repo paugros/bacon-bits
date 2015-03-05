@@ -416,6 +416,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			args.put(TagArg.TYPE, TagType.USER.toString());
 			pd.setInterests(tagDao.list(args));
 
+			pd.setResources(getResources(pd.getUser()));
+
 			if (pd.getUser() == null) {
 				return null;
 			}
@@ -502,6 +504,18 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		return user;
+	}
+
+	@Override
+	public ArrayList<Data> linkResource(User user, int resourceId) {
+		String sql = "";
+		try {
+			sql = "insert into resourceUserMapping(resourceId, userId) values(?, ?)";
+			update(sql, resourceId, user.getId());
+		} catch (Exception e) {
+		}
+
+		return getResources(user);
 	}
 
 	@Override
@@ -1076,6 +1090,12 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 	}
 
 	@Override
+	public void unLinkResource(User user, int resourceId) {
+		String sql = "delete from resourceUserMapping where userId = ? and resourceId = ?";
+		update(sql, user.getId(), resourceId);
+	}
+
+	@Override
 	public void updateMenuOrdinals(ArrayList<MainMenuItem> items) {
 		for (MainMenuItem item : items) {
 			String sql = "update menuItems set ordinal = " + item.getOrdinal() + " where id = " + item.getId();
@@ -1524,6 +1544,15 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		args.put(UserArg.ADMIN_OF_GROUP_ID, g.getId());
 
 		return list(args);
+	}
+
+	private ArrayList<Data> getResources(User user) {
+		String sql = "select r.id, r.name \n";
+		sql += "from resources r \n";
+		sql += "join resourceUserMapping rm on rm.resourceId = r.id \n";
+		sql += "where rm.userId = ? order by r.name";
+
+		return query(sql, ServerUtils.getGenericRowMapper(), user.getId());
 	}
 
 }

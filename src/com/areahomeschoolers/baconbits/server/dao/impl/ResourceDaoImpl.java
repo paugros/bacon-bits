@@ -146,6 +146,12 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 				update("update resources set viewCount = viewCount + 1 where id = ?", resourceId);
 			}
 			pd.setResource(getById(resourceId));
+
+			String sql = "select u.id, concat(u.firstName, ' ', u.lastName) as name \n";
+			sql += "from users u \n";
+			sql += "join resourceUserMapping rm on rm.userId = u.id \n";
+			sql += "where rm.resourceId = ?";
+			pd.setOwners(query(sql, ServerUtils.getGenericRowMapper(), resourceId));
 		} else {
 			pd.setResource(new Resource());
 		}

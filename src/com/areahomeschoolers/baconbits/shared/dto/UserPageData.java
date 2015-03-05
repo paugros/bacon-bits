@@ -8,6 +8,7 @@ public class UserPageData implements IsSerializable {
 	private User user;
 	private ArrayList<Tag> interests;
 	private int firstBirthYear;
+	private ArrayList<Data> resources;
 
 	public UserPageData() {
 
@@ -21,6 +22,10 @@ public class UserPageData implements IsSerializable {
 		return interests;
 	}
 
+	public ArrayList<Data> getResources() {
+		return resources;
+	}
+
 	public User getUser() {
 		return user;
 	}
@@ -31,6 +36,10 @@ public class UserPageData implements IsSerializable {
 
 	public void setInterests(ArrayList<Tag> interests) {
 		this.interests = interests;
+	}
+
+	public void setResources(ArrayList<Data> resources) {
+		this.resources = resources;
 	}
 
 	public void setUser(User user) {

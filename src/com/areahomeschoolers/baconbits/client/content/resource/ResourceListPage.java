@@ -139,7 +139,16 @@ public final class ResourceListPage implements Page {
 
 		for (Resource r : resources) {
 			String descriptionText = new HTML(r.getDescription()).getText().toLowerCase();
-			boolean visible = r.getName().toLowerCase().contains(text) || descriptionText.contains(text);
+			boolean visible = false;
+			if (r.getName().toLowerCase().contains(text)) {
+				visible = true;
+			} else if (descriptionText.contains(text)) {
+				visible = true;
+			} else if (r.getAddress() != null && r.getAddress().contains(text)) {
+				visible = true;
+			} else if (r.getTags().contains(text)) {
+				visible = true;
+			}
 			if (viewMode == ViewMode.GRID) {
 				fp.setVisible(r, visible);
 			} else {

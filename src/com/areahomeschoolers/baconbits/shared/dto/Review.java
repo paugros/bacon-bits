@@ -28,6 +28,7 @@ public final class Review extends EntityDto<Review> {
 	// aux
 	private String addedByFullName;
 	private int entityId;
+	private boolean addedByOwner;
 
 	public String getAddedByFullName() {
 		return addedByFullName;
@@ -76,8 +77,16 @@ public final class Review extends EntityDto<Review> {
 		return userId;
 	}
 
+	public boolean getAddedByOwner() {
+		return addedByOwner;
+	}
+
 	public void setAddedByFullName(String addedByFullName) {
 		this.addedByFullName = addedByFullName;
+	}
+
+	public void setAddedByOwner(boolean addedByOwner) {
+		this.addedByOwner = addedByOwner;
 	}
 
 	public void setAddedDate(Date addedDate) {

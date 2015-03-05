@@ -43,6 +43,9 @@ public class ReviewDaoImpl extends SpringWrapper implements ReviewDao {
 			resource.setAnonymous(rs.getBoolean("anonymous"));
 			String safeHtml = new SafeHtmlBuilder().appendEscaped(rs.getString("review")).toSafeHtml().asString();
 			resource.setReview(Common.makeUrlsClickable(safeHtml).replaceAll("\\\n", "<br/>"));
+			if (rs.getInt("owner") > 0) {
+				resource.setAddedByOwner(true);
+			}
 
 			return resource;
 		}
@@ -62,7 +65,7 @@ public class ReviewDaoImpl extends SpringWrapper implements ReviewDao {
 
 		List<Object> sqlArgs = new ArrayList<>();
 
-		String sql = "select r.*, concat(u.firstName, ' ', u.lastName) as addedByFullName \n";
+		String sql = "select r.*, ru.id as owner, concat(u.firstName, ' ', u.lastName) as addedByFullName \n";
 		sql += "from reviews r \n";
 		sql += "join users u on u.id = r.userId \n";
 		if (mappingType != null) {
@@ -71,6 +74,7 @@ public class ReviewDaoImpl extends SpringWrapper implements ReviewDao {
 				sql += "and rm." + mappingType.toString().toLowerCase() + "Id = ? \n";
 				sqlArgs.add(entityId);
 			}
+			sql += "left join resourceUserMapping ru on ru.resourceId = rm.resourceId and ru.userId = r.userId \n";
 		}
 		sql += "where 1 = 1 ";
 
@@ -119,7 +123,10 @@ public class ReviewDaoImpl extends SpringWrapper implements ReviewDao {
 			update(sql, review.getId(), review.getEntityId());
 		}
 
-		return list(new ArgMap<ReviewArg>(ReviewArg.ID, review.getId())).get(0);
+		ArgMap<ReviewArg> args = new ArgMap<ReviewArg>(ReviewArg.ID, review.getId());
+		args.put(ReviewArg.ENTITY_ID, review.getEntityId());
+		args.put(ReviewArg.TYPE, ReviewType.RESOURCE.toString());
+		return list(args).get(0);
 	}
 
 }

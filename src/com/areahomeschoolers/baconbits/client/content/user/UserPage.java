@@ -1,6 +1,7 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,7 +27,9 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.content.user.UserTable.UserColumn;
+import com.areahomeschoolers.baconbits.client.event.ConfirmHandler;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
+import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -43,6 +46,7 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.CalendarPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.CookieCrumb;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.EditableImage;
@@ -50,7 +54,9 @@ import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.FixedWidthLabel;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
+import com.areahomeschoolers.baconbits.client.widgets.SearchBox;
 import com.areahomeschoolers.baconbits.client.widgets.ServerResponseDialog;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
@@ -64,6 +70,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Book;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
@@ -94,6 +101,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -243,26 +251,29 @@ public class UserPage implements Page {
 					hp.setCellWidth(image, "220px");
 
 					tabBody.add(WidgetFactory.newSection("", hp, ContentWidth.MAXWIDTH1100PX));
-					// interests
-					// if (!pageData.getInterests().isEmpty() || canEditUser(user)) {
-					// VerticalPanel tp = new VerticalPanel();
-					// Label heading = new Label("Interests");
-					// heading.addStyleName("hugeText");
-					// tp.add(heading);
-					// String txt =
-					// "Interests can be anything: hobbies, academic topics, religions, curriculum publishers, teaching styles, recreational activities, sports, or whatever else. ";
-					// txt +=
-					// "We'll use these interests to help you find other homeschoolers with similar interests, and to show you events, articles and books relating to your interests. ";
-					// txt += "The most useful interests are neither too general nor too specific.";
-					// Label sub = new Label(txt);
-					// sub.getElement().getStyle().setColor("#666666");
-					// if (viewingSelf()) {
-					// tp.add(sub);
-					// }
-					// tp.setWidth("600px");
-					//
-					// tabBody.add(tp);
-					// }
+
+					if (Application.isSystemAdministrator()) {
+						VerticalPanel rp = new VerticalPanel();
+						rp.setSpacing(5);
+						final FlexTable ft = new FlexTable();
+						SearchBox sb = new SearchBox(new ParameterHandler<HtmlSuggestion>() {
+							@Override
+							public void execute(HtmlSuggestion item) {
+								userService.linkResource(user, item.getEntityId(), new Callback<ArrayList<Data>>() {
+									@Override
+									protected void doOnSuccess(ArrayList<Data> result) {
+										pageData.setResources(result);
+										populateUserResources(ft);
+									}
+								});
+							}
+						}, EnumSet.of(TagType.RESOURCE));
+
+						rp.add(sb);
+						rp.add(ft);
+						populateUserResources(ft);
+						fieldTable.addField("Owned resources:", rp);
+					}
 
 					createTagSection();
 					fieldTable.addField(tagField);
@@ -788,6 +799,38 @@ public class UserPage implements Page {
 		privacyPreferenceWidgets.add(w);
 
 		return w;
+	}
+
+	private void populateUserResources(final FlexTable ft) {
+		ft.removeAllRows();
+
+		for (int i = 0; i < pageData.getResources().size(); i++) {
+			final Data d = pageData.getResources().get(i);
+			Hyperlink link = new Hyperlink(d.get("name"), PageUrl.resource(d.getId()));
+			link.getElement().getStyle().setMarginRight(25, Unit.PX);
+			ft.setWidget(i, 0, link);
+
+			ClickLabel cl = new ClickLabel("X", new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					ConfirmDialog.confirm("Remove " + user.getFullName() + " as an owner of " + d.get("name") + "?", new ConfirmHandler() {
+						@Override
+						public void onConfirm() {
+							pageData.getResources().remove(d);
+							populateUserResources(ft);
+							userService.unLinkResource(user, d.getId(), new Callback<Void>(false) {
+								@Override
+								protected void doOnSuccess(Void result) {
+
+								}
+							});
+						}
+					});
+				}
+			});
+
+			ft.setWidget(i, 1, cl);
+		}
 	}
 
 	private void printLabels(List<Book> books) {

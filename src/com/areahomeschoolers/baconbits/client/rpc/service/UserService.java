@@ -6,6 +6,7 @@ import java.util.HashMap;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.HistoryEntry;
@@ -40,6 +41,8 @@ public interface UserService extends RemoteService {
 
 	public User getUserByUsername(String username);
 
+	public ArrayList<Data> linkResource(User user, int resourceId);
+
 	public ArrayList<User> list(ArgMap<UserArg> args);
 
 	public ArrayList<UserGroup> listGroups(ArgMap<UserGroupArg> args);
@@ -59,6 +62,8 @@ public interface UserService extends RemoteService {
 	public void setCurrentLocation(String location, double lat, double lng, int radius);
 
 	public void switchToUser(int userId);
+
+	public void unLinkResource(User user, int resourceId);
 
 	public void updateMenuOrdinals(ArrayList<MainMenuItem> items);
 

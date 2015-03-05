@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Email;
 import com.areahomeschoolers.baconbits.shared.dto.GroupData;
 import com.areahomeschoolers.baconbits.shared.dto.HistoryEntry;
@@ -74,6 +75,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 	@Override
 	public User getUserByUsername(String username) {
 		return dao.getUserByUsername(username);
+	}
+
+	@Override
+	public ArrayList<Data> linkResource(User user, int resourceId) {
+		return dao.linkResource(user, resourceId);
 	}
 
 	@Override
@@ -156,6 +162,11 @@ public class UserServiceImpl extends GwtController implements UserService {
 	@Override
 	public void switchToUser(int userId) {
 		ServerContext.switchToUser(userId);
+	}
+
+	@Override
+	public void unLinkResource(User user, int resourceId) {
+		dao.unLinkResource(user, resourceId);
 	}
 
 	@Override
