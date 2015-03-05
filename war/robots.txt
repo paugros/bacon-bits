@@ -1,4 +1,3 @@
-# go away
 User-agent: *
-Disallow: 
+Disallow: /*_escaped_fragment_=page=User*
 Sitemap: http://www.myhomeschoolgroups.com/sitemap.xml
