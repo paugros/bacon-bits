@@ -1,3 +1,3 @@
 User-agent: *
-Disallow: /*_escaped_fragment_=page=User*
+Disallow: /*_escaped_fragment_=page%3DUser*
 Sitemap: http://www.myhomeschoolgroups.com/sitemap.xml
