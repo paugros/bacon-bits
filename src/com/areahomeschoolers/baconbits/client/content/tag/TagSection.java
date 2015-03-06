@@ -14,6 +14,7 @@ import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagService;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
+import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.validation.HasValidator;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
@@ -250,7 +251,7 @@ public class TagSection extends Composite implements HasValidator {
 		suggestBox.setClearOnFocus(true);
 		suggestBox.setAutoSelectEnabled(false);
 
-		fp.setWidth("600px");
+		fp.addStyleName(ContentWidth.MAXWIDTH600PX.toString());
 		vp.setSpacing(8);
 
 		add.addClickHandler(new ClickHandler() {

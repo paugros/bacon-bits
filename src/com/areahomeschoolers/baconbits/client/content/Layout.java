@@ -203,6 +203,9 @@ public final class Layout {
 		if (Application.isAuthenticated()) {
 			final DropDownMenu dm = new DropDownMenu(Application.getCurrentUser().getFirstName());
 			dm.addItem("My Profile", PageUrl.user(Application.getCurrentUserId()));
+			if (Application.getCurrentUser().memberOfAny(Constants.ONLINE_BOOK_SELLERS_GROUP_ID, Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID)) {
+				dm.addItem("My Books", PageUrl.user(Application.getCurrentUserId()) + "&details=true&tab=4");
+			}
 			dm.addItem("Log out", new Command() {
 				@Override
 				public void execute() {
