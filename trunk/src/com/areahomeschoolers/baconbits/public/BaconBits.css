@@ -215,6 +215,11 @@ img {
 	border-right: none;
 }
 
+.MAXWIDTH600PX {
+	width: 100%;
+	max-width: 600px;
+}
+
 .MAXWIDTH800PX {
 	width: 100%;
 	max-width: 800px;

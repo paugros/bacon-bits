@@ -918,10 +918,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setAddedById(ServerContext.getCurrentUserId());
 			event.setOwningOrgId(ServerContext.getCurrentOrgId());
 
-			if (event.getCloneFromId() > 0) {
-				event.setTitle(event.getTitle() + " (1)");
-			}
-
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
 			sql += "markupOverride, markupPercent, markupDollars, facilityName, directoryPriority, contactName, contactEmail, priceNotApplicable, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, notificationEmail, owningOrgId, ";

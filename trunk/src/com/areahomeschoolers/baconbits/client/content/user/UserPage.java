@@ -461,7 +461,7 @@ public class UserPage implements Page {
 						args.put(BookArg.USER_ID, user.getId());
 
 						final BookTable table = new BookTable(args);
-						table.addColumn(BookColumn.ADDED_DATE);
+						table.setDisplayColumns(BookColumn.TITLE, BookColumn.STATUS, BookColumn.PRICE, BookColumn.VIEWS, BookColumn.ADDED_DATE);
 						table.getTitleBar().addExcelControl();
 						table.getTitleBar().addSearchControl();
 
