@@ -61,6 +61,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			break;
 		case USER:
 			UserDao ud = ServerContext.getDaoImpl("user");
+			sql += "left join userGroupMembers org on org.userId = u.id and org.groupId = " + ServerContext.getCurrentOrgId() + " \n";
 			sql += ud.createWhere() + " ";
 			sql += "and isActive(u.startDate, u.endDate) = 1 \n";
 			break;
@@ -173,8 +174,7 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		final int tagId = args.getInt(TagArg.TAG_ID);
 		final boolean getCounts = args.getBoolean(TagArg.GET_COUNTS);
 		final boolean getAllCounts = args.getBoolean(TagArg.GET_ALL_COUNTS);
-		final TagType mappingType = Common.isNullOrBlank(args.getString(TagArg.TYPE)) ? null : TagType.valueOf(args
-				.getString(TagArg.TYPE));
+		final TagType mappingType = Common.isNullOrBlank(args.getString(TagArg.TYPE)) ? null : TagType.valueOf(args.getString(TagArg.TYPE));
 		int mappingId = args.getInt(TagArg.MAPPING_ID);
 
 		boolean locationFilter = args.getBoolean(TagArg.LOCATION_FILTER);

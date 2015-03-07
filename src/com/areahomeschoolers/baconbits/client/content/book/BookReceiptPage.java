@@ -47,7 +47,7 @@ public final class BookReceiptPage implements Page {
 	private static int showTransaction = 0;
 
 	public BookReceiptPage(final VerticalPanel p) {
-		if (!Application.administratorOf(17)) {
+		if (!Application.administratorOfCurrentOrg()) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
 		}
