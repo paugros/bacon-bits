@@ -275,6 +275,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		boolean inMyCart = args.getBoolean(BookArg.IN_MY_CART);
 		int newNumber = args.getInt(BookArg.NEW_NUMBER);
 		List<Integer> ids = args.getIntList(BookArg.IDS);
+		boolean currentOrgOnly = args.getBoolean(BookArg.CURRENT_ORG_ONLY);
 		boolean locationFilter = args.getBoolean(BookArg.LOCATION_FILTER);
 		int withinMiles = ServerContext.getCurrentRadius();
 		String withinLat = Double.toString(ServerContext.getCurrentLat());
@@ -289,6 +290,10 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		if (userId > 0) {
 			sql += "and b.userId = ? ";
 			sqlArgs.add(userId);
+		}
+
+		if (currentOrgOnly) {
+			sql += "and org.id is not null \n";
 		}
 
 		if (inMyCart) {
@@ -470,7 +475,12 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		html += "</b></td></tr>";
 		html += "</table></body></html>\n";
 
-		sql = "update books set statusId = 2, boughtById = ?, soldAtBookSale = 1, soldDate = now() where id in(" + Common.join(ids, ",") + ")";
+		sql = "update books b \n";
+		sql += "join users u on u.id = b.userId \n";
+		sql += "join userGroupMembers ugm on ugm.userId = u.id \n";
+		sql += "set b.statusId = 2, b.boughtById = ?, b.soldAtBookSale = 1, b.soldDate = now() \n";
+		sql += "where b.id in(" + Common.join(ids, ",") + ")";
+
 		Integer bid = (boughtBy == null) ? null : boughtBy.getId();
 		update(sql, bid);
 
@@ -519,6 +529,7 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		sql += "left join documents dd on dd.id = t.imageId \n";
 		sql += "left join bookGradeLevels ba on ba.id = b.gradeLevelId \n";
 		sql += "left join bookConditions bo on bo.id = b.conditionId \n";
+		sql += "left join userGroupMembers org on org.userId = b.userId and org.groupId = " + ServerContext.getCurrentOrgId() + " \n";
 		sql += "left join bookShoppingCart bsc on bsc.bookId = b.id and bsc.userId = " + ServerContext.getCurrentUserId() + " \n";
 		sql += "where 1 = 1 \n";
 

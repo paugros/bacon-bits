@@ -217,9 +217,13 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		String sql = "where 1 = 1 ";
 		if (!ServerContext.isAuthenticated()) {
 			sql += "and u.directoryOptOut = 0 \n";
-		} else if (!(ServerContext.isSystemAdministrator() || ServerContext.getCurrentUser().hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS))) {
+		} else if (!ServerContext.isSystemAdministrator()) {
 			int id = ServerContext.getCurrentUserId();
-			sql += "and (u.directoryOptOut = 0 or u.id = " + id + " or u.parentId = " + id + ") \n";
+			if (ServerContext.getCurrentUser().administratorOf(ServerContext.getCurrentOrgId())) {
+				sql += "and org.id is not null \n";
+			} else {
+				sql += "and (u.directoryOptOut = 0 or u.id = " + id + " or u.parentId = " + id + ") \n";
+			}
 		}
 
 		return sql;
@@ -1367,6 +1371,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		sql += "left join groups gg on gg.id = p.groupId \n";
 		sql += "where p.userId = u.id) as privacyPrefs \n";
 		sql += "from users u \n";
+		sql += "left join userGroupMembers org on org.userId = u.id and org.groupId = " + ServerContext.getCurrentOrgId() + " \n";
 		sql += "left join documents d on d.id = u.imageId \n";
 		sql += "left join users uu on uu.id = u.parentId \n";
 		// common interests
