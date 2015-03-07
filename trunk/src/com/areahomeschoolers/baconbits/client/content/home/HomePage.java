@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.resource.AdTile;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
 import com.areahomeschoolers.baconbits.client.content.resource.TileConfig;
@@ -150,6 +151,10 @@ public class HomePage implements Page {
 
 				g.setWidget(2, 2, getAdWidget(2));
 
+				if (Application.isAuthenticated() && !signedUpForBooks()) {
+					centerPanel.add(new SellBooksMiniModule());
+				}
+
 				centerPanel.add(g);
 				// centerPanel.setCellHorizontalAlignment(g, HasHorizontalAlignment.ALIGN_CENTER);
 
@@ -201,7 +206,8 @@ public class HomePage implements Page {
 				@Override
 				public void execute() {
 					if (signedUpForBooks()) {
-						String text = "Thank you for registering to sell books with us.<br><br>You can now begin loading your books into the system using the <b>My Items -> Books</b> menu option.";
+						String text = "Thank you for registering to sell books with us.<br><br>";
+						text += "You can now begin loading your books into the system using the <b>My Books</b> menu option under your name in the upper right.";
 						HTML label = new HTML(text);
 						label.setWidth("300px");
 						AlertDialog dialog = new AlertDialog("Thanks!", label);

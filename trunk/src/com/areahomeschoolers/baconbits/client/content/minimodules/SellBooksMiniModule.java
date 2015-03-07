@@ -18,6 +18,7 @@ import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.PaypalData;
+import com.areahomeschoolers.baconbits.shared.dto.UserGroup.GroupPolicy;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -64,7 +65,12 @@ public class SellBooksMiniModule extends Composite {
 			return;
 		}
 
-		articleService.getById(Constants.BOOK_TC_ARTICLE_ID, new Callback<Article>() {
+		int articleId = Application.getCurrentOrg().getPolicyId(GroupPolicy.BOOKS_POLICY);
+		if (articleId == 0) {
+			articleId = Constants.BOOK_TC_ARTICLE_ID;
+		}
+
+		articleService.getById(articleId, new Callback<Article>() {
 			@Override
 			protected void doOnSuccess(Article result) {
 				VerticalPanel content = new VerticalPanel();
