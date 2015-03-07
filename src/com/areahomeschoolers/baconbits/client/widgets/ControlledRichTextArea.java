@@ -9,7 +9,6 @@ import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
 import com.areahomeschoolers.baconbits.shared.dto.Document.DocumentLinkType;
-import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -333,7 +332,7 @@ public class ControlledRichTextArea extends Composite {
 				bottomPanel.add(foreColors = createColorList("Foreground"));
 				bottomPanel.add(fonts = createFontList());
 				bottomPanel.add(fontSizes = createFontSizes());
-				if (Application.hasRole(AccessLevel.GROUP_ADMINISTRATORS)) {
+				if (Application.isSystemAdministrator()) {
 					bottomPanel.add(insertLink);
 				}
 
