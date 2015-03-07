@@ -302,6 +302,15 @@ public class TagSection extends Composite implements HasValidator {
 		initWidget(vp);
 	}
 
+	public void addTag(String name) {
+		Tag tag = new Tag();
+		tag.setName(name);
+		tag.setMappingType(mappingType);
+		tag.setEntityId(entityId);
+
+		addTag(tag);
+	}
+
 	@Override
 	public Validator getValidator() {
 		return validator;
@@ -368,6 +377,12 @@ public class TagSection extends Composite implements HasValidator {
 	}
 
 	private boolean addTag(Tag tag) {
+		for (Tag t : tagMap.keySet()) {
+			if (t.getName().equals(tag.getName())) {
+				return false;
+			}
+		}
+
 		if (!Application.isSystemAdministrator()) {
 			int max = 4;
 			if (mappingType.equals(TagType.USER)) {

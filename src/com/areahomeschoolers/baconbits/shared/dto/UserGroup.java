@@ -55,7 +55,8 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public enum GroupPolicy implements IsSerializable, Serializable {
 		PUBLIC_GREETING("Public Greeting", "publicGreetingId"), PRIVATE_GREETING("Private Greeting", "privateGreetingId"), GENERAL_POLICY("General Policy",
-				"generalPolicyId"), EVENT_POLICY("Event Policy", "eventPolicyId"), COOP_POLICY("Co-op Policy", "coopPolicyId");
+				"generalPolicyId"), EVENT_POLICY("Event Policy", "eventPolicyId"), COOP_POLICY("Co-op Policy", "coopPolicyId"), BOOKS_POLICY(
+				"Book Sale Policy", "booksPolicyId");
 
 		private String column;
 		private String title;
@@ -126,6 +127,7 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 	private Integer generalPolicyId;
 	private Integer eventPolicyId;
 	private Integer coopPolicyId;
+	private Integer booksPolicyId;
 	private String payPalEmail;
 	private Integer logoId;
 	private Integer faviconId;
@@ -177,6 +179,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public boolean getAdministrator() {
 		return isAdministrator;
+	}
+
+	public Integer getBooksPolicyId() {
+		return booksPolicyId;
 	}
 
 	@Override
@@ -321,6 +327,8 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 			return privateGreetingId;
 		case PUBLIC_GREETING:
 			return publicGreetingId;
+		case BOOKS_POLICY:
+			return booksPolicyId;
 		default:
 			return 0;
 		}
@@ -399,6 +407,10 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 
 	public void setAdministrator(boolean isAdministrator) {
 		this.isAdministrator = isAdministrator;
+	}
+
+	public void setBooksPolicyId(Integer booksPolicyId) {
+		this.booksPolicyId = booksPolicyId;
 	}
 
 	@Override

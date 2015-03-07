@@ -233,17 +233,16 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 		boolean soldOnline = args.getBoolean(BookArg.SOLD_ONLINE);
 		List<Object> sqlArgs = new ArrayList<Object>();
 
-		String sql = "select bb.*, (select group_concat(groupName separator ', ') from groups g \n";
-		sql += "join userGroupMembers ugm on ugm.groupId = g.id \n";
-		sql += "where bb.userId = ugm.userId and g.id in(" + Constants.ONLINE_BOOK_SELLERS_GROUP_ID + ", " + Constants.PHYSICAL_BOOK_SELLERS_GROUP_ID
-				+ ", 31)) as groups  from \n";
-		sql += "(select count(b.id) as total, sum(b.price) as totalPrice, b.userId, u.firstName, u.lastName \n";
+		String sql = "select count(b.id) as total, sum(b.price) as totalPrice, ";
+		sql += "sum(case when statusId = 1 then b.price else 0.00 end) as totalAvailable, \n";
+		sql += "sum(case when statusId = 2 then b.price else 0.00 end) as totalSold, \n";
+		sql += "b.userId, u.firstName, u.lastName \n";
 		sql += "from books b \n";
 		sql += "join users u on u.id = b.userId \n";
 		if (!ServerContext.isSystemAdministrator()) {
 			sql += "join userGroupMembers ugm on ugm.userId = u.id and ugm.groupId = " + ServerContext.getCurrentOrgId() + " ";
 		}
-		sql += "where 1 = 1 \n";
+		sql += "where b.statusId in(1, 2) \n";
 		if (statusId > 0) {
 			sql += "and b.statusId = ? \n";
 			sqlArgs.add(statusId);
@@ -259,7 +258,6 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 
 		sql += "group by u.firstName, u.lastName, b.userId \n";
 		sql += "order by u.firstName, u.lastName \n";
-		sql += ") as bb";
 
 		return query(sql, ServerUtils.getGenericRowMapper(), sqlArgs.toArray());
 	}
@@ -491,10 +489,12 @@ public class BookDaoImpl extends SpringWrapper implements BookDao, Suggestible {
 	public PaypalData signUpToSell(int groupOption) {
 		PaymentDao paymentDao = ServerContext.getDaoImpl("payment");
 		Payment p = new Payment();
+		p.addReceiver(Constants.CG_PAYPAL_EMAIL, 5.00);
 		p.setUserId(ServerContext.getCurrentUserId());
 		p.setPaymentTypeId(2);
 		p.setStatusId(1);
-		p.setPrincipalAmount(5);
+		p.setPrincipalAmount(5.00);
+		p.setMarkupAmount(0.00);
 		p.setReturnPage("Home&pt=book");
 		p.setMemo("Payment for book selling registration");
 		p = paymentDao.save(p);
