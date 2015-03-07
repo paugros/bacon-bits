@@ -212,7 +212,7 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "Book Seller Summary", PageUrl.bookSellerSummary());
 		}
 
-		if (Application.administratorOf(17)) {
+		if (Application.administratorOfCurrentOrg()) {
 			addLinkToMenu(menu, "Create Book Receipt", PageUrl.bookReceipt());
 		}
 
