@@ -78,11 +78,13 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			event.setCategoryId(rs.getInt("categoryId"));
 			event.setCost(rs.getDouble("cost"));
 			event.setPrice(rs.getDouble("price"));
+			event.setResourceId(rs.getInt("resourceId"));
 			event.setHighPrice(rs.getDouble("highPrice"));
 			event.setMarkup(rs.getDouble("markup"));
 			event.setDescription(rs.getString("description"));
 			event.setEndDate(rs.getTimestamp("endDate"));
 			event.setGroupId(rs.getInt("groupId"));
+			event.setResourceName(rs.getString("resourceName"));
 			event.setMaximumParticipants(rs.getInt("maximumParticipants"));
 			event.setMinimumParticipants(rs.getInt("minimumParticipants"));
 			event.setNotificationEmail(rs.getString("notificationEmail"));
@@ -736,6 +738,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 	@Override
 	public ArrayList<Event> list(ArgMap<EventArg> args) {
 		List<Object> sqlArgs = new ArrayList<Object>();
+		int resourceId = args.getInt(EventArg.RESOURCE_ID);
 		List<Integer> tagIds = args.getIntList(EventArg.HAS_TAGS);
 		int upcoming = args.getInt(EventArg.UPCOMING_NUMBER);
 		// boolean showCommunity = args.getBoolean(EventArg.ONLY_COMMUNITY);
@@ -770,6 +773,11 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 		if (locationFilter && !Common.isNullOrBlank(state) && state.matches("^[A-Z]{2}$")) {
 			sql += "and (e.state = '" + state + "' or (e.address is null or e.address = '')) \n";
+		}
+
+		if (resourceId > 0) {
+			sql += "and e.resourceId = ? ";
+			sqlArgs.add(resourceId);
 		}
 
 		if (!Common.isNullOrEmpty(tagIds)) {
@@ -894,7 +902,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			String sql = "update events set title = :title, description = :description, startDate = :startDate, endDate = :endDate, visibilityLevelId = :visibilityLevelId, ";
 			sql += "addedDate = :addedDate, groupId = :groupId, categoryId = :categoryId, cost = :cost, adultRequired = :adultRequired, markup = :markup, ";
 			sql += "markupOverride = :markupOverride, markupPercent = :markupPercent, markupDollars = :markupDollars, facilityName = :facilityName, ";
-			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, ";
+			sql += "registrationStartDate = :registrationStartDate, registrationEndDate = :registrationEndDate, sendSurvey = :sendSurvey, resourceId = :resourceId, ";
 			sql += "minimumParticipants = :minimumParticipants, maximumParticipants = :maximumParticipants, requiresRegistration = :requiresRegistration, ";
 			sql += "address = :address, street = :street, city = :city, state = :state, zip = :zip, lat = :lat, lng = :lng, highPrice = :highPrice, ";
 			sql += "registrationInstructions = :registrationInstructions, seriesId = :seriesId, requiredInSeries = :requiredInSeries, directoryPriority = :directoryPriority, ";
@@ -921,12 +929,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			String sql = "insert into events (title, description, addedById, startDate, endDate, addedDate, groupId, categoryId, cost, adultRequired, markup, ";
 			sql += "markupOverride, markupPercent, markupDollars, facilityName, directoryPriority, contactName, contactEmail, priceNotApplicable, ";
 			sql += "registrationStartDate, registrationEndDate, sendSurvey, minimumParticipants, maximumParticipants, notificationEmail, owningOrgId, ";
-			sql += "address, street, city, state, zip, lat, lng, payPalEmail, refundPolicy, highPrice, minimumAge, maximumAge, ";
+			sql += "address, street, city, state, zip, lat, lng, payPalEmail, refundPolicy, highPrice, minimumAge, maximumAge, resourceId, ";
 			sql += "publishDate, active, price, requiresRegistration, phone, website, visibilityLevelId, registrationInstructions, seriesId, requiredInSeries) values ";
 			sql += "(:title, :description, :addedById, :startDate, :endDate, now(), :groupId, :categoryId, :cost, :adultRequired, :markup, ";
 			sql += ":markupOverride, :markupPercent, :markupDollars, :facilityName, :directoryPriority, :contactName, :contactEmail, :priceNotApplicable, ";
 			sql += ":registrationStartDate, :registrationEndDate, :sendSurvey, :minimumParticipants, :maximumParticipants, :notificationEmail, :owningOrgId, ";
-			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :payPalEmail, :refundPolicy, :highPrice, :minimumAge, :maximumAge, ";
+			sql += ":address, :street, :city, :state, :zip, :lat, :lng, :payPalEmail, :refundPolicy, :highPrice, :minimumAge, :maximumAge, :resourceId, ";
 			sql += ":publishDate, :active, :price, :requiresRegistration, :phone, :website, :visibilityLevelId, :registrationInstructions, :seriesId, :requiredInSeries)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
@@ -1149,7 +1157,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 
 	private String createSqlBase() {
 		int userId = ServerContext.getCurrentUserId();
-		String sql = "select e.*, g.groupName, c.category, u.firstName, u.lastName, l.visibilityLevel, \n";
+		String sql = "select e.*, r.name as resourceName, g.groupName, c.category, u.firstName, u.lastName, l.visibilityLevel, \n";
 		sql += "gg.markupPercent as groupMarkupPercent, gg.markupDollars as groupMarkupDollars, gg.markupOverride as groupMarkupOverride, \n";
 		sql += "(select group_concat(price + markup) from eventAgeGroups where eventId = e.id) as agePrices, \n";
 		sql += "(select group_concat(concat(minimumAge, '-', maximumAge)) from eventAgeGroups where eventId = e.id) as ageRanges, \n";
@@ -1169,6 +1177,7 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		sql += "left join groups g on g.id = e.groupId \n";
 		sql += "left join tags t on t.id = e.firstTagId \n";
 		sql += "left join documents d on d.id = t.imageId \n";
+		sql += "left join resources r on r.id = e.resourceId \n";
 		sql += "join groups gg on gg.id = e.owningOrgId \n";
 		sql += "join eventCategories c on c.id = e.categoryId \n";
 		sql += "join users u on u.id = e.addedById \n";

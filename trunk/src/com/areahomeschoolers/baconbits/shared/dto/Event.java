@@ -52,6 +52,7 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private int minimumAge;
 	private int maximumAge;
 	private boolean priceNotApplicable = true;
+	private Integer resourceId;
 
 	// address
 	private String address;
@@ -65,6 +66,7 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 	private String facilityName;
 
 	// auxilliary
+	private String resourceName;
 	private String tags;
 	private Integer imageId;
 	private Integer smallImageId;
@@ -368,6 +370,17 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 
 	public boolean getRequiresRegistration() {
 		return requiresRegistration;
+	}
+
+	public Integer getResourceId() {
+		if (resourceId == null || resourceId == 0) {
+			return null;
+		}
+		return resourceId;
+	}
+
+	public String getResourceName() {
+		return resourceName;
 	}
 
 	public boolean getSaveAllInSeries() {
@@ -688,6 +701,14 @@ public class Event extends EntityDto<Event> implements HasDocuments, HasGroupOwn
 
 	public void setRequiresRegistration(boolean requiresRegistration) {
 		this.requiresRegistration = requiresRegistration;
+	}
+
+	public void setResourceId(Integer resourceId) {
+		this.resourceId = resourceId;
+	}
+
+	public void setResourceName(String resourceName) {
+		this.resourceName = resourceName;
 	}
 
 	public void setSaveAllInSeries(boolean saveAllInSeries) {

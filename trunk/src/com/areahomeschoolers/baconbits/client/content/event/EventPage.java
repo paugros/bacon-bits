@@ -1,6 +1,8 @@
 package com.areahomeschoolers.baconbits.client.content.event;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
@@ -21,6 +23,8 @@ import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventService;
 import com.areahomeschoolers.baconbits.client.rpc.service.EventServiceAsync;
+import com.areahomeschoolers.baconbits.client.rpc.service.ResourceService;
+import com.areahomeschoolers.baconbits.client.rpc.service.ResourceServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
@@ -37,9 +41,11 @@ import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EmailDialog;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.FieldDisplayLink;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
+import com.areahomeschoolers.baconbits.client.widgets.HtmlSuggestion;
 import com.areahomeschoolers.baconbits.client.widgets.ItemVisibilityWidget;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.MarkupTextBox;
@@ -51,6 +57,7 @@ import com.areahomeschoolers.baconbits.client.widgets.PhoneTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.PriceRangeBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.SearchBox;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.client.widgets.TitleBar;
@@ -66,6 +73,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventPageData;
 import com.areahomeschoolers.baconbits.shared.dto.EventParticipant;
 import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
+import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
@@ -89,6 +97,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -113,6 +122,7 @@ public class EventPage implements Page {
 	private VerticalPanel page;
 	private final FieldTable fieldTable = new FieldTable();
 	private final EventServiceAsync eventService = (EventServiceAsync) ServiceCache.getService(EventService.class);
+	private final ResourceServiceAsync resourceService = (ResourceServiceAsync) ServiceCache.getService(ResourceService.class);
 	private EventPageData pageData;
 	private TabPage tabPanel;
 	private FlexTable ageTable = new FlexTable();
@@ -126,6 +136,7 @@ public class EventPage implements Page {
 	private FormField tagField;
 	private String title;
 	private FormField payPalField;
+	private Resource resource;
 
 	public EventPage(final VerticalPanel page) {
 		int eventId = Url.getIntegerParameter("eventId");
@@ -486,6 +497,45 @@ public class EventPage implements Page {
 			}
 		});
 		fieldTable.addField(eventDatesField);
+
+		int urlResourceId = Url.getIntegerParameter("resourceId");
+		if (!event.isSaved() && urlResourceId > 0) {
+			fetchResource(urlResourceId);
+		}
+
+		final FieldDisplayLink resourceDisplay = new FieldDisplayLink();
+		final SearchBox resourceSearchBox = new SearchBox(new ParameterHandler<HtmlSuggestion>() {
+			@Override
+			public void execute(HtmlSuggestion item) {
+				if (!event.isSaved() && (resource == null || item.getEntityId() != resource.getId())) {
+					fetchResource(item.getEntityId());
+					event.setResourceId(item.getEntityId());
+				}
+			}
+		}, EnumSet.of(TagType.RESOURCE));
+
+		FormField resourceField = form.createFormField("Associated resource:", resourceSearchBox, resourceDisplay);
+		resourceField.setInitializer(new Command() {
+			@Override
+			public void execute() {
+				resourceDisplay.setText(event.getResourceName());
+				if (event.getResourceId() != null) {
+					resourceDisplay.setHref(PageUrl.resource(event.getResourceId()));
+				}
+			}
+		});
+		resourceField.setDtoUpdater(new Command() {
+			@Override
+			public void execute() {
+				if (resourceSearchBox.getCurrentSuggestion() != null) {
+					event.setResourceId(resourceSearchBox.getCurrentSuggestion().getEntityId());
+				}
+			}
+		});
+
+		if (!(!event.isSaved() && urlResourceId > 0)) {
+			fieldTable.addField(resourceField);
+		}
 
 		AddressField af = new AddressField(event);
 		final FormField addressField = af.getFormField();
@@ -1220,19 +1270,17 @@ public class EventPage implements Page {
 		pp.getElement().getStyle().setMarginTop(10, Unit.PX);
 		pp.getElement().getStyle().setMarginLeft(10, Unit.PX);
 
-		// EditableImage image = new EditableImage(DocumentLinkType.EVENT, calendarEvent.getId());
 		Image image = null;
 		if (event.getImageId() != null) {
 			image = new Image(ClientUtils.createDocumentUrl(event.getImageId(), event.getImageExtension()));
 		} else {
 			image = new Image(MainImageBundle.INSTANCE.defaultLarge());
 		}
-		// image.setEnabled(Application.isSystemAdministrator());
-		// image.populate();
 		pp.add(image);
 		pp.setCellWidth(image, "1%");
 
 		VerticalPanel vp = new VerticalPanel();
+		vp.setSpacing(3);
 
 		Label titleLabel = new Label(event.getTitle());
 		titleLabel.addStyleName("hugeText");
@@ -1249,6 +1297,11 @@ public class EventPage implements Page {
 
 		if (!Common.isNullOrBlank(event.getFacilityName())) {
 			vp.add(new Label("At " + event.getFacilityName()));
+		}
+
+		if (event.getResourceId() != null) {
+			Hyperlink rlink = new Hyperlink(event.getResourceName(), PageUrl.resource(event.getResourceId()));
+			vp.add(rlink);
 		}
 
 		if (!Common.isNullOrBlank(event.getAddress())) {
@@ -1448,6 +1501,16 @@ public class EventPage implements Page {
 		page.add(outerPanel);
 	}
 
+	private void fetchResource(int id) {
+		resourceService.getById(id, new Callback<Resource>() {
+			@Override
+			protected void doOnSuccess(Resource result) {
+				resource = result;
+				populateFromResource();
+			}
+		});
+	}
+
 	private void populateAgeGroups() {
 		ageTable.removeAllRows();
 		if (Application.administratorOf(event)) {
@@ -1501,6 +1564,22 @@ public class EventPage implements Page {
 			}
 
 		}
+	}
+
+	private void populateFromResource() {
+		event.setAddress(resource.getAddress());
+		event.setFacilityName(resource.getFacilityName());
+		event.setWebsite(resource.getUrl());
+		event.setContactEmail(resource.getContactEmail());
+		event.setContactName(resource.getContactName());
+		event.setPhone(resource.getPhone());
+
+		List<String> tags = Common.split(resource.getTags(), ", ");
+		for (String tag : tags) {
+			tagSection.addTag(tag);
+		}
+
+		form.initialize();
 	}
 
 	private void populateVolunteerPositions() {
