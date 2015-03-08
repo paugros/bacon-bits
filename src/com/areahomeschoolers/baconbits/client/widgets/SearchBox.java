@@ -102,6 +102,14 @@ public final class SearchBox extends Composite {
 		textBox.addBlurHandler(bh);
 	}
 
+	public HtmlSuggestion getCurrentSuggestion() {
+		return currentSuggestion;
+	}
+
+	public void setEnabled(boolean enabled) {
+		textBox.setEnabled(enabled);
+	}
+
 	public void setFocus(boolean focus) {
 		textBox.setFocus(focus);
 	}

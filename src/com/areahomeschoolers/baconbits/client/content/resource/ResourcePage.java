@@ -73,6 +73,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -743,7 +744,7 @@ public class ResourcePage implements Page {
 		}
 
 		if (resource.getShowInAds() && allowEdit()) {
-			String stats = "<table style=\"color: #666666; margin-top: 25px\" width=150>";
+			String stats = "<table style=\"color: #666666; margin-top: 25px; min-width: 150px;\">";
 			stats += "<tr><td>Views</td><td>" + Integer.toString(resource.getViewCount()) + "</td></tr>";
 			stats += "<tr><td>Impressions</td><td>" + Integer.toString(resource.getImpressions()) + "</td></tr>";
 			String clicks = "0";
@@ -757,11 +758,16 @@ public class ResourcePage implements Page {
 		pp.add(vp);
 
 		if (allowEdit()) {
+			VerticalPanel mp = new VerticalPanel();
+			mp.setSpacing(6);
 			DefaultHyperlink edit = new DefaultHyperlink("Edit details", PageUrl.resource(resource.getId()) + "&details=true");
 			edit.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
-			edit.getElement().getStyle().setMarginRight(5, Unit.PX);
-			pp.add(edit);
-			pp.setCellHorizontalAlignment(edit, HasHorizontalAlignment.ALIGN_RIGHT);
+			// edit.getElement().getStyle().setMarginRight(5, Unit.PX);
+			Hyperlink eventAdd = new Hyperlink("Add event", PageUrl.event(0) + "&resourceId=" + resource.getId());
+			mp.add(edit);
+			mp.add(eventAdd);
+			pp.add(mp);
+			pp.setCellHorizontalAlignment(mp, HasHorizontalAlignment.ALIGN_RIGHT);
 		}
 
 		VerticalPanel ovp = new VerticalPanel();
@@ -793,6 +799,26 @@ public class ResourcePage implements Page {
 
 		VerticalPanel outerPanel = new VerticalPanel();
 		outerPanel.add(ovp);
+
+		if (!pd.getEvents().isEmpty()) {
+			VerticalPanel ep = new VerticalPanel();
+			ep.setSpacing(10);
+
+			for (Data e : pd.getEvents()) {
+				Hyperlink el = new Hyperlink(e.get("title"), PageUrl.event(e.getId()));
+				String txt = el.toString() + "<span style=\"color: #555555;\">&nbsp;&nbsp;-&nbsp;&nbsp;";
+				txt += Formatter.formatDate(e.getDate("startDate"), "MMM d") + "</span>";
+				HTML eep = new HTML(txt);
+
+				ep.add(eep);
+			}
+
+			Label upcoming = new Label("Upcoming Events");
+			upcoming.getElement().getStyle().setMarginTop(8, Unit.PX);
+			upcoming.addStyleName("largeText mediumPadding");
+			outerPanel.add(upcoming);
+			outerPanel.add(ep);
+		}
 
 		ReviewSection rs = new ReviewSection(ReviewType.RESOURCE, resource.getId());
 		rs.populate();

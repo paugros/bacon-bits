@@ -152,6 +152,9 @@ public class ResourceDaoImpl extends SpringWrapper implements ResourceDao, Sugge
 			sql += "join resourceUserMapping rm on rm.userId = u.id \n";
 			sql += "where rm.resourceId = ?";
 			pd.setOwners(query(sql, ServerUtils.getGenericRowMapper(), resourceId));
+
+			sql = "select id, title, startDate from events where resourceId = ? and active = 1 and startDate > now() order by startDate";
+			pd.setEvents(query(sql, ServerUtils.getGenericRowMapper(), resourceId));
 		} else {
 			pd.setResource(new Resource());
 		}

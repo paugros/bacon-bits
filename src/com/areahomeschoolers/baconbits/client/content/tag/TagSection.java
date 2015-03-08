@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.tag;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -192,6 +193,7 @@ public class TagSection extends Composite implements HasValidator {
 	private HorizontalPanel hp = new HorizontalPanel();
 	private Validator validator;
 	private Map<Tag, TagWidget> tagMap = new HashMap<>();
+	private HashSet<String> tagNames = new HashSet<>();
 
 	public TagSection(TagType type, int itemId) {
 		this.mappingType = type;
@@ -311,6 +313,11 @@ public class TagSection extends Composite implements HasValidator {
 		addTag(tag);
 	}
 
+	public void clear() {
+		tags.clear();
+		fp.clear();
+	}
+
 	@Override
 	public Validator getValidator() {
 		return validator;
@@ -377,11 +384,12 @@ public class TagSection extends Composite implements HasValidator {
 	}
 
 	private boolean addTag(Tag tag) {
-		for (Tag t : tagMap.keySet()) {
-			if (t.getName().equals(tag.getName())) {
-				return false;
-			}
+		if (tagNames.contains(tag.getName())) {
+			return false;
 		}
+
+		// we do this early here, to prevent duplicates that are programatically added
+		tagNames.add(tag.getName());
 
 		if (!Application.isSystemAdministrator()) {
 			int max = 4;
@@ -419,6 +427,8 @@ public class TagSection extends Composite implements HasValidator {
 		fader.fadeIn();
 		tags.add(tag);
 		tagMap.put(tag, tw);
+		// we do this a second time here, because the server may have changed it
+		tagNames.add(tag.getName());
 	}
 
 	private void createNewTag() {
