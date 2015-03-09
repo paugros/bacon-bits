@@ -86,7 +86,7 @@ public final class CrawlFilterChain implements Filter {
 
 			String agent = URLEncoder.encode("Mozilla/5.0+(Windows+NT+6.1)+AppleWebKit/537.36+Chrome/28.0.1468.0+Safari/537.36+PhantomJsCloud/1.1", "UTF-8");
 			String jsUrl = "http://api.phantomjscloud.com/single/browser/v1/997774cd49a439c431a67f9cf08d2b3025f3d5a6/?requestType=text&targetUrl=" + url;
-			jsUrl += "&loadImages=false&outputAsJson=false&timeout=30000&abortOnJavascriptErrors=false&delayTime=1000&isDebug=false&postDomLoadedTimeout=10000";
+			jsUrl += "&loadImages=false&outputAsJson=false&timeout=300000&abortOnJavascriptErrors=false&delayTime=800&isDebug=false&postDomLoadedTimeout=30000";
 			jsUrl += "&userAgent=" + agent + "&viewportSize=" + URLEncoder.encode("{+height:1280,+width:720+}", "UTF-8") + "&geolocation=us";
 
 			// System.out.println("JS URL: " + jsUrl);
