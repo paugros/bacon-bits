@@ -111,9 +111,8 @@ public class HomePage implements Page {
 					if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(org.getId()) == null) {
 						centerPanel.add(new RequestMembershipLink(org));
 					}
+					centerPanel.add(new ArticleWidget(pageData.getIntro()));
 				}
-
-				centerPanel.add(new ArticleWidget(pageData.getIntro()));
 
 				if (Application.hasLocation()) {
 					String txt = "NOTE: The resource, event and homeschooler numbers below are only those ";
