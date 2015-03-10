@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -17,6 +18,8 @@ public interface ArticleServiceAsync {
 	public void save(Article article, AsyncCallback<Article> callback);
 
 	void getComments(ArgMap<ArticleArg> args, AsyncCallback<ArrayList<BlogComment>> callback);
+
+	void getTopics(ArgMap<ArticleArg> args, AsyncCallback<ArrayList<Data>> callback);
 
 	void hideComment(int commentId, AsyncCallback<Void> callback);
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.article.ArticleWidget;
 import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniModule;
 import com.areahomeschoolers.baconbits.client.content.resource.AdTile;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
@@ -21,6 +22,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ImageSwitcher;
+import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -86,11 +88,14 @@ public class HomePage implements Page {
 			});
 		}
 
-		page.getElement().getStyle().setZIndex(0);
-		page.getElement().getStyle().setPosition(Position.RELATIVE);
-		// begin slider test ground
-		ImageSwitcher s = new ImageSwitcher();
-		page.add(s);
+		if (Application.isCitrus()) {
+			page.getElement().getStyle().setZIndex(0);
+			page.getElement().getStyle().setPosition(Position.RELATIVE);
+			// begin slider test ground
+			ImageSwitcher s = new ImageSwitcher();
+			page.add(s);
+		}
+
 		Application.getLayout().setPage("Homeschooling Resources and Events, in Your Area", page);
 		// end slider test ground
 
@@ -100,6 +105,15 @@ public class HomePage implements Page {
 			@Override
 			protected void doOnSuccess(HomePageData result) {
 				pageData = result;
+
+				if (!Application.isCitrus()) {
+					UserGroup org = Application.getCurrentOrg();
+					if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(org.getId()) == null) {
+						centerPanel.add(new RequestMembershipLink(org));
+					}
+				}
+
+				centerPanel.add(new ArticleWidget(pageData.getIntro()));
 
 				if (Application.hasLocation()) {
 					String txt = "NOTE: The resource, event and homeschooler numbers below are only those ";
@@ -136,7 +150,7 @@ public class HomePage implements Page {
 				g.setWidget(1, 0, new Tile(uc));
 
 				TileConfig bbc = new TileConfig().setTagType(TagType.ARTICLE).setText("Blog");
-				bbc.setImage(new Image(MainImageBundle.INSTANCE.blogTile())).setUrl(PageUrl.blog(0));
+				bbc.setImage(new Image(MainImageBundle.INSTANCE.blogTile())).setUrl(PageUrl.blog());
 				g.setWidget(1, 1, new Tile(bbc));
 
 				g.setWidget(1, 2, getAdWidget(1));

@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.content.article.ArticleListPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticleManagementPage;
 import com.areahomeschoolers.baconbits.client.content.article.ArticlePage;
 import com.areahomeschoolers.baconbits.client.content.article.BlogPage;
+import com.areahomeschoolers.baconbits.client.content.article.BlogPostPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookListPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookManagementPage;
 import com.areahomeschoolers.baconbits.client.content.book.BookPage;
@@ -360,6 +361,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new UserListPage(vp);
 		} else if ("EventList".equals(page)) {
 			new EventListPage(vp);
+		} else if ("Blog".equals(page)) {
+			new BlogPage(vp);
 		} else if ("UserGroupList".equals(page)) {
 			new UserGroupListPage(vp);
 		} else if ("ArticleGroup".equals(page)) {
@@ -378,8 +381,8 @@ public final class Application implements ValueChangeHandler<String> {
 			new RegistrationManagementPage(vp);
 		} else if ("ArticleList".equals(page)) {
 			new ArticleListPage(vp);
-		} else if ("Blog".equals(page)) {
-			new BlogPage(vp);
+		} else if ("BlogPost".equals(page)) {
+			new BlogPostPage(vp);
 		} else if ("ResourceManagement".equals(page)) {
 			new ResourceManagementPage(vp);
 		} else if ("UserManagement".equals(page)) {

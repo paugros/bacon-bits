@@ -39,6 +39,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ResourceArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.TagArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
+import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Data;
 import com.areahomeschoolers.baconbits.shared.dto.Event;
 import com.areahomeschoolers.baconbits.shared.dto.EventAgeGroup;
@@ -321,33 +322,31 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 		// args.put(EventArg.REGISTERED_BY_OR_ADDED_FOR_ID, ServerContext.getCurrentUserId());
 		// pd.setMyUpcomingEvents(list(args));
 		// }
-		//
-		// Integer articleId = 0;
-		//
-		// UserGroup org = ServerContext.getCurrentOrg();
-		// if (org != null) {
-		// articleId = ServerContext.isAuthenticated() ? org.getPrivateGreetingId() : org.getPublicGreetingId();
-		// if (articleId == null) {
-		// articleId = 0;
-		// }
-		// }
-		// ArticleDao articleDao = ServerContext.getDaoImpl("article");
-		// Article a = articleDao.getById(articleId);
-		// if (a == null) {
-		// a = new Article();
-		// a.setTitle("Welcome!");
-		// String text;
-		// if (org != null) {
-		// text = "Welcome to " + org.getGroupName() + ". ";
-		// } else {
-		// text = "Welcome. ";
-		// }
-		// text += "Our site is still being constructed, but you can have a look around anyway.";
-		// a.setArticle(text);
-		// }
-		// pd.setIntro(a);
-		//
-		// pd.setPartners(articleDao.getById(Constants.PARTNER_LOGO_ARTICLE_ID));
+
+		Integer articleId = 0;
+
+		UserGroup org = ServerContext.getCurrentOrg();
+		if (org != null) {
+			articleId = ServerContext.isAuthenticated() ? org.getPrivateGreetingId() : org.getPublicGreetingId();
+			if (articleId == null) {
+				articleId = 0;
+			}
+		}
+		ArticleDao articleDao = ServerContext.getDaoImpl("article");
+		Article a = articleDao.getById(articleId);
+		if (a == null) {
+			a = new Article();
+			a.setTitle("Welcome!");
+			String text;
+			if (org != null) {
+				text = "Welcome to " + org.getGroupName() + ". ";
+			} else {
+				text = "Welcome. ";
+			}
+			text += "We're still setting up the site, but you can have a look around anyway.";
+			a.setArticle(text);
+		}
+		pd.setIntro(a);
 
 		// various counts
 		BookDao bd = ServerContext.getDaoImpl("book");

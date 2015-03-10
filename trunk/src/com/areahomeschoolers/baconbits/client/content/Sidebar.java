@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class Sidebar extends Composite {
 	public enum MiniModule {
-		COMMUNITY_EVENTS, UPCOMING_EVENTS, LINKS, SELL_BOOKS, NEW_EVENTS, MY_EVENTS, CITRUS, NEW_USERS, NEW_BOOKS, ACTIVE_USERS, ADS;
+		COMMUNITY_EVENTS, UPCOMING_EVENTS, LINKS, SELL_BOOKS, NEW_EVENTS, MY_EVENTS, CITRUS, NEW_USERS, NEW_BOOKS, ACTIVE_USERS, ADS, NEWS_TOPICS;
 	}
 
 	private static Map<MiniModule, Widget> cache = new HashMap<MiniModule, Widget>();

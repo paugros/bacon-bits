@@ -12,14 +12,13 @@ import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 
 public class RequestMembershipLink extends Composite {
 	private ClickLabel label;
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 
 	public RequestMembershipLink(final UserGroup userGroup) {
-		label = new ClickLabel("Click here to request membership in " + userGroup.getGroupName(), new ClickHandler() {
+		label = new ClickLabel("Want to become a member of " + userGroup.getGroupName() + "? Click here to request.", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				ConfirmDialog.confirm("Send a request to join this group?", new ConfirmHandler() {

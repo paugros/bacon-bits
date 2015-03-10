@@ -186,6 +186,20 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 	}
 
 	@Override
+	public ArrayList<Data> getTopics(ArgMap<ArticleArg> args) {
+		String sql = "select t.id, t.name, count(tm.id) as total \n";
+		sql += "from tagArticleMapping tm \n";
+		sql += "join tags t on t.id = tm.tagId \n";
+		sql += "join articles a on a.id = tm.articleId \n";
+		sql += "where a.newsItem = 1 and (a.endDate is null or a.endDate > now()) \n";
+		sql += "and a.owningOrgId = ? ";
+		sql += "group by tm.tagId, t.name \n";
+		sql += "order by t.name";
+
+		return query(sql, ServerUtils.getGenericRowMapper(), ServerContext.getCurrentOrgId());
+	}
+
+	@Override
 	public void hideComment(int commentId) {
 		String sql = "update comments set endDate = now(), hiddenById = ? where id = ?";
 		update(sql, commentId, ServerContext.getCurrentUserId());
@@ -197,7 +211,6 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 		List<Integer> tagIds = args.getIntList(ArticleArg.HAS_TAGS);
 		int top = args.getInt(ArticleArg.MOST_RECENT);
 		String idString = args.getString(ArticleArg.IDS);
-		int orgId = args.getInt(ArticleArg.OWNING_ORG_ID);
 		boolean blogOnly = args.getBoolean(ArticleArg.BLOG_ONLY);
 		boolean includeBlog = args.getBoolean(ArticleArg.INCLUDE_BLOG);
 		int beforeId = args.getInt(ArticleArg.BEFORE_ID);
@@ -213,11 +226,6 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 
 		if (onlyTagged) {
 			sql += "and a.firstTagId is not null \n";
-		}
-
-		if (orgId > 0) {
-			sql += "and a.owningOrgId = ? ";
-			sqlArgs.add(orgId);
 		}
 
 		if (blogOnly) {

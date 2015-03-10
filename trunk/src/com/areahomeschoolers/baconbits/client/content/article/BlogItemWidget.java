@@ -3,6 +3,7 @@ package com.areahomeschoolers.baconbits.client.content.article;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -14,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ControlledRichTextArea;
 import com.areahomeschoolers.baconbits.client.widgets.DateTimeBox;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
@@ -23,6 +25,7 @@ import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.Spacer;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.Document;
+import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.dom.client.Style.Overflow;
@@ -36,7 +39,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -50,7 +52,7 @@ public class BlogItemWidget extends Composite {
 			vp.setWidth(NEWS_ITEM_WIDTH + 6 + "px");
 			vp.addStyleName("grayUnderline");
 
-			DefaultHyperlink title = new DefaultHyperlink(item.getTitle(), PageUrl.blog(item.getId()));
+			DefaultHyperlink title = new DefaultHyperlink(item.getTitle(), PageUrl.blogPost(item.getId()));
 			title.getElement().getStyle().setFontSize(25, Unit.PX);
 			title.getElement().getStyle().setColor("#333333");
 			vp.add(title);
@@ -109,7 +111,7 @@ public class BlogItemWidget extends Composite {
 			if (item.getCommentCount() == 1) {
 				s = "";
 			}
-			DefaultHyperlink commentLink = new DefaultHyperlink(item.getCommentCount() + " comment" + s, PageUrl.blog(item.getId()) + "&comment=1");
+			DefaultHyperlink commentLink = new DefaultHyperlink(item.getCommentCount() + " comment" + s, PageUrl.blogPost(item.getId()) + "&comment=1");
 			commentLink.addStyleName("largeText");
 			commentsPanel.add(commentLink);
 
@@ -136,8 +138,15 @@ public class BlogItemWidget extends Composite {
 			body.getElement().getStyle().setPadding(5, Unit.PX);
 			vp.add(body);
 
+			if (Url.isParamValidId("postId")) {
+				TagSection ts = new TagSection(TagType.ARTICLE, item.getId());
+				ts.setEditingEnabled(false);
+				ts.populate();
+				vp.add(ts);
+			}
+
 			if (Application.isAuthenticated() && Url.getIntegerParameter("comment") != 1) {
-				vp.add(new DefaultHyperlink("Add comment", PageUrl.blog(item.getId()) + "&comment=1"));
+				vp.add(new DefaultHyperlink("Add comment", PageUrl.blogPost(item.getId()) + "&comment=1"));
 				vp.add(new Spacer(1));
 			}
 
@@ -154,6 +163,7 @@ public class BlogItemWidget extends Composite {
 		});
 		private final ArticleServiceAsync newsService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 		private VerticalPanel vp = new VerticalPanel();
+		private TagSection tagSection;
 
 		public WriteNewsItem() {
 			final FieldTable ft = new FieldTable();
@@ -242,6 +252,14 @@ public class BlogItemWidget extends Composite {
 			});
 			ft.addField(expirationField);
 
+			tagSection = new TagSection(TagType.ARTICLE, item.getId());
+			tagSection.setRequired(true);
+			tagSection.populate();
+
+			FormField tagField = form.createFormField("Tags:", tagSection);
+			tagField.removeEditLabel();
+			ft.addField(tagField);
+
 			vp.add(ft);
 
 			final ControlledRichTextArea bodyInput = new ControlledRichTextArea();
@@ -271,7 +289,7 @@ public class BlogItemWidget extends Composite {
 					if (item.isSaved()) {
 						panel.setWidget(new ReadNewsItem());
 					} else {
-						HistoryToken.set(PageUrl.blog(0));
+						HistoryToken.set(PageUrl.blog());
 					}
 				}
 			});
@@ -292,13 +310,18 @@ public class BlogItemWidget extends Composite {
 			item.setNewsItem(true);
 			newsService.save(item, new Callback<Article>() {
 				@Override
-				protected void doOnSuccess(Article result) {
+				protected void doOnSuccess(final Article result) {
 					Application.setConfirmNavigation(false);
 					if (item.isSaved()) {
 						item = result;
 						panel.setWidget(new ReadNewsItem());
 					} else {
-						HistoryToken.set(PageUrl.blog(result.getId()));
+						tagSection.saveAll(result.getId(), new Callback<Void>() {
+							@Override
+							protected void doOnSuccess(Void r) {
+								HistoryToken.set(PageUrl.blogPost(result.getId()));
+							}
+						});
 					}
 				}
 			});

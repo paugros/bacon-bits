@@ -5,6 +5,7 @@ import com.areahomeschoolers.baconbits.client.content.user.CreateUserDialog;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.User;
@@ -16,7 +17,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -64,7 +64,7 @@ public class LinksMiniModule extends Composite {
 		}
 		vp.add(new DefaultHyperlink("Event Listing", PageUrl.eventList()));
 		vp.add(new DefaultHyperlink("Event Calendar", PageUrl.eventCalendar()));
-		vp.add(new DefaultHyperlink("News", PageUrl.blog(0)));
+		vp.add(new DefaultHyperlink("News", PageUrl.blog()));
 		vp.add(new DefaultHyperlink("Book Store", PageUrl.bookList()));
 
 		if (Application.isAuthenticated()) {
