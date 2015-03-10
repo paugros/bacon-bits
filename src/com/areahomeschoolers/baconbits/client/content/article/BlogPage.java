@@ -6,17 +6,16 @@ import java.util.List;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.Sidebar;
-import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
+import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule.AdDirection;
 import com.areahomeschoolers.baconbits.client.generated.Page;
-import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
+import com.areahomeschoolers.baconbits.client.widgets.AddLink;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.MailListLink;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
@@ -24,6 +23,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
@@ -41,7 +41,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -50,41 +49,37 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class BlogPage implements Page {
 	private final ArticleServiceAsync articleService = (ArticleServiceAsync) ServiceCache.getService(ArticleService.class);
 	private VerticalPanel page = new VerticalPanel();
-	private int blogId = Url.getIntegerParameter("postId");
 	private List<Article> items;
-	private Article item;
 	private VerticalPanel blogPanel = new VerticalPanel();
+	private VerticalPanel sidebar = new VerticalPanel();
+	private VerticalPanel topicsPanel = new VerticalPanel();
+	private VerticalPanel pagePanel = new VerticalPanel();
 	private ArgMap<ArticleArg> args;
 	private static HandlerRegistration registration;
+	private Button filterButton;
+	private SimplePanel morePanel = new SimplePanel();
+	private static final int PAGE_SIZE = 15;
 
 	public BlogPage(VerticalPanel p) {
 		page = p;
 		page.getElement().getStyle().setPaddingLeft(20, Unit.PX);
 
-		args = new ArgMap<ArticleArg>(ArticleArg.OWNING_ORG_ID, Application.getCurrentOrgId());
-		args.put(ArticleArg.MOST_RECENT, 15);
+		sidebar.setWidth("210px");
+		args = new ArgMap<ArticleArg>(ArticleArg.BLOG_ONLY);
+		args.put(ArticleArg.MOST_RECENT, PAGE_SIZE);
 		args.setStatus(Status.ACTIVE);
-		args.put(ArticleArg.BLOG_ONLY);
-		if (blogId > 0) {
-			args.put(ArticleArg.ARTICLE_ID, blogId);
+		int tagId = Url.getIntegerParameter("tagId");
+		if (tagId > 0) {
+			args.put(ArticleArg.HAS_TAGS, tagId);
 		}
 		articleService.list(args, new Callback<ArrayList<Article>>() {
 			@Override
 			protected void doOnSuccess(ArrayList<Article> result) {
 				items = result;
-				if (blogId > 0) {
-					item = result.get(0);
-				}
 
 				initialize();
 			}
 		});
-	}
-
-	private void addBlogItems(List<Article> list) {
-		for (Article i : list) {
-			blogPanel.add(new BlogItemWidget(i));
-		}
 	}
 
 	private void initialize() {
@@ -114,17 +109,9 @@ public class BlogPage implements Page {
 		blogPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 		blogPanel.getElement().getStyle().setBorderWidth(1, Unit.PX);
 
-		if (blogId < 0) {
-			initListPage();
-		} else {
-			initSinglePage();
-		}
+		topicsPanel.setSpacing(7);
+		populateTopicsPanel();
 
-		Sidebar sb = Sidebar.create(MiniModule.ADS);
-		Application.getLayout().setPage("Blog", sb, page);
-	}
-
-	private void initListPage() {
 		// header
 		VerticalPanel outerVp = new VerticalPanel();
 		Label header = new Label("Blog");
@@ -155,7 +142,7 @@ public class BlogPage implements Page {
 		filterHorizontalPanel.add(afterDateBox);
 		filterHorizontalPanel.add(new Label("and/or before"));
 		filterHorizontalPanel.add(beforeDateBox);
-		final Button filterButton = new Button("Search");
+		filterButton = new Button("Search");
 
 		filterHorizontalPanel.add(filterButton);
 
@@ -172,7 +159,7 @@ public class BlogPage implements Page {
 		outerGrayPanel.setWidget(filterVerticalPanel);
 		outerVp.add(header);
 		outerVp.add(outerGrayPanel);
-		page.add(outerVp);
+		pagePanel.add(outerVp);
 
 		filterButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -189,16 +176,7 @@ public class BlogPage implements Page {
 
 				filterButton.setEnabled(false);
 
-				articleService.list(args, new Callback<ArrayList<Article>>() {
-					@Override
-					protected void doOnSuccess(ArrayList<Article> result) {
-						blogPanel.clear();
-						items.clear();
-						items.addAll(result);
-						addBlogItems(result);
-						filterButton.setEnabled(true);
-					}
-				});
+				populate();
 			}
 		});
 
@@ -227,70 +205,105 @@ public class BlogPage implements Page {
 		PaddedPanel pp = new PaddedPanel(3);
 		pp.setWidth("100%");
 		if (Application.administratorOfCurrentOrg() || Application.memberOf(33)) {
-			Image edit = new Image(MainImageBundle.INSTANCE.plus());
-			edit.addStyleName("pointer");
-			ClickHandler cl = new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					page.clear();
-					blogPanel.clear();
-					item = new Article();
-					HistoryToken.append("newsId=0", false);
-					initSinglePage();
-				}
-			};
-			edit.addClickHandler(cl);
-			ClickLabel label = new ClickLabel("Add post");
-			label.addClickHandler(cl);
-			label.setWordWrap(false);
-			pp.add(edit);
-			pp.setCellWidth(edit, "1%");
-			pp.add(label);
-			pp.setCellWidth(label, "1%");
+			AddLink add = new AddLink("Add post", PageUrl.blogPost(0));
+			pp.add(add);
+			// pp.setCellWidth(add, "1%");
 		}
 
 		page.setWidth("auto");
 		MailListLink signUp = new MailListLink("Sign Up For Updates");
 		pp.add(signUp);
 		pp.setCellHorizontalAlignment(signUp, HasHorizontalAlignment.ALIGN_RIGHT);
-		page.add(pp);
+		pagePanel.add(pp);
 
-		page.add(blogPanel);
+		sidebar.add(topicsPanel);
+		sidebar.add(new AdsMiniModule(AdDirection.VERTICAL));
+		blogPanel.setWidth("100%");
+		blogPanel.getElement().getStyle().setMarginTop(10, Unit.PX);
 
-		addBlogItems(items);
+		HorizontalPanel hp = new PaddedPanel(10);
+		hp.add(sidebar);
+		pagePanel.add(blogPanel);
+		hp.add(pagePanel);
+		page.add(hp);
 
-		ClickLabel more = new ClickLabel("Load more news >>", new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				args.put(ArticleArg.BEFORE_ID, items.get(items.size() - 1).getId());
-				articleService.list(args, new Callback<ArrayList<Article>>() {
-					@Override
-					protected void doOnSuccess(ArrayList<Article> result) {
-						items.addAll(result);
-						addBlogItems(result);
-					}
-				});
-			}
-		});
-		more.addStyleName("heavyPadding bold hugeText");
-		page.add(more);
+		pagePanel.add(morePanel);
+
+		populate();
+
+		Application.getLayout().setPage("Blog", page);
 	}
 
-	private void initSinglePage() {
-		page.add(blogPanel);
+	private void populate() {
+		articleService.list(args, new Callback<ArrayList<Article>>() {
+			@Override
+			protected void doOnSuccess(ArrayList<Article> result) {
+				if (args.getInt(ArticleArg.BEFORE_ID) == 0) {
+					blogPanel.clear();
+					items.clear();
+				}
+				items.addAll(result);
+				filterButton.setEnabled(true);
 
-		if (item == null) {
-			item = new Article();
-		}
+				for (Article i : result) {
+					blogPanel.add(new BlogItemWidget(i));
+				}
 
-		DefaultHyperlink back = new DefaultHyperlink("<< Blog", PageUrl.blog(0));
-		blogPanel.add(back);
+				if (result.isEmpty() && blogPanel.getWidgetCount() == 0) {
+					Label empty = new Label("No posts have been added yet");
+					empty.setWidth("100%");
+					empty.getElement().getStyle().setMarginBottom(10, Unit.PX);
+					blogPanel.add(empty);
+				}
 
-		blogPanel.add(new BlogItemWidget(item));
+				if (!result.isEmpty() && result.size() == PAGE_SIZE) {
+					ClickLabel more = new ClickLabel("Load more >>", new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							args.put(ArticleArg.BEFORE_ID, items.get(items.size() - 1).getId());
+							populate();
+						}
+					});
+					more.addStyleName("heavyPadding bold largeText");
+					morePanel.setWidget(more);
+				} else {
+					morePanel.clear();
+				}
+			}
+		});
+	}
 
-		if (blogId > 0) {
-			ArgMap<ArticleArg> args = new ArgMap<ArticleArg>(ArticleArg.ARTICLE_ID, blogId);
-			blogPanel.add(new BlogCommentSection(blogId, args));
-		}
+	private void populateTopicsPanel() {
+		topicsPanel.clear();
+
+		articleService.getTopics(new ArgMap<ArticleArg>(), new Callback<ArrayList<Data>>() {
+			@Override
+			protected void doOnSuccess(ArrayList<Data> result) {
+				if (result.isEmpty()) {
+					return;
+				}
+
+				Label title = new Label("Topics");
+				title.addStyleName("largeText");
+				topicsPanel.add(title);
+
+				for (final Data d : result) {
+					ClickLabel link = new ClickLabel(d.get("name") + " (" + d.get("total") + ")", new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							args = new ArgMap<>(ArticleArg.MOST_RECENT, PAGE_SIZE);
+							args.setStatus(Status.ACTIVE);
+							args.put(ArticleArg.HAS_TAGS, d.getId());
+							args.put(ArticleArg.BLOG_ONLY);
+							HistoryToken.set(PageUrl.blog() + "&tagId=" + d.getId(), false);
+							populate();
+						}
+					});
+					link.getElement().getStyle().setMarginLeft(8, Unit.PX);
+
+					topicsPanel.add(link);
+				}
+			}
+		});
 	}
 }

@@ -13,6 +13,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 @Controller
 @RequestMapping("/article")
@@ -35,6 +36,11 @@ public class ArticleServiceImpl extends GwtController implements ArticleService 
 	@Override
 	public ArrayList<BlogComment> getComments(ArgMap<ArticleArg> args) {
 		return dao.getComments(args);
+	}
+
+	@Override
+	public ArrayList<Data> getTopics(ArgMap<ArticleArg> args) {
+		return dao.getTopics(args);
 	}
 
 	@Override

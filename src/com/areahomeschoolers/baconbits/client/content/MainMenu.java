@@ -74,7 +74,7 @@ public final class MainMenu extends MenuBar {
 		addItem("Events", getEventsMenu());
 		addLinkToMenu(this, "Resources", PageUrl.tagGroup(TagType.RESOURCE.toString()));
 		if (!ClientUtils.isMobileBrowser()) {
-			addLinkToMenu(this, "Blog", PageUrl.blog(0));
+			addLinkToMenu(this, "Blog", PageUrl.blog());
 		}
 
 		if (Application.isAuthenticated() && !ClientUtils.isMobileBrowser()) {

@@ -19,8 +19,12 @@ public class PageUrl {
 		return "page=ArticleManagement";
 	}
 
-	public static String blog(int id) {
-		String url = "page=Blog";
+	public static String blog() {
+		return "page=Blog";
+	}
+
+	public static String blogPost(int id) {
+		String url = "page=BlogPost";
 		return (id == 0) ? url : url + "&postId=" + id;
 	}
 

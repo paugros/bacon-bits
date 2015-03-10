@@ -10,6 +10,8 @@ import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultInlineHyperlink;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
@@ -24,8 +26,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
-import com.areahomeschoolers.baconbits.client.widgets.DefaultInlineHyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -72,7 +72,7 @@ public class NewsModule extends Composite {
 			pp.add(date);
 			pp.setCellVerticalAlignment(date, HasVerticalAlignment.ALIGN_MIDDLE);
 
-			DefaultHyperlink title = new DefaultInlineHyperlink(item.getTitle(), PageUrl.blog(item.getId()));
+			DefaultHyperlink title = new DefaultInlineHyperlink(item.getTitle(), PageUrl.blogPost(item.getId()));
 			title.getElement().getStyle().setFontWeight(FontWeight.BOLD);
 			title.getElement().getStyle().setFontSize(14, Unit.PX);
 			title.getElement().getStyle().setWhiteSpace(WhiteSpace.NOWRAP);
@@ -80,7 +80,7 @@ public class NewsModule extends Composite {
 			String text = new HTML(item.getArticle()).getText();
 			text = text.replaceAll("\\.", ". ");
 
-			DefaultHyperlink body = new DefaultInlineHyperlink("- " + text, PageUrl.blog(item.getId()));
+			DefaultHyperlink body = new DefaultInlineHyperlink("- " + text, PageUrl.blogPost(item.getId()));
 			body.getElement().getStyle().setHeight(2.83, Unit.EX);
 			body.getElement().getStyle().setColor("#777777");
 			body.getElement().getStyle().setOverflow(Overflow.HIDDEN);
@@ -96,7 +96,7 @@ public class NewsModule extends Composite {
 			vp.add(pp);
 		}
 
-		DefaultHyperlink more = new DefaultHyperlink(":: More news ::", PageUrl.blog(0));
+		DefaultHyperlink more = new DefaultHyperlink(":: More news ::", PageUrl.blog());
 		vp.add(more);
 	}
 

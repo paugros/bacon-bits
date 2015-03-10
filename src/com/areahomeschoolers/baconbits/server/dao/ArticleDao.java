@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.Article;
 import com.areahomeschoolers.baconbits.shared.dto.BlogComment;
+import com.areahomeschoolers.baconbits.shared.dto.Data;
 
 public interface ArticleDao {
 	public String createWhere();
@@ -17,6 +18,8 @@ public interface ArticleDao {
 	public ArrayList<BlogComment> getComments(ArgMap<ArticleArg> args);
 
 	public int getCount();
+
+	public ArrayList<Data> getTopics(ArgMap<ArticleArg> args);
 
 	@PreAuthorize("hasRole('GROUP_ADMINISTRATORS')")
 	public void hideComment(int commentId);
