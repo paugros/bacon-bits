@@ -383,10 +383,6 @@ public class UserGroup extends EntityDto<UserGroup> implements HasGroupOwnership
 		return Common.isActive(new Date(), endDate);
 	}
 
-	public boolean isAdministrator() {
-		return isAdministrator;
-	}
-
 	public boolean isCitrus() {
 		return getId() == Constants.CG_ORG_ID;
 	}
