@@ -31,7 +31,7 @@ public class GroupMembershipControl {
 		if (!Application.administratorOf(userGroup)) {
 			return new Label(Common.yesNo(userGroup.getAdministrator()));
 		}
-		return new ClickLabel(Common.yesNo(user.administratorOf(userGroup.getId())), new ClickHandler() {
+		return new ClickLabel(Common.yesNo(userGroup.getAdministrator()), new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				String action = userGroup.getAdministrator() ? "Revoke" : "Grant";
@@ -39,13 +39,13 @@ public class GroupMembershipControl {
 				ConfirmDialog.confirm(confirm, new ConfirmHandler() {
 					@Override
 					public void onConfirm() {
-						boolean admin = !user.administratorOf(userGroup.getId());
+						boolean admin = !userGroup.getAdministrator();
 						userGroup.setAdministrator(admin);
-						user.getGroups().get(userGroup.getId()).setAdministrator(admin);
-						onUpdate.execute();
+						// user.getGroups().get(userGroup.getId()).setAdministrator(admin);
 						userService.updateUserGroupRelation(user, userGroup, true, new Callback<Void>(false) {
 							@Override
 							protected void doOnSuccess(Void item) {
+								onUpdate.execute();
 							}
 						});
 					}

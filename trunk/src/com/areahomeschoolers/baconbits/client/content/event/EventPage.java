@@ -498,6 +498,7 @@ public class EventPage implements Page {
 
 		int urlResourceId = Url.getIntegerParameter("resourceId");
 		if (!event.isSaved() && urlResourceId > 0) {
+			event.setResourceId(urlResourceId);
 			fetchResource(urlResourceId);
 		}
 
@@ -1475,6 +1476,12 @@ public class EventPage implements Page {
 
 		ovp.add(ts);
 
+		if (event.getDocumentCount() > 0) {
+			DocumentSection ds = new DocumentSection(event, false);
+			ds.init();
+			ovp.add(ds);
+		}
+
 		if (!Common.isNullOrBlank(event.getDescription())) {
 			HTML desc = new HTML(event.getDescription());
 			desc.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
@@ -1495,7 +1502,7 @@ public class EventPage implements Page {
 		VerticalPanel outerPanel = new VerticalPanel();
 		outerPanel.add(oovp);
 
-		if (!pageData.getMoreFromResource().isEmpty()) {
+		if (!Common.isNullOrEmpty(pageData.getMoreFromResource())) {
 			outerPanel.add(new EventListWidget("More Events From " + event.getResourceName(), pageData.getMoreFromResource()));
 		}
 
