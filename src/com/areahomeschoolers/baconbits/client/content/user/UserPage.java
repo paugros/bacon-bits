@@ -229,6 +229,9 @@ public class UserPage implements Page {
 			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH1100PX));
 		} else {
 			tabPanel = new TabPage();
+			if (!ClientUtils.isMobileBrowser()) {
+				tabPanel.setWidth("850px");
+			}
 			form.emancipate();
 			tabPanel.add("Profile", new TabPageCommand() {
 				@Override
