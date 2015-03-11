@@ -70,10 +70,12 @@ public final class BookListPage implements Page {
 	public BookListPage(final VerticalPanel p) {
 		fp.setWidth("100%");
 		page = p;
+		page.getElement().getStyle().setMarginLeft(15, Unit.PX);
 
 		table.setDisplayColumns(BookColumn.IMAGE, BookColumn.TITLE, BookColumn.TAGS, BookColumn.PRICE, BookColumn.GRADE_LEVEL, BookColumn.CONDITION);
 		table.addStyleName(ContentWidth.MAXWIDTH1100PX.toString());
 		table.setDefaultSortColumn(BookColumn.TITLE, SortDirection.SORT_ASC);
+		table.disablePaging();
 
 		if (Application.hasLocation()) {
 			args.put(BookArg.LOCATION_FILTER, true);
@@ -95,6 +97,7 @@ public final class BookListPage implements Page {
 			protected void doOnSuccess(BookPageData result) {
 				pd = result;
 
+				page.setWidth("100%");
 				String title = "Books";
 				CookieCrumb cc = new CookieCrumb();
 				cc.add(new DefaultHyperlink("Books By Type", PageUrl.tagGroup("BOOK")));

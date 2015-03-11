@@ -74,6 +74,8 @@ public final class EventListPage implements Page {
 
 	public EventListPage(final VerticalPanel page) {
 		this.page = page;
+		page.setWidth("100%");
+		page.getElement().getStyle().setMarginLeft(15, Unit.PX);
 		if (Application.hasLocation()) {
 			args.put(EventArg.LOCATION_FILTER, true);
 		}
@@ -89,6 +91,7 @@ public final class EventListPage implements Page {
 		table.setDisplayColumns(EventColumn.REGISTERED, EventColumn.IMAGE, EventColumn.TITLE, EventColumn.DESCRIPTION, EventColumn.START_DATE,
 				EventColumn.LOCATION, EventColumn.TAGS, EventColumn.PRICE, EventColumn.AGES);
 		table.addStyleName(ContentWidth.MAXWIDTH1300PX.toString());
+		table.disablePaging();
 
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new DefaultHyperlink("Events By Type", PageUrl.tagGroup("EVENT")));

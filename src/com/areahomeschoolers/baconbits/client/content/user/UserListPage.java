@@ -76,6 +76,10 @@ public final class UserListPage implements Page {
 
 		table.setDisplayColumns(UserColumn.PICTURE, UserColumn.STATUS, UserColumn.NAME, UserColumn.LOCATION, UserColumn.EMAIL, UserColumn.INTERESTS);
 		table.addStyleName(ContentWidth.MAXWIDTH1100PX.toString());
+		table.disablePaging();
+
+		page.setWidth("100%");
+		page.getElement().getStyle().setMarginLeft(15, Unit.PX);
 
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new DefaultHyperlink("Homeschoolers By Interests", PageUrl.tagGroup("USER")));

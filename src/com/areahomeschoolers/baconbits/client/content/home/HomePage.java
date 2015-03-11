@@ -10,6 +10,7 @@ import com.areahomeschoolers.baconbits.client.content.minimodules.SellBooksMiniM
 import com.areahomeschoolers.baconbits.client.content.resource.AdTile;
 import com.areahomeschoolers.baconbits.client.content.resource.Tile;
 import com.areahomeschoolers.baconbits.client.content.resource.TileConfig;
+import com.areahomeschoolers.baconbits.client.content.user.CreateUserDialog;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.images.MainImageBundle;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -21,13 +22,16 @@ import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.ImageSwitcher;
+import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.HomePageData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
+import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.gwt.core.client.Scheduler;
@@ -47,6 +51,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -89,6 +94,47 @@ public class HomePage implements Page {
 		}
 
 		if (Application.isCitrus()) {
+			VerticalPanel groupOffer = new VerticalPanel();
+			groupOffer.setSpacing(10);
+			groupOffer.addStyleName(ContentWidth.MAXWIDTH800PX.toString());
+			String grpUrl = Constants.URL_SEPARATOR + PageUrl.userGroup(0);
+			String grpTxt = "<div class=moduleTitle>Host Your Homeschool Group</div>";
+			grpTxt += "Creating a free hosted homeschool group site takes less than a minute. ";
+			grpTxt += "Your site will have its own member directory, forum, event registration system (including payment reciept), ";
+			grpTxt += "curriculum marketplace, and access to hundreds of local homeschooling resources and events.";
+
+			if (Application.isAuthenticated()) {
+				grpTxt += "<div style=\"padding-top: 10px;\"><a href=\"" + grpUrl + "\" style=\"font-size: 16px;\">Try it out!</a></div>";
+				groupOffer.add(new HTML(grpTxt));
+			} else {
+
+				ClickLabel login = new ClickLabel("sign in", new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						LoginDialog.showLogin();
+					}
+				});
+
+				ClickLabel createUser = new ClickLabel("create an account", new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						CreateUserDialog dialog = new CreateUserDialog();
+						dialog.center(new User());
+					}
+				});
+
+				HorizontalPanel actionPanel = new HorizontalPanel();
+				actionPanel.add(new HTML("Just&nbsp;"));
+				actionPanel.add(login);
+				actionPanel.add(new HTML("&nbsp;or&nbsp;"));
+				actionPanel.add(createUser);
+				actionPanel.add(new HTML(", then add your group."));
+				groupOffer.add(new HTML(grpTxt));
+				groupOffer.add(actionPanel);
+			}
+
+			page.add(groupOffer);
+
 			page.getElement().getStyle().setZIndex(0);
 			page.getElement().getStyle().setPosition(Position.RELATIVE);
 			// begin slider test ground

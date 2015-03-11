@@ -19,6 +19,7 @@ public abstract class Constants {
 
 	public static final String DOCUMENT_URL_PREFIX = "/baconbits/service/file?id=";
 
+	public static final String FACEBOOK_URL = "https://www.facebook.com/";
 	public static final String URL_SPECIAL_CHAR = "!";
 	public static final String URL_SEPARATOR = "#" + URL_SPECIAL_CHAR;
 	public static final int CG_ORG_ID = 21;
@@ -30,6 +31,7 @@ public abstract class Constants {
 	public static final int ACCOUNT_CREATION_INSTRUCTIONS_ID = 77;
 	public static final int ONLINE_BOOK_SELLERS_GROUP_ID = 16;
 	public static final int PHYSICAL_BOOK_SELLERS_GROUP_ID = 17;
+	public static final int BLOG_CONTRIBUTORS_GROUP_ID = 33;
 	public static final int BOOK_TC_ARTICLE_ID = 103;
 	public static final String CG_DOMAIN = "myhomeschoolgroups.com";
 	public static final String CG_URL = "http://www." + CG_DOMAIN;

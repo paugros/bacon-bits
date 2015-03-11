@@ -110,13 +110,13 @@ public class UserServiceImpl extends GwtController implements UserService {
 		if (user.getGeneratePassword() && !response.hasErrors()) {
 			Mailer mail = new Mailer();
 			mail.addTo(user.getFullName() + " <" + user.getEmail() + ">");
-			String sn = ServerContext.getCurrentOrg().getShortName();
+			String sn = ServerContext.getCurrentOrg().getOrganizationName();
 			mail.setSubject(sn + " Login Information");
 			String msg = "Hello,\n\n";
 			if (!user.isSaved()) {
-				msg += "A login account has been created for you at " + sn + ". \n\n";
+				msg += "A login account has been created for you with " + sn + ". \n\n";
 			} else {
-				msg += "The password for your " + sn + " account has been reset. ";
+				msg += "The password for your account with " + sn + " has been reset. ";
 			}
 			msg += "Login information appears below. You will be required to establish a new password upon logging in.\n\n";
 			msg += "Site: " + ServerContext.getBaseUrlWithoutSeparator() + "\n";

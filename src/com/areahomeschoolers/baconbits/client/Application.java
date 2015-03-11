@@ -414,7 +414,6 @@ public final class Application implements ValueChangeHandler<String> {
 	public Application(ApplicationData ap) {
 		// set session information
 		applicationData = ap;
-		APPLICATION_NAME = ap.getCurrentOrg().getShortName();
 
 		if (getCurrentOrg() != null && getCurrentOrg().getFaviconId() != null) {
 			NodeList<Element> links = com.google.gwt.dom.client.Document.get().getElementsByTagName("link");

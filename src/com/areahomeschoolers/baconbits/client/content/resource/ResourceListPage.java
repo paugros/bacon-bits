@@ -65,11 +65,13 @@ public final class ResourceListPage implements Page {
 	public ResourceListPage(final VerticalPanel p) {
 		String title = "Resources";
 		page = p;
-
+		page.setWidth("100%");
+		page.getElement().getStyle().setMarginLeft(15, Unit.PX);
 		table.setDisplayColumns(ResourceColumn.IMAGE, ResourceColumn.NAME, ResourceColumn.DESCRIPTION, ResourceColumn.LOCATION, ResourceColumn.TAGS,
 				ResourceColumn.PRICE, ResourceColumn.AGES);
 		table.addStyleName(ContentWidth.MAXWIDTH1100PX.toString());
 		table.setDefaultSortColumn(ResourceColumn.NAME, SortDirection.SORT_ASC);
+		table.disablePaging();
 
 		if (Application.hasLocation()) {
 			args.put(ResourceArg.LOCATION_FILTER, true);

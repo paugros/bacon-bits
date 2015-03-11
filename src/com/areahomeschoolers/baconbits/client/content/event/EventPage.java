@@ -8,8 +8,6 @@ import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.document.DocumentSection;
-import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
-import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule.AdDirection;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.tag.TagSection;
@@ -520,7 +518,7 @@ public class EventPage implements Page {
 			public void execute() {
 				resourceDisplay.setText(event.getResourceName());
 				if (event.getResourceId() != null) {
-					resourceDisplay.setHref(PageUrl.resource(event.getResourceId()));
+					resourceDisplay.setTargetHistoryToken(PageUrl.resource(event.getResourceId()));
 				}
 			}
 		});
@@ -1496,7 +1494,10 @@ public class EventPage implements Page {
 
 		VerticalPanel outerPanel = new VerticalPanel();
 		outerPanel.add(oovp);
-		outerPanel.add(new AdsMiniModule(AdDirection.HORIZONTAL));
+
+		if (!pageData.getMoreFromResource().isEmpty()) {
+			outerPanel.add(new EventListWidget("More Events From " + event.getResourceName(), pageData.getMoreFromResource()));
+		}
 
 		page.add(outerPanel);
 	}
