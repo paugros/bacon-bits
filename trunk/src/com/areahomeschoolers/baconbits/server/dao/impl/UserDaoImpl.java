@@ -34,6 +34,7 @@ import org.springframework.stereotype.Repository;
 
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.server.dao.PaymentDao;
+import com.areahomeschoolers.baconbits.server.dao.ResourceDao;
 import com.areahomeschoolers.baconbits.server.dao.Suggestible;
 import com.areahomeschoolers.baconbits.server.dao.TagDao;
 import com.areahomeschoolers.baconbits.server.dao.UserDao;
@@ -56,6 +57,7 @@ import com.areahomeschoolers.baconbits.shared.dto.PollResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.PollUpdateData;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
+import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.ServerResponseData;
 import com.areahomeschoolers.baconbits.shared.dto.ServerSuggestionData;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
@@ -998,6 +1000,10 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			sql += "shortName = :shortName, orgDomain = :orgDomain, orgSubDomain = :orgSubDomain, endDate = :endDate where id = :id";
 			update(sql, namedParams);
 		} else {
+			if (queryForInt("select count(*) from groups where isActive(startDate, endDate) = 1 and orgSubDomain = ?", group.getOrgSubDomain()) > 0) {
+				return null;
+			}
+
 			if (group.getStartDate() == null) {
 				group.setStartDate(new Date());
 			}
@@ -1024,6 +1030,39 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			if (group.getOrganization()) {
 				update("update groups set organizationId = id where id = ?", group.getId());
 				group.setOrganizationName(group.getGroupName());
+
+				// add the adder as a admin
+				sql = "insert into userGroupMembers (userId, groupId, isAdministrator, groupApproved, userApproved) ";
+				sql += "values(?, ?, 1, 1, 1)";
+				update(sql, ServerContext.getCurrentUserId(), group.getId());
+
+				// auto-add a resource
+				Resource r = new Resource();
+				r.setName(group.getOrganizationName());
+				r.setUrl("http://" + group.getOrgSubDomain() + Constants.CG_DOMAIN);
+				r.setFacebookUrl(group.getFacebookUrl());
+				r.setAddress(group.getAddress());
+				r.setLat(group.getLat());
+				r.setLng(group.getLng());
+				r.setZip(group.getZip());
+				r.setStreet(group.getStreet());
+				r.setCity(group.getCity());
+				r.setState(group.getState());
+				r.setDescription(group.getDescription());
+				User u = ServerContext.getCurrentUser();
+				r.setContactEmail(u.getEmail());
+				r.setContactName(u.getFullName());
+
+				ResourceDao resourceDao = ServerContext.getDaoImpl("resource");
+				r = resourceDao.save(r);
+
+				if (ServerContext.isLive()) {
+					sql = "update resources set firstTagId = 160 where id = ?";
+					update(sql, r.getId());
+				}
+
+				sql = "insert into resourceUserMapping (resourceId, userId) values(?, ?)";
+				update(sql, r.getId(), u.getId());
 			}
 		}
 

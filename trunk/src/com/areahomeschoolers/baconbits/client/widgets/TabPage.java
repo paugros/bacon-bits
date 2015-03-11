@@ -21,7 +21,6 @@ public class TabPage extends LazyDecoratedTabPanel {
 
 	public VerticalPanel add(String tabText, final boolean enableCaching, final TabPageCommand command) {
 		final VerticalPanel vp = new VerticalPanel();
-		vp.setWidth("100%");
 		vp.setSpacing(spacing);
 
 		Command cmd = new Command() {

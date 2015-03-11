@@ -1,8 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.client.content.Sidebar;
-import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
@@ -11,11 +9,11 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
-import com.areahomeschoolers.baconbits.client.widgets.DefaultHyperlink;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public final class UserGroupListPage implements Page {
@@ -26,8 +24,9 @@ public final class UserGroupListPage implements Page {
 		}
 
 		ArgMap<UserGroupArg> args = new ArgMap<UserGroupArg>();
-		final String title = "Organizations and Groups";
+		final String title = "Groups";
 		final UserGroupTable table = new UserGroupTable(args);
+		table.disablePaging();
 		table.setTitle(title);
 		table.setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.ORGANIZATION, UserGroupColumn.DESCRIPTION, UserGroupColumn.START_DATE,
 				UserGroupColumn.END_DATE);
@@ -36,15 +35,13 @@ public final class UserGroupListPage implements Page {
 		}
 
 		table.getTitleBar().addExcelControl();
-		table.getTitleBar().addSearchControl();
 		table.addStatusFilterBox();
 		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH900PX));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
 			@Override
 			public void onDataReturn() {
-				Sidebar sb = Sidebar.create(MiniModule.ACTIVE_USERS, MiniModule.NEW_USERS);
-				Application.getLayout().setPage(title, sb, page);
+				Application.getLayout().setPage(title, page);
 			}
 		});
 

@@ -19,6 +19,7 @@ import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.MailListLink;
 import com.areahomeschoolers.baconbits.client.widgets.PaddedPanel;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.ArticleArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
@@ -80,6 +81,14 @@ public class BlogPage implements Page {
 				initialize();
 			}
 		});
+	}
+
+	private boolean canAddPost() {
+		if (Application.isCitrus()) {
+			return Application.administratorOfCurrentOrg() || Application.memberOf(Constants.BLOG_CONTRIBUTORS_GROUP_ID);
+		}
+
+		return Application.memberOf(Application.getCurrentOrgId());
 	}
 
 	private void initialize() {
@@ -153,7 +162,7 @@ public class BlogPage implements Page {
 		checkBoxPanel.add(i);
 
 		filterVerticalPanel.add(filterHorizontalPanel);
-		if (Application.administratorOfCurrentOrg() || Application.memberOf(33)) {
+		if (Application.administratorOfCurrentOrg() || Application.memberOf(Constants.BLOG_CONTRIBUTORS_GROUP_ID)) {
 			filterVerticalPanel.add(checkBoxPanel);
 		}
 		outerGrayPanel.setWidget(filterVerticalPanel);
@@ -204,10 +213,9 @@ public class BlogPage implements Page {
 		// Add post
 		PaddedPanel pp = new PaddedPanel(3);
 		pp.setWidth("100%");
-		if (Application.administratorOfCurrentOrg() || Application.memberOf(33)) {
+		if (canAddPost()) {
 			AddLink add = new AddLink("Add post", PageUrl.blogPost(0));
 			pp.add(add);
-			// pp.setCellWidth(add, "1%");
 		}
 
 		page.setWidth("auto");

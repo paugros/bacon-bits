@@ -414,6 +414,12 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 				pd.setEventsInSeries(list(args));
 			}
 
+			// other events from same resource
+			if (pd.getEvent().getResourceId() != null) {
+				sql = "select id, title, startDate from events where resourceId = ? and active = 1 and startDate > now() order by startDate";
+				pd.setMoreFromResource(query(sql, ServerUtils.getGenericRowMapper(), pd.getEvent().getResourceId()));
+			}
+
 			// age groups
 			pd.setAgeGroups(getAgeGroups(eventId));
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
+import com.areahomeschoolers.baconbits.client.content.event.EventListWidget;
 import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule;
 import com.areahomeschoolers.baconbits.client.content.minimodules.AdsMiniModule.AdDirection;
 import com.areahomeschoolers.baconbits.client.content.review.ReviewSection;
@@ -801,23 +802,7 @@ public class ResourcePage implements Page {
 		outerPanel.add(ovp);
 
 		if (!pd.getEvents().isEmpty()) {
-			VerticalPanel ep = new VerticalPanel();
-			ep.setSpacing(10);
-
-			for (Data e : pd.getEvents()) {
-				Hyperlink el = new Hyperlink(e.get("title"), PageUrl.event(e.getId()));
-				String txt = el.toString() + "<span style=\"color: #555555;\">&nbsp;&nbsp;-&nbsp;&nbsp;";
-				txt += Formatter.formatDate(e.getDate("startDate"), "MMM d") + "</span>";
-				HTML eep = new HTML(txt);
-
-				ep.add(eep);
-			}
-
-			Label upcoming = new Label("Upcoming Events");
-			upcoming.getElement().getStyle().setMarginTop(8, Unit.PX);
-			upcoming.addStyleName("largeText mediumPadding");
-			outerPanel.add(upcoming);
-			outerPanel.add(ep);
+			outerPanel.add(new EventListWidget("Upcoming Events", pd.getEvents()));
 		}
 
 		ReviewSection rs = new ReviewSection(ReviewType.RESOURCE, resource.getId());

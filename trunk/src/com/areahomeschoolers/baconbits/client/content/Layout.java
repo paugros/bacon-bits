@@ -389,7 +389,6 @@ public final class Layout {
 	public void setPage(String title, Sidebar sidebar, VerticalPanel page) {
 		if (currentPagePanel == page) {
 			Grid pageGrid = new Grid(1, 2);
-			pageGrid.setWidth("100%");
 			pageGrid.setWidget(0, 0, sidebar);
 			pageGrid.setWidget(0, 1, page);
 			pageGrid.getCellFormatter().setWidth(0, 0, "250px");
@@ -438,6 +437,7 @@ public final class Layout {
 		VerticalPanel vp = new VerticalPanel();
 		vp.setWidth("100%");
 		vp.add(page);
+		vp.setCellHorizontalAlignment(page, HasHorizontalAlignment.ALIGN_CENTER);
 		vp.add(links);
 		vp.add(copyright);
 		vp.add(legal);

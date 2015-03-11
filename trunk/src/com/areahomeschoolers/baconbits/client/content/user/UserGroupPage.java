@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
-import com.areahomeschoolers.baconbits.client.content.Sidebar;
-import com.areahomeschoolers.baconbits.client.content.Sidebar.MiniModule;
 import com.areahomeschoolers.baconbits.client.content.event.MarkupField;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage;
 import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError;
@@ -25,30 +23,36 @@ import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
+import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldDisplayLink;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
 import com.areahomeschoolers.baconbits.client.widgets.Form;
 import com.areahomeschoolers.baconbits.client.widgets.FormField;
 import com.areahomeschoolers.baconbits.client.widgets.NumericTextBox;
+import com.areahomeschoolers.baconbits.client.widgets.RegexTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
-import com.areahomeschoolers.baconbits.client.widgets.RequiredListBox;
 import com.areahomeschoolers.baconbits.client.widgets.RequiredTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage;
 import com.areahomeschoolers.baconbits.client.widgets.TabPage.TabPageCommand;
 import com.areahomeschoolers.baconbits.client.widgets.ValidatorDateBox;
 import com.areahomeschoolers.baconbits.shared.Common;
+import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserArg;
 import com.areahomeschoolers.baconbits.shared.dto.Arg.UserGroupArg;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap;
 import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
-import com.areahomeschoolers.baconbits.shared.dto.UserGroup.AccessLevel;
 
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.i18n.client.HasDirection.Direction;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -70,8 +74,6 @@ public class UserGroupPage implements Page {
 	private FieldTable fieldTable = new FieldTable();
 	private UserServiceAsync userService = (UserServiceAsync) ServiceCache.getService(UserService.class);
 	private FormField subDomainField;
-	private FormField domainField;
-	private FormField shortNameField;
 	private FormField payPalEmailField;
 	private FormField feeField;
 	private FormField markupField;
@@ -81,11 +83,6 @@ public class UserGroupPage implements Page {
 		int userGroupId = Url.getIntegerParameter("userGroupId");
 
 		if (!Application.isAuthenticated()) {
-			new ErrorPage(PageError.NOT_AUTHORIZED);
-			return;
-		}
-
-		if (!Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS) && userGroupId < 0) {
 			new ErrorPage(PageError.NOT_AUTHORIZED);
 			return;
 		}
@@ -116,14 +113,20 @@ public class UserGroupPage implements Page {
 				}
 			});
 		} else {
+			String type = Url.getParameter("type");
+			boolean isOrg = Common.isNullOrBlank(type);
+			group.setOrganization(isOrg);
+			group.setOwningOrgId(isOrg ? 0 : Application.getCurrentOrgId());
+			group.setContactId(Application.getCurrentUserId());
+			group.setOrgDomain(Constants.CG_DOMAIN);
+
 			initializePage();
 		}
 	}
 
 	private void createFieldTable() {
-		fieldTable.setWidth("100%");
-
 		final RequiredTextBox nameInput = new RequiredTextBox();
+		nameInput.setVisibleLength(30);
 		nameInput.setMaxLength(50);
 		final Label nameDisplay = new Label();
 		FormField nameField = form.createFormField("Name:", nameInput, nameDisplay);
@@ -142,36 +145,26 @@ public class UserGroupPage implements Page {
 		});
 		fieldTable.addField(nameField);
 
-		if (Application.isSystemAdministrator()) {
-			final CheckBox orgInput = new CheckBox("This group is an organization");
-
-			if (!group.isSaved()) {
-				orgInput.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-					@Override
-					public void onValueChange(ValueChangeEvent<Boolean> event) {
-						toggleOrgFields(event.getValue());
-					}
-				});
-				FormField orgField = form.createFormField("Organization:", orgInput, null);
-				orgField.setDtoUpdater(new Command() {
-					@Override
-					public void execute() {
-						boolean isOrg = orgInput.getValue();
-						group.setOrganization(isOrg);
-						group.setOwningOrgId(isOrg ? 0 : Application.getCurrentOrgId());
-					}
-				});
-				fieldTable.addField(orgField);
-			}
-
-			final RequiredTextBox subDomainInput = new RequiredTextBox();
-			subDomainInput.setMaxLength(255);
-			final Label subDomainDisplay = new Label();
-			subDomainField = form.createFormField("Sub-domain:", subDomainInput, subDomainDisplay);
+		if (group.isOrganization()) {
+			HorizontalPanel dp = new HorizontalPanel();
+			final RegexTextBox subDomainInput = new RegexTextBox("^(?:[A-Za-z0-9][A-Za-z0-9\\-]{0,61}[A-Za-z0-9]|[A-Za-z0-9])$");
+			subDomainInput.getValidator().setErrorMessage("Site address: allowed characters include letters, numbers, and hyphens (not leading or trailing)");
+			subDomainInput.setDirection(Direction.RTL);
+			dp.add(subDomainInput);
+			Label domainText = new Label("." + Constants.CG_DOMAIN);
+			domainText.getElement().getStyle().setMarginBottom(3, Unit.PX);
+			dp.add(domainText);
+			dp.setCellVerticalAlignment(domainText, HasVerticalAlignment.ALIGN_BOTTOM);
+			subDomainInput.setRequired(true);
+			subDomainInput.setMaxLength(30);
+			final Anchor subDomainDisplay = new Anchor();
+			subDomainField = form.createFormField("Site address:", dp, subDomainDisplay);
+			subDomainField.setValidator(subDomainInput.getValidator());
 			subDomainField.setInitializer(new Command() {
 				@Override
 				public void execute() {
-					subDomainDisplay.setText(group.getOrgSubDomain());
+					subDomainDisplay.setText(group.getOrgSubDomain() + "." + Constants.CG_DOMAIN);
+					subDomainDisplay.setHref("http://" + group.getOrgSubDomain() + "." + Constants.CG_DOMAIN);
 					subDomainInput.setText(group.getOrgSubDomain());
 				}
 			});
@@ -183,48 +176,7 @@ public class UserGroupPage implements Page {
 			});
 			fieldTable.addField(subDomainField);
 
-			final RequiredTextBox domainInput = new RequiredTextBox();
-			domainInput.setMaxLength(255);
-			domainInput.setVisibleLength(30);
-			final Label domainDisplay = new Label();
-			domainField = form.createFormField("Domain:", domainInput, domainDisplay);
-			domainField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					domainDisplay.setText(group.getOrgDomain());
-					domainInput.setText(group.getOrgDomain());
-				}
-			});
-			domainField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					group.setOrgDomain(domainInput.getText().toLowerCase());
-				}
-			});
-			fieldTable.addField(domainField);
-
-			final RequiredTextBox shortNameInput = new RequiredTextBox();
-			shortNameInput.setMaxLength(10);
-			shortNameInput.setVisibleLength(10);
-			final Label shortNameDisplay = new Label();
-			shortNameField = form.createFormField("Abbreviation/short name:", shortNameInput, shortNameDisplay);
-			shortNameField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					shortNameDisplay.setText(group.getShortName());
-					shortNameInput.setText(group.getShortName());
-				}
-			});
-			shortNameField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					group.setShortName(shortNameInput.getText());
-				}
-			});
-			fieldTable.addField(shortNameField);
-
 			final EmailTextBox payPalEmailInput = new EmailTextBox();
-			payPalEmailInput.setRequired(true);
 			payPalEmailInput.setMaxLength(255);
 			payPalEmailInput.setVisibleLength(30);
 			final Label payPalEmailDisplay = new Label();
@@ -244,10 +196,6 @@ public class UserGroupPage implements Page {
 			});
 			fieldTable.addField(payPalEmailField);
 
-			if (!group.isSaved()) {
-				orgInput.setValue(group.isOrganization());
-			}
-
 			final Label feeDisplay = new Label();
 			final NumericTextBox feeInput = new NumericTextBox(2);
 			feeInput.setMaxLength(50);
@@ -258,9 +206,9 @@ public class UserGroupPage implements Page {
 					String display = "None";
 					if (group.getMembershipFee() > 0) {
 						display = Formatter.formatCurrency(group.getMembershipFee());
+						feeInput.setValue(group.getMembershipFee());
 					}
 					feeDisplay.setText(display);
-					feeInput.setValue(group.getMembershipFee());
 				}
 			});
 			feeField.setDtoUpdater(new Command() {
@@ -271,11 +219,11 @@ public class UserGroupPage implements Page {
 			});
 			fieldTable.addField(feeField);
 
-			markupField = new MarkupField(group).getFormField();
-			form.addField(markupField);
-			fieldTable.addField(markupField);
-
-			toggleOrgFields(group.isOrganization());
+			if (Application.isSystemAdministrator()) {
+				markupField = new MarkupField(group).getFormField();
+				form.addField(markupField);
+				fieldTable.addField(markupField);
+			}
 		}
 
 		final TextBox descriptionInput = new TextBox();
@@ -303,14 +251,17 @@ public class UserGroupPage implements Page {
 		fieldTable.addField(addressField);
 
 		final Label religiousDisplay = new Label();
-		final RequiredListBox religiousInput = new RequiredListBox();
+		final DefaultListBox religiousInput = new DefaultListBox();
+		religiousInput.addItem("- Select -");
 		religiousInput.addItem("This is a religious group");
 		religiousInput.addItem("This is a secular group");
 		FormField religiousField = form.createFormField("Religious affiliation:", religiousInput, religiousDisplay);
 		religiousField.setInitializer(new Command() {
 			@Override
 			public void execute() {
-				religiousInput.setSelectedIndex(group.getReligious() ? 1 : 2);
+				if (group.isSaved()) {
+					religiousInput.setSelectedIndex(group.getReligious() ? 1 : 2);
+				}
 				religiousDisplay.setText(religiousInput.getSelectedText());
 			}
 		});
@@ -378,54 +329,59 @@ public class UserGroupPage implements Page {
 					facebookDisplay.setText(group.getFacebookUrl());
 					facebookInput.setText(group.getFacebookUrl());
 				} else {
-					facebookInput.setText("https://www.facebook.com/");
+					facebookInput.setText(Constants.FACEBOOK_URL);
 				}
 			}
 		});
 		facebookField.setDtoUpdater(new Command() {
 			@Override
 			public void execute() {
-				group.setFacebookUrl(facebookInput.getText());
+				String url = facebookInput.getText().trim();
+				if (!url.equals(Constants.FACEBOOK_URL)) {
+					group.setFacebookUrl(facebookInput.getText());
+				}
 			}
 		});
 		fieldTable.addField(facebookField);
 
-		final ValidatorDateBox startInput = new ValidatorDateBox();
-		final Label startDateDisplay = new Label();
-		FormField startField = form.createFormField("Start date:", startInput, startDateDisplay);
-		startField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				startDateDisplay.setText(Formatter.formatDate(group.getStartDate()));
-				startInput.setValue(group.getStartDate());
-			}
-		});
-		startField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				group.setStartDate(startInput.getValue());
-			}
-		});
-		fieldTable.addField(startField);
+		if (Application.isSystemAdministrator()) {
+			final ValidatorDateBox startInput = new ValidatorDateBox();
+			final Label startDateDisplay = new Label();
+			FormField startField = form.createFormField("Start date:", startInput, startDateDisplay);
+			startField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					startDateDisplay.setText(Formatter.formatDate(group.getStartDate()));
+					startInput.setValue(group.getStartDate());
+				}
+			});
+			startField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					group.setStartDate(startInput.getValue());
+				}
+			});
+			fieldTable.addField(startField);
 
-		// end date
-		final ValidatorDateBox endInput = new ValidatorDateBox();
-		final Label endDateDisplay = new Label();
-		FormField endField = form.createFormField("End date:", endInput, endDateDisplay);
-		endField.setInitializer(new Command() {
-			@Override
-			public void execute() {
-				endDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(group.getEndDate())));
-				endInput.setValue(group.getEndDate());
-			}
-		});
-		endField.setDtoUpdater(new Command() {
-			@Override
-			public void execute() {
-				group.setEndDate(endInput.getValue());
-			}
-		});
-		fieldTable.addField(endField);
+			// end date
+			final ValidatorDateBox endInput = new ValidatorDateBox();
+			final Label endDateDisplay = new Label();
+			FormField endField = form.createFormField("End date:", endInput, endDateDisplay);
+			endField.setInitializer(new Command() {
+				@Override
+				public void execute() {
+					endDateDisplay.setText(Common.getDefaultIfNull(Formatter.formatDate(group.getEndDate())));
+					endInput.setValue(group.getEndDate());
+				}
+			});
+			endField.setDtoUpdater(new Command() {
+				@Override
+				public void execute() {
+					group.setEndDate(endInput.getValue());
+				}
+			});
+			fieldTable.addField(endField);
+		}
 	}
 
 	private void initializePage() {
@@ -434,15 +390,29 @@ public class UserGroupPage implements Page {
 		form.initialize();
 
 		if (!group.isSaved()) {
+			if (Application.isCitrus() && group.isOrganization() && !Application.isSystemAdministrator()) {
+				VerticalPanel help = new VerticalPanel();
+				help.setSpacing(5);
+				Label heading = new Label("Create Your New Group");
+				heading.addStyleName("largeText");
+				help.add(heading);
+				String info = "After saving, you'll be redirected to your new site. You'll need to log in again using the ";
+				info += "same user and password you use for this site.";
+				HTML infoBlock = new HTML(info);
+				infoBlock.addStyleName(ContentWidth.MAXWIDTH600PX.toString());
+				help.add(infoBlock);
+
+				page.add(help);
+			}
 			form.configureForAdd(fieldTable);
-			page.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH900PX));
+			page.add(fieldTable);
 		} else {
 			tabPanel = new TabPage();
 			form.emancipate();
 			tabPanel.add("Group", new TabPageCommand() {
 				@Override
 				public void execute(VerticalPanel tabBody) {
-					tabBody.add(WidgetFactory.newSection(title, fieldTable, ContentWidth.MAXWIDTH900PX));
+					tabBody.add(fieldTable);
 
 					tabPanel.selectTabNow(tabBody);
 				}
@@ -478,16 +448,26 @@ public class UserGroupPage implements Page {
 			page.add(tabPanel);
 		}
 
-		Sidebar sb = Sidebar.create(MiniModule.ACTIVE_USERS, MiniModule.NEW_USERS);
-		Application.getLayout().setPage(title, sb, page);
+		Application.getLayout().setPage(title, page);
 	}
 
 	private void save(final FormField field) {
 		userService.saveUserGroup(group, new Callback<UserGroup>() {
 			@Override
 			protected void doOnSuccess(UserGroup a) {
+				if (a == null) {
+					AlertDialog.alert("Sorry, that site address is unavailable. Please try something different.");
+					field.getSubmitButton().setEnabled(true);
+					form.getSubmitButton().setEnabled(true);
+					return;
+				}
+
 				if (!Url.isParamValidId("userGroupId")) {
-					HistoryToken.set(PageUrl.userGroup(a.getId()));
+					if (group.isOrganization() && !Application.isSystemAdministrator()) {
+						Window.Location.assign("http://" + group.getOrgSubDomain() + "." + Constants.CG_DOMAIN);
+					} else {
+						HistoryToken.set(PageUrl.userGroup(a.getId()));
+					}
 				} else {
 					group = a;
 					form.setDto(a);
@@ -495,18 +475,5 @@ public class UserGroupPage implements Page {
 				}
 			}
 		});
-	}
-
-	private void toggleOrgFields(boolean visible) {
-		fieldTable.setFieldVisibility(subDomainField, visible);
-		fieldTable.setFieldVisibility(domainField, visible);
-		fieldTable.setFieldVisibility(shortNameField, visible);
-		fieldTable.setFieldVisibility(payPalEmailField, visible);
-		fieldTable.setFieldVisibility(feeField, visible);
-		fieldTable.setFieldVisibility(markupField, visible);
-
-		if (!group.isSaved() && visible) {
-			form.configureForAdd();
-		}
 	}
 }

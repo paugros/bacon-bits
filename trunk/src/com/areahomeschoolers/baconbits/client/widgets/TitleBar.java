@@ -126,6 +126,7 @@ public class TitleBar extends Composite {
 		}
 
 		controlPanel.add(control);
+		controlPanel.setCellVerticalAlignment(control, HasVerticalAlignment.ALIGN_MIDDLE);
 	}
 
 	public void addLink(Widget link) {

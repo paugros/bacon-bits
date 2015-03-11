@@ -58,6 +58,8 @@ public final class TagGroupPage implements Page {
 
 	public TagGroupPage(final VerticalPanel p) {
 		page = p;
+		page.setWidth("100%");
+		page.getElement().getStyle().setMarginLeft(15, Unit.PX);
 		try {
 			type = TagType.valueOf(Url.getParameter("type"));
 		} catch (Exception e) {

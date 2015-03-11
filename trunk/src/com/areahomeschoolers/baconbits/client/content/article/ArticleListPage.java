@@ -61,6 +61,8 @@ public final class ArticleListPage implements Page {
 
 	public ArticleListPage(final VerticalPanel page) {
 		this.page = page;
+		page.setWidth("100%");
+		page.getElement().getStyle().setMarginLeft(15, Unit.PX);
 		args.put(ArticleArg.ONLY_TAGGED);
 		if (!Common.isNullOrBlank(Url.getParameter("tagId"))) {
 			args.put(ArticleArg.HAS_TAGS, Url.getIntListParameter("tagId"));
@@ -70,6 +72,7 @@ public final class ArticleListPage implements Page {
 		table.setDisplayColumns(ArticleColumn.IMAGE, ArticleColumn.TITLE, ArticleColumn.TAGS);
 		table.setDefaultSortColumn(ArticleColumn.TITLE, SortDirection.SORT_ASC);
 		table.addStyleName(ContentWidth.MAXWIDTH1000PX.toString());
+		table.disablePaging();
 
 		CookieCrumb cc = new CookieCrumb();
 		cc.add(new DefaultHyperlink("Articles By Type", PageUrl.tagGroup("ARTICLE")));

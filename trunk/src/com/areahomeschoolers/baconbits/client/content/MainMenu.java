@@ -198,6 +198,7 @@ public final class MainMenu extends MenuBar {
 			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
 			addLinkToMenu(menu, "Add Article", PageUrl.article(0));
 			addLinkToMenu(menu, "Add User", PageUrl.user(0));
+			addLinkToMenu(menu, "Add Sub-group", PageUrl.userGroup(0) + "&type=sub");
 			menu.addSeparator();
 			addLinkToMenu(menu, "Article Management", PageUrl.articleManagement());
 			addLinkToMenu(menu, "Group Management", PageUrl.userGroupList());

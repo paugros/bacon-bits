@@ -12,6 +12,7 @@ public class EventPageData implements IsSerializable {
 	private ArrayList<EventVolunteerPosition> volunteerPositions;
 	private ArrayList<Event> eventsInSeries;
 	private ArrayList<Tag> tags;
+	private ArrayList<Data> moreFromResource;
 
 	public EventPageData() {
 
@@ -31,6 +32,10 @@ public class EventPageData implements IsSerializable {
 
 	public ArrayList<Event> getEventsInSeries() {
 		return eventsInSeries;
+	}
+
+	public ArrayList<Data> getMoreFromResource() {
+		return moreFromResource;
 	}
 
 	public EventRegistration getRegistration() {
@@ -59,6 +64,10 @@ public class EventPageData implements IsSerializable {
 
 	public void setEventsInSeries(ArrayList<Event> eventsInSeries) {
 		this.eventsInSeries = eventsInSeries;
+	}
+
+	public void setMoreFromResource(ArrayList<Data> moreFromResource) {
+		this.moreFromResource = moreFromResource;
 	}
 
 	public void setRegistration(EventRegistration registration) {
