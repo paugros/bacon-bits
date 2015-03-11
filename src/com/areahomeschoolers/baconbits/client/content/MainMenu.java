@@ -82,7 +82,7 @@ public final class MainMenu extends MenuBar {
 		}
 
 		if (Application.administratorOfCurrentOrg() || Application.administratorOf(17)) {
-			addItem("Admin", getAdminMenu());
+			addItem("Manage", getManageMenu());
 		}
 
 	}
@@ -190,7 +190,25 @@ public final class MainMenu extends MenuBar {
 		addMenuHandlers(subMenu);
 	}
 
-	private MenuBar getAdminMenu() {
+	private MenuBar getEventsMenu() {
+		MenuBar menu = new MenuBar(true);
+		addLinkToMenu(menu, "Event Listing", PageUrl.eventList());
+		addLinkToMenu(menu, "Calendar", PageUrl.eventCalendar());
+
+		if (Application.isAuthenticated()) {
+			menu.addSeparator();
+			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
+			addLinkToMenu(menu, "Event Payment / Checkout", PageUrl.payment());
+		}
+
+		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
+			addLinkToMenu(menu, "Registration Management", PageUrl.registrationManagement());
+		}
+
+		return menu;
+	}
+
+	private MenuBar getManageMenu() {
 		final MenuBar menu = new MenuBar(true);
 
 		if (Application.administratorOfCurrentOrg()) {
@@ -283,24 +301,6 @@ public final class MainMenu extends MenuBar {
 					Application.reloadPage();
 				}
 			});
-		}
-
-		return menu;
-	}
-
-	private MenuBar getEventsMenu() {
-		MenuBar menu = new MenuBar(true);
-		addLinkToMenu(menu, "Event Listing", PageUrl.eventList());
-		addLinkToMenu(menu, "Calendar", PageUrl.eventCalendar());
-
-		if (Application.isAuthenticated()) {
-			menu.addSeparator();
-			addLinkToMenu(menu, "Add Event", PageUrl.event(0));
-			addLinkToMenu(menu, "Event Payment / Checkout", PageUrl.payment());
-		}
-
-		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
-			addLinkToMenu(menu, "Registration Management", PageUrl.registrationManagement());
 		}
 
 		return menu;
