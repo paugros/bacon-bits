@@ -4,8 +4,10 @@ import java.util.Date;
 
 import com.areahomeschoolers.baconbits.shared.Common;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 public class Tag extends EntityDto<Tag> {
-	public enum TagType {
+	public enum TagType implements IsSerializable {
 		USER("#ffff77"), ARTICLE("#d2d6ec"), EVENT("#a2d69e"), BOOK("#ffcc6f"), RESOURCE("#bae0f5");
 		// USER("#e4ed81"), ARTICLE("#eca575"), EVENT("#80c87d"), BOOK("#f28e76"), RESOURCE("#92ceef");
 

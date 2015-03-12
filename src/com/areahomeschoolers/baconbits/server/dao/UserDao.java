@@ -64,7 +64,6 @@ public interface UserDao {
 
 	public PrivacyPreference savePrivacyPreference(PrivacyPreference privacyPreference);
 
-	@PreAuthorize("hasRole('ORGANIZATION_ADMINISTRATORS')")
 	public UserGroup saveUserGroup(UserGroup group);
 
 	public boolean sendPasswordResetEmail(String username);
