@@ -203,7 +203,6 @@ public class ResourcePage implements Page {
 
 		pp.add(ft);
 
-		pp.setWidth("1000px");
 		page.add(pp);
 
 		form.setEnabled(allowEdit());

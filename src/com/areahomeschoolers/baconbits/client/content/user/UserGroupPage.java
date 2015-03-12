@@ -15,6 +15,7 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
@@ -24,7 +25,9 @@ import com.areahomeschoolers.baconbits.client.validation.Validator;
 import com.areahomeschoolers.baconbits.client.validation.ValidatorCommand;
 import com.areahomeschoolers.baconbits.client.widgets.AddressField;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
+import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
 import com.areahomeschoolers.baconbits.client.widgets.DefaultListBox;
+import com.areahomeschoolers.baconbits.client.widgets.EmailDialog;
 import com.areahomeschoolers.baconbits.client.widgets.EmailTextBox;
 import com.areahomeschoolers.baconbits.client.widgets.FieldDisplayLink;
 import com.areahomeschoolers.baconbits.client.widgets.FieldTable;
@@ -46,6 +49,8 @@ import com.areahomeschoolers.baconbits.shared.dto.ArgMap.Status;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup;
 
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.HasDirection.Direction;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
@@ -403,11 +408,18 @@ public class UserGroupPage implements Page {
 				help.add(infoBlock);
 
 				page.add(help);
+			} else if (!group.isOrganization()) {
+				Label heading = new Label("New Group");
+				heading.addStyleName("largeText");
+				page.add(heading);
 			}
 			form.configureForAdd(fieldTable);
 			page.add(fieldTable);
 		} else {
 			tabPanel = new TabPage();
+			if (!ClientUtils.isMobileBrowser()) {
+				tabPanel.setWidth("850px");
+			}
 			form.emancipate();
 			tabPanel.add("Group", new TabPageCommand() {
 				@Override
@@ -427,6 +439,16 @@ public class UserGroupPage implements Page {
 					userTable.setUserGroup(group);
 					userTable.disablePaging();
 					userTable.setTitle("Members");
+					userTable.getTitleBar().addLink(new ClickLabel("Email Members", new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							EmailDialog dialog = new EmailDialog();
+							dialog.setShowSubjectBox(true);
+							dialog.setAllowEditRecipients(true);
+							dialog.addBcc(userTable.getFullList());
+							dialog.center();
+						}
+					}));
 					userTable.getTitleBar().addSearchControl();
 					userTable.getTitleBar().addExcelControl();
 					userTable.setDisplayColumns(UserColumn.PICTURE, UserColumn.ACTIVITY, UserColumn.NAME, UserColumn.EMAIL, UserColumn.PHONE,

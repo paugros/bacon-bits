@@ -12,7 +12,8 @@ public final class UserSelector extends EntityCellSelector<User, UserArg, UserCo
 	public UserSelector(ArgMap<UserArg> args) {
 		this();
 		userTable = new UserTable(args);
-		userTable.setTitle("User Groups");
+		userTable.setDisplayColumns(UserColumn.NAME, UserColumn.EMAIL, UserColumn.LOCATION);
+		userTable.setTitle("Users");
 		userTable.getTitleBar().addSearchControl();
 		setEntityCellTable(userTable);
 

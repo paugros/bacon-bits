@@ -8,6 +8,7 @@ import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookService;
 import com.areahomeschoolers.baconbits.client.rpc.service.BookServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
@@ -84,6 +85,9 @@ public final class BookSellerSummaryPage implements Page {
 		table.getTitleBar().addExcelControl();
 		table.getTitleBar().addSearchControl();
 		table.disablePaging();
+		if (!ClientUtils.isMobileBrowser()) {
+			table.setWidth("800px");
+		}
 		page.add(WidgetFactory.newSection(table, ContentWidth.MAXWIDTH750PX));
 
 		table.addDataReturnHandler(new DataReturnHandler() {
