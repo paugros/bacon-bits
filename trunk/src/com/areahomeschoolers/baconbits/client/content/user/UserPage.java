@@ -598,7 +598,6 @@ public class UserPage implements Page {
 						help.getElement().getStyle().setBorderColor("#cccccc");
 						help.getElement().getStyle().setBorderWidth(1, Unit.PX);
 						help.getElement().getStyle().setBackgroundColor("#ffffff");
-						help.addStyleName("smallText");
 						help.setWidth("600px");
 
 						FieldTable ft = new FieldTable();

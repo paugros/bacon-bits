@@ -1,5 +1,9 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.areahomeschoolers.baconbits.client.Application;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.content.user.UserSelector;
@@ -42,6 +46,8 @@ public class EmailDialog extends DefaultDialog {
 	private boolean allowEditRecipients;
 	private UserSelector userSelector;
 	private EmailTextBox emailTextBox;
+	// private List<User> recipients = new ArrayList<>();
+	private Set<User> recipients = new HashSet<>();
 
 	public EmailDialog() {
 		setModal(false);
@@ -49,16 +55,61 @@ public class EmailDialog extends DefaultDialog {
 		setText("Send Email");
 	}
 
-	public void addBcc(String bccEmail) {
-		email.addBcc(bccEmail);
+	public void addBcc(List<User> fullList) {
+		for (User u : fullList) {
+			addBcc(u);
+		}
 	}
 
-	public void addCc(String ccEmail) {
-		email.addCc(ccEmail);
+	public void addBcc(String... bccEmail) {
+		for (String e : bccEmail) {
+			email.addBcc(e);
+		}
 	}
 
-	public void addTo(String toEmail) {
-		email.addTo(toEmail);
+	public void addBcc(User u) {
+		if (!Common.isNullOrBlank(u.getEmail())) {
+			addBcc(u.getEmail());
+			recipients.add(u);
+		}
+	}
+
+	public void addCc(List<User> fullList) {
+		for (User u : fullList) {
+			addCc(u);
+		}
+	}
+
+	public void addCc(String... ccEmail) {
+		for (String e : ccEmail) {
+			email.addCc(e);
+		}
+	}
+
+	public void addCc(User u) {
+		if (!Common.isNullOrBlank(u.getEmail())) {
+			addCc(u.getEmail());
+			recipients.add(u);
+		}
+	}
+
+	public void addTo(List<User> fullList) {
+		for (User u : fullList) {
+			addTo(u);
+		}
+	}
+
+	public void addTo(String... toEmail) {
+		for (String e : toEmail) {
+			email.addTo(e);
+		}
+	}
+
+	public void addTo(User u) {
+		if (!Common.isNullOrBlank(u.getEmail())) {
+			addTo(u.getEmail());
+			recipients.add(u);
+		}
 	}
 
 	public void insertHtml(String html) {
@@ -116,27 +167,31 @@ public class EmailDialog extends DefaultDialog {
 
 			if (allowEditRecipients) {
 				PaddedPanel tp = new PaddedPanel();
-				tp.add(new Label("To:"));
+				tp.add(new Label("To (bcc):"));
 				email.addTo(Application.getCurrentUser().getEmail());
 				final ClickLabel uc = new ClickLabel("Click to choose recipients");
 
 				ArgMap<UserArg> ua = new ArgMap<UserArg>(Status.ACTIVE);
 				ua.put(UserArg.ORGANIZATION_ID, Application.getCurrentOrgId());
 				ua.put(UserArg.HAS_EMAIL, true);
-
 				userSelector = new UserSelector(ua);
 				userSelector.setMultiSelect(true);
+				if (!Common.isNullOrEmpty(recipients)) {
+					userSelector.getCellTable().populate(recipients);
+					userSelector.getCellTable().setSelectedItems(recipients);
+					uc.setText(recipients.size() + " recipients");
+				}
+
 				userSelector.addSubmitCommand(new Command() {
 					@Override
 					public void execute() {
 						email.getBccs().clear();
+						recipients.clear();
 						for (User u : userSelector.getSelectedItems()) {
-							if (!Common.isNullOrBlank(u.getEmail())) {
-								email.addBcc(u.getEmail());
-							}
+							addBcc(u);
 						}
 
-						uc.setText(email.getBccs().size() + " recipients");
+						uc.setText(recipients.size() + " recipients");
 					}
 				});
 
@@ -161,10 +216,15 @@ public class EmailDialog extends DefaultDialog {
 			}
 
 			if (showSubjectBox) {
+				VerticalPanel sp = new VerticalPanel();
 				subjectBox.setVisibleLength(68);
 				subjectBox.addStyleName("largeText");
 				subjectBox.setText(email.getSubject());
-				vp.add(subjectBox);
+				Label subjectLabel = new Label("Subject");
+				subjectLabel.addStyleName("smallText grayText");
+				sp.add(subjectLabel);
+				sp.add(subjectBox);
+				vp.add(sp);
 			}
 
 			if (Application.isAuthenticated()) {

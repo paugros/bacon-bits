@@ -73,6 +73,7 @@ import com.areahomeschoolers.baconbits.shared.dto.EventRegistration;
 import com.areahomeschoolers.baconbits.shared.dto.EventVolunteerPosition;
 import com.areahomeschoolers.baconbits.shared.dto.Resource;
 import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
+import com.areahomeschoolers.baconbits.shared.dto.User;
 import com.areahomeschoolers.baconbits.shared.dto.UserGroup.VisibilityLevel;
 
 import com.google.gwt.core.client.Scheduler;
@@ -211,6 +212,9 @@ public class EventPage implements Page {
 		} else {
 			Application.setConfirmNavigation(false);
 			tabPanel = new TabPage();
+			if (!ClientUtils.isMobileBrowser()) {
+				tabPanel.setWidth("875px");
+			}
 			form.emancipate();
 
 			tabPanel.add("Event", false, new TabPageCommand() {
@@ -242,7 +246,7 @@ public class EventPage implements Page {
 							}));
 						}
 
-						tb.addLink(new ClickLabel("Email", new ClickHandler() {
+						tb.addLink(new ClickLabel("Email This Event", new ClickHandler() {
 							@Override
 							public void onClick(ClickEvent e) {
 								EmailDialog dialog = new EmailDialog();
@@ -412,9 +416,15 @@ public class EventPage implements Page {
 										emailDialog = new EmailDialog();
 										String subject = event.getTitle() + " - " + Formatter.formatDateTime(event.getStartDate());
 										emailDialog.setSubject(subject);
+										emailDialog.setAllowEditRecipients(true);
 										emailDialog.setShowSubjectBox(true);
 										for (EventParticipant p : table.getFullList()) {
-											emailDialog.addBcc(p.getRegistrantEmailAddress());
+											User u = new User();
+											u.setId(p.getUserId());
+											u.setEmail(p.getRegistrantEmailAddress());
+											u.setFirstName(p.getAddedByFirstName());
+											u.setLastName(p.getAddedByLastName());
+											emailDialog.addBcc(u);
 										}
 										emailDialog.center();
 									}

@@ -863,7 +863,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 	/**
 	 * Populate table from a pre-existing list.
 	 */
-	public void populate(List<T> items) {
+	public void populate(Collection<T> items) {
 		populate(false);
 		getCallback().onSuccess(new ArrayList<T>(items));
 	}
@@ -1479,7 +1479,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 					} else {
 						label = new Label(NumberFormat.getFormat(format).format(val));
 					}
-					label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+					// label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
 					return label;
 				}
 			};
@@ -1493,7 +1493,7 @@ public abstract class EntityCellTable<T extends EntityDto<T>, U extends Arg, C e
 		});
 
 		AggregateFooterData data = new AggregateFooterData(method, numberGetter, format, new Label());
-		data.label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+		// data.label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
 		aggregateFooterDataMap.put(header, data);
 
 		return col;
