@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -704,6 +705,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		int id = args.getInt(UserGroupArg.ID);
 		String subDomain = args.getString(UserGroupArg.ORG_SUB_DOMAIN);
 		String domain = args.getString(UserGroupArg.ORG_DOMAIN);
+		int orgId = args.getInt(UserGroupArg.ORGANIZATION_ID);
 
 		List<Object> sqlArgs = new ArrayList<Object>();
 		String sql = "select g.*, concat(u.firstName, ' ', u.lastName) as contact, ";
@@ -734,6 +736,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		sql += "where 1 = 1 ";
+
+		if (orgId > 0) {
+			sql += "and g.organizationId = ? ";
+			sqlArgs.add(orgId);
+		}
 
 		if (args.getStatus() != Status.ALL) {
 			sql += "and isActive(g.startDate, g.endDate) = " + (args.getStatus() == Status.ACTIVE ? "1" : "0") + " \n";
@@ -1005,7 +1012,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			}
 
 			if (group.getStartDate() == null) {
-				group.setStartDate(new Date());
+				Calendar calendar = Calendar.getInstance();
+				calendar.add(Calendar.DAY_OF_MONTH, -1);
+				group.setStartDate(calendar.getTime());
 			}
 
 			String sql = "insert into groups (groupName, description, isOrganization, startDate, religious, membershipFee, facebookUrl, ";
@@ -1014,14 +1023,14 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			}
 			sql += "address, street, city, state, zip, lat, lng, ";
 			sql += "markupOverride, markupPercent, markupDollars, ";
-			sql += "shortName, orgDomain, orgSubDomain, payPalEmail, endDate) ";
+			sql += "shortName, orgDomain, orgSubDomain, payPalEmail, endDate, contactId) ";
 			sql += "values(:groupName, :description, :organization, :startDate, :religious, :membershipFee, :facebookUrl, ";
 			if (group.getOwningOrgId() > 0) {
 				sql += ":owningOrgId, ";
 			}
 			sql += ":address, :street, :city, :state, :zip, :lat, :lng, ";
 			sql += ":markupOverride, :markupPercent, :markupDollars, ";
-			sql += ":shortName, :orgDomain, :orgSubDomain, :payPalEmail, :endDate)";
+			sql += ":shortName, :orgDomain, :orgSubDomain, :payPalEmail, :endDate, :contactId)";
 
 			KeyHolder keys = new GeneratedKeyHolder();
 			update(sql, namedParams, keys);
@@ -1035,6 +1044,8 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				sql = "insert into userGroupMembers (userId, groupId, isAdministrator, groupApproved, userApproved) ";
 				sql += "values(?, ?, 1, 1, 1)";
 				update(sql, ServerContext.getCurrentUserId(), group.getId());
+				// need to update cache
+				ServerContext.deleteCacheKey("user_" + ServerContext.getCurrentUserId());
 
 				// auto-add a resource
 				Resource r = new Resource();
@@ -1056,10 +1067,11 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 				ResourceDao resourceDao = ServerContext.getDaoImpl("resource");
 				r = resourceDao.save(r);
 
-				if (ServerContext.isLive()) {
-					sql = "update resources set firstTagId = 160 where id = ?";
-					update(sql, r.getId());
-				}
+				int tagId = queryForInt(0, "select id from tags where name = 'Homeschool Groups'");
+				sql = "update resources set firstTagId = ? where id = ?";
+				update(sql, tagId, r.getId());
+				sql = "insert into tagResourceMapping (resourceId, tagId) values(?, ?)";
+				update(sql, r.getId(), tagId);
 
 				sql = "insert into resourceUserMapping (resourceId, userId) values(?, ?)";
 				update(sql, r.getId(), u.getId());

@@ -44,10 +44,8 @@ import com.areahomeschoolers.baconbits.client.event.ParameterHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
-import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.widgets.ConfirmDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ResetPasswordDialog;
-import com.areahomeschoolers.baconbits.client.widgets.UserAgreementDialog;
 import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
@@ -538,16 +536,16 @@ public final class Application implements ValueChangeHandler<String> {
 			createNewPage(page);
 		}
 
-		boolean viewingPolicies = false;
-		int articleId = Url.getIntegerParameter("articleId");
-		if ("Article".equals(page) && (articleId == 72 || articleId == 73)) {
-			viewingPolicies = true;
-		}
+		// boolean viewingPolicies = false;
+		// int articleId = Url.getIntegerParameter("articleId");
+		// if ("Article".equals(page) && (articleId == 72 || articleId == 73)) {
+		// viewingPolicies = true;
+		// }
 
-		if (isAuthenticated() && getCurrentUser().getShowUserAgreement() && !viewingPolicies) {
-			UserAgreementDialog dialog = new UserAgreementDialog();
-			dialog.center();
-		}
+		// if (isAuthenticated() && getCurrentUser().getShowUserAgreement() && !viewingPolicies) {
+		// UserAgreementDialog dialog = new UserAgreementDialog();
+		// dialog.center();
+		// }
 	}
 
 	private void pollForData() {

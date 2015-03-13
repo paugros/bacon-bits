@@ -148,7 +148,7 @@ public final class ResourceListPage implements Page {
 				visible = true;
 			} else if (r.getAddress() != null && r.getAddress().contains(text)) {
 				visible = true;
-			} else if (r.getTags().contains(text)) {
+			} else if (r.getTags() != null && r.getTags().contains(text)) {
 				visible = true;
 			}
 			if (viewMode == ViewMode.GRID) {

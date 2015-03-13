@@ -1,12 +1,10 @@
 package com.areahomeschoolers.baconbits.client.widgets;
 
 import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserService;
 import com.areahomeschoolers.baconbits.client.rpc.service.UserServiceAsync;
-import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreference;
 import com.areahomeschoolers.baconbits.shared.dto.PrivacyPreferenceType;
@@ -83,7 +81,6 @@ public class UserAgreementDialog extends DefaultDialog {
 				userService.save(u, new Callback<ServerResponseData<User>>() {
 					@Override
 					protected void doOnSuccess(ServerResponseData<User> result) {
-						HistoryToken.set(PageUrl.user(Application.getCurrentUserId()) + "&tab=7&gb=true&details=true");
 					}
 				});
 

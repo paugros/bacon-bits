@@ -1,7 +1,6 @@
 package com.areahomeschoolers.baconbits.client.content.user;
 
 import com.areahomeschoolers.baconbits.client.Application;
-import com.areahomeschoolers.baconbits.client.HistoryToken;
 import com.areahomeschoolers.baconbits.client.ServiceCache;
 import com.areahomeschoolers.baconbits.client.event.FormSubmitHandler;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
@@ -65,7 +64,6 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 						userService.save(entity, new Callback<ServerResponseData<User>>() {
 							@Override
 							protected void doOnSuccess(ServerResponseData<User> result) {
-								final User savedUser = result.getData();
 								if (result.hasErrors()) {
 									new ServerResponseDialog(result).center();
 									form.getSubmitButton().setEnabled(true);
@@ -75,9 +73,6 @@ public class CreateUserDialog extends EntityEditDialog<User> {
 								loginService.login(entity.getUserName(), entity.getPassword(), new Callback<Boolean>() {
 									@Override
 									protected void doOnSuccess(Boolean result) {
-										if (!Url.getBooleanParameter("bookSaleSignup")) {
-											HistoryToken.set(PageUrl.user(savedUser.getId()) + "&tab=7&gb=true&details=true", false);
-										}
 										Window.Location.reload();
 									}
 								});
