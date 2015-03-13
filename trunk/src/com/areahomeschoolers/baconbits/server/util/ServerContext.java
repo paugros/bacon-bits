@@ -47,6 +47,10 @@ public class ServerContext implements ApplicationContextAware {
 		cache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
 	}
 
+	public static void deleteCacheKey(String key) {
+		cache.delete(key);
+	}
+
 	public static ApplicationContext getApplicationContext() {
 		return ctx;
 	}

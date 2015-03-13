@@ -12,6 +12,7 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagService;
 import com.areahomeschoolers.baconbits.client.rpc.service.TagServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
@@ -40,6 +41,9 @@ public final class TagManagementPage implements Page {
 		args.put(TagArg.GET_ALL_COUNTS);
 
 		final TagTable table = new TagTable(args);
+		if (!ClientUtils.isMobileBrowser()) {
+			table.setWidth("800px");
+		}
 		table.setSelectionPolicy(SelectionPolicy.MULTI_ROW);
 		table.getTitleBar().addPagingControl();
 		table.getTitleBar().addSearchControl();

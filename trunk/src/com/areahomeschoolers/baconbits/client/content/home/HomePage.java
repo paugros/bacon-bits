@@ -160,7 +160,7 @@ public class HomePage implements Page {
 					centerPanel.add(new ArticleWidget(pageData.getIntro()));
 				}
 
-				if (Application.hasLocation()) {
+				if (Application.hasLocation() && Application.isCitrus()) {
 					String txt = "NOTE: The resource, event and community numbers below are only those ";
 					if (Application.getCurrentLocation().length() == 2) {
 						txt += "in " + Application.getCurrentLocation() + ". ";

@@ -320,7 +320,7 @@ public class ArticleDaoImpl extends SpringWrapper implements ArticleDao, Suggest
 			if (article.getGroupPolicy() != null) {
 				sql = "update groups set " + article.getGroupPolicy().getColumn() + " = ? where id = ?";
 				update(sql, article.getId(), article.getOwningOrgId());
-				ServerContext.getCurrentOrg().setPolicyId(article.getGroupPolicy(), article.getId());
+				ServerContext.deleteCacheKey("group_" + article.getOwningOrgId());
 			}
 		}
 

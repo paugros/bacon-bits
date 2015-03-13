@@ -109,7 +109,7 @@ public class UserGroupPage implements Page {
 					heading.addStyleName("hugeText");
 					head.add(heading);
 
-					if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(group.getId()) == null) {
+					if (Application.isAuthenticated() && group.getOrganization() && Application.getCurrentUser().getGroups().get(group.getId()) == null) {
 						head.add(new RequestMembershipLink(group));
 					}
 
@@ -122,8 +122,10 @@ public class UserGroupPage implements Page {
 			boolean isOrg = Common.isNullOrBlank(type);
 			group.setOrganization(isOrg);
 			group.setOwningOrgId(isOrg ? 0 : Application.getCurrentOrgId());
-			group.setContactId(Application.getCurrentUserId());
 			group.setOrgDomain(Constants.CG_DOMAIN);
+			if (isOrg) {
+				group.setContactId(Application.getCurrentUserId());
+			}
 
 			initializePage();
 		}

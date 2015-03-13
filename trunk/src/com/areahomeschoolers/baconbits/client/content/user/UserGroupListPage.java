@@ -6,6 +6,7 @@ import com.areahomeschoolers.baconbits.client.content.system.ErrorPage.PageError
 import com.areahomeschoolers.baconbits.client.content.user.UserGroupTable.UserGroupColumn;
 import com.areahomeschoolers.baconbits.client.event.DataReturnHandler;
 import com.areahomeschoolers.baconbits.client.generated.Page;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
@@ -24,14 +25,21 @@ public final class UserGroupListPage implements Page {
 		}
 
 		ArgMap<UserGroupArg> args = new ArgMap<UserGroupArg>();
+		if (!Application.isCitrus()) {
+			args.put(UserGroupArg.ORGANIZATION_ID, Application.getCurrentOrgId());
+		}
 		final String title = "Groups";
 		final UserGroupTable table = new UserGroupTable(args);
+		if (!ClientUtils.isMobileBrowser()) {
+			table.setWidth("900px");
+		}
 		table.disablePaging();
 		table.setTitle(title);
 		table.setDisplayColumns(UserGroupColumn.GROUP, UserGroupColumn.ORGANIZATION, UserGroupColumn.DESCRIPTION, UserGroupColumn.START_DATE,
 				UserGroupColumn.END_DATE);
-		if (Application.hasRole(AccessLevel.ORGANIZATION_ADMINISTRATORS)) {
+		if (Application.isAuthenticated()) {
 			table.getTitleBar().addLink(new DefaultHyperlink("Add", PageUrl.userGroup(0)));
+			table.getTitleBar().addLink(new DefaultHyperlink("Add Sub-group", PageUrl.userGroup(0) + "&type=sub"));
 		}
 
 		table.getTitleBar().addExcelControl();
