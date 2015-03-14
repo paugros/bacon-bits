@@ -109,7 +109,7 @@ public class UserGroupPage implements Page {
 					heading.addStyleName("hugeText");
 					head.add(heading);
 
-					if (Application.isAuthenticated() && group.getOrganization() && Application.getCurrentUser().getGroups().get(group.getId()) == null) {
+					if (Application.isAuthenticated() && Application.getCurrentUser().getGroups().get(group.getId()) == null) {
 						head.add(new RequestMembershipLink(group));
 					}
 
