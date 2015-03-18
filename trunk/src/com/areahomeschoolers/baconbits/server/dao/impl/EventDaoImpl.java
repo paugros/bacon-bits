@@ -798,14 +798,6 @@ public class EventDaoImpl extends SpringWrapper implements EventDao, Suggestible
 			if (ServerContext.isAuthenticated()) {
 				ids.addAll(ServerContext.getCurrentUser().getOrganizationIds());
 			}
-
-			// String idString = Common.join(ids, ", ");
-
-			// if (showCommunity) {
-			// sql += "and (e.categoryId = 6 or e.owningOrgId not in(" + idString + ")) ";
-			// } else if (!includeCommunity) {
-			// sql += "and (e.categoryId != 6 and e.owningOrgId in(" + idString + ")) ";
-			// }
 		}
 
 		if (seriesId > 0) {
