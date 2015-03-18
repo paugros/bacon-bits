@@ -121,13 +121,6 @@ public class BlogPage implements Page {
 		topicsPanel.setSpacing(7);
 		populateTopicsPanel();
 
-		// header
-		VerticalPanel outerVp = new VerticalPanel();
-		Label header = new Label("Blog");
-		header.getElement().getStyle().setFontSize(24, Unit.PX);
-		header.getElement().getStyle().setPaddingLeft(5, Unit.PX);
-		header.addStyleName("bold");
-
 		// filter
 		PaddedPanel filterHorizontalPanel = new PaddedPanel();
 		filterHorizontalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
@@ -166,9 +159,7 @@ public class BlogPage implements Page {
 			filterVerticalPanel.add(checkBoxPanel);
 		}
 		outerGrayPanel.setWidget(filterVerticalPanel);
-		outerVp.add(header);
-		outerVp.add(outerGrayPanel);
-		pagePanel.add(outerVp);
+		pagePanel.add(outerGrayPanel);
 
 		filterButton.addClickHandler(new ClickHandler() {
 			@Override
