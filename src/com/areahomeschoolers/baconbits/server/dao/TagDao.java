@@ -10,7 +10,7 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag;
 public interface TagDao {
 	public Tag addMapping(Tag mappingTag);
 
-	public void addMappings(int entityId, ArrayList<Tag> tags);
+	public void addMappings(int entityId, HashSet<Tag> tags);
 
 	public void delete(int tagId);
 

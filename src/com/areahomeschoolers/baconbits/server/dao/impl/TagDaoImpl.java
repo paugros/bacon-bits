@@ -7,10 +7,12 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -37,7 +39,6 @@ import com.areahomeschoolers.baconbits.shared.dto.Tag.TagType;
 
 @Repository
 public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
-
 	public static String createWhere(TagType type, int withinMiles, String withinLat, String withinLng, String state) {
 		String sql = "";
 		switch (type) {
@@ -96,6 +97,8 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 		return sql;
 	}
 
+	private final Logger logger = Logger.getLogger(this.getClass().toString());
+
 	@Autowired
 	public TagDaoImpl(DataSource dataSource) {
 		super(dataSource);
@@ -112,25 +115,30 @@ public class TagDaoImpl extends SpringWrapper implements TagDao, Suggestible {
 			return tag;
 		}
 
-		SqlParameterSource namedParams = new BeanPropertySqlParameterSource(tag);
-		String sql = "insert into " + tag.getMappingTable() + "(" + tag.getMappingColumn() + ", tagId) ";
-		sql += "values(:entityId, :id)";
+		Tag mapped = null;
+		try {
+			SqlParameterSource namedParams = new BeanPropertySqlParameterSource(tag);
+			String sql = "insert into " + tag.getMappingTable() + "(" + tag.getMappingColumn() + ", tagId) ";
+			sql += "values(:entityId, :id)";
 
-		KeyHolder keys = new GeneratedKeyHolder();
-		update(sql, namedParams, keys);
+			KeyHolder keys = new GeneratedKeyHolder();
+			update(sql, namedParams, keys);
 
-		ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_ID, ServerUtils.getIdFromKeys(keys));
-		args.put(TagArg.TYPE, tag.getMappingType().toString());
-		Tag mapped = list(args).get(0);
-		mapped.setEntityId(tag.getEntityId());
+			ArgMap<TagArg> args = new ArgMap<TagArg>(TagArg.MAPPING_ID, ServerUtils.getIdFromKeys(keys));
+			args.put(TagArg.TYPE, tag.getMappingType().toString());
+			mapped = list(args).get(0);
+			mapped.setEntityId(tag.getEntityId());
 
-		updateFirstTagColumn(tag);
+			updateFirstTagColumn(tag);
+		} catch (DataIntegrityViolationException e) {
+			logger.warning(e.getMessage());
+		}
 
 		return mapped;
 	}
 
 	@Override
-	public void addMappings(int entityId, ArrayList<Tag> tags) {
+	public void addMappings(int entityId, HashSet<Tag> tags) {
 		for (Tag tag : tags) {
 			tag.setEntityId(entityId);
 			addMapping(tag);
