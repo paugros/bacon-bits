@@ -17,6 +17,7 @@ import com.areahomeschoolers.baconbits.client.generated.Page;
 import com.areahomeschoolers.baconbits.client.rpc.Callback;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleService;
 import com.areahomeschoolers.baconbits.client.rpc.service.ArticleServiceAsync;
+import com.areahomeschoolers.baconbits.client.util.ClientUtils;
 import com.areahomeschoolers.baconbits.client.util.Formatter;
 import com.areahomeschoolers.baconbits.client.util.PageUrl;
 import com.areahomeschoolers.baconbits.client.util.Url;
@@ -239,7 +240,9 @@ public class ArticlePage implements Page {
 		final ControlledRichTextArea dataInput = new ControlledRichTextArea();
 		final HTML dataDisplay = new HTML();
 		dataDisplay.getElement().getStyle().setPadding(10, Unit.PX);
-		dataDisplay.setWidth("800px");
+		if (!ClientUtils.isMobileBrowser()) {
+			dataDisplay.setWidth("800px");
+		}
 		dataDisplay.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
 		final FormField dataField = form.createFormField("", dataInput, dataDisplay);
 		dataField.setDtoUpdater(new Command() {
