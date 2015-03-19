@@ -23,6 +23,7 @@ import com.areahomeschoolers.baconbits.client.util.Url;
 import com.areahomeschoolers.baconbits.client.util.WidgetFactory.ContentWidth;
 import com.areahomeschoolers.baconbits.client.widgets.AlertDialog;
 import com.areahomeschoolers.baconbits.client.widgets.ClickLabel;
+import com.areahomeschoolers.baconbits.client.widgets.FeedbackWidget;
 import com.areahomeschoolers.baconbits.client.widgets.ImageSwitcher;
 import com.areahomeschoolers.baconbits.client.widgets.LoginDialog;
 import com.areahomeschoolers.baconbits.client.widgets.RequestMembershipLink;
@@ -134,6 +135,10 @@ public class HomePage implements Page {
 			}
 
 			page.add(groupOffer);
+
+			FeedbackWidget fw = new FeedbackWidget();
+			fw.getElement().getStyle().setMarginLeft(10, Unit.PX);
+			page.add(fw);
 
 			page.getElement().getStyle().setZIndex(0);
 			page.getElement().getStyle().setPosition(Position.RELATIVE);

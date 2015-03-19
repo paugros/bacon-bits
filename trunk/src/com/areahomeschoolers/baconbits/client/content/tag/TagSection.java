@@ -181,7 +181,7 @@ public class TagSection extends Composite implements HasValidator {
 	}
 
 	private VerticalPanel vp = new VerticalPanel();
-	private ArrayList<Tag> tags = new ArrayList<>();
+	private HashSet<Tag> tags = new HashSet<>();
 	private EntitySuggestBox suggestBox;
 	private Button add = new Button("Add");
 	private FlowPanel fp = new FlowPanel();
@@ -342,16 +342,18 @@ public class TagSection extends Composite implements HasValidator {
 				}
 			});
 		} else {
-			populate(tags);
+			populate(new ArrayList<>(tags));
 		}
 	}
 
-	public void populate(ArrayList<Tag> tags) {
-		if (tags == null) {
-			tags = new ArrayList<>();
+	public void populate(ArrayList<Tag> t) {
+		if (t == null) {
+			t = new ArrayList<>();
 		}
 
-		this.tags = tags;
+		tags.clear();
+		tags.addAll(t);
+
 		fp.clear();
 		for (Tag tag : tags) {
 			TagWidget tw = new TagWidget(tag);
@@ -421,6 +423,9 @@ public class TagSection extends Composite implements HasValidator {
 	}
 
 	private void addTagToPanel(Tag tag) {
+		if (tag == null) {
+			return;
+		}
 		TagWidget tw = new TagWidget(tag);
 		fp.add(tw);
 		Fader fader = new Fader(tw);

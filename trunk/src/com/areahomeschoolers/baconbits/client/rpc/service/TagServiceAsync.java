@@ -20,7 +20,7 @@ public interface TagServiceAsync {
 
 	public void save(Tag tag, AsyncCallback<Tag> callback);
 
-	void addMappings(int entityId, ArrayList<Tag> tags, AsyncCallback<Void> callback);
+	void addMappings(int entityId, HashSet<Tag> tags, AsyncCallback<Void> callback);
 
 	void merge(Tag tag, HashSet<Integer> tagIds, AsyncCallback<Tag> callback);
 }

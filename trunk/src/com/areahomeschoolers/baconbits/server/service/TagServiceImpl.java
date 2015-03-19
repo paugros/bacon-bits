@@ -33,7 +33,7 @@ public class TagServiceImpl extends GwtController implements TagService {
 	}
 
 	@Override
-	public void addMappings(int entityId, ArrayList<Tag> tags) {
+	public void addMappings(int entityId, HashSet<Tag> tags) {
 		dao.addMappings(entityId, tags);
 	}
 

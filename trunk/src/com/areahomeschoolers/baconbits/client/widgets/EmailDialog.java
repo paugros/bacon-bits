@@ -46,8 +46,11 @@ public class EmailDialog extends DefaultDialog {
 	private boolean allowEditRecipients;
 	private UserSelector userSelector;
 	private EmailTextBox emailTextBox;
+	private Button send = new Button("Send Email");
+	private String aboveText;
 	// private List<User> recipients = new ArrayList<>();
 	private Set<User> recipients = new HashSet<>();
+	private boolean ccSender = true;
 
 	public EmailDialog() {
 		setModal(false);
@@ -112,12 +115,32 @@ public class EmailDialog extends DefaultDialog {
 		}
 	}
 
+	public String getAboveText() {
+		return aboveText;
+	}
+
+	public Button getSubmitButton() {
+		return send;
+	}
+
 	public void insertHtml(String html) {
 		this.insertHtml = html;
 	}
 
+	public void setAboveText(String aboveText) {
+		this.aboveText = aboveText;
+	}
+
 	public void setAllowEditRecipients(boolean allow) {
 		this.allowEditRecipients = allow;
+	}
+
+	public void setCcSender(boolean cc) {
+		ccSender = cc;
+	}
+
+	public void setFormattingEnabled(boolean enabled) {
+		textArea.getToolbar().setVisible(enabled);
 	}
 
 	public void setFrom(String fromEmail) {
@@ -127,7 +150,9 @@ public class EmailDialog extends DefaultDialog {
 			fromBox.setRequired(true);
 		} else {
 			fromPanel.setWidget(new Label(fromEmail));
-			email.addCc(fromEmail);
+			if (ccSender) {
+				email.addCc(fromEmail);
+			}
 			fromBox.setRequired(false);
 		}
 	}
@@ -156,9 +181,12 @@ public class EmailDialog extends DefaultDialog {
 		if (bp == null) {
 			email.setHtmlMail(true);
 			textArea.getTextArea().setWidth("600px");
-			textArea.getTextArea().setHeight("400px");
+			textArea.getTextArea().setHeight("300px");
 			bp = new ButtonPanel(this);
 			vp.setSpacing(10);
+			if (aboveText != null) {
+				vp.add(new Label(aboveText));
+			}
 			PaddedPanel fp = new PaddedPanel();
 			fromBox.setVisibleLength(30);
 			fp.add(new Label("Your email:"));
@@ -235,7 +263,6 @@ public class EmailDialog extends DefaultDialog {
 
 			vp.add(textArea);
 
-			final Button send = new Button("Send Email");
 			send.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -245,7 +272,9 @@ public class EmailDialog extends DefaultDialog {
 						}
 
 						fromEmail = fromBox.getValue();
-						email.addCc(fromEmail);
+						if (ccSender) {
+							email.addCc(fromEmail);
+						}
 					}
 
 					if (showSubjectBox) {
