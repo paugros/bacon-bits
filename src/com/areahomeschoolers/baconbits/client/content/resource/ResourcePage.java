@@ -594,7 +594,6 @@ public class ResourcePage implements Page {
 		final ControlledRichTextArea descriptionInput = new ControlledRichTextArea();
 		final FormField descriptionField = form.createFormField("Description:", descriptionInput, descriptionDisplay);
 		descriptionDisplay.getElement().getStyle().setPadding(10, Unit.PX);
-		descriptionDisplay.setWidth("800px");
 		descriptionDisplay.getElement().getStyle().setOverflowX(Overflow.HIDDEN);
 		descriptionField.setRequired(true);
 		descriptionField.setInitializer(new Command() {
@@ -798,6 +797,9 @@ public class ResourcePage implements Page {
 		}
 
 		VerticalPanel outerPanel = new VerticalPanel();
+		if (!ClientUtils.isMobileBrowser()) {
+			ovp.setWidth("650px");
+		}
 		outerPanel.add(ovp);
 
 		if (!pd.getEvents().isEmpty()) {
