@@ -230,7 +230,8 @@ public class BlogPage implements Page {
 
 		populate();
 
-		Application.getLayout().setPage("Blog", page);
+		String title = Application.isCitrus() ? "Blog" : "Forum";
+		Application.getLayout().setPage(title, page);
 	}
 
 	private void populate() {
