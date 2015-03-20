@@ -99,10 +99,10 @@ public class HomePage implements Page {
 			groupOffer.setSpacing(10);
 			groupOffer.addStyleName(ContentWidth.MAXWIDTH800PX.toString());
 			String grpUrl = Constants.URL_SEPARATOR + PageUrl.userGroup(0);
-			String grpTxt = "<div class=moduleTitle>Host Your Homeschool Group</div>";
-			grpTxt += "Creating a free hosted homeschool group site takes less than a minute. ";
-			grpTxt += "Your site will have its own member directory, forum, event registration system (including payment reciept), ";
-			grpTxt += "curriculum marketplace, and access to hundreds of local homeschooling resources and events.";
+			String grpTxt = "<div class=moduleTitle>Create Your Homeschool Community Space</div>";
+			grpTxt += "Creating a free homeschool community site takes less than a minute. ";
+			grpTxt += "Your space will have its own member directory, forum, event registration, customizable menus, ";
+			grpTxt += "and access to tons of local homeschooling resources and events.";
 
 			if (Application.isAuthenticated()) {
 				grpTxt += "<div style=\"padding-top: 10px;\"><a href=\"" + grpUrl + "\" style=\"font-size: 16px;\">Try it out!</a></div>";
