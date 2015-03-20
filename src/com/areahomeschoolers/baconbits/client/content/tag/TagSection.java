@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -181,7 +182,7 @@ public class TagSection extends Composite implements HasValidator {
 	}
 
 	private VerticalPanel vp = new VerticalPanel();
-	private HashSet<Tag> tags = new HashSet<>();
+	private HashSet<Tag> tags = new LinkedHashSet<>();
 	private EntitySuggestBox suggestBox;
 	private Button add = new Button("Add");
 	private FlowPanel fp = new FlowPanel();
