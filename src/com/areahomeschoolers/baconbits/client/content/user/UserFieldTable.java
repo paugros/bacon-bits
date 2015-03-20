@@ -135,25 +135,27 @@ public class UserFieldTable extends FieldTable {
 			});
 			addField(emailField);
 
-			final EmailTextBox payPalEmailInput = new EmailTextBox();
-			payPalEmailInput.setMaxLength(255);
-			payPalEmailInput.setVisibleLength(30);
-			final Label payPalEmailDisplay = new Label();
-			FormField payPalEmailField = form.createFormField("PayPal email:", payPalEmailInput, payPalEmailDisplay);
-			payPalEmailField.setInitializer(new Command() {
-				@Override
-				public void execute() {
-					payPalEmailDisplay.setText(Common.getDefaultIfNull(user.getPayPalEmail()));
-					payPalEmailInput.setText(user.getPayPalEmail());
-				}
-			});
-			payPalEmailField.setDtoUpdater(new Command() {
-				@Override
-				public void execute() {
-					user.setPayPalEmail(payPalEmailInput.getText().trim());
-				}
-			});
-			addField(payPalEmailField);
+			if (user.isSaved()) {
+				final EmailTextBox payPalEmailInput = new EmailTextBox();
+				payPalEmailInput.setMaxLength(255);
+				payPalEmailInput.setVisibleLength(30);
+				final Label payPalEmailDisplay = new Label();
+				FormField payPalEmailField = form.createFormField("PayPal email:", payPalEmailInput, payPalEmailDisplay);
+				payPalEmailField.setInitializer(new Command() {
+					@Override
+					public void execute() {
+						payPalEmailDisplay.setText(Common.getDefaultIfNull(user.getPayPalEmail()));
+						payPalEmailInput.setText(user.getPayPalEmail());
+					}
+				});
+				payPalEmailField.setDtoUpdater(new Command() {
+					@Override
+					public void execute() {
+						user.setPayPalEmail(payPalEmailInput.getText().trim());
+					}
+				});
+				addField(payPalEmailField);
+			}
 		}
 
 		if (!user.isChild() && user.isSaved() && Application.getUserActivity().get(user.getId()) != null) {
