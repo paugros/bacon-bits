@@ -11,10 +11,6 @@ public class DefaultListBox extends ListBox {
 		getElement().getStyle().setBorderColor("#cccccc");
 	}
 
-	public DefaultListBox(boolean isMultipleSelect) {
-		super(isMultipleSelect);
-	}
-
 	public void addItem(String text, int value) {
 		addItem(text, Integer.toString(value));
 	}
@@ -73,7 +69,7 @@ public class DefaultListBox extends ListBox {
 
 	/**
 	 * Sets the row's style to a title style. Also disables the row.
-	 * 
+	 *
 	 * @param index
 	 */
 	public void setItemTitled(int index) {

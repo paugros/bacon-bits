@@ -85,20 +85,20 @@ public class VariableSizePager extends AbstractPager {
 		}
 	}
 
+	private static final String PAGE_SIZE_PREF = "tablePageSize.";
 	private final ImageButton firstPage;
 	private final ImageButton lastPage;
 	private final ImageButton nextPage;
 	private final ImageButton prevPage;
 	private final CellTitleBar<?> titlebar;
 	private final Style style;
-	private final HorizontalPanel layout;
 
+	private final HorizontalPanel layout;
 	private int desiredPageSize = 0;
 	private int index = 0;
 	private DefaultListBox pageSizeListBox;
 	private boolean pageResizingEnabled = true;
 	private int pagingThreshold;
-	private static final String PAGE_SIZE_PREF = "tablePageSize.";
 	private List<ParameterHandler<Integer>> pageSizeChangeHandlers = new ArrayList<ParameterHandler<Integer>>();
 
 	public VariableSizePager(CellTitleBar<?> titlebar) {
@@ -153,7 +153,7 @@ public class VariableSizePager extends AbstractPager {
 		layout.add(firstPage);
 		layout.add(prevPage);
 
-		pageSizeListBox = new DefaultListBox(false);
+		pageSizeListBox = new DefaultListBox();
 		for (PageSize p : EnumSet.allOf(PageSize.class)) {
 			pageSizeListBox.addItem(p.getText(), p.getSize());
 		}
@@ -243,7 +243,7 @@ public class VariableSizePager extends AbstractPager {
 
 	/**
 	 * Enable or disable the next page buttons.
-	 * 
+	 *
 	 * @param disabled
 	 *            true to disable, false to enable
 	 */
@@ -313,7 +313,7 @@ public class VariableSizePager extends AbstractPager {
 
 	/**
 	 * Enable or disable the previous page buttons.
-	 * 
+	 *
 	 * @param disabled
 	 *            true to disable, false to enable
 	 */
