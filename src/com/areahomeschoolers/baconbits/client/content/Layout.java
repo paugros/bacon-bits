@@ -33,7 +33,6 @@ import com.areahomeschoolers.baconbits.shared.Common;
 import com.areahomeschoolers.baconbits.shared.Constants;
 import com.areahomeschoolers.baconbits.shared.dto.ApplicationData;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Cursor;
@@ -276,7 +275,7 @@ public final class Layout {
 				public void onClick(ClickEvent event) {
 					LoginServiceAsync loginService = (LoginServiceAsync) ServiceCache.getService(LoginService.class);
 
-					if (!GWT.isProdMode()) {
+					if (!Application.isProduction()) {
 						loginService.loginAndGetApplicationData("paul.augros@gmail.com", "L33nfiatna", new AsyncCallback<ApplicationData>() {
 							@Override
 							public void onFailure(Throwable caught) {

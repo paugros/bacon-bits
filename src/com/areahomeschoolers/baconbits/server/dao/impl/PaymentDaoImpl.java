@@ -237,7 +237,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 				userReceiver.setPrimary(Boolean.FALSE);
 			}
 
-			if (ServerContext.isLive()) {
+			if (ServerContext.isProduction()) {
 				userReceiver.setEmail(email);
 			} else {
 				userReceiver.setEmail(testAccounts.get(i++)); // password same as email
@@ -252,7 +252,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 			siteReceiver.setPrimary(Boolean.TRUE);
 
 			// site email address
-			if (ServerContext.isLive()) {
+			if (ServerContext.isProduction()) {
 				siteReceiver.setEmail(Constants.CG_PAYPAL_EMAIL);
 			} else {
 				siteReceiver.setEmail("citrusgroups@citrusgroups.com"); // password same as email
@@ -275,7 +275,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 		cd.setIpAddress(ServerContext.getRequest().getRemoteAddr());
 
 		payRequest.setClientDetails(cd);
-		if (!ServerContext.isLive()) {
+		if (!ServerContext.isProduction()) {
 			payRequest.setSenderEmail("someone@enduser.com"); // password same as email
 		}
 
@@ -422,7 +422,7 @@ public class PaymentDaoImpl extends SpringWrapper implements PaymentDao {
 	private Properties getPayPalProperties() {
 		if (payPalProperties == null) {
 			Properties p = new Properties();
-			if (ServerContext.isLive()) {
+			if (ServerContext.isProduction()) {
 				// account email: paugros@citrusgroups.com
 				// p.setProperty("acct1.UserName", "paugros_api1.citrusgroups.com");
 				// p.setProperty("acct1.Password", "3ZTN3RH82WUQZB5G");

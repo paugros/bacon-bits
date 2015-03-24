@@ -120,7 +120,7 @@ public class Mailer {
 
 			String bodyText, subjectText;
 
-			if (ServerContext.isLive()) {
+			if (ServerContext.isProduction()) {
 				InternetAddress[] recipientTo = getAddresses(tos);
 				message.setRecipients(Message.RecipientType.TO, recipientTo);
 				if (!ccs.isEmpty()) {

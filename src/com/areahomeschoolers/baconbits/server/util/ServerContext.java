@@ -39,8 +39,8 @@ public class ServerContext implements ApplicationContextAware {
 	private static ApplicationContext ctx = null;
 	// tl holds all thread-specific data
 	private static ThreadLocal<ServerContext> tl = new ThreadLocal<ServerContext>();
-	private static boolean isLiveIsSet;
-	private static boolean isLive;
+	private static boolean isProductionIsSet;
+	private static boolean isProduction;
 	private static MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
 
 	static {
@@ -58,9 +58,9 @@ public class ServerContext implements ApplicationContextAware {
 	/**
 	 * Returns server-side equivalent of GWT.getHostPageBaseURL() with the gwt.codesrv parameter, if present. <b>NOTE:</b> because the return value may contain
 	 * the code server parameter, it is not possible to use this method in links that contain paths.
-	 * 
+	 *
 	 * @return String in the form of "[scheme]://[host][:protocol]/[?gwt.codesvr=[host:port]]"
-	 * 
+	 *
 	 */
 	public static String getBaseUrl() {
 		return getBaseUrlWithoutSeparator() + Constants.URL_SEPARATOR;
@@ -73,7 +73,7 @@ public class ServerContext implements ApplicationContextAware {
 			url += ":" + port;
 		}
 
-		if (!isLive()) {
+		if (!isProduction()) {
 			url += "?gwt.codesvr=127.0.0.1:9997";
 		}
 		url += "/" + Constants.URL_SEPARATOR;
@@ -227,12 +227,17 @@ public class ServerContext implements ApplicationContextAware {
 		return getCurrentOrg().isCitrus();
 	}
 
-	public static boolean isLive() {
-		if (isLiveIsSet) {
-			return isLive;
+	public static boolean isPhantomJsRequest() {
+		String agent = tl.get().request.getHeader("User-Agent");
+		return (agent != null && agent.contains("PhantomJsCloud"));
+	}
+
+	public static boolean isProduction() {
+		if (isProductionIsSet) {
+			return isProduction;
 		}
 
-		isLive = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production;
+		isProduction = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production;
 
 		String version = SystemProperty.applicationVersion.get();
 		if (version == null) {
@@ -240,17 +245,12 @@ public class ServerContext implements ApplicationContextAware {
 		}
 
 		if (!version.contains(Constants.PRODUCTION_VERSION)) {
-			isLive = false;
+			isProduction = false;
 		}
 
-		isLiveIsSet = true;
+		isProductionIsSet = true;
 
-		return isLive;
-	}
-
-	public static boolean isPhantomJsRequest() {
-		String agent = tl.get().request.getHeader("User-Agent");
-		return (agent != null && agent.contains("PhantomJsCloud"));
+		return isProduction;
 	}
 
 	public static boolean isSystemAdministrator() {
@@ -306,7 +306,7 @@ public class ServerContext implements ApplicationContextAware {
 
 	/**
 	 * Called after successful authentication, pulls current user from db and puts it in session
-	 * 
+	 *
 	 * @param username
 	 *            Authenticated user's username
 	 */

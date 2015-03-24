@@ -270,8 +270,8 @@ public final class Application implements ValueChangeHandler<String> {
 		return inactivityManager.isIdle();
 	}
 
-	public static boolean isLive() {
-		return applicationData.isLive();
+	public static boolean isProduction() {
+		return applicationData.isProduction();
 	}
 
 	public static boolean isSystemAdministrator() {

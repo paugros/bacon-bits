@@ -74,7 +74,7 @@ public class LoginServiceImpl extends GwtController implements LoginService {
 			ap.setCurrentLat(ServerContext.getCurrentLat());
 			ap.setCurrentLng(ServerContext.getCurrentLng());
 		}
-		ap.setLive(ServerContext.isLive());
+		ap.setLive(ServerContext.isProduction());
 
 		// UserDao userDao = ServerContext.getDaoImpl("user");
 		// ap.setDynamicMenuItems(userDao.getMenuItems(new ArgMap<UserArg>(UserArg.ORGANIZATION_ID, ServerContext.getCurrentOrgId())));

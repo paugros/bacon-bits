@@ -65,7 +65,7 @@ public class IpnServlet extends HttpServlet implements ServletContextAware, Cont
 				params.append("&" + name + "=" + URLEncoder.encode(value, encoding));
 			}
 
-			if (!ServerContext.isLive()) {
+			if (!ServerContext.isProduction()) {
 				processPayment(request, params.toString());
 				return null;
 			}

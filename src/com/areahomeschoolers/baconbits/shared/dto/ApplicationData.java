@@ -73,7 +73,7 @@ public class ApplicationData implements IsSerializable {
 		return userPreferences;
 	}
 
-	public boolean isLive() {
+	public boolean isProduction() {
 		return isLive;
 	}
 

@@ -10,7 +10,7 @@ public class DataSourceFactory {
 	public DataSource createDataSource() {
 		BasicDataSource ds = new BasicDataSource();
 
-		String db = ServerContext.isLive() ? "areahomeschoolers" : "development";
+		String db = ServerContext.isProduction() ? "areahomeschoolers" : "development";
 		ds.setUrl("jdbc:google:rdbms://baconbits-sql:" + db + "/baconbits");
 		ds.setValidationQuery("select max(id) from articles");
 		ds.setTestWhileIdle(true);

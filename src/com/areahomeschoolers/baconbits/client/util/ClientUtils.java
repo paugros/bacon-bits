@@ -34,7 +34,7 @@ public abstract class ClientUtils {
 	public static final List<Character> ALLOWED_KEY_CODES = Collections.unmodifiableList(Arrays.asList(PRIVATE_ALLOWED_KEY_CODES));
 
 	public final static String createDocumentUrl(int documentId, String fileExtension) {
-		if (Application.isLive()) {
+		if (Application.isProduction()) {
 			return Constants.GCS_PREFIX + Integer.toString(documentId) + "." + fileExtension;
 		}
 
