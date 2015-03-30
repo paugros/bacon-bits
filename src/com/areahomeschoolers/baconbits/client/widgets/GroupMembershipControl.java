@@ -29,17 +29,17 @@ public class GroupMembershipControl {
 
 	public Widget createAdminWidget(final Command onUpdate) {
 		if (!Application.administratorOf(userGroup)) {
-			return new Label(Common.yesNo(userGroup.getAdministrator()));
+			return new Label(Common.yesNo(user.administratorOf(userGroup.getId())));
 		}
-		return new ClickLabel(Common.yesNo(userGroup.getAdministrator()), new ClickHandler() {
+		return new ClickLabel(Common.yesNo(user.administratorOf(userGroup.getId())), new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				String action = userGroup.getAdministrator() ? "Revoke" : "Grant";
+				String action = user.administratorOf(userGroup.getId()) ? "Revoke" : "Grant";
 				String confirm = action + " administrator access for " + user.getFullName() + " in the " + userGroup.getGroupName() + " group?";
 				ConfirmDialog.confirm(confirm, new ConfirmHandler() {
 					@Override
 					public void onConfirm() {
-						boolean admin = !userGroup.getAdministrator();
+						boolean admin = !user.administratorOf(userGroup.getId());
 						userGroup.setAdministrator(admin);
 						// user.getGroups().get(userGroup.getId()).setAdministrator(admin);
 						userService.updateUserGroupRelation(user, userGroup, true, new Callback<Void>(false) {

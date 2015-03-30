@@ -129,6 +129,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 			User u = createUser(rs, true);
 			u.setGroupApproved(rs.getBoolean("groupApproved"));
 			u.setUserApproved(rs.getBoolean("userApproved"));
+			GroupData ug = new GroupData();
+			ug.setAdministrator(rs.getBoolean("isAdministrator"));
+			u.getGroups().put(rs.getInt("groupId"), ug);
 			return u;
 		}
 	}
@@ -564,7 +567,7 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 		}
 
 		if (groupId > 0) {
-			groupCols += "ugm.userApproved, ugm.groupApproved, ";
+			groupCols += "ugm.userApproved, ugm.groupApproved, ugm.isAdministrator, ugm.groupId, \n";
 		}
 
 		String sql = createSqlBase(groupCols);
@@ -1184,6 +1187,9 @@ public class UserDaoImpl extends SpringWrapper implements UserDao, Suggestible {
 						body += "<a href=\"" + ServerContext.getBaseUrlWithCodeServer() + "\">";
 						body += g.getGroupName() + "</a> has been approved.";
 					} else {
+						if (ServerContext.getCurrentUserId() != u.getId()) {
+							return;
+						}
 						// email group
 						m.addTo(getAdminsForGroup(g));
 						subject += u.getFullName();

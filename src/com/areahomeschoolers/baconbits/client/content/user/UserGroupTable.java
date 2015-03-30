@@ -157,7 +157,7 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 							return new GroupMembershipControl(user, item).createApprovalWidget(new Command() {
 								@Override
 								public void execute() {
-									refresh();
+									populate();
 								}
 							});
 						}
@@ -179,7 +179,7 @@ public final class UserGroupTable extends EntityCellTable<UserGroup, UserGroupAr
 							return new GroupMembershipControl(user, item).createAdminWidget(new Command() {
 								@Override
 								public void execute() {
-									refresh();
+									populate();
 								}
 							});
 						}
